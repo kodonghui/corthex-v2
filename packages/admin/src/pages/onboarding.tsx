@@ -107,8 +107,8 @@ const STEPS = [
 ]
 
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
-  manager: { label: 'Manager', color: 'bg-[#556B2F]/10 text-[#556B2F]' },
-  specialist: { label: 'Specialist', color: 'bg-[#5a7247]/10 text-[#5a7247]' },
+  manager: { label: 'Manager', color: 'bg-corthex-accent-deep/10 text-corthex-accent-deep' },
+  specialist: { label: 'Specialist', color: 'bg-corthex-accent/10 text-corthex-accent' },
   worker: { label: 'Worker', color: 'bg-gray-100 text-gray-600' },
 }
 

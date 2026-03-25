@@ -589,7 +589,7 @@ export function OpsLogPage() {
                               checked={selectedIds.has(item.id)}
                               onChange={(e) => { e.stopPropagation(); toggleSelect(item.id) }}
                               disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                              className="w-3.5 h-3.5 rounded accent-[#606C38]"
+                              className="w-3.5 h-3.5 rounded accent-corthex-accent"
                               onClick={(e) => e.stopPropagation()}
                             />
                             <StatusBadge status={item.status} />

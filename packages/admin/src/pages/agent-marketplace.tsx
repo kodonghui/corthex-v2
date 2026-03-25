@@ -26,7 +26,7 @@ function tierColor(tier: string | null) {
   if (!tier) return 'bg-slate-700 text-slate-300'
   const map: Record<string, string> = {
     manager: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-    specialist: 'bg-[#5a7247]/20 text-[#a3c48a] border border-[#5a7247]/30',
+    specialist: 'bg-corthex-accent/20 text-corthex-accent-hover border border-corthex-accent/30',
     worker: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
   }
   return map[tier] || 'bg-slate-700 text-slate-300'
@@ -112,7 +112,7 @@ function MarketPreviewModal({
           <button
             onClick={onImport}
             disabled={importing}
-            className="bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg px-5 py-2 transition-colors"
+            className="bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg px-5 py-2 transition-colors"
           >
             {importing ? '가져오는 중...' : '가져오기'}
           </button>
@@ -136,7 +136,7 @@ function MarketCard({
     <div
       data-testid={`marketplace-card-${template.id}`}
       onClick={onClick}
-      className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 cursor-pointer hover:border-[#5a7247]/50 hover:bg-slate-800 transition-all duration-200"
+      className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 cursor-pointer hover:border-corthex-accent/50 hover:bg-slate-800 transition-all duration-200"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-base font-semibold text-slate-50 line-clamp-1">
@@ -223,12 +223,12 @@ export function AgentMarketplacePage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="템플릿 검색..."
-          className="flex-1 bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition-colors"
+          className="flex-1 bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition-colors"
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[160px]"
+          className="bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[160px]"
         >
           <option value="">전체 카테고리</option>
           {categories.map((cat) => (
@@ -238,7 +238,7 @@ export function AgentMarketplacePage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-1 focus:ring-[#5a7247] rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[130px]"
+          className="bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[130px]"
         >
           <option value="">전체 티어</option>
           <option value="manager">매니저</option>

@@ -160,16 +160,16 @@ export function AgoraPage() {
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tight text-[#1a1a1a] mb-3">
+            <h1 className="text-5xl md:text-6xl font-black tracking-tight text-corthex-text-primary mb-3">
               아고라 Agora
             </h1>
-            <p className="text-[#6b705c] text-lg">
+            <p className="text-corthex-text-secondary text-lg">
               팀 토론과 아이디어를 공유하는 공간입니다
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 bg-[#606C38] hover:bg-[#4e5a2b] text-white px-6 py-3.5 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-[#606C38]/10"
+            className="inline-flex items-center gap-2 bg-corthex-accent hover:bg-corthex-accent-deep text-white px-6 py-3.5 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-corthex-accent/10"
           >
             <Plus className="w-5 h-5" />
             새 토론 시작 New Thread
@@ -184,8 +184,8 @@ export function AgoraPage() {
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors ${
                 activeCategory === cat
-                  ? 'bg-[#606C38] text-white'
-                  : 'bg-[#f5f0e8] text-[#6b705c] border border-[#e5e1d3] hover:bg-[#f0ebe0]'
+                  ? 'bg-corthex-accent text-white'
+                  : 'bg-corthex-elevated text-corthex-text-secondary border border-corthex-border hover:bg-corthex-elevated'
               }`}
             >
               {cat}
@@ -200,17 +200,17 @@ export function AgoraPage() {
             return (
               <article
                 key={thread.id}
-                className={`group rounded-xl p-6 transition-all hover:bg-[#f0ebe0] cursor-pointer ${
+                className={`group rounded-xl p-6 transition-all hover:bg-corthex-elevated cursor-pointer ${
                   thread.pinned
-                    ? 'bg-[#f5f0e8] border-l-4 border-[#b45309]'
-                    : 'bg-[#f5f0e8] border border-[#e5e1d3]'
+                    ? 'bg-corthex-elevated border-l-4 border-amber-700'
+                    : 'bg-corthex-elevated border border-corthex-border'
                 }`}
               >
                 {/* Pinned badge */}
                 {thread.pinned && (
                   <div className="flex items-center gap-2 mb-3">
-                    <Pin className="w-3.5 h-3.5 text-[#b45309]" />
-                    <span className="bg-[#fef3c7] text-[#b45309] px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">
+                    <Pin className="w-3.5 h-3.5 text-amber-700" />
+                    <span className="bg-[#fef3c7] text-amber-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">
                       고정 Pinned
                     </span>
                   </div>
@@ -218,11 +218,11 @@ export function AgoraPage() {
 
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                   <div className="flex-1">
-                    <h2 className="text-xl font-bold text-[#1a1a1a] mb-2 group-hover:text-[#606C38] transition-colors">
+                    <h2 className="text-xl font-bold text-corthex-text-primary mb-2 group-hover:text-corthex-accent transition-colors">
                       {thread.title}
                     </h2>
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-medium text-[#1a1a1a]">{thread.author}</span>
+                      <span className="text-sm font-medium text-corthex-text-primary">{thread.author}</span>
                       <span
                         className="px-2 py-0.5 rounded text-[10px] font-bold"
                         style={{ backgroundColor: `${catColor.bg}10`, color: catColor.text }}
@@ -230,10 +230,10 @@ export function AgoraPage() {
                         {thread.category}
                       </span>
                     </div>
-                    <p className="text-[#6b705c] line-clamp-2 mb-4 leading-relaxed">
+                    <p className="text-corthex-text-secondary line-clamp-2 mb-4 leading-relaxed">
                       {thread.preview}
                     </p>
-                    <div className="flex flex-wrap items-center gap-6 text-[#756e5a] text-xs">
+                    <div className="flex flex-wrap items-center gap-6 text-corthex-text-secondary text-xs">
                       <div className="flex items-center gap-1.5">
                         <MessageSquare className="w-4 h-4" />
                         <span>답글 {thread.replies}개</span>
@@ -256,22 +256,22 @@ export function AgoraPage() {
 
         {/* Pagination */}
         <footer className="flex justify-center items-center mt-12 gap-2 pb-10">
-          <button className="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg transition-colors">
+          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 flex items-center justify-center bg-[#606C38] text-white rounded-lg font-bold shadow-md shadow-[#606C38]/20">
+          <button className="w-10 h-10 flex items-center justify-center bg-corthex-accent text-white rounded-lg font-bold shadow-md shadow-corthex-accent/20">
             1
           </button>
           {[2, 3].map((n) => (
-            <button key={n} className="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg font-semibold transition-colors">
+            <button key={n} className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg font-semibold transition-colors">
               {n}
             </button>
           ))}
-          <span className="w-10 h-10 flex items-center justify-center text-[#6b705c]">...</span>
-          <button className="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg font-semibold transition-colors">
+          <span className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary">...</span>
+          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg font-semibold transition-colors">
             12
           </button>
-          <button className="w-10 h-10 flex items-center justify-center text-[#6b705c] hover:bg-[#f5f0e8] rounded-lg transition-colors">
+          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors">
             <ChevronRight className="w-5 h-5" />
           </button>
         </footer>

@@ -57,7 +57,7 @@ type Comment = {
 }
 
 const STATUS_STYLES: Record<string, { label: string; bgClass: string; textClass: string }> = {
-  draft: { label: 'Draft', bgClass: 'bg-[#f0ebe0]', textClass: 'text-[#6b705c]' },
+  draft: { label: 'Draft', bgClass: 'bg-corthex-elevated', textClass: 'text-corthex-text-secondary' },
   submitted: { label: 'Submitted', bgClass: 'bg-amber-100', textClass: 'text-amber-700' },
   reviewed: { label: 'Reviewed', bgClass: 'bg-green-100', textClass: 'text-green-700' },
 }
@@ -265,17 +265,17 @@ export function ReportsPage() {
     }
   }
 
-  const inputClass = 'w-full bg-white border border-[#e5e1d3] focus:border-[#606C38] text-[#1a1a1a] rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#606C38]/20 focus:outline-none'
+  const inputClass = 'w-full bg-white border border-corthex-border focus:border-corthex-accent text-corthex-text-primary rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-corthex-accent/20 focus:outline-none'
 
   // === Create view ===
   if (view === 'create') {
     return (
       <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
-        <div className="px-8 py-4 border-b border-[#e5e1d3] flex items-center gap-3 bg-white">
-          <button onClick={handleBack} className="text-sm text-[#6b705c] hover:text-[#6b705c]" data-testid="back-btn">
+        <div className="px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-white">
+          <button onClick={handleBack} className="text-sm text-corthex-text-secondary hover:text-corthex-text-secondary" data-testid="back-btn">
             &larr; 목록
           </button>
-          <h2 className="text-lg font-semibold text-[#1a1a1a]">새 보고서</h2>
+          <h2 className="text-lg font-semibold text-corthex-text-primary">새 보고서</h2>
         </div>
         <div className="flex-1 overflow-y-auto px-12 py-8 max-w-2xl mx-auto w-full space-y-4">
           <input
@@ -307,7 +307,7 @@ export function ReportsPage() {
             >
               {createReport.isPending ? '저장 중...' : '초안 저장'}
             </button>
-            <button onClick={handleBack} className="text-[#6b705c] hover:text-[#6b705c] text-sm px-5 py-2.5">
+            <button onClick={handleBack} className="text-corthex-text-secondary hover:text-corthex-text-secondary text-sm px-5 py-2.5">
               취소
             </button>
           </div>
@@ -324,8 +324,8 @@ export function ReportsPage() {
           {/* Dashboard Content */}
           <div className="flex-1 flex overflow-hidden">
             {/* Report List Column */}
-            <div className="w-1/3 border-r border-[#e5e1d3] flex flex-col overflow-hidden bg-[#f5f0e8]/50">
-              <div className="p-4 flex gap-2 overflow-x-auto shrink-0 border-b border-[#e5e1d3]">
+            <div className="w-1/3 border-r border-corthex-border flex flex-col overflow-hidden bg-corthex-elevated/50">
+              <div className="p-4 flex gap-2 overflow-x-auto shrink-0 border-b border-corthex-border">
                 {filterTabs.map(tab => (
                   <button
                     key={tab.value}
@@ -333,7 +333,7 @@ export function ReportsPage() {
                     className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                       activeTab === tab.value
                         ? 'text-white'
-                        : 'bg-white border border-[#e5e1d3] text-[#6b705c]'
+                        : 'bg-white border border-corthex-border text-corthex-text-secondary'
                     }`}
                     style={activeTab === tab.value ? { backgroundColor: accentColor } : {}}
                   >
@@ -344,10 +344,10 @@ export function ReportsPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {isLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-4 bg-white rounded-xl h-24 animate-pulse border border-[#e5e1d3]" />
+                    <div key={i} className="p-4 bg-white rounded-xl h-24 animate-pulse border border-corthex-border" />
                   ))
                 ) : filteredReports.length === 0 ? (
-                  <div className="text-center py-16 text-sm text-[#756e5a]" data-testid="reports-empty">
+                  <div className="text-center py-16 text-sm text-corthex-text-secondary" data-testid="reports-empty">
                     보고서가 없습니다
                   </div>
                 ) : (
@@ -361,7 +361,7 @@ export function ReportsPage() {
                         className={`p-4 bg-white rounded-xl transition-all cursor-pointer shadow-sm ${
                           isSelected
                             ? 'border-2 ring-1'
-                            : 'border border-[#e5e1d3] hover:border-stone-400'
+                            : 'border border-corthex-border hover:border-stone-400'
                         }`}
                         style={isSelected ? { borderColor: accentColor, boxShadow: `0 0 0 1px ${accentColor}1a` } : {}}
                         data-testid={`report-item-${r.id}`}
@@ -370,12 +370,12 @@ export function ReportsPage() {
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bgClass} ${style.textClass}`}>
                             {style.label}
                           </span>
-                          <span className="text-[10px] text-[#756e5a] font-medium">
+                          <span className="text-[10px] text-corthex-text-secondary font-medium">
                             {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
                           </span>
                         </div>
-                        <h3 className="font-bold text-[#1a1a1a] mb-1 leading-tight">{r.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-[#6b705c]">
+                        <h3 className="font-bold text-corthex-text-primary mb-1 leading-tight">{r.title}</h3>
+                        <div className="flex items-center gap-2 text-xs text-corthex-text-secondary">
                           <Wrench className="w-4 h-4" />
                           <span>Agent: {r.authorName}</span>
                         </div>
@@ -389,26 +389,26 @@ export function ReportsPage() {
             {/* Report Detail Viewer */}
             <div className="flex-1 flex flex-col overflow-hidden bg-white">
               {!selectedReport || !report ? (
-                <div className="flex-1 flex items-center justify-center text-[#756e5a] text-sm">
+                <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
                   보고서를 선택하세요
                 </div>
               ) : (
                 <>
                   {/* Detail Header Actions */}
-                  <div className="px-8 py-4 border-b border-[#e5e1d3] flex justify-between items-center bg-[#f5f0e8]/30">
+                  <div className="px-8 py-4 border-b border-corthex-border flex justify-between items-center bg-corthex-elevated/30">
                     <div className="flex gap-4">
                       {report.status !== 'draft' && (
-                        <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors">
+                        <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors">
                           <Download className="w-5 h-5" />
                         </button>
                       )}
                       {report.status !== 'draft' && (
-                        <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors">
+                        <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors">
                           <Share2 className="w-5 h-5" />
                         </button>
                       )}
                       {isMyReport && report.status === 'draft' && (
-                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-[#f0ebe0] rounded-lg transition-colors text-red-500">
+                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors text-red-500">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       )}
@@ -418,7 +418,7 @@ export function ReportsPage() {
                         <>
                           <button
                             onClick={handleStartEdit}
-                            className="px-4 py-2 bg-[#f0ebe0] text-[#6b705c] rounded-xl text-sm font-bold hover:bg-[#f0ebe0] transition-colors"
+                            className="px-4 py-2 bg-corthex-elevated text-corthex-text-secondary rounded-xl text-sm font-bold hover:bg-corthex-elevated transition-colors"
                             data-testid="edit-btn"
                           >
                             Request Edit
@@ -474,7 +474,7 @@ export function ReportsPage() {
                           >
                             {updateReport.isPending ? '저장 중...' : '저장'}
                           </button>
-                          <button onClick={() => setEditMode(false)} className="text-[#6b705c] hover:text-[#6b705c] text-sm px-4 py-2">
+                          <button onClick={() => setEditMode(false)} className="text-corthex-text-secondary hover:text-corthex-text-secondary text-sm px-4 py-2">
                             취소
                           </button>
                         </div>
@@ -483,17 +483,17 @@ export function ReportsPage() {
                       <>
                         <div className="space-y-4">
                           <h1 className="text-4xl leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{report.title}</h1>
-                          <div className="flex items-center gap-6 py-4 border-y border-[#e5e1d3]/50">
+                          <div className="flex items-center gap-6 py-4 border-y border-corthex-border/50">
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Created Date</span>
+                              <span className="text-[10px] text-corthex-text-secondary uppercase tracking-widest font-bold">Created Date</span>
                               <span className="text-sm font-medium">{new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Authoring Agent</span>
+                              <span className="text-[10px] text-corthex-text-secondary uppercase tracking-widest font-bold">Authoring Agent</span>
                               <span className="text-sm font-medium">{report.authorName}</span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-[10px] text-[#756e5a] uppercase tracking-widest font-bold">Status</span>
+                              <span className="text-[10px] text-corthex-text-secondary uppercase tracking-widest font-bold">Status</span>
                               <span className="text-sm font-medium" style={{ color: accentColor }}>{STATUS_STYLES[report.status]?.label ?? report.status}</span>
                             </div>
                           </div>
@@ -503,7 +503,7 @@ export function ReportsPage() {
                         <div className="prose prose-neutral max-w-none space-y-6">
                           <MarkdownRenderer
                             content={report.content || '(내용 없음)'}
-                            className="prose prose-neutral max-w-none text-[#6b705c] text-sm leading-relaxed"
+                            className="prose prose-neutral max-w-none text-corthex-text-secondary text-sm leading-relaxed"
                           />
                         </div>
 
@@ -514,7 +514,7 @@ export function ReportsPage() {
                               <Lightbulb className="w-5 h-5" />
                               AI Recommendation
                             </h4>
-                            <p className="text-sm italic text-[#6b705c]">
+                            <p className="text-sm italic text-corthex-text-secondary">
                               "This report contains actionable insights. Consider sharing with relevant department heads for review."
                             </p>
                           </div>
@@ -524,7 +524,7 @@ export function ReportsPage() {
 
                     {/* CEO Feedback Section */}
                     {report.status !== 'draft' && (
-                      <div className="mt-16 pt-8 border-t border-[#e5e1d3]">
+                      <div className="mt-16 pt-8 border-t border-corthex-border">
                         <h3 className="text-xl mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>CEO Feedback &amp; Comments</h3>
                         <div className="space-y-4">
                           {remainingComments > 0 && (
@@ -535,29 +535,29 @@ export function ReportsPage() {
 
                           {comments.map((c) => (
                             <div key={c.id} className="flex gap-4">
-                              <div className="w-10 h-10 rounded-full bg-[#e5e1d3] overflow-hidden shrink-0 border border-[#d4cfc4] flex items-center justify-center text-[#6b705c] text-xs font-bold">
+                              <div className="w-10 h-10 rounded-full bg-corthex-border overflow-hidden shrink-0 border border-corthex-border-strong flex items-center justify-center text-corthex-text-secondary text-xs font-bold">
                                 {c.authorName[0]?.toUpperCase() ?? 'U'}
                               </div>
-                              <div className="flex-1 bg-[#f5f0e8] p-4 rounded-2xl rounded-tl-none">
+                              <div className="flex-1 bg-corthex-elevated p-4 rounded-2xl rounded-tl-none">
                                 <div className="flex justify-between items-center mb-1">
                                   <span className="font-bold text-sm">{c.authorName}
-                                    {c.authorId === user?.id && <span className="ml-2 text-[10px] bg-[#e5e1d3] px-1.5 py-0.5 rounded text-[#6b705c]">YOU</span>}
+                                    {c.authorId === user?.id && <span className="ml-2 text-[10px] bg-corthex-border px-1.5 py-0.5 rounded text-corthex-text-secondary">YOU</span>}
                                   </span>
-                                  <span className="text-[10px] text-[#756e5a]">
+                                  <span className="text-[10px] text-corthex-text-secondary">
                                     {new Date(c.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-[#6b705c] leading-relaxed">{c.content}</p>
+                                <p className="text-sm text-corthex-text-secondary leading-relaxed">{c.content}</p>
                               </div>
                             </div>
                           ))}
 
                           {/* Input Area */}
                           <div className="mt-6">
-                            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#756e5a] mb-2 px-1">Add your feedback</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary mb-2 px-1">Add your feedback</label>
                             <div className="relative">
                               <textarea
-                                className="w-full bg-white border-[#e5e1d3] rounded-2xl p-4 text-sm placeholder:text-[#756e5a] border"
+                                className="w-full bg-white border-corthex-border rounded-2xl p-4 text-sm placeholder:text-corthex-text-secondary border"
                                 placeholder="Write a comment..."
                                 rows={3}
                                 value={commentInput}
@@ -591,11 +591,11 @@ export function ReportsPage() {
       {/* ConfirmDialog: CEO 보고 */}
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-2">CEO에게 보고</h3>
-            <p className="text-xs text-[#6b705c] mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
+          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">CEO에게 보고</h3>
+            <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setConfirmOpen(false)} className="border border-[#d4cfc4] rounded-lg px-4 py-2 text-sm text-[#6b705c] hover:bg-[#f5f0e8]">취소</button>
+              <button onClick={() => setConfirmOpen(false)} className="border border-corthex-border-strong rounded-lg px-4 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated">취소</button>
               <button onClick={() => { setConfirmOpen(false); submitReport.mutate() }} className="text-white rounded-lg px-4 py-2 text-sm font-medium" style={{ backgroundColor: accentColor }}>보고하기</button>
             </div>
           </div>
@@ -605,11 +605,11 @@ export function ReportsPage() {
       {/* ConfirmDialog: 삭제 */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl p-6 w-96">
-            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-2">보고서 삭제</h3>
-            <p className="text-xs text-[#6b705c] mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
+          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+            <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">보고서 삭제</h3>
+            <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-[#d4cfc4] rounded-lg px-4 py-2 text-sm text-[#6b705c] hover:bg-[#f5f0e8]">취소</button>
+              <button onClick={() => setDeleteConfirmOpen(false)} className="border border-corthex-border-strong rounded-lg px-4 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated">취소</button>
               <button onClick={() => { setDeleteConfirmOpen(false); deleteReport.mutate() }} className="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm font-medium">삭제</button>
             </div>
           </div>

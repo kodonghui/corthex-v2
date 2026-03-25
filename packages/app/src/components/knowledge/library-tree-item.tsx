@@ -13,7 +13,7 @@ export function LibraryTreeItem({ label, icon, isExpanded, isActive, children }:
     return (
         <div className="group flex flex-col py-1">
             <div className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${isActive
-                    ? 'bg-[#5a7247]/10 text-[#5a7247] border border-[#5a7247]/20'
+                    ? 'bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20'
                     : 'hover:bg-stone-100/50 text-stone-600'
                 }`}>
                 {isExpanded ? <ChevronDown className={`w-4 h-4 ${isActive ? '' : 'text-stone-400'}`} /> : <ChevronRight className={`w-4 h-4 ${isActive ? '' : 'text-stone-400'}`} />}
@@ -37,7 +37,7 @@ export function LibraryTreeSubItem({ label, icon, isActive }: { label: string, i
                 ? 'bg-stone-100/80 text-slate-100'
                 : 'hover:bg-stone-100/50 text-stone-500'
             }`}>
-            <div className={`${isActive ? 'text-[#5a7247]' : ''}`}>
+            <div className={`${isActive ? 'text-corthex-accent' : ''}`}>
                 {icon}
             </div>
             <span className="text-sm font-medium select-none truncate">{label}</span>

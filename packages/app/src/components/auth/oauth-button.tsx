@@ -12,7 +12,7 @@ export function OAuthButton({ provider, onClick }: OAuthButtonProps) {
             type="button"
             onClick={onClick}
         >
-            <Bot className="w-5 h-5 text-[#D97757]" />
+            <Bot className="w-5 h-5 text-corthex-warning" />
             <span>{provider}로 로그인</span>
         </button>
     )

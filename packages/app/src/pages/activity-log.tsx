@@ -350,15 +350,15 @@ export function ActivityLogPage() {
   const alertCount24h = securityQuery.data?.data?.count24h ?? 0
 
   return (
-    <div className="flex-1 flex flex-col bg-[#faf8f5] overflow-hidden" data-testid="activity-log-page">
+    <div className="flex-1 flex flex-col bg-corthex-bg overflow-hidden" data-testid="activity-log-page">
       {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
         {/* Header Section */}
-        <header className="border-b border-[#e5e1d3] px-8 py-6 bg-white shrink-0" data-purpose="page-header">
+        <header className="border-b border-corthex-border px-8 py-6 bg-white shrink-0" data-purpose="page-header">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-[#283618]">Activity Log</h1>
-              <p className="text-sm mt-1 text-[#6b705c]">Audit trail for workspace events and operations.</p>
+              <h1 className="text-2xl font-bold text-corthex-accent-deep">Activity Log</h1>
+              <p className="text-sm mt-1 text-corthex-text-secondary">Audit trail for workspace events and operations.</p>
             </div>
             <div className="flex items-center gap-3">
               <WsStatusIndicator />
@@ -367,7 +367,7 @@ export function ActivityLogPage() {
                   <Search className="h-4 w-4" style={{ color: '#756e5a' }} />
                 </span>
                 <input
-                  className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-[#606C38] w-64 transition-all"
+                  className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-corthex-accent w-64 transition-all"
                   style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
                   placeholder="Search events..."
                   type="text"
@@ -381,7 +381,7 @@ export function ActivityLogPage() {
                   placeholder="Tool name filter..."
                   value={toolNameFilter}
                   onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-                  className="py-2 px-3 border rounded-lg text-sm w-40 transition-colors focus:ring-1 focus:ring-[#606C38]"
+                  className="py-2 px-3 border rounded-lg text-sm w-40 transition-colors focus:ring-1 focus:ring-corthex-accent"
                   style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
                   data-testid="tool-name-filter"
                 />
@@ -400,13 +400,13 @@ export function ActivityLogPage() {
                 </select>
               )}
               <button
-                className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-[#f0ebe0]"
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-corthex-elevated"
                 style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3', color: '#6b705c' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
                 Filters
               </button>
-              <button className="p-2 rounded-lg transition-colors hover:bg-[#4e5a2b]" style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
+              <button className="p-2 rounded-lg transition-colors hover:bg-corthex-accent-deep" style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
             </div>
@@ -605,7 +605,7 @@ function TimelineView({ items }: { items: AgentActivity[] }) {
                   }}
                 />
                 <div
-                  className="flex-1 bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                  className="flex-1 bg-corthex-elevated border border-corthex-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -658,7 +658,7 @@ function DelegationTimeline({ items }: { items: Delegation[] }) {
               }}
             />
             <div
-              className="flex-1 bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+              className="flex-1 bg-corthex-elevated border border-corthex-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">

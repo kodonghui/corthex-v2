@@ -55,12 +55,12 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
   return (
     <div data-testid="debate-list-panel" className="flex flex-col h-full">
       {/* Header */}
-      <div className="shrink-0 p-4 border-b border-[#5a7247]/10">
+      <div className="shrink-0 p-4 border-b border-corthex-accent/10">
         <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider">Debates</h3>
       </div>
 
       {/* Filter */}
-      <div className="shrink-0 px-4 py-2 border-b border-[#5a7247]/10">
+      <div className="shrink-0 px-4 py-2 border-b border-corthex-accent/10">
         <div className="flex gap-1">
           {(['all', 'in-progress', 'completed', 'failed'] as StatusFilter[]).map((f) => (
             <button
@@ -70,7 +70,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
               className={cn(
                 'text-[10px] px-2 py-1 rounded-full transition-colors',
                 filter === f
-                  ? 'bg-[#5a7247]/10 text-[#5a7247]'
+                  ? 'bg-corthex-accent/10 text-corthex-accent'
                   : 'text-stone-500 hover:text-stone-600',
               )}
             >
@@ -84,7 +84,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
       <div className="flex-1 overflow-y-auto">
         {isLoading && (
           <div className="flex items-center justify-center h-32">
-            <div className="w-5 h-5 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-stone-300 border-t-corthex-accent rounded-full animate-spin" />
           </div>
         )}
 
@@ -94,7 +94,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
             <p className="text-xs text-stone-400 mb-3">AGORA에서 에이전트 간 토론을 시작하세요</p>
             <button
               onClick={onCreateNew}
-              className="bg-[#5a7247]/20 hover:bg-[#5a7247]/30 text-[#5a7247] text-sm rounded-lg px-4 py-2 transition-colors flex items-center gap-2"
+              className="bg-corthex-accent/20 hover:bg-corthex-accent/30 text-corthex-accent text-sm rounded-lg px-4 py-2 transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               토론 시작
@@ -114,15 +114,15 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
               className={cn(
                 'w-full flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between cursor-pointer transition-colors border-l-4',
                 isSelected
-                  ? 'bg-[#5a7247]/10 border-[#5a7247]'
-                  : 'hover:bg-[#5a7247]/5 border-transparent',
+                  ? 'bg-corthex-accent/10 border-corthex-accent'
+                  : 'hover:bg-corthex-accent/5 border-transparent',
               )}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className={cn(
                   'flex items-center justify-center rounded shrink-0 w-10 h-10',
                   isActive
-                    ? 'bg-[#5a7247]/20 text-[#5a7247]'
+                    ? 'bg-corthex-accent/20 text-corthex-accent'
                     : 'bg-stone-100 text-stone-500',
                 )}>
                   {isActive ? <MessageCircle className="w-5 h-5" /> : <History className="w-5 h-5" />}
@@ -148,11 +148,11 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
       </div>
 
       {/* New Debate Button */}
-      <div className="mt-auto p-4 border-t border-[#5a7247]/10">
+      <div className="mt-auto p-4 border-t border-corthex-accent/10">
         <button
           data-testid="debate-create-btn"
           onClick={onCreateNew}
-          className="w-full py-2 px-4 rounded-lg bg-[#5a7247]/20 text-[#5a7247] hover:bg-[#5a7247]/30 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+          className="w-full py-2 px-4 rounded-lg bg-corthex-accent/20 text-corthex-accent hover:bg-corthex-accent/30 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           New Debate

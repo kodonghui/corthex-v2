@@ -43,21 +43,21 @@ function MobileStatsSummary() {
   const publishedCount = stats.byStatus.find((s) => s.status === 'published')?.count ?? 0
 
   return (
-    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#f5f0e8] via-[#f5f0e8] to-transparent pt-12 z-10 pointer-events-none">
-      <div className="bg-white rounded-xl shadow-lg border border-[#e5e1d3] p-4 pointer-events-auto">
-        <h3 className="text-xs font-semibold text-[#908a78] uppercase tracking-wider mb-3">This Week</h3>
-        <div className="flex justify-between items-center divide-x divide-[#e5e1d3]">
+    <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-corthex-elevated via-corthex-elevated to-transparent pt-12 z-10 pointer-events-none">
+      <div className="bg-white rounded-xl shadow-lg border border-corthex-border p-4 pointer-events-auto">
+        <h3 className="text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider mb-3">This Week</h3>
+        <div className="flex justify-between items-center divide-x divide-corthex-border">
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-[#1a1a1a] font-mono tabular-nums">{publishedCount}</span>
-            <span className="text-[10px] text-[#908a78] mt-1">Published</span>
+            <span className="text-2xl font-semibold text-corthex-text-primary font-mono tabular-nums">{publishedCount}</span>
+            <span className="text-[10px] text-corthex-text-secondary mt-1">Published</span>
           </div>
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold font-mono tabular-nums text-[#606C38]">{stats.total}</span>
-            <span className="text-[10px] text-[#908a78] mt-1">Total Content</span>
+            <span className="text-2xl font-semibold font-mono tabular-nums text-corthex-accent">{stats.total}</span>
+            <span className="text-[10px] text-corthex-text-secondary mt-1">Total Content</span>
           </div>
           <div className="flex flex-col items-center flex-1">
-            <span className="text-2xl font-semibold text-[#1a1a1a] font-mono tabular-nums">{stats.byPlatform.length}</span>
-            <span className="text-[10px] text-[#908a78] mt-1">Platforms</span>
+            <span className="text-2xl font-semibold text-corthex-text-primary font-mono tabular-nums">{stats.byPlatform.length}</span>
+            <span className="text-[10px] text-corthex-text-secondary mt-1">Platforms</span>
           </div>
         </div>
       </div>
@@ -173,10 +173,10 @@ export function SnsPage() {
         {/* Header */}
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-[#1a1a1a] mb-2">
-              소셜 피드 <span className="text-[#6b705c] font-medium">Social Feed</span>
+            <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary mb-2">
+              소셜 피드 <span className="text-corthex-text-secondary font-medium">Social Feed</span>
             </h1>
-            <p className="text-[#6b705c] text-lg">팀 소식과 업데이트를 공유합니다</p>
+            <p className="text-corthex-text-secondary text-lg">팀 소식과 업데이트를 공유합니다</p>
           </div>
           {/* Filter Chips */}
           <div className="flex flex-wrap gap-2">
@@ -185,8 +185,8 @@ export function SnsPage() {
                 key={chip}
                 className={`rounded-full px-5 py-2.5 font-semibold transition-all text-sm ${
                   i === 0
-                    ? 'bg-[#606C38] text-white shadow-sm'
-                    : 'border border-[#e5e1d3] text-[#6b705c] bg-white hover:bg-[#f5f0e8]'
+                    ? 'bg-corthex-accent text-white shadow-sm'
+                    : 'border border-corthex-border text-corthex-text-secondary bg-white hover:bg-corthex-elevated'
                 }`}
               >
                 {chip}
@@ -199,24 +199,24 @@ export function SnsPage() {
           {/* Left Sidebar */}
           <div className="hidden lg:block lg:col-span-3">
             <div className="sticky top-8 space-y-8">
-              <div className="bg-[#f5f0e8] p-8 rounded-xl border border-[#e5e1d3]/50">
-                <h3 className="text-sm font-mono uppercase tracking-widest text-[#756e5a] mb-4">Current Status</h3>
+              <div className="bg-corthex-elevated p-8 rounded-xl border border-corthex-border/50">
+                <h3 className="text-sm font-mono uppercase tracking-widest text-corthex-text-secondary mb-4">Current Status</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#4d7c0f]" />
-                    <span className="text-sm text-[#6b705c]">System Operational</span>
+                    <div className="w-2 h-2 rounded-full bg-corthex-accent" />
+                    <span className="text-sm text-corthex-text-secondary">System Operational</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-[#756e5a]">LATENCY:</span>
-                    <span className="text-xs font-mono text-[#606C38]">24ms</span>
+                    <span className="text-xs font-mono text-corthex-text-secondary">LATENCY:</span>
+                    <span className="text-xs font-mono text-corthex-accent">24ms</span>
                   </div>
                 </div>
               </div>
               <div className="px-4">
-                <h4 className="text-xs font-bold uppercase text-[#756e5a] mb-4">Trending Tags</h4>
+                <h4 className="text-xs font-bold uppercase text-corthex-text-secondary mb-4">Trending Tags</h4>
                 <div className="flex flex-wrap gap-2">
                   {['#Q1Growth', '#SecurityPlus', '#Efficiency'].map((tag) => (
-                    <span key={tag} className="text-sm text-[#606C38] hover:underline cursor-pointer">{tag}</span>
+                    <span key={tag} className="text-sm text-corthex-accent hover:underline cursor-pointer">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -226,33 +226,33 @@ export function SnsPage() {
           {/* Main Feed */}
           <div className="lg:col-span-9 xl:col-span-8">
             {/* Post Composer */}
-            <div className="bg-[#f5f0e8] rounded-xl p-6 mb-12 shadow-sm border border-[#e5e1d3] transition-all focus-within:ring-2 ring-[#606C38]/20">
+            <div className="bg-corthex-elevated rounded-xl p-6 mb-12 shadow-sm border border-corthex-border transition-all focus-within:ring-2 ring-corthex-accent/20">
               <div className="flex gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-[#283618] text-white flex items-center justify-center font-bold shrink-0">You</div>
+                <div className="w-12 h-12 rounded-full bg-corthex-accent-deep text-white flex items-center justify-center font-bold shrink-0">You</div>
                 <textarea
-                  className="w-full bg-transparent border-none focus:ring-0 text-[#1a1a1a] placeholder-[#756e5a] resize-none pt-2 text-lg"
+                  className="w-full bg-transparent border-none focus:ring-0 text-corthex-text-primary placeholder-corthex-text-secondary resize-none pt-2 text-lg"
                   placeholder="새 소식을 공유하세요... Share an update"
                   rows={2}
                 />
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-[#e5e1d3]">
+              <div className="flex items-center justify-between pt-4 border-t border-corthex-border">
                 <div className="flex gap-2">
-                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
                     <Image className="w-5 h-5" />
                     <span className="text-xs font-semibold">Image</span>
                   </button>
-                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
                     <Paperclip className="w-5 h-5" />
                     <span className="text-xs font-semibold">File</span>
                   </button>
-                  <button className="p-2 text-[#6b705c] hover:bg-[#f0ebe0] rounded-lg transition-colors flex items-center gap-1">
+                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
                     <BarChart2 className="w-5 h-5" />
                     <span className="text-xs font-semibold">Poll</span>
                   </button>
                 </div>
                 <button
                   onClick={() => toast.info('이 기능은 준비 중입니다')}
-                  className="bg-[#4d7c0f] hover:opacity-90 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95"
+                  className="bg-corthex-accent hover:opacity-90 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95"
                 >
                   게시 Post
                 </button>
@@ -266,25 +266,25 @@ export function SnsPage() {
                   key={post.id}
                   className={`rounded-xl p-8 shadow-sm border transition-shadow hover:shadow-md ${
                     post.isSystem
-                      ? 'bg-[#f0ebe0] border-l-4 border-l-[#2563eb] border-y border-r border-[#e5e1d3]'
-                      : 'bg-[#f5f0e8] border-[#e5e1d3]'
+                      ? 'bg-corthex-elevated border-l-4 border-l-corthex-info border-y border-r border-corthex-border'
+                      : 'bg-corthex-elevated border-corthex-border'
                   }`}
                 >
                   {/* Author Header */}
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex gap-4">
                       {post.isSystem ? (
-                        <div className="w-12 h-12 rounded-full bg-[#283618] flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-corthex-accent-deep flex items-center justify-center">
                           <Bot className="w-6 h-6 text-white" />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-[#606C38] text-white flex items-center justify-center font-bold text-lg">
+                        <div className="w-12 h-12 rounded-full bg-corthex-accent text-white flex items-center justify-center font-bold text-lg">
                           {post.author.charAt(0)}
                         </div>
                       )}
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-[#1a1a1a]">{post.author}</h3>
+                          <h3 className="font-bold text-corthex-text-primary">{post.author}</h3>
                           <span
                             className="px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold"
                             style={{ backgroundColor: post.badgeBg, color: post.badgeText }}
@@ -292,11 +292,11 @@ export function SnsPage() {
                             {post.badge}
                           </span>
                         </div>
-                        <p className="text-xs font-mono text-[#756e5a] mt-0.5">{post.timeAgo}</p>
+                        <p className="text-xs font-mono text-corthex-text-secondary mt-0.5">{post.timeAgo}</p>
                       </div>
                     </div>
                     {!post.isSystem && (
-                      <button className="text-[#756e5a] hover:bg-[#f0ebe0] rounded-full p-1">
+                      <button className="text-corthex-text-secondary hover:bg-corthex-elevated rounded-full p-1">
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                     )}
@@ -305,7 +305,7 @@ export function SnsPage() {
                   {/* Content */}
                   <div className="mb-6">
                     {post.securityBanner && (
-                      <div className="bg-[#283618] text-white p-4 rounded-lg mb-4 flex items-center gap-4">
+                      <div className="bg-corthex-accent-deep text-white p-4 rounded-lg mb-4 flex items-center gap-4">
                         <div className="text-3xl">{'\u{1F6E1}\u{FE0F}'}</div>
                         <div>
                           <p className="font-bold">{post.securityBanner.title}</p>
@@ -313,35 +313,35 @@ export function SnsPage() {
                         </div>
                       </div>
                     )}
-                    <p className={`text-[#6b705c] leading-relaxed ${post.isSystem ? 'font-semibold' : 'text-lg'}`}>
+                    <p className={`text-corthex-text-secondary leading-relaxed ${post.isSystem ? 'font-semibold' : 'text-lg'}`}>
                       {post.content}
                     </p>
                     {post.tags && (
                       <div className="flex gap-2 mt-4">
                         {post.tags.map((tag) => (
-                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-white/40 rounded border border-[#e5e1d3] text-[#2563eb]">
+                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-white/40 rounded border border-corthex-border text-corthex-info">
                             {tag}
                           </span>
                         ))}
                       </div>
                     )}
                     {post.file && (
-                      <div className="flex items-center gap-4 p-4 bg-white/50 border border-[#e5e1d3] rounded-lg cursor-pointer hover:bg-white transition-colors mt-4">
-                        <div className="bg-[#dc2626]/10 p-3 rounded-lg">
-                          <span className="text-[#dc2626] text-xl">{'\u{1F4C4}'}</span>
+                      <div className="flex items-center gap-4 p-4 bg-white/50 border border-corthex-border rounded-lg cursor-pointer hover:bg-white transition-colors mt-4">
+                        <div className="bg-red-600/10 p-3 rounded-lg">
+                          <span className="text-red-600 text-xl">{'\u{1F4C4}'}</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-bold text-[#1a1a1a]">{post.file.name}</p>
-                          <p className="text-xs text-[#756e5a] font-mono">{post.file.size} - {post.file.type}</p>
+                          <p className="text-sm font-bold text-corthex-text-primary">{post.file.name}</p>
+                          <p className="text-xs text-corthex-text-secondary font-mono">{post.file.size} - {post.file.type}</p>
                         </div>
-                        <Download className="w-5 h-5 text-[#756e5a]" />
+                        <Download className="w-5 h-5 text-corthex-text-secondary" />
                       </div>
                     )}
                     {post.stats && (
                       <div className="grid grid-cols-2 gap-4 mt-4">
                         {post.stats.map((stat) => (
-                          <div key={stat.label} className="bg-white/60 p-5 rounded-xl border border-[#e5e1d3]">
-                            <p className="text-[10px] uppercase tracking-tighter text-[#756e5a] font-bold mb-1">{stat.label}</p>
+                          <div key={stat.label} className="bg-white/60 p-5 rounded-xl border border-corthex-border">
+                            <p className="text-[10px] uppercase tracking-tighter text-corthex-text-secondary font-bold mb-1">{stat.label}</p>
                             <p className="text-2xl font-mono font-bold" style={{ color: stat.color }}>{stat.value}</p>
                           </div>
                         ))}
@@ -350,9 +350,9 @@ export function SnsPage() {
                   </div>
 
                   {/* Reactions */}
-                  <div className="flex items-center gap-6 pt-4 border-t border-[#e5e1d3]/60">
+                  <div className="flex items-center gap-6 pt-4 border-t border-corthex-border/60">
                     {post.reactions.map((r, i) => (
-                      <button key={i} className="flex items-center gap-2 text-sm text-[#6b705c] hover:text-[#606C38] transition-colors">
+                      <button key={i} className="flex items-center gap-2 text-sm text-corthex-text-secondary hover:text-corthex-accent transition-colors">
                         <span className="text-base">{r.emoji}</span>
                         <span className="font-mono">{r.count}</span>
                       </button>

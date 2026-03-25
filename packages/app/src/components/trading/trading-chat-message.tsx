@@ -15,7 +15,7 @@ export function TradingChatMessage({ isUser, message, time }: TradingChatMessage
                     <User className="w-[18px] h-[18px]" />
                 </div>
                 <div className="flex-1 flex flex-col items-end">
-                    <div className="bg-[#5a7247]/20 border border-[#5a7247]/30 rounded-lg p-3 text-slate-100">
+                    <div className="bg-corthex-accent/20 border border-corthex-accent/30 rounded-lg p-3 text-slate-100">
                         {message}
                     </div>
                     <span className="text-[10px] text-stone-500 mt-1 mr-1">{time}</span>
@@ -26,7 +26,7 @@ export function TradingChatMessage({ isUser, message, time }: TradingChatMessage
 
     return (
         <div className="flex gap-3">
-            <div className="w-8 h-8 rounded bg-[#5a7247]/20 flex-none flex items-center justify-center text-[#5a7247]">
+            <div className="w-8 h-8 rounded bg-corthex-accent/20 flex-none flex items-center justify-center text-corthex-accent">
                 <Bot className="w-[18px] h-[18px]" />
             </div>
             <div className="flex-1">

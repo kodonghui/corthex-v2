@@ -15,7 +15,7 @@ export function LogFilterBar() {
             </div>
             <div className="w-full md:w-72">
                 <label className="flex flex-col w-full h-10">
-                    <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-200 bg-white/50 focus-within:border-[#5a7247] transition-colors">
+                    <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-200 bg-white/50 focus-within:border-corthex-accent transition-colors">
                         <div className="text-stone-500 flex items-center justify-center pl-3">
                             <Search className="w-5 h-5" />
                         </div>

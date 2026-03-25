@@ -62,14 +62,14 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   online: 'bg-green-500',
-  working: 'bg-[#5a7247] animate-pulse',
+  working: 'bg-corthex-accent animate-pulse',
   error: 'bg-red-400',
   offline: 'bg-slate-300',
 }
 
 const TIER_BADGE: Record<string, string> = {
   manager: 'bg-amber-100 text-amber-800 border-amber-200',
-  specialist: 'bg-[#556B2F]/10 text-[#556B2F] border-[#556B2F]/20',
+  specialist: 'bg-corthex-accent-deep/10 text-corthex-accent-deep border-corthex-accent-deep/20',
   worker: 'bg-slate-100 text-slate-800 border-slate-200',
 }
 
@@ -93,7 +93,7 @@ const defaultCreateForm: CreateForm = {
 
 type DetailTab = 'soul' | 'config' | 'memory'
 
-const inputCls = 'w-full border-[#dce1cd] rounded-lg focus:ring-[#667447] focus:border-[#667447] py-2 text-sm'
+const inputCls = 'w-full border-corthex-border rounded-lg focus:ring-corthex-accent focus:border-corthex-accent py-2 text-sm'
 const selectCls = inputCls
 
 export function AgentsPage() {
@@ -325,7 +325,7 @@ export function AgentsPage() {
                   data-testid="agents-search-input"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-sm rounded-lg focus:ring-[#83935d] focus:border-[#83935d] bg-white"
+                  className="w-full pl-9 pr-4 py-2 text-sm rounded-lg focus:ring-corthex-accent focus:border-corthex-accent bg-white"
                   style={{ borderColor: '#dce1cd' }}
                   placeholder="Search agents..."
                   type="text"
@@ -367,7 +367,7 @@ export function AgentsPage() {
                       className={`bg-white p-4 rounded-xl shadow-sm cursor-pointer transition-all group ${
                         isSelected
                           ? 'border-2'
-                          : 'border hover:border-[#c2ccaa]'
+                          : 'border hover:border-corthex-border'
                       }`}
                       style={{
                         borderColor: isSelected ? '#a3b182' : '#dce1cd',
@@ -415,7 +415,7 @@ export function AgentsPage() {
                     className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
                       detailTab === 'soul'
                         ? 'font-bold'
-                        : 'hover:text-[#667447]'
+                        : 'hover:text-corthex-accent'
                     }`}
                     style={{
                       borderColor: detailTab === 'soul' ? '#667447' : 'transparent',
@@ -430,7 +430,7 @@ export function AgentsPage() {
                     className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
                       detailTab === 'config'
                         ? 'font-bold'
-                        : 'hover:text-[#667447]'
+                        : 'hover:text-corthex-accent'
                     }`}
                     style={{
                       borderColor: detailTab === 'config' ? '#667447' : 'transparent',
@@ -444,7 +444,7 @@ export function AgentsPage() {
                     className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
                       detailTab === 'memory'
                         ? 'font-bold'
-                        : 'hover:text-[#667447]'
+                        : 'hover:text-corthex-accent'
                     }`}
                     style={{
                       borderColor: detailTab === 'memory' ? '#667447' : 'transparent',
@@ -549,8 +549,8 @@ export function AgentsPage() {
                         <div className="space-y-2">
                           {(selectedAgent.allowedTools || []).map((tool) => (
                             <label key={tool} className="flex items-center gap-3 group cursor-pointer">
-                              <input defaultChecked type="checkbox" className="rounded text-[#667447] focus:ring-[#83935d]" style={{ borderColor: '#c2ccaa' }} />
-                              <span className="text-sm font-medium transition-colors group-hover:text-[#363d2a]" style={{ color: '#4e5938' }}>{tool}</span>
+                              <input defaultChecked type="checkbox" className="rounded text-corthex-accent focus:ring-corthex-accent" style={{ borderColor: '#c2ccaa' }} />
+                              <span className="text-sm font-medium transition-colors group-hover:text-corthex-accent-deep" style={{ color: '#4e5938' }}>{tool}</span>
                             </label>
                           ))}
                         </div>
@@ -567,7 +567,7 @@ export function AgentsPage() {
                                 onChange={(e) => handleCacheToggle(e.target.checked)}
                                 className="sr-only peer"
                               />
-                              <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#667447]" style={{ backgroundColor: editForm.enableSemanticCache ? '#667447' : '#dce1cd' }} />
+                              <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-corthex-accent" style={{ backgroundColor: editForm.enableSemanticCache ? '#667447' : '#dce1cd' }} />
                             </div>
                           </label>
                         </div>
@@ -712,7 +712,7 @@ export function AgentsPage() {
                       const tpl = soulTemplates.find((t) => t.id === e.target.value)
                       if (tpl) setForm({ ...form, soul: tpl.content })
                     }}
-                    className="w-full mb-2 border-[#dce1cd] rounded-lg text-xs py-1.5 focus:ring-[#667447] focus:border-[#667447]"
+                    className="w-full mb-2 border-corthex-border rounded-lg text-xs py-1.5 focus:ring-corthex-accent focus:border-corthex-accent"
                   >
                     <option value="">템플릿 불러오기...</option>
                     {soulTemplates.map((t) => <option key={t.id} value={t.id}>{t.isBuiltin ? '[기본] ' : ''}{t.name}</option>)}

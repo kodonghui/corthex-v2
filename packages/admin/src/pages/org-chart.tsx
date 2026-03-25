@@ -43,13 +43,13 @@ type OrgChartData = {
 // ============================================================
 const STATUS_CONFIG: Record<string, { color: string; pulse?: boolean; label: string }> = {
   online: { color: 'bg-emerald-500', label: '온라인' },
-  working: { color: 'bg-[#5a7247]', pulse: true, label: '작업 중' },
+  working: { color: 'bg-corthex-accent', pulse: true, label: '작업 중' },
   error: { color: 'bg-red-500', label: '오류' },
   offline: { color: 'bg-slate-500', label: '오프라인' },
 }
 
 const TIER_CONFIG: Record<string, { bg: string; label: string }> = {
-  manager: { bg: 'bg-[#283618] text-[#a3c48a]', label: 'Manager' },
+  manager: { bg: 'bg-corthex-accent-deep text-corthex-accent-hover', label: 'Manager' },
   specialist: { bg: 'bg-cyan-900 text-cyan-300', label: 'Specialist' },
   worker: { bg: 'bg-slate-700 text-slate-400', label: 'Worker' },
 }
@@ -138,7 +138,7 @@ function AgentDetailPanel({
               <select
                 value={moveDeptId}
                 onChange={(e) => setMoveDeptId(e.target.value)}
-                className="flex-1 px-2 py-1.5 text-sm border border-slate-600 rounded-lg bg-slate-800 text-slate-50 focus:ring-2 focus:ring-[#5a7247] focus:outline-none"
+                className="flex-1 px-2 py-1.5 text-sm border border-slate-600 rounded-lg bg-slate-800 text-slate-50 focus:ring-2 focus:ring-corthex-accent focus:outline-none"
               >
                 <option value="">미배속</option>
                 {departments.map((d) => (
@@ -148,7 +148,7 @@ function AgentDetailPanel({
               <button
                 onClick={handleMove}
                 disabled={!deptChanged || moveMutation.isPending}
-                className="px-3 py-1.5 text-xs bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                className="px-3 py-1.5 text-xs bg-corthex-accent hover:bg-corthex-accent disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
               >
                 {moveMutation.isPending ? '...' : '이동'}
               </button>
@@ -200,7 +200,7 @@ function AgentNode({ agent, onSelect }: { agent: OrgAgent; onSelect: (a: OrgAgen
   return (
     <button
       onClick={() => onSelect(agent)}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-[#5a7247] focus:outline-none focus:ring-2 focus:ring-[#5a7247]/40 transition-colors cursor-pointer w-full text-left"
+      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-corthex-accent focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 transition-colors cursor-pointer w-full text-left"
       data-testid={`agent-node-${agent.id}`}
     >
       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
@@ -225,25 +225,25 @@ function DepartmentSection({ dept, onSelectAgent }: { dept: OrgDept; onSelectAge
     <div className="ml-6 md:ml-10">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#283618]/30 border border-[#3a5a1c] hover:bg-[#283618]/40 transition-colors w-full text-left"
+        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-corthex-accent-deep/30 border border-corthex-accent-deep hover:bg-corthex-accent-deep/40 transition-colors w-full text-left"
         data-testid={`dept-${dept.id}`}
       >
-        <span className="text-xs text-[#a3c48a]">{expanded ? '▼' : '▶'}</span>
-        <span className="text-sm font-medium text-[#a3c48a]">{dept.name}</span>
-        {dept.description && <span className="text-xs text-[#7a9a62] truncate hidden sm:inline">— {dept.description}</span>}
-        <span className="text-xs px-1.5 py-0.5 rounded-full bg-[#3a5a1c] text-[#a3c48a] ml-auto flex-shrink-0">
+        <span className="text-xs text-corthex-accent-hover">{expanded ? '▼' : '▶'}</span>
+        <span className="text-sm font-medium text-corthex-accent-hover">{dept.name}</span>
+        {dept.description && <span className="text-xs text-corthex-accent truncate hidden sm:inline">— {dept.description}</span>}
+        <span className="text-xs px-1.5 py-0.5 rounded-full bg-corthex-accent-deep text-corthex-accent-hover ml-auto flex-shrink-0">
           {dept.agents.length}
         </span>
       </button>
       {expanded && dept.agents.length > 0 && (
-        <div className="ml-6 md:ml-10 mt-2 space-y-1.5 border-l-2 border-[#3a5a1c] pl-4">
+        <div className="ml-6 md:ml-10 mt-2 space-y-1.5 border-l-2 border-corthex-accent-deep pl-4">
           {dept.agents.map((agent) => (
             <AgentNode key={agent.id} agent={agent} onSelect={onSelectAgent} />
           ))}
         </div>
       )}
       {expanded && dept.agents.length === 0 && (
-        <div className="ml-6 md:ml-10 mt-2 border-l-2 border-[#3a5a1c] pl-4">
+        <div className="ml-6 md:ml-10 mt-2 border-l-2 border-corthex-accent-deep pl-4">
           <p className="text-xs text-slate-500 py-2">에이전트 없음</p>
         </div>
       )}
@@ -321,7 +321,7 @@ export function OrgChartPage() {
             <p className="text-sm text-red-500">조직도를 불러올 수 없습니다.</p>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2 text-sm rounded-lg bg-[#5a7247] text-white hover:bg-[#6b8a55] transition-colors"
+              className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"
             >
               다시 시도
             </button>
@@ -342,7 +342,7 @@ export function OrgChartPage() {
       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
         {/* Company root node */}
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-100 text-slate-900 mb-4">
-          <span className="w-8 h-8 rounded-lg bg-[#5a7247] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+          <span className="w-8 h-8 rounded-lg bg-corthex-accent text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
             {org.company.name.charAt(0)}
           </span>
           <span className="text-sm font-semibold">{org.company.name}</span>
@@ -357,7 +357,7 @@ export function OrgChartPage() {
             <p className="text-sm text-slate-500">아직 조직이 구성되지 않았습니다.</p>
             <button
               onClick={() => navigate('/org-templates')}
-              className="px-4 py-2 text-sm rounded-lg bg-[#5a7247] text-white hover:bg-[#6b8a55] transition-colors"
+              className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"
             >
               템플릿으로 시작하세요
             </button>

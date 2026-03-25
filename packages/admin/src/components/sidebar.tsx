@@ -67,7 +67,7 @@ function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
     <button
       onClick={handleSwitch}
       disabled={!companyId || switching}
-      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-[#a3c48a] bg-[#5a7247]/20 hover:bg-[#5a7247]/30"
+      className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-corthex-accent-hover bg-corthex-accent/20 hover:bg-corthex-accent/30"
     >
       <ArrowLeftRight className="w-4 h-4" />
       <span>{switching ? '전환 중...' : 'CEO 앱으로 전환'}</span>
@@ -101,15 +101,15 @@ export function Sidebar() {
   }, [selectedCompanyId, companies, setSelectedCompanyId])
 
   return (
-    <aside className="w-60 h-screen flex flex-col bg-[#283618] text-[#a3c48a]">
-      <div className="p-4 border-b border-[#3a5a1c]">
+    <aside className="w-60 h-screen flex flex-col bg-corthex-accent-deep text-corthex-accent-hover">
+      <div className="p-4 border-b border-corthex-accent-deep">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-[#5a7247] text-white flex items-center justify-center text-sm font-bold">
+          <div className="w-8 h-8 rounded-lg bg-corthex-accent text-white flex items-center justify-center text-sm font-bold">
             C
           </div>
           <div>
-            <p className="text-sm font-bold text-[#e5e1d3]">CORTHEX</p>
-            <p className="text-xs text-[#8fae7a]">Admin Console</p>
+            <p className="text-sm font-bold text-corthex-border">CORTHEX</p>
+            <p className="text-xs text-corthex-accent-hover">Admin Console</p>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export function Sidebar() {
           <select
             value={selectedCompanyId || ''}
             onChange={(e) => setSelectedCompanyId(e.target.value)}
-            className="w-full px-2 py-1.5 text-xs border border-[#3a5a1c] rounded-lg bg-[#1e2b12] text-[#e5e1d3] focus:ring-2 focus:ring-[#5a7247]/40 focus:outline-none"
+            className="w-full px-2 py-1.5 text-xs border border-corthex-accent-deep rounded-lg bg-corthex-accent-deep text-corthex-border focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
           >
             {companies.map((c) => (
               <option key={c.id} value={c.id}>
@@ -127,11 +127,11 @@ export function Sidebar() {
             ))}
           </select>
         ) : companiesLoading ? (
-          <div className="w-full px-2 py-1.5 text-xs text-[#8fae7a] animate-pulse">
+          <div className="w-full px-2 py-1.5 text-xs text-corthex-accent-hover animate-pulse">
             회사 로딩중...
           </div>
         ) : (
-          <div className="w-full px-2 py-1.5 text-xs text-[#8fae7a]/60">
+          <div className="w-full px-2 py-1.5 text-xs text-corthex-accent-hover/60">
             등록된 회사 없음
           </div>
         )}
@@ -148,8 +148,8 @@ export function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? 'bg-[#5a7247]/30 text-[#e5e1d3] font-medium'
-                    : 'text-[#a3c48a] hover:bg-[#5a7247]/20 hover:text-[#e5e1d3]'
+                    ? 'bg-corthex-accent/30 text-corthex-border font-medium'
+                    : 'text-corthex-accent-hover hover:bg-corthex-accent/20 hover:text-corthex-border'
                 }`
               }
             >
@@ -160,14 +160,14 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[#3a5a1c] space-y-2">
+      <div className="p-3 border-t border-corthex-accent-deep space-y-2">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               isActive
-                ? 'bg-[#5a7247]/30 text-[#e5e1d3] font-medium'
-                : 'text-[#a3c48a] hover:bg-[#5a7247]/20 hover:text-[#e5e1d3]'
+                ? 'bg-corthex-accent/30 text-corthex-border font-medium'
+                : 'text-corthex-accent-hover hover:bg-corthex-accent/20 hover:text-corthex-border'
             }`
           }
         >
@@ -177,17 +177,17 @@ export function Sidebar() {
         <SwitchToCeoButton companyId={selectedCompanyId} />
         <div className="flex items-center justify-between px-3 py-2">
           <div>
-            <p className="text-sm font-medium text-[#e5e1d3]">{user?.name}</p>
-            <p className="text-xs text-[#8fae7a]">{user?.role}</p>
+            <p className="text-sm font-medium text-corthex-border">{user?.name}</p>
+            <p className="text-xs text-corthex-accent-hover">{user?.role}</p>
           </div>
           <button
             onClick={logout}
-            className="text-xs text-[#8fae7a] hover:text-red-400 transition-colors"
+            className="text-xs text-corthex-accent-hover hover:text-red-400 transition-colors"
           >
             로그아웃
           </button>
         </div>
-        <div className="px-3 text-[10px] text-[#5a7247] font-mono">
+        <div className="px-3 text-[10px] text-corthex-accent font-mono">
           #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
         </div>
       </div>

@@ -11,7 +11,7 @@ export function Toolbar({ title = "NEXUS", subtitle = "Global Operations Network
         <header className="h-12 border-b border-slate-200 bg-white/50/50 backdrop-blur-md flex items-center justify-between px-4 z-10 flex-shrink-0">
             <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                    <Network className="text-[#5a7247] w-5 h-5" />
+                    <Network className="text-corthex-accent w-5 h-5" />
                     <h1 className="text-sm font-bold tracking-wide text-slate-900">{title}</h1>
                 </div>
                 <div className="w-px h-4 bg-slate-300 mx-2"></div>
@@ -35,12 +35,12 @@ export function Toolbar({ title = "NEXUS", subtitle = "Global Operations Network
                     <span className="text-xs font-medium text-stone-400">편집 모드</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                         <input className="sr-only peer" type="checkbox" />
-                        <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#5a7247]"></div>
+                        <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-corthex-accent"></div>
                     </label>
                 </div>
 
                 {/* Export Button */}
-                <button className="h-8 px-4 bg-[#5a7247]/10 hover:bg-[#5a7247]/20 text-[#5a7247] text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
+                <button className="h-8 px-4 bg-corthex-accent/10 hover:bg-corthex-accent/20 text-corthex-accent text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
                     <Download className="w-4 h-4" />
                     내보내기
                 </button>

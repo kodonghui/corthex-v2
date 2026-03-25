@@ -81,7 +81,7 @@ export function HumanPanel({
           href="/admin/employees"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-[#8fae7a] hover:text-[#a3c48a] underline"
+          className="text-xs text-corthex-accent-hover hover:text-corthex-accent-hover underline"
         >
           직원 관리에서 편집 →
         </a>

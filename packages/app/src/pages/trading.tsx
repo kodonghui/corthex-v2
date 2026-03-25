@@ -57,24 +57,24 @@ export function TradingPage() {
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <h1 className="text-4xl font-extrabold tracking-tighter text-[#1a1a1a]">트레이딩 Trading</h1>
-              <div className="flex items-center gap-2 px-3 py-1 bg-[#f5f0e8] rounded-full">
-                <span className="w-2 h-2 bg-[#4d7c0f] rounded-full animate-pulse" />
-                <span className="text-xs font-medium text-[#6b705c]">시장 개장 Market Open</span>
+              <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-text-primary">트레이딩 Trading</h1>
+              <div className="flex items-center gap-2 px-3 py-1 bg-corthex-elevated rounded-full">
+                <span className="w-2 h-2 bg-corthex-accent rounded-full animate-pulse" />
+                <span className="text-xs font-medium text-corthex-text-secondary">시장 개장 Market Open</span>
               </div>
             </div>
-            <p className="text-sm font-mono text-[#756e5a] opacity-70">TERMINAL_STABLE_V3.0.4 // SESSION_ACTIVE</p>
+            <p className="text-sm font-mono text-corthex-text-secondary opacity-70">TERMINAL_STABLE_V3.0.4 // SESSION_ACTIVE</p>
           </div>
           {/* Timeframe Selector */}
-          <div className="flex items-center bg-[#f0ebe0] p-1 rounded-xl">
+          <div className="flex items-center bg-corthex-elevated p-1 rounded-xl">
             {TIMEFRAMES.map((tf) => (
               <button
                 key={tf}
                 onClick={() => setSelectedTimeframe(tf)}
                 className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
                   selectedTimeframe === tf
-                    ? 'font-bold bg-[#606C38] text-white shadow-sm'
-                    : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                    ? 'font-bold bg-corthex-accent text-white shadow-sm'
+                    : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
                 }`}
               >
                 {tf}
@@ -85,9 +85,9 @@ export function TradingPage() {
 
         <main className="flex flex-col lg:flex-row gap-6">
           {/* LEFT PANEL: Tickers */}
-          <section className="w-full lg:w-[350px] bg-[#f5f0e8] rounded-xl overflow-hidden shadow-sm flex flex-col border border-[#e5e1d3]">
-            <div className="p-5 border-b border-[#e5e1d3]">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c] flex items-center gap-2">
+          <section className="w-full lg:w-[350px] bg-corthex-elevated rounded-xl overflow-hidden shadow-sm flex flex-col border border-corthex-border">
+            <div className="p-5 border-b border-corthex-border">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
                 시세 Tickers
               </h2>
@@ -95,18 +95,18 @@ export function TradingPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="text-[10px] text-[#908a78] font-bold uppercase tracking-tighter bg-[#f0ebe0]/50">
+                  <tr className="text-[10px] text-corthex-text-secondary font-bold uppercase tracking-tighter bg-corthex-elevated/50">
                     <th className="px-5 py-3">종목 Symbol</th>
                     <th className="px-5 py-3 text-right">현재가 Price</th>
                     <th className="px-5 py-3 text-right">변동 Change</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e5e1d3]/50 text-xs">
+                <tbody className="divide-y divide-corthex-border/50 text-xs">
                   {TICKERS.map((t) => (
-                    <tr key={t.symbol} className="hover:bg-[#f0ebe0] transition-colors cursor-pointer">
-                      <td className="px-5 py-4 font-bold text-[#1a1a1a]">{t.symbol}</td>
+                    <tr key={t.symbol} className="hover:bg-corthex-elevated transition-colors cursor-pointer">
+                      <td className="px-5 py-4 font-bold text-corthex-text-primary">{t.symbol}</td>
                       <td className="px-5 py-4 text-right font-mono">{t.price}</td>
-                      <td className={`px-5 py-4 text-right font-mono ${t.positive ? 'text-[#4d7c0f]' : 'text-[#dc2626]'}`}>{t.change}</td>
+                      <td className={`px-5 py-4 text-right font-mono ${t.positive ? 'text-corthex-accent' : 'text-red-600'}`}>{t.change}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -118,13 +118,13 @@ export function TradingPage() {
           <section className="flex-1 flex flex-col gap-4">
             <div className="flex items-center justify-between px-2">
               <div className="flex items-baseline gap-4">
-                <h2 className="text-xl font-bold tracking-tight text-[#1a1a1a]">BTC/USD 차트</h2>
+                <h2 className="text-xl font-bold tracking-tight text-corthex-text-primary">BTC/USD 차트</h2>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-mono font-bold">$67,432.50</span>
-                  <span className="text-sm font-mono text-[#4d7c0f]">+$1,543.20 (+2.34%)</span>
+                  <span className="text-sm font-mono text-corthex-accent">+$1,543.20 (+2.34%)</span>
                 </div>
               </div>
-              <div className="flex bg-[#f0ebe0] rounded-lg p-0.5">
+              <div className="flex bg-corthex-elevated rounded-lg p-0.5">
                 {CHART_TYPES.map((ct) => (
                   <button
                     key={ct}
@@ -132,7 +132,7 @@ export function TradingPage() {
                     className={`px-3 py-1 text-xs transition-colors ${
                       selectedChartType === ct
                         ? 'font-bold bg-white rounded-md shadow-sm'
-                        : 'font-medium text-[#6b705c]'
+                        : 'font-medium text-corthex-text-secondary'
                     }`}
                   >
                     {ct}
@@ -142,7 +142,7 @@ export function TradingPage() {
             </div>
 
             {/* Main Chart Area */}
-            <div className="bg-[#f0ebe0] rounded-xl flex-1 min-h-[450px] relative overflow-hidden border border-[#e5e1d3]">
+            <div className="bg-corthex-elevated rounded-xl flex-1 min-h-[450px] relative overflow-hidden border border-corthex-border">
               <div
                 className="absolute inset-0 opacity-20 pointer-events-none"
                 style={{
@@ -156,7 +156,7 @@ export function TradingPage() {
                     {CANDLE_BARS.map((h, i) => (
                       <div
                         key={i}
-                        className={`w-full rounded-sm ${i === 2 || i === 6 ? 'bg-[#dc2626]/40' : 'bg-[#4d7c0f]/40'}`}
+                        className={`w-full rounded-sm ${i === 2 || i === 6 ? 'bg-red-600/40' : 'bg-corthex-accent/40'}`}
                         style={{ height: `${h}%` }}
                       />
                     ))}
@@ -179,9 +179,9 @@ export function TradingPage() {
             </div>
 
             {/* Volume Chart */}
-            <div className="h-24 bg-[#f0ebe0] rounded-xl relative overflow-hidden p-2 flex items-end gap-1 border border-[#e5e1d3]">
+            <div className="h-24 bg-corthex-elevated rounded-xl relative overflow-hidden p-2 flex items-end gap-1 border border-corthex-border">
               {VOLUME_BARS.map((h, i) => (
-                <div key={i} className="flex-1 bg-[#908a78]/20 rounded-t-sm" style={{ height: `${h}%` }} />
+                <div key={i} className="flex-1 bg-corthex-text-secondary/20 rounded-t-sm" style={{ height: `${h}%` }} />
               ))}
             </div>
           </section>
@@ -189,18 +189,18 @@ export function TradingPage() {
           {/* RIGHT PANEL */}
           <aside className="w-full lg:w-[300px] flex flex-col gap-6">
             {/* Order Panel */}
-            <div className="bg-[#f5f0e8] rounded-xl p-5 shadow-sm space-y-6 border border-[#e5e1d3]">
+            <div className="bg-corthex-elevated rounded-xl p-5 shadow-sm space-y-6 border border-corthex-border">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c]">주문 Order</h2>
-                <Info className="w-4 h-4 text-[#908a78]" />
+                <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary">주문 Order</h2>
+                <Info className="w-4 h-4 text-corthex-text-secondary" />
               </div>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-[#f0ebe0] rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-corthex-elevated rounded-xl">
                 <button
                   onClick={() => setOrderSide('buy')}
                   className={`py-2 text-sm rounded-lg transition-colors ${
                     orderSide === 'buy'
-                      ? 'font-bold bg-[#4d7c0f] text-white shadow-md'
-                      : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                      ? 'font-bold bg-corthex-accent text-white shadow-md'
+                      : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
                   }`}
                 >
                   매수 Buy
@@ -209,8 +209,8 @@ export function TradingPage() {
                   onClick={() => setOrderSide('sell')}
                   className={`py-2 text-sm rounded-lg transition-colors ${
                     orderSide === 'sell'
-                      ? 'font-bold bg-[#dc2626] text-white shadow-md'
-                      : 'font-medium text-[#6b705c] hover:bg-[#e5e1d3]'
+                      ? 'font-bold bg-red-600 text-white shadow-md'
+                      : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
                   }`}
                 >
                   매도 Sell
@@ -218,36 +218,36 @@ export function TradingPage() {
               </div>
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase text-[#908a78] ml-1">수량 Amount</label>
+                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">수량 Amount</label>
                   <div className="relative">
                     <input
-                      className="w-full bg-white border-b border-[#e5e1d3] focus:border-[#606C38] focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      className="w-full bg-white border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
                       type="text"
                       defaultValue="0.10"
                     />
-                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-[#908a78]">BTC</span>
+                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-corthex-text-secondary">BTC</span>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase text-[#908a78] ml-1">가격 Price</label>
+                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">가격 Price</label>
                   <div className="relative">
                     <input
-                      className="w-full bg-white border-b border-[#e5e1d3] focus:border-[#606C38] focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      className="w-full bg-white border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
                       type="text"
                       defaultValue="67,432.50"
                     />
-                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-[#908a78]">USD</span>
+                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-corthex-text-secondary">USD</span>
                   </div>
                 </div>
               </div>
-              <div className="py-4 border-t border-[#e5e1d3]">
+              <div className="py-4 border-t border-corthex-border">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-xs text-[#6b705c]">예상 비용 Estimated Cost</span>
+                  <span className="text-xs text-corthex-text-secondary">예상 비용 Estimated Cost</span>
                   <span className="font-mono font-bold">$6,743.25</span>
                 </div>
                 <button
                   onClick={() => toast.info('이 기능은 준비 중입니다')}
-                  className="w-full bg-[#4d7c0f] hover:brightness-110 text-white font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-[#4d7c0f]/20"
+                  className="w-full bg-corthex-accent hover:brightness-110 text-white font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-corthex-accent/20"
                 >
                   주문 실행 Execute
                 </button>
@@ -255,14 +255,14 @@ export function TradingPage() {
             </div>
 
             {/* Portfolio Summary */}
-            <div className="bg-[#f5f0e8] rounded-xl p-5 shadow-sm space-y-5 border border-[#e5e1d3]">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-[#6b705c]">포트폴리오 Portfolio</h2>
+            <div className="bg-corthex-elevated rounded-xl p-5 shadow-sm space-y-5 border border-corthex-border">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary">포트폴리오 Portfolio</h2>
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-[#908a78] uppercase tracking-wider">Total Value</p>
-                <h3 className="text-2xl font-mono font-black text-[#1a1a1a]">$125,847.30</h3>
-                <p className="text-xs font-mono text-[#4d7c0f] font-medium">일간 손익 Daily P&L: +$2,341.50 (+1.89%)</p>
+                <p className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-wider">Total Value</p>
+                <h3 className="text-2xl font-mono font-black text-corthex-text-primary">$125,847.30</h3>
+                <p className="text-xs font-mono text-corthex-accent font-medium">일간 손익 Daily P&L: +$2,341.50 (+1.89%)</p>
               </div>
-              <div className="space-y-3 pt-4 border-t border-[#e5e1d3]">
+              <div className="space-y-3 pt-4 border-t border-corthex-border">
                 {PORTFOLIO.map((p) => (
                   <div key={p.name}>
                     <div className="flex items-center justify-between">
@@ -272,7 +272,7 @@ export function TradingPage() {
                       </div>
                       <span className="text-xs font-mono font-bold">{p.pct}%</span>
                     </div>
-                    <div className="w-full bg-[#f0ebe0] h-1.5 rounded-full overflow-hidden mt-1">
+                    <div className="w-full bg-corthex-elevated h-1.5 rounded-full overflow-hidden mt-1">
                       <div className="h-full rounded-full" style={{ width: `${p.pct}%`, backgroundColor: p.color }} />
                     </div>
                   </div>
@@ -283,7 +283,7 @@ export function TradingPage() {
         </main>
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-[#e5e1d3] flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-[#908a78] uppercase tracking-[0.2em] gap-4">
+        <footer className="mt-12 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-corthex-text-secondary uppercase tracking-[0.2em] gap-4">
           <div className="flex gap-6">
             <span>Latency: 14ms</span>
             <span>Server: Tokyo-AWS-01</span>

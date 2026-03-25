@@ -64,7 +64,7 @@ export function QueueTab() {
             { label: '총 예약', value: stats.byStatus.reduce((s, b) => s + b.count, 0), color: 'text-blue-400' },
             { label: '오늘 발행', value: stats.todayCount, color: 'text-emerald-400' },
             { label: '실패', value: stats.failedCount, color: stats.failedCount > 0 ? 'text-red-400' : 'text-stone-500' },
-            { label: '다음 발행', value: stats.nextScheduled ? new Date(stats.nextScheduled).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-', color: 'text-[#5a7247]' },
+            { label: '다음 발행', value: stats.nextScheduled ? new Date(stats.nextScheduled).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-', color: 'text-corthex-accent' },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-stone-100/50 border border-stone-200 rounded-xl p-4 text-center">
               <p className={`text-2xl font-bold ${color}`}>{value}</p>
@@ -151,7 +151,7 @@ export function QueueTab() {
               </div>
               <div className="text-right shrink-0">
                 {item.scheduledAt && (
-                  <p className="text-xs text-[#5a7247]">
+                  <p className="text-xs text-corthex-accent">
                     {new Date(item.scheduledAt).toLocaleString('ko', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 )}

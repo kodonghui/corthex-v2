@@ -21,7 +21,7 @@ export function PerformanceStats({
                         <p className="text-stone-500 text-sm mb-1">총 처리 작업</p>
                         <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-mono font-bold tracking-tight text-white">{totalJobs.toLocaleString()}</span>
-                            <span className="text-[#5a7247] text-xs font-mono">{jobsTrend} 이번 주</span>
+                            <span className="text-corthex-accent text-xs font-mono">{jobsTrend} 이번 주</span>
                         </div>
                     </div>
                     <div className="w-full h-px bg-stone-200/50"></div>
@@ -31,7 +31,7 @@ export function PerformanceStats({
                             <span className="text-2xl font-mono font-bold tracking-tight text-white">{successRate}%</span>
                         </div>
                         <div className="w-full bg-stone-200 h-1.5 rounded-full mt-3 overflow-hidden">
-                            <div className="bg-[#5a7247] h-full rounded-full" style={{ width: `${successRate}%` }}></div>
+                            <div className="bg-corthex-accent h-full rounded-full" style={{ width: `${successRate}%` }}></div>
                         </div>
                     </div>
                     <div className="w-full h-px bg-stone-200/50"></div>

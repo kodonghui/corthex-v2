@@ -146,22 +146,22 @@ function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boole
   const handleZoomOut = () => { zoomOut(); setZoom(Math.round(getZoom() * 100)) }
 
   return (
-    <header className="h-14 bg-white border-b border-[#e5e1d3] px-6 flex items-center justify-between z-10 shrink-0">
+    <header className="h-14 bg-white border-b border-corthex-border px-6 flex items-center justify-between z-10 shrink-0">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Network className="w-5 h-5 text-[#5a7247]" />
-          <h1 className="text-lg font-bold text-[#283618]">NEXUS</h1>
-          <span className="text-sm text-[#6b705c]">/ Org Chart</span>
+          <Network className="w-5 h-5 text-corthex-accent" />
+          <h1 className="text-lg font-bold text-corthex-accent-deep">NEXUS</h1>
+          <span className="text-sm text-corthex-text-secondary">/ Org Chart</span>
         </div>
       </div>
       <div className="flex items-center gap-3">
         {/* Zoom controls */}
-        <div className="flex items-center bg-[#f5f0e8] rounded-lg p-0.5">
-          <button onClick={handleZoomOut} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#e5e1d3] text-[#6b705c] transition-colors" title="Zoom Out">
+        <div className="flex items-center bg-corthex-elevated rounded-lg p-0.5">
+          <button onClick={handleZoomOut} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-corthex-border text-corthex-text-secondary transition-colors" title="Zoom Out">
             <ZoomOut className="w-4 h-4" />
           </button>
-          <span className="text-xs font-mono font-medium w-10 text-center text-[#6b705c]">{zoom}%</span>
-          <button onClick={handleZoomIn} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#e5e1d3] text-[#6b705c] transition-colors" title="Zoom In">
+          <span className="text-xs font-mono font-medium w-10 text-center text-corthex-text-secondary">{zoom}%</span>
+          <button onClick={handleZoomIn} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-corthex-border text-corthex-text-secondary transition-colors" title="Zoom In">
             <ZoomIn className="w-4 h-4" />
           </button>
         </div>
@@ -170,17 +170,17 @@ function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boole
         {isAdmin && (
           <>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-[#6b705c]">편집 모드</span>
+              <span className="text-xs font-medium text-corthex-text-secondary">편집 모드</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input className="sr-only peer" type="checkbox" checked={editMode} onChange={onToggleEditMode} />
-                <div className="w-9 h-5 bg-[#e5e1d3] peer-focus:outline-none rounded-full peer peer-checked:bg-[#5a7247] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+                <div className="w-9 h-5 bg-corthex-border peer-focus:outline-none rounded-full peer peer-checked:bg-corthex-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
               </label>
             </div>
 
-            <button className="px-4 py-1.5 text-sm bg-white border border-[#e5e1d3] rounded-lg hover:bg-[#f5f0e8] transition-colors shadow-sm text-[#283618] font-medium">
+            <button className="px-4 py-1.5 text-sm bg-white border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors shadow-sm text-corthex-accent-deep font-medium">
               Save Draft
             </button>
-            <button className="px-4 py-1.5 text-sm text-[#faf8f5] bg-[#5a7247] rounded-lg hover:bg-[#4a6337] transition-colors shadow-sm font-medium">
+            <button className="px-4 py-1.5 text-sm text-corthex-bg bg-corthex-accent rounded-lg hover:bg-corthex-accent-deep transition-colors shadow-sm font-medium">
               Publish Changes
             </button>
           </>
@@ -240,10 +240,10 @@ function NexusPageInner() {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full">
         <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
-        <div className="flex-1 flex items-center justify-center bg-[#faf8f5]" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
+        <div className="flex-1 flex items-center justify-center bg-corthex-bg" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-[#5a7247] border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-[#6b705c]">조직도를 불러오는 중...</p>
+            <div className="w-8 h-8 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-corthex-text-secondary">조직도를 불러오는 중...</p>
           </div>
         </div>
       </div>
@@ -255,7 +255,7 @@ function NexusPageInner() {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full">
         <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
-        <div className="flex-1 flex items-center justify-center bg-[#faf8f5]" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
+        <div className="flex-1 flex items-center justify-center bg-corthex-bg" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
             <p className="text-sm text-red-600">조직도를 불러올 수 없습니다</p>
             <button onClick={() => refetch()} className="text-xs text-red-500 hover:text-red-400 underline mt-2">다시 시도</button>
@@ -272,14 +272,14 @@ function NexusPageInner() {
     return (
       <div data-testid="nexus-page" className="flex flex-col h-full">
         <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
-        <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-[#faf8f5]" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
-          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-[#e5e1d3] bg-white/80 backdrop-blur-sm max-w-md text-center">
-            <div className="w-16 h-16 rounded-full bg-[#5a7247]/10 flex items-center justify-center mb-2">
-              <Network className="w-8 h-8 text-[#5a7247]" />
+        <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-corthex-bg" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
+          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-corthex-border bg-white/80 backdrop-blur-sm max-w-md text-center">
+            <div className="w-16 h-16 rounded-full bg-corthex-accent/10 flex items-center justify-center mb-2">
+              <Network className="w-8 h-8 text-corthex-accent" />
             </div>
-            <h2 className="text-lg font-bold text-[#283618]">조직이 구성되지 않았습니다</h2>
-            <p className="text-sm text-[#6b705c]">관리자 패널에서 부서와 에이전트를 추가해주세요</p>
-            <button className="mt-4 h-10 px-6 bg-[#5a7247] text-[#faf8f5] rounded-xl text-sm font-bold hover:bg-[#4a6337] transition-colors">
+            <h2 className="text-lg font-bold text-corthex-accent-deep">조직이 구성되지 않았습니다</h2>
+            <p className="text-sm text-corthex-text-secondary">관리자 패널에서 부서와 에이전트를 추가해주세요</p>
+            <button className="mt-4 h-10 px-6 bg-corthex-accent text-corthex-bg rounded-xl text-sm font-bold hover:bg-corthex-accent-deep transition-colors">
               Initialize Workspace
             </button>
           </div>

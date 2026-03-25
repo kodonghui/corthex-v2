@@ -39,7 +39,7 @@ type MarketTemplate = {
 // ============================================================
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
   manager: { label: 'Manager', color: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
-  specialist: { label: 'Specialist', color: 'bg-[#5a7247]/20 text-[#a3c48a] border border-[#5a7247]/30' },
+  specialist: { label: 'Specialist', color: 'bg-corthex-accent/20 text-corthex-accent-hover border border-corthex-accent/30' },
   worker: { label: 'Worker', color: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' },
 }
 
@@ -93,7 +93,7 @@ function MarketPreviewModal({
         {template.tags && template.tags.length > 0 && (
           <div className="px-6 pt-3 flex flex-wrap gap-1.5">
             {template.tags.map((tag) => (
-              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-[#283618]/30 text-[#a3c48a]">
+              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-corthex-accent-deep/30 text-corthex-accent-hover">
                 {tag}
               </span>
             ))}
@@ -146,7 +146,7 @@ function MarketPreviewModal({
           <button
             onClick={onClone}
             disabled={cloning}
-            className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
           >
             {cloning ? '복제 중...' : '내 조직에 복제'}
           </button>
@@ -166,15 +166,15 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-[#5a7247] hover:shadow-lg hover:shadow-[#283618]/10 focus:outline-none focus:ring-2 focus:ring-[#5a7247]/40"
+      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-50 group-hover:text-[#a3c48a] transition-colors">
+        <h3 className="text-base font-semibold text-slate-50 group-hover:text-corthex-accent-hover transition-colors">
           {template.name}
         </h3>
         <div className="flex items-center gap-2 flex-shrink-0">
           {template.isBuiltin && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#283618] text-[#a3c48a]">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-accent-deep text-corthex-accent-hover">
               기본
             </span>
           )}
@@ -190,7 +190,7 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
       {template.tags && template.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {template.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#283618]/30 text-[#a3c48a]">
+            <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-corthex-accent-deep/30 text-corthex-accent-hover">
               {tag}
             </span>
           ))}
@@ -293,7 +293,7 @@ export function TemplateMarketPage() {
             <p className="text-sm text-red-500">마켓 데이터를 불러올 수 없습니다.</p>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2 text-sm rounded-lg bg-[#5a7247] text-white hover:bg-[#6b8a55] transition-colors"
+              className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"
             >
               다시 시도
             </button>
@@ -319,13 +319,13 @@ export function TemplateMarketPage() {
           placeholder="템플릿 이름 검색..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 placeholder-slate-500 focus:border-[#5a7247] focus:ring-2 focus:ring-[#5a7247]/40 focus:outline-none"
+          className="flex-1 px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 placeholder-slate-500 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
         />
         {allTags.length > 0 && (
           <select
             value={selectedTag}
             onChange={(e) => setSelectedTag(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 focus:border-[#5a7247] focus:ring-2 focus:ring-[#5a7247]/40 focus:outline-none"
+            className="px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
           >
             <option value="">모든 태그</option>
             {allTags.map((tag) => (

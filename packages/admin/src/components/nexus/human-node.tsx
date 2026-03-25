@@ -21,7 +21,7 @@ export const HumanNode = memo(function HumanNode({ data, selected }: { data: Hum
   return (
     <div
       className={`px-4 py-3 rounded-lg bg-purple-950 border-2 shadow-md min-w-[200px] ${
-        selected ? 'border-[#8fae7a] ring-2 ring-[#8fae7a]/50' : 'border-purple-500'
+        selected ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover/50' : 'border-purple-500'
       }`}
       data-testid="nexus-human-node"
     >

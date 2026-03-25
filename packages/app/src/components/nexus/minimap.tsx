@@ -9,7 +9,7 @@ export function Minimap() {
             </div>
             <div className="flex-1 border border-slate-200 rounded-lg bg-slate-50 relative overflow-hidden">
                 {/* Viewport Indicator */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-10 border border-[#5a7247] bg-[#5a7247]/10 rounded-sm"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-10 border border-corthex-accent bg-corthex-accent/10 rounded-sm"></div>
             </div>
         </div>
     )

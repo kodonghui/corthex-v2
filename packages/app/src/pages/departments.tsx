@@ -97,14 +97,14 @@ function DepartmentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">
           부서명 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅부" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">설명</label>
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">설명</label>
         <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="부서 설명 (선택)" rows={3} />
       </div>
       <div className="flex gap-2 justify-end pt-2">
@@ -143,9 +143,9 @@ function CascadePanel({
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#b45309]/5 border border-[#b45309]/20 rounded-lg p-3">
-        <p className="text-sm font-medium text-[#b45309] mb-2">삭제 영향 분석</p>
-        <div className="space-y-1 text-xs text-[#b45309]/80">
+      <div className="bg-amber-700/5 border border-amber-700/20 rounded-lg p-3">
+        <p className="text-sm font-medium text-amber-700 mb-2">삭제 영향 분석</p>
+        <div className="space-y-1 text-xs text-amber-700/80">
           <p>소속 에이전트: <strong>{analysis.agentCount}명</strong> (미할당으로 전환됨)</p>
           <p>진행 중 작업: <strong>{analysis.activeTaskCount}건</strong></p>
           <p>부서 지식: <strong>{analysis.knowledgeCount}건</strong></p>
@@ -153,11 +153,11 @@ function CascadePanel({
       </div>
       {analysis.agentBreakdown.length > 0 && (
         <div className="max-h-40 overflow-y-auto">
-          <p className="text-xs font-medium text-[#908a78] mb-1">영향 받는 에이전트</p>
+          <p className="text-xs font-medium text-corthex-text-secondary mb-1">영향 받는 에이전트</p>
           <div className="space-y-1">
             {analysis.agentBreakdown.map((agent) => (
-              <div key={agent.id} className="flex items-center justify-between text-xs px-2 py-1 bg-[#faf8f5] rounded border border-[#e5e1d3]">
-                <span className="text-[#6b705c]">{agent.name}</span>
+              <div key={agent.id} className="flex items-center justify-between text-xs px-2 py-1 bg-corthex-bg rounded border border-corthex-border">
+                <span className="text-corthex-text-secondary">{agent.name}</span>
                 <Badge variant="default">{agent.tier}</Badge>
               </div>
             ))}
@@ -177,16 +177,16 @@ function CascadePanel({
 // ── Agent status helpers ──
 
 const STATUS_COLORS: Record<string, { dot: string; label: string }> = {
-  online: { dot: 'bg-[#606C38]', label: '활성' },
-  working: { dot: 'bg-[#2563eb]', label: '작업 중' },
-  error: { dot: 'bg-[#dc2626]', label: '오류' },
-  offline: { dot: 'bg-[#756e5a]/40', label: '오프라인' },
+  online: { dot: 'bg-corthex-accent', label: '활성' },
+  working: { dot: 'bg-corthex-info', label: '작업 중' },
+  error: { dot: 'bg-red-600', label: '오류' },
+  offline: { dot: 'bg-corthex-text-secondary/40', label: '오프라인' },
 }
 
 const TIER_COLORS: Record<string, string> = {
-  manager: 'bg-[#283618] text-white',
-  specialist: 'bg-[#606C38] text-white',
-  worker: 'bg-[#f5f0e8] text-[#283618]',
+  manager: 'bg-corthex-accent-deep text-white',
+  specialist: 'bg-corthex-accent text-white',
+  worker: 'bg-corthex-elevated text-corthex-accent-deep',
 }
 
 const DEPT_ICONS = [
@@ -219,25 +219,25 @@ function DepartmentDetailSection({
   const agents = agentsData?.data ?? []
 
   return (
-    <div className="bg-[#f5f0e8] rounded-xl p-8 border border-[#e5e1d3]">
+    <div className="bg-corthex-elevated rounded-xl p-8 border border-corthex-border">
       {/* Header Section */}
       <div className="flex justify-between items-start mb-10">
         <div className="flex gap-6 items-center">
-          <div className="w-20 h-20 bg-[#283618] text-white rounded-2xl flex items-center justify-center shadow-2xl">
+          <div className="w-20 h-20 bg-corthex-accent-deep text-white rounded-2xl flex items-center justify-center shadow-2xl">
             <Building2 className="w-10 h-10" />
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-4xl font-black text-[#283618] tracking-tight">{dept.name}</h2>
+              <h2 className="text-4xl font-black text-corthex-accent-deep tracking-tight">{dept.name}</h2>
             </div>
-            <p className="mt-2 text-[#756e5a] max-w-xl leading-relaxed">{dept.description || '설명 없음'}</p>
+            <p className="mt-2 text-corthex-text-secondary max-w-xl leading-relaxed">{dept.description || '설명 없음'}</p>
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={onEdit} className="px-6 py-2.5 bg-[#f5f0e8] text-[#1a1a1a] font-bold rounded-lg hover:bg-[#e5e1d3] transition-colors border border-[#e5e1d3] active:scale-95">
+          <button onClick={onEdit} className="px-6 py-2.5 bg-corthex-elevated text-corthex-text-primary font-bold rounded-lg hover:bg-corthex-border transition-colors border border-corthex-border active:scale-95">
             수정 Edit
           </button>
-          <button onClick={onDelete} className="px-6 py-2.5 bg-[#dc2626]/10 text-[#dc2626] font-bold rounded-lg hover:bg-[#dc2626] hover:text-white transition-all active:scale-95">
+          <button onClick={onDelete} className="px-6 py-2.5 bg-red-600/10 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-95">
             삭제 Delete
           </button>
         </div>
@@ -246,11 +246,11 @@ function DepartmentDetailSection({
       {/* Members List */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-[#283618] flex items-center gap-2">
+          <h3 className="text-xl font-bold text-corthex-accent-deep flex items-center gap-2">
             <Users className="w-5 h-5" />
             소속 에이전트
           </h3>
-          <div className="text-[#756e5a] text-xs font-mono uppercase tracking-widest">
+          <div className="text-corthex-text-secondary text-xs font-mono uppercase tracking-widest">
             {agentsLoading ? '...' : `${agents.length} Entities`}
           </div>
         </div>
@@ -260,43 +260,43 @@ function DepartmentDetailSection({
             {[1, 2].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
           </div>
         ) : agents.length === 0 ? (
-          <div className="bg-[#faf8f5] border border-[#e5e1d3] rounded-xl p-6 text-center">
-            <Bot className="w-8 h-8 text-[#6b705c] mx-auto mb-2" />
-            <p className="text-sm text-[#6b705c]">이 부서에 할당된 에이전트가 없습니다</p>
+          <div className="bg-corthex-bg border border-corthex-border rounded-xl p-6 text-center">
+            <Bot className="w-8 h-8 text-corthex-text-secondary mx-auto mb-2" />
+            <p className="text-sm text-corthex-text-secondary">이 부서에 할당된 에이전트가 없습니다</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl bg-[#faf8f5] border border-[#e5e1d3]/50">
+          <div className="overflow-hidden rounded-xl bg-corthex-bg border border-corthex-border/50">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#e5e1d3]/50">
-                  <th className="px-6 py-4 text-[10px] font-mono text-[#756e5a] uppercase tracking-widest">Agent Name</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-[#756e5a] uppercase tracking-widest">Tier</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-[#756e5a] uppercase tracking-widest">Status</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-[#756e5a] uppercase tracking-widest">Model</th>
+                <tr className="bg-corthex-border/50">
+                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Agent Name</th>
+                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Tier</th>
+                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Model</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e5e1d3]/30">
+              <tbody className="divide-y divide-corthex-border/30">
                 {agents.map((agent) => {
                   const statusInfo = STATUS_COLORS[agent.status] ?? STATUS_COLORS.offline
                   const tierColor = TIER_COLORS[agent.tier] ?? TIER_COLORS.worker
                   return (
-                    <tr key={agent.id} className="hover:bg-[#f5f0e8] transition-colors">
+                    <tr key={agent.id} className="hover:bg-corthex-elevated transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${tierColor}`}>
                             {agent.name.slice(0, 2)}
                           </div>
-                          <span className="font-bold text-[#1a1a1a]">{agent.name}</span>
+                          <span className="font-bold text-corthex-text-primary">{agent.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#6b705c] capitalize">{agent.tier}</td>
+                      <td className="px-6 py-4 text-sm text-corthex-text-secondary capitalize">{agent.tier}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
-                          <span className="text-sm font-medium text-[#1a1a1a]">{statusInfo.label}</span>
+                          <span className="text-sm font-medium text-corthex-text-primary">{statusInfo.label}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-[#283618]">{agent.modelName}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-corthex-accent-deep">{agent.modelName}</td>
                     </tr>
                   )
                 })}
@@ -384,7 +384,7 @@ export function DepartmentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="departments-page" className="flex-1 p-8 space-y-6 bg-[#faf8f5]">
+      <div data-testid="departments-page" className="flex-1 p-8 space-y-6 bg-corthex-bg">
         <Skeleton className="h-10 w-48" />
         <div className="flex gap-8">
           <div className="w-[440px]">
@@ -400,29 +400,29 @@ export function DepartmentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="departments-page" className="flex-1 p-8 bg-[#faf8f5]">
-        <div className="bg-[#dc2626]/10 border border-[#dc2626]/20 rounded-xl p-6 text-center">
-          <p className="text-sm text-[#dc2626]">부서 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-[#dc2626] hover:opacity-70 underline mt-2">다시 시도</button>
+      <div data-testid="departments-page" className="flex-1 p-8 bg-corthex-bg">
+        <div className="bg-red-600/10 border border-red-600/20 rounded-xl p-6 text-center">
+          <p className="text-sm text-red-600">부서 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-red-600 hover:opacity-70 underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="departments-page" className="flex-1 bg-[#faf8f5] overflow-y-auto">
+    <div data-testid="departments-page" className="flex-1 bg-corthex-bg overflow-y-auto">
       <div className="p-8 max-w-[1440px] mx-auto">
         <div className="flex gap-8 items-start">
           {/* LEFT PANEL: Department Navigation */}
           <aside className="w-[440px] sticky top-8 flex flex-col gap-6">
             <header className="flex justify-between items-end mb-2">
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tighter text-[#283618]">부서 관리</h1>
-                <p className="text-[#756e5a] font-medium text-sm tracking-wide uppercase">Departments</p>
+                <h1 className="text-3xl font-extrabold tracking-tighter text-corthex-accent-deep">부서 관리</h1>
+                <p className="text-corthex-text-secondary font-medium text-sm tracking-wide uppercase">Departments</p>
               </div>
               <button
                 onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#606C38] hover:bg-[#4e5a2b] text-white rounded-lg font-semibold transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-5 py-2.5 bg-corthex-accent hover:bg-corthex-accent-deep text-white rounded-lg font-semibold transition-all shadow-sm active:scale-95"
               >
                 <Plus className="w-5 h-5" />
                 <span>부서 생성</span>
@@ -443,29 +443,29 @@ export function DepartmentsPage() {
                     key={dept.id}
                     data-testid={`dept-row-${dept.id}`}
                     onClick={() => handleCardClick(dept)}
-                    className={`bg-[#f5f0e8] p-5 rounded-xl cursor-pointer transition-all group ${
+                    className={`bg-corthex-elevated p-5 rounded-xl cursor-pointer transition-all group ${
                       isSelected
-                        ? 'border-2 border-[#606C38] shadow-lg'
-                        : 'border border-transparent hover:border-[#e5e1d3]/50 hover:shadow-lg'
+                        ? 'border-2 border-corthex-accent shadow-lg'
+                        : 'border border-transparent hover:border-corthex-border/50 hover:shadow-lg'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`p-2 rounded-lg transition-colors ${isSelected ? 'bg-[#606C38] text-white' : 'bg-[#e5e1d3] text-[#283618] group-hover:bg-[#606C38] group-hover:text-white'}`}>
+                      <div className={`p-2 rounded-lg transition-colors ${isSelected ? 'bg-corthex-accent text-white' : 'bg-corthex-border text-corthex-accent-deep group-hover:bg-corthex-accent group-hover:text-white'}`}>
                         <Building2 className="w-5 h-5" />
                       </div>
                       {isSelected && (
-                        <span className="text-[10px] font-mono text-[#606C38] font-bold px-2 py-0.5 bg-[#606C38]/10 rounded-full">ACTIVE</span>
+                        <span className="text-[10px] font-mono text-corthex-accent font-bold px-2 py-0.5 bg-corthex-accent/10 rounded-full">ACTIVE</span>
                       )}
                     </div>
-                    <h3 className="font-bold text-[#1a1a1a] text-lg leading-tight">{dept.name}</h3>
-                    <p className="text-[#6b705c] text-xs mt-1">{dept.description || '설명 없음'}</p>
+                    <h3 className="font-bold text-corthex-text-primary text-lg leading-tight">{dept.name}</h3>
+                    <p className="text-corthex-text-secondary text-xs mt-1">{dept.description || '설명 없음'}</p>
                     <div className="mt-4 space-y-1.5">
-                      <div className="flex justify-between text-[10px] font-mono text-[#756e5a] uppercase">
+                      <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary uppercase">
                         <span>Budget</span>
                         <span>--%</span>
                       </div>
-                      <div className="w-full bg-[#e5e1d3] h-1.5 rounded-full overflow-hidden">
-                        <div className={`${isSelected ? 'bg-[#606C38]' : 'bg-[#283618]/30'} h-full`} style={{ width: '50%' }} />
+                      <div className="w-full bg-corthex-border h-1.5 rounded-full overflow-hidden">
+                        <div className={`${isSelected ? 'bg-corthex-accent' : 'bg-corthex-accent-deep/30'} h-full`} style={{ width: '50%' }} />
                       </div>
                     </div>
                   </div>
@@ -474,15 +474,15 @@ export function DepartmentsPage() {
 
               {/* Inactive departments inline */}
               {inactiveDepts.map((dept) => (
-                <div key={dept.id} className="bg-[#f5f0e8] p-5 rounded-xl opacity-50 border border-transparent">
+                <div key={dept.id} className="bg-corthex-elevated p-5 rounded-xl opacity-50 border border-transparent">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="p-2 bg-[#e5e1d3] text-[#756e5a] rounded-lg">
+                    <div className="p-2 bg-corthex-border text-corthex-text-secondary rounded-lg">
                       <Building2 className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-mono text-[#756e5a] font-bold px-2 py-0.5 bg-[#e5e1d3] rounded-full">INACTIVE</span>
+                    <span className="text-[10px] font-mono text-corthex-text-secondary font-bold px-2 py-0.5 bg-corthex-border rounded-full">INACTIVE</span>
                   </div>
-                  <h3 className="font-bold text-[#756e5a] text-lg leading-tight">{dept.name}</h3>
-                  {dept.description && <p className="text-[#908a78] text-xs mt-1 line-clamp-2">{dept.description}</p>}
+                  <h3 className="font-bold text-corthex-text-secondary text-lg leading-tight">{dept.name}</h3>
+                  {dept.description && <p className="text-corthex-text-secondary text-xs mt-1 line-clamp-2">{dept.description}</p>}
                 </div>
               ))}
             </div>
@@ -498,10 +498,10 @@ export function DepartmentsPage() {
                 onClose={() => setSelectedDept(null)}
               />
             ) : (
-              <div className="bg-[#f5f0e8] rounded-xl border border-[#e5e1d3] p-12 text-center">
-                <Building2 className="w-16 h-16 text-[#e5e1d3] mx-auto mb-4" />
-                <p className="text-[#6b705c] font-medium">부서를 선택하세요</p>
-                <p className="text-[#908a78] text-sm mt-1">좌측 카드에서 부서를 클릭하면 상세 정보가 표시됩니다</p>
+              <div className="bg-corthex-elevated rounded-xl border border-corthex-border p-12 text-center">
+                <Building2 className="w-16 h-16 text-corthex-border mx-auto mb-4" />
+                <p className="text-corthex-text-secondary font-medium">부서를 선택하세요</p>
+                <p className="text-corthex-text-secondary text-sm mt-1">좌측 카드에서 부서를 클릭하면 상세 정보가 표시됩니다</p>
               </div>
             )}
           </main>

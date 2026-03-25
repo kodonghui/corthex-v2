@@ -20,11 +20,11 @@ export function TriggerCard({
 }: TriggerCardProps) {
     return (
         <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-[#5a7247] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute top-0 left-0 w-1 h-full bg-corthex-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex justify-between items-start">
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="text-[#5a7247] text-sm flex items-center justify-center">{agentIcon}</div>
+                        <div className="text-corthex-accent text-sm flex items-center justify-center">{agentIcon}</div>
                         <p className="font-mono text-stone-400 text-xs">Agent: {agentName}</p>
                     </div>
                     <h4 className="text-lg font-bold text-slate-800">{triggerName}</h4>
@@ -34,7 +34,7 @@ export function TriggerCard({
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="p-2 text-stone-500 hover:text-[#5a7247] transition-colors">
+                    <button className="p-2 text-stone-500 hover:text-corthex-accent transition-colors">
                         <Settings className="w-5 h-5" />
                     </button>
                     <label className="toggle-wrapper cursor-pointer relative w-12 h-6">
@@ -44,7 +44,7 @@ export function TriggerCard({
                             className="sr-only toggle-checkbox"
                             type="checkbox"
                         />
-                        <div className={`block w-12 h-6 rounded-full transition-colors ${isActive ? 'bg-[#5a7247]' : 'bg-slate-200'}`}></div>
+                        <div className={`block w-12 h-6 rounded-full transition-colors ${isActive ? 'bg-corthex-accent' : 'bg-slate-200'}`}></div>
                         <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isActive ? 'transform translate-x-6' : ''}`}></div>
                     </label>
                 </div>

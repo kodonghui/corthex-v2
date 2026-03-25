@@ -12,12 +12,12 @@ export interface FileCardProps {
 
 export function FileCard({ filename, size, uploaderName, uploaderIcon, fileIcon, iconBgClass }: FileCardProps) {
     return (
-        <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 hover:border-[#5a7247]/50 transition-colors group cursor-pointer relative overflow-hidden">
+        <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 hover:border-corthex-accent/50 transition-colors group cursor-pointer relative overflow-hidden">
             <div className="flex items-start justify-between mb-4">
                 <div className={`size-10 rounded flex items-center justify-center ${iconBgClass}`}>
                     {fileIcon}
                 </div>
-                <button className="text-stone-500 hover:text-[#5a7247] opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="text-stone-500 hover:text-corthex-accent opacity-0 group-hover:opacity-100 transition-opacity">
                     <MoreVertical className="w-5 h-5" />
                 </button>
             </div>

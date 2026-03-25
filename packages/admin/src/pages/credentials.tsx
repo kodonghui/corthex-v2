@@ -157,7 +157,7 @@ export function CredentialsPage() {
                   className={`px-4 py-2 rounded-lg text-sm transition-colors ${
                     selectedUserId === u.id
                       ? 'font-semibold text-white'
-                      : 'text-gray-600 hover:bg-[#edf3e9]'
+                      : 'text-gray-600 hover:bg-corthex-elevated'
                   }`}
                   style={selectedUserId === u.id ? { backgroundColor: '#4a6741' } : {}}
                 >
@@ -211,7 +211,7 @@ export function CredentialsPage() {
                         data-testid="credentials-cli-label-input"
                         value={tokenForm.label}
                         onChange={(e) => setTokenForm({ ...tokenForm, label: e.target.value })}
-                        className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                        className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                         style={{ borderColor: '#dce8d5' }}
                         placeholder="예: CI/CD Pipeline A"
                         required
@@ -226,7 +226,7 @@ export function CredentialsPage() {
                           value={tokenForm.token}
                           onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
                           rows={2}
-                          className="w-full rounded-lg border text-sm font-mono resize-none focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          className="w-full rounded-lg border text-sm font-mono resize-none focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                           style={{ borderColor: '#dce8d5' }}
                           placeholder="sk-ant-oat01-..."
                           required
@@ -277,7 +277,7 @@ export function CredentialsPage() {
                       </thead>
                       <tbody className="divide-y text-sm" style={{ borderColor: '#edf3e9' }}>
                         {creds.map((c) => (
-                          <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-[#f8faf7] transition-colors">
+                          <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-corthex-bg transition-colors">
                             <td className="px-6 py-4">
                               <div className="font-medium" style={{ color: '#263222' }}>{selectedUser?.username || c.userId}</div>
                               <div className="text-xs text-gray-500">{selectedUser?.name}</div>
@@ -320,8 +320,8 @@ export function CredentialsPage() {
                 <div className="px-6 py-4 bg-white border-t flex items-center justify-between text-xs text-gray-500" style={{ borderColor: '#edf3e9' }}>
                   <span>총 {creds.length}개의 인증 토큰이 검색되었습니다.</span>
                   <div className="flex gap-2">
-                    <button className="p-1 px-2 border rounded hover:bg-[#f8faf7] disabled:opacity-50" style={{ borderColor: '#dce8d5' }} disabled>이전</button>
-                    <button className="p-1 px-2 border rounded hover:bg-[#f8faf7]" style={{ borderColor: '#dce8d5' }}>다음</button>
+                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg disabled:opacity-50" style={{ borderColor: '#dce8d5' }} disabled>이전</button>
+                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg" style={{ borderColor: '#dce8d5' }}>다음</button>
                   </div>
                 </div>
               </section>
@@ -366,7 +366,7 @@ export function CredentialsPage() {
                           data-testid="credentials-api-provider"
                           value={apiKeyForm.provider}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
-                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                           style={{ borderColor: '#dce8d5' }}
                         >
                           <option value="kis">KIS (한국투자증권)</option>
@@ -381,7 +381,7 @@ export function CredentialsPage() {
                           data-testid="credentials-api-scope"
                           value={apiKeyForm.scope}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
-                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                           style={{ borderColor: '#dce8d5' }}
                         >
                           <option value="user">개인용</option>
@@ -394,7 +394,7 @@ export function CredentialsPage() {
                           data-testid="credentials-api-label-input"
                           value={apiKeyForm.label}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, label: e.target.value })}
-                          className="w-full rounded-lg border text-sm focus:border-[#4a6741] focus:ring-[#4a6741]"
+                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                           style={{ borderColor: '#dce8d5' }}
                           placeholder="선택사항"
                         />
@@ -407,7 +407,7 @@ export function CredentialsPage() {
                         type="password"
                         value={apiKeyForm.key}
                         onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
-                        className="w-full rounded-lg border text-sm font-mono focus:border-[#4a6741] focus:ring-[#4a6741]"
+                        className="w-full rounded-lg border text-sm font-mono focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
                         style={{ borderColor: '#dce8d5' }}
                         required
                       />
@@ -445,7 +445,7 @@ export function CredentialsPage() {
                       <div
                         key={k.id}
                         data-testid={`credentials-api-key-${k.id}`}
-                        className="flex items-center justify-between px-6 py-4 hover:bg-[#f8faf7] transition-colors"
+                        className="flex items-center justify-between px-6 py-4 hover:bg-corthex-bg transition-colors"
                       >
                         <div>
                           <div className="flex items-center gap-2">

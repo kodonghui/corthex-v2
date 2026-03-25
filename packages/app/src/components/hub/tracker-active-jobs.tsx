@@ -29,7 +29,7 @@ export function TrackerActiveJobs({ jobs = [
                                 {job.type === 'scheduled' ? (
                                     <Clock className="w-[18px] h-[18px] text-stone-500 mt-0.5" />
                                 ) : (
-                                    <RefreshCw className="w-[18px] h-[18px] text-[#5a7247] mt-0.5 translate-y-[1px] animate-spin-slow" />
+                                    <RefreshCw className="w-[18px] h-[18px] text-corthex-accent mt-0.5 translate-y-[1px] animate-spin-slow" />
                                 )}
                                 <div>
                                     <p className="text-sm font-medium text-slate-100">{job.name}</p>
@@ -42,7 +42,7 @@ export function TrackerActiveJobs({ jobs = [
                                     IDLE
                                 </span>
                             ) : (
-                                <span className="px-2 py-0.5 rounded text-[10px] bg-[rgba(34,211,238,0.10)] text-[#5a7247] border border-[rgba(34,211,238,0.20)] font-bold tracking-wider animate-pulse">
+                                <span className="px-2 py-0.5 rounded text-[10px] bg-[rgba(34,211,238,0.10)] text-corthex-accent border border-[rgba(34,211,238,0.20)] font-bold tracking-wider animate-pulse">
                                     SYNC
                                 </span>
                             )}

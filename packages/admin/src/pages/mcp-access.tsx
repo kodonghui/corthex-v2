@@ -90,7 +90,7 @@ export function McpAccessPage() {
         <select
           value={selectedAgentId ?? ''}
           onChange={e => setSelectedAgentId(e.target.value || null)}
-          className="bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#5a7247] min-w-48"
+          className="bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-corthex-accent min-w-48"
         >
           <option value="">에이전트를 선택하세요</option>
           {agents.map(a => (
@@ -106,7 +106,7 @@ export function McpAccessPage() {
         <div className="text-slate-400 text-sm">
           <p>등록된 MCP 서버가 없습니다.</p>
           <p className="text-xs mt-1 text-slate-500">
-            먼저 <a href="/admin/mcp-servers" className="text-[#8fae7a] hover:underline">MCP 서버 관리</a>에서 서버를 등록하세요.
+            먼저 <a href="/admin/mcp-servers" className="text-corthex-accent-hover hover:underline">MCP 서버 관리</a>에서 서버를 등록하세요.
           </p>
         </div>
       ) : (
@@ -132,7 +132,7 @@ export function McpAccessPage() {
                         checked={granted}
                         disabled={isSaving}
                         onChange={() => handleToggle(server.id, granted)}
-                        className="w-4 h-4 rounded border-slate-600 text-[#5a7247] bg-slate-900 focus:ring-[#5a7247] focus:ring-offset-slate-900 cursor-pointer disabled:cursor-wait"
+                        className="w-4 h-4 rounded border-slate-600 text-corthex-accent bg-slate-900 focus:ring-corthex-accent focus:ring-offset-slate-900 cursor-pointer disabled:cursor-wait"
                       />
                     </td>
                     <td className="px-4 py-3">

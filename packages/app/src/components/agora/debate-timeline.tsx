@@ -151,7 +151,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
     return (
       <div className="flex-1 flex items-center justify-center text-stone-400">
         <div className="text-center space-y-2">
-          <div className="w-5 h-5 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin mx-auto" />
+          <div className="w-5 h-5 border-2 border-stone-300 border-t-corthex-accent rounded-full animate-spin mx-auto" />
           <p className="text-xs">토론 시작 대기 중...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
           case 'round-header':
             return (
               <div key={`rh-${i}`} data-testid={`round-header-${entry.roundNum}`} className="flex justify-center my-2">
-                <span className="px-3 py-1 bg-[#5a7247]/10 text-[#5a7247] text-xs rounded-full font-mono">
+                <span className="px-3 py-1 bg-corthex-accent/10 text-corthex-accent text-xs rounded-full font-mono">
                   Round {entry.roundNum} / {entry.totalRounds}
                 </span>
               </div>
@@ -206,7 +206,7 @@ export function DebateTimeline({ debate, timeline }: Props) {
       {isLive && allEntries.length === 0 && (
         <div className="flex items-center justify-center h-full">
           <div className="text-center space-y-2 text-stone-500">
-            <div className="w-5 h-5 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin mx-auto" />
+            <div className="w-5 h-5 border-2 border-stone-300 border-t-corthex-accent rounded-full animate-spin mx-auto" />
             <p className="text-xs">토론 진행 중...</p>
           </div>
         </div>

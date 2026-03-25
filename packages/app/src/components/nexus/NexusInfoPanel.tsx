@@ -78,7 +78,7 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       {node.agentId && (
         <button
           onClick={() => navigate(`/chat?agentId=${node.agentId}`)}
-          className="w-full py-2.5 bg-[#5a7247]/10 text-[#5a7247] border border-[#5a7247]/20 text-sm font-medium rounded-lg hover:bg-[#5a7247]/20 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20 text-sm font-medium rounded-lg hover:bg-corthex-accent/20 transition-colors flex items-center justify-center gap-2"
         >
           <MessageSquare className="w-4 h-4" />
           채팅하기

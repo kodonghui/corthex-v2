@@ -13,7 +13,7 @@ const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipRootProps>(
   function TooltipRoot({ children, className, ...otherProps }, ref) {
     return (
       <div
-        className={twClassNames("flex flex-col items-start gap-2 rounded-md border border-[#283618] bg-[#283618] px-2 py-1 shadow-lg", className)}
+        className={twClassNames("flex flex-col items-start gap-2 rounded-md border border-corthex-accent-deep bg-corthex-accent-deep px-2 py-1 shadow-lg", className)}
         ref={ref}
         {...otherProps}
       >

@@ -102,7 +102,7 @@ export function DepartmentPanel({
     <div className="space-y-4" data-testid="department-panel">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded bg-[#5a7247] flex-shrink-0" />
+        <div className="w-2.5 h-2.5 rounded bg-corthex-accent flex-shrink-0" />
         <h3 className="text-sm font-semibold text-slate-100 truncate flex-1">{department.name}</h3>
         <SaveIndicator status={saveStatus} />
       </div>
@@ -133,7 +133,7 @@ export function DepartmentPanel({
           value={description}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           rows={3}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#5a7247]"
+          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-corthex-accent"
           data-testid="dept-description-input"
         />
       </div>
@@ -147,7 +147,7 @@ export function DepartmentPanel({
             // Manager assignment would need agent tier change API — mark as read-only hint for now
             addToast({ type: 'info', message: '매니저 변경은 에이전트 관리에서 설정하세요' })
           }}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#5a7247]"
+          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-corthex-accent"
           data-testid="dept-manager-select"
         >
           <option value="">없음</option>

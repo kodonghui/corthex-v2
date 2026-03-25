@@ -37,10 +37,10 @@ export function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[#faf8f5]">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-corthex-bg">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#606C38] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-[#6b705c]">로딩 중...</p>
+          <div className="w-8 h-8 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-corthex-text-secondary">로딩 중...</p>
         </div>
       </div>
     )

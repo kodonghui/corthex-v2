@@ -432,7 +432,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           </div>
         )}
 
-        {detail.hashtags && <p className="text-sm text-[#5a7247]">{detail.hashtags}</p>}
+        {detail.hashtags && <p className="text-sm text-corthex-accent">{detail.hashtags}</p>}
 
         {detail.rejectReason && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
@@ -451,7 +451,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
 
         <p className="text-xs text-stone-400">
           작성: {detail.creatorName} · {new Date(detail.createdAt).toLocaleString('ko')}
-          {detail.accountName && <> · 계정: <span className="text-[#5a7247]">@{detail.accountName}</span></>}
+          {detail.accountName && <> · 계정: <span className="text-corthex-accent">@{detail.accountName}</span></>}
         </p>
 
         {/* Actions */}

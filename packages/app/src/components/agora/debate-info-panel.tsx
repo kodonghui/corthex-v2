@@ -12,7 +12,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const AVATAR_COLORS = [
-  { bg: 'bg-[#5a7247]/20', text: 'text-[#5a7247]', border: 'border-[#5a7247]/30' },
+  { bg: 'bg-corthex-accent/20', text: 'text-corthex-accent', border: 'border-corthex-accent/30' },
   { bg: 'bg-violet-500/20', text: 'text-violet-400', border: 'border-violet-500/30' },
   { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30' },
   { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' },
@@ -59,7 +59,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
   return (
     <div data-testid="debate-info-panel" className="h-full flex flex-col overflow-hidden">
       {/* Tabs */}
-      <div className="shrink-0 flex border-b border-[#5a7247]/10">
+      <div className="shrink-0 flex border-b border-corthex-accent/10">
         {TAB_ITEMS.map((tab) => {
           const isDisabled = tab.value === 'diff' && !isDiffEnabled
           const isActive = activeTab === tab.value
@@ -72,7 +72,7 @@ export function DebateInfoPanel({ debate }: { debate: Debate }) {
               className={cn(
                 'flex-1 py-2.5 text-xs font-medium transition-colors border-b-2',
                 isActive
-                  ? 'border-[#5a7247] text-[#5a7247]'
+                  ? 'border-corthex-accent text-corthex-accent'
                   : 'border-transparent text-stone-500 hover:text-stone-600',
                 isDisabled && 'opacity-40 cursor-not-allowed',
               )}
@@ -103,7 +103,7 @@ function InfoContent({ debate }: { debate: Debate }) {
   return (
     <>
       {/* Header */}
-      <div className="p-6 border-b border-[#5a7247]/10">
+      <div className="p-6 border-b border-corthex-accent/10">
         <h3 className="text-lg font-semibold text-slate-100 mb-1">Debate Info</h3>
         {isActive && (
           <div className="flex items-center gap-2 text-emerald-500">
@@ -127,7 +127,7 @@ function InfoContent({ debate }: { debate: Debate }) {
           <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Duration</span>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-stone-400" />
-            <div className="font-mono text-2xl text-[#5a7247] font-medium">
+            <div className="font-mono text-2xl text-corthex-accent font-medium">
               {debate.rounds.length > 0 ? `R${debate.rounds.length}/${debate.maxRounds}` : '--:--'}
             </div>
           </div>
@@ -191,7 +191,7 @@ function InfoContent({ debate }: { debate: Debate }) {
 
       {/* End debate button */}
       {isActive && (
-        <div className="p-6 border-t border-[#5a7247]/10">
+        <div className="p-6 border-t border-corthex-accent/10">
           <button className="w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 font-medium">
             <StopCircle className="w-5 h-5" />
             토론 종료 (End Debate)

@@ -94,7 +94,7 @@ export function McpCredentialsPage() {
         </div>
         <button
           onClick={() => { setShowForm(true); setEditKeyName(null); setForm(EMPTY_FORM) }}
-          className="px-3 py-1.5 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded transition-colors"
+          className="px-3 py-1.5 bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded transition-colors"
         >
           + 크리덴셜 추가
         </button>
@@ -115,7 +115,7 @@ export function McpCredentialsPage() {
                 value={form.keyName}
                 onChange={e => setForm(f => ({ ...f, keyName: e.target.value }))}
                 placeholder="tistory_access_token"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247] disabled:opacity-50 font-mono"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent disabled:opacity-50 font-mono"
               />
             </div>
             <div className="space-y-1">
@@ -129,14 +129,14 @@ export function McpCredentialsPage() {
                 value={form.value}
                 onChange={e => setForm(f => ({ ...f, value: e.target.value }))}
                 placeholder="••••••••••••••••"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#5a7247]"
+                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
             <div className="col-span-2 flex items-center gap-3">
               <button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="px-4 py-1.5 bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded transition-colors"
+                className="px-4 py-1.5 bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded transition-colors"
               >
                 {createMutation.isPending || updateMutation.isPending ? '저장 중...' : '저장'}
               </button>

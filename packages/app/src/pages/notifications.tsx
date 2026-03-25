@@ -186,15 +186,15 @@ export function NotificationsPage() {
   if (showSettings) {
     return (
       <div
-        className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased"
+        className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased"
         data-testid="notifications-page"
       >
         <div className="p-8 max-w-[1440px] mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-extrabold tracking-tighter text-[#283618] uppercase">Notification Settings</h1>
+            <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Settings</h1>
             <button
               onClick={() => setShowSettings(false)}
-              className="flex items-center gap-2 px-4 py-2 text-[#283618] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 text-corthex-accent-deep font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to list
@@ -208,21 +208,21 @@ export function NotificationsPage() {
 
   return (
     <div
-      className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased"
+      className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased"
       data-testid="notifications-page"
     >
       <div className="p-8 max-w-[1440px] mx-auto min-h-screen flex flex-col">
         {/* HEADER SECTION */}
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tighter text-[#283618] uppercase">Notification Center</h1>
-            <p className="text-[#6b705c] mt-2 font-medium">CORTHEX System Alerts &amp; Updates</p>
+            <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Center</h1>
+            <p className="text-corthex-text-secondary mt-2 font-medium">CORTHEX System Alerts &amp; Updates</p>
           </div>
           <div className="flex items-center gap-3">
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllRead.mutate()}
-                className="flex items-center gap-2 px-4 py-2 text-[#283618] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+                className="flex items-center gap-2 px-4 py-2 text-corthex-accent-deep font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
                 data-testid="mark-all-read"
               >
                 <CheckCheck className="w-4 h-4" />
@@ -231,7 +231,7 @@ export function NotificationsPage() {
             )}
             <button
               onClick={() => setShowSettings(true)}
-              className="flex items-center gap-2 px-4 py-2 text-[#6b705c] font-mono text-xs uppercase tracking-widest hover:bg-[#f5f0e8] transition-colors rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 text-corthex-text-secondary font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
               title="Notification settings"
             >
               <Settings className="w-4 h-4" />
@@ -248,22 +248,22 @@ export function NotificationsPage() {
                 onClick={() => setTab(chip.key)}
                 className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
                   activeTab === chip.key
-                    ? 'bg-[#606C38] text-white shadow-sm'
-                    : 'bg-[#f5f0e8] text-[#6b705c] hover:bg-[#e5e1d3]'
+                    ? 'bg-corthex-accent text-white shadow-sm'
+                    : 'bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border'
                 }`}
               >
                 {chip.label}
               </button>
             ))}
-            <div className="w-px h-5 bg-[#e5e1d3] mx-1" />
+            <div className="w-px h-5 bg-corthex-border mx-1" />
             {FILTER_CHIPS.map((chip) => (
               <button
                 key={chip.key}
                 onClick={() => setFilter(chip.key)}
                 className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
                   filter === chip.key
-                    ? 'bg-[#606C38] text-white shadow-sm'
-                    : 'bg-[#f5f0e8] text-[#6b705c] hover:bg-[#e5e1d3]'
+                    ? 'bg-corthex-accent text-white shadow-sm'
+                    : 'bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border'
                 }`}
                 data-testid={`filter-${chip.key}`}
               >
@@ -274,10 +274,10 @@ export function NotificationsPage() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-[#6b705c] px-3 py-1 bg-[#f5f3f0] rounded-lg border border-[#e5e1d3]/30">
-            <Search className="w-4 h-4 text-[#6b705c]/60" />
+          <div className="flex items-center gap-2 text-corthex-text-secondary px-3 py-1 bg-corthex-bg rounded-lg border border-corthex-border/30">
+            <Search className="w-4 h-4 text-corthex-text-secondary/60" />
             <input
-              className="bg-transparent border-none focus:ring-0 focus:outline-none text-xs font-mono w-48 p-0 placeholder:text-[#6b705c]/40 text-[#1a1a1a]"
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-xs font-mono w-48 p-0 placeholder:text-corthex-text-secondary/40 text-corthex-text-primary"
               placeholder="Filter alerts..."
               type="text"
               value={searchQuery}
@@ -287,10 +287,10 @@ export function NotificationsPage() {
         </nav>
 
         {/* MASTER-DETAIL LAYOUT */}
-        <main className="flex-1 flex flex-col lg:flex-row gap-0 bg-[#f5f3f0] rounded-2xl overflow-hidden shadow-2xl shadow-[#283618]/5 ring-1 ring-[#e5e1d3]/30">
+        <main className="flex-1 flex flex-col lg:flex-row gap-0 bg-corthex-bg rounded-2xl overflow-hidden shadow-2xl shadow-corthex-accent-deep/5 ring-1 ring-corthex-border/30">
           {/* LIST PANEL (LEFT) */}
-          <section className="lg:w-[60%] flex flex-col border-r border-[#e5e1d3]/30">
-            <div className="p-4 bg-[#f5f0e8] text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b705c]/60 flex justify-between">
+          <section className="lg:w-[60%] flex flex-col border-r border-corthex-border/30">
+            <div className="p-4 bg-corthex-elevated text-[10px] font-mono uppercase tracking-[0.2em] text-corthex-text-secondary/60 flex justify-between">
               <span>Active Stream</span>
               <span>{filteredNotifications.length} Records Found</span>
             </div>
@@ -298,14 +298,14 @@ export function NotificationsPage() {
               {isLoading ? (
                 <div className="space-y-0">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="p-5 border-b border-[#e5e1d3]/10">
+                    <div key={i} className="p-5 border-b border-corthex-border/10">
                       <Skeleton className="h-16 rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />
                     </div>
                   ))}
                 </div>
               ) : filteredNotifications.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-sm text-[#6b705c]">
+                  <p className="text-sm text-corthex-text-secondary">
                     {filter === 'unread' ? 'No unread notifications' : 'No notifications found'}
                   </p>
                 </div>
@@ -322,12 +322,12 @@ export function NotificationsPage() {
                     <div
                       key={n.id}
                       onClick={() => handleClick(n)}
-                      className={`group relative flex items-start gap-4 p-5 transition-all cursor-pointer border-b border-[#e5e1d3]/10 ${
+                      className={`group relative flex items-start gap-4 p-5 transition-all cursor-pointer border-b border-corthex-border/10 ${
                         isSelected
-                          ? 'bg-[#e5e1d3]/60'
+                          ? 'bg-corthex-border/60'
                           : n.isRead
-                            ? 'hover:bg-[#f5f0e8]/60'
-                            : 'bg-white/40 hover:bg-[#f5f0e8]'
+                            ? 'hover:bg-corthex-elevated/60'
+                            : 'bg-white/40 hover:bg-corthex-elevated'
                       }`}
                       style={{ borderLeftWidth: '4px', borderLeftColor: borderColor }}
                       data-testid={`notification-${n.id}`}
@@ -342,15 +342,15 @@ export function NotificationsPage() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-1">
-                          <h3 className={`text-sm text-[#1a1a1a] ${n.isRead ? 'font-medium' : 'font-bold'}`}>
+                          <h3 className={`text-sm text-corthex-text-primary ${n.isRead ? 'font-medium' : 'font-bold'}`}>
                             {n.title}
                           </h3>
-                          <span className="font-mono text-[10px] text-[#6b705c]/50 shrink-0 ml-2">
+                          <span className="font-mono text-[10px] text-corthex-text-secondary/50 shrink-0 ml-2">
                             {formatTimeShort(n.createdAt)}
                           </span>
                         </div>
                         {n.body && (
-                          <p className="text-xs text-[#6b705c]/70 line-clamp-1 mb-2">{n.body}</p>
+                          <p className="text-xs text-corthex-text-secondary/70 line-clamp-1 mb-2">{n.body}</p>
                         )}
                         <div className="flex items-center gap-3">
                           <span
@@ -372,8 +372,8 @@ export function NotificationsPage() {
           </section>
 
           {/* DETAIL PANEL (RIGHT) */}
-          <section className="lg:w-[40%] flex flex-col bg-[#f5f3f0]/30">
-            <div className="p-4 bg-[#f5f0e8] text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b705c]/60">
+          <section className="lg:w-[40%] flex flex-col bg-corthex-bg/30">
+            <div className="p-4 bg-corthex-elevated text-[10px] font-mono uppercase tracking-[0.2em] text-corthex-text-secondary/60">
               Inspection Detail
             </div>
             {selectedNotification ? (
@@ -395,10 +395,10 @@ export function NotificationsPage() {
                         </div>
                       )
                     })()}
-                    <h2 className="text-2xl font-bold tracking-tight text-[#1a1a1a] mb-2">
+                    <h2 className="text-2xl font-bold tracking-tight text-corthex-text-primary mb-2">
                       {selectedNotification.title}
                     </h2>
-                    <div className="flex items-center gap-4 text-xs font-mono text-[#6b705c]/60">
+                    <div className="flex items-center gap-4 text-xs font-mono text-corthex-text-secondary/60">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
                         {formatTimeShort(selectedNotification.createdAt)}
@@ -413,14 +413,14 @@ export function NotificationsPage() {
                   <div className="space-y-8">
                     {selectedNotification.body && (
                       <div>
-                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-3">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary/50 mb-3">
                           Message Content
                         </h4>
                         <div
-                          className="p-4 bg-[#f5f0e8] rounded-xl border-l-2"
+                          className="p-4 bg-corthex-elevated rounded-xl border-l-2"
                           style={{ borderLeftColor: (TYPE_ICON_STYLE[selectedNotification.type] || { dot: '#606C38' }).dot }}
                         >
-                          <p className="text-sm leading-relaxed text-[#1a1a1a]/80">
+                          <p className="text-sm leading-relaxed text-corthex-text-primary/80">
                             {selectedNotification.body}
                           </p>
                         </div>
@@ -428,28 +428,28 @@ export function NotificationsPage() {
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-[#f5f0e8] rounded-xl">
-                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-2">Type</h4>
-                        <p className="text-sm font-bold text-[#1a1a1a]">{selectedNotification.type.replace(/_/g, ' ')}</p>
-                        <p className="text-[10px] font-mono text-[#6b705c]/60">{TYPE_CATEGORY[selectedNotification.type] || 'Alert'}</p>
+                      <div className="p-4 bg-corthex-elevated rounded-xl">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary/50 mb-2">Type</h4>
+                        <p className="text-sm font-bold text-corthex-text-primary">{selectedNotification.type.replace(/_/g, ' ')}</p>
+                        <p className="text-[10px] font-mono text-corthex-text-secondary/60">{TYPE_CATEGORY[selectedNotification.type] || 'Alert'}</p>
                       </div>
-                      <div className="p-4 bg-[#f5f0e8] rounded-xl">
-                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-2">Created</h4>
-                        <p className="text-sm font-bold text-[#1a1a1a]">{getDateGroup(selectedNotification.createdAt)}</p>
-                        <p className="text-[10px] font-mono text-[#6b705c]/60">{formatTimeShort(selectedNotification.createdAt)}</p>
+                      <div className="p-4 bg-corthex-elevated rounded-xl">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary/50 mb-2">Created</h4>
+                        <p className="text-sm font-bold text-corthex-text-primary">{getDateGroup(selectedNotification.createdAt)}</p>
+                        <p className="text-[10px] font-mono text-corthex-text-secondary/60">{formatTimeShort(selectedNotification.createdAt)}</p>
                       </div>
                     </div>
 
                     {/* Actions */}
                     <div className="pt-6">
-                      <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#6b705c]/50 mb-4">
+                      <h4 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary/50 mb-4">
                         Available Actions
                       </h4>
                       <div className="flex flex-col gap-3">
                         {selectedNotification.actionUrl && (
                           <button
                             onClick={() => handleNavigate(selectedNotification)}
-                            className="w-full py-4 bg-[#606C38] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#4e5a2b] transition-all active:scale-[0.98]"
+                            className="w-full py-4 bg-corthex-accent text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-corthex-accent-deep transition-all active:scale-[0.98]"
                           >
                             <CheckCircle className="w-5 h-5" />
                             Open Related Page
@@ -458,7 +458,7 @@ export function NotificationsPage() {
                         {!selectedNotification.isRead && (
                           <button
                             onClick={() => markRead.mutate(selectedNotification.id)}
-                            className="w-full py-4 bg-[#e5e1d3] text-[#1a1a1a] font-bold rounded-xl border border-[#e5e1d3] flex items-center justify-center gap-2 hover:bg-[#f5f0e8] transition-all active:scale-[0.98]"
+                            className="w-full py-4 bg-corthex-border text-corthex-text-primary font-bold rounded-xl border border-corthex-border flex items-center justify-center gap-2 hover:bg-corthex-elevated transition-all active:scale-[0.98]"
                           >
                             <CheckCheck className="w-5 h-5" />
                             Mark as Read
@@ -469,8 +469,8 @@ export function NotificationsPage() {
                   </div>
                 </div>
                 {/* Detail Footer */}
-                <div className="p-6 bg-[#f5f0e8]/50 border-t border-[#e5e1d3]/20">
-                  <button className="flex items-center gap-2 text-xs font-mono text-[#6b705c]/50 hover:text-[#1a1a1a] transition-colors">
+                <div className="p-6 bg-corthex-elevated/50 border-t border-corthex-border/20">
+                  <button className="flex items-center gap-2 text-xs font-mono text-corthex-text-secondary/50 hover:text-corthex-text-primary transition-colors">
                     <History className="w-4 h-4" />
                     View Event History Logs
                   </button>
@@ -479,10 +479,10 @@ export function NotificationsPage() {
             ) : (
               <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-[#f5f0e8] flex items-center justify-center mx-auto mb-4">
-                    <Info className="w-8 h-8 text-[#6b705c]/30" />
+                  <div className="w-16 h-16 rounded-2xl bg-corthex-elevated flex items-center justify-center mx-auto mb-4">
+                    <Info className="w-8 h-8 text-corthex-text-secondary/30" />
                   </div>
-                  <p className="text-sm text-[#6b705c]/60 font-medium">Select a notification to view details</p>
+                  <p className="text-sm text-corthex-text-secondary/60 font-medium">Select a notification to view details</p>
                 </div>
               </div>
             )}
@@ -493,16 +493,16 @@ export function NotificationsPage() {
         <footer className="mt-8 flex justify-between items-center px-2">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#606C38]" />
-              <span className="font-mono text-[10px] text-[#6b705c]/50 uppercase tracking-widest">System Online</span>
+              <span className="w-2 h-2 rounded-full bg-corthex-accent" />
+              <span className="font-mono text-[10px] text-corthex-text-secondary/50 uppercase tracking-widest">System Online</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] text-[#6b705c]/50 uppercase tracking-widest">
+              <span className="font-mono text-[10px] text-corthex-text-secondary/50 uppercase tracking-widest">
                 {unreadCount} unread
               </span>
             </div>
           </div>
-          <div className="font-mono text-[10px] text-[#6b705c]/30">
+          <div className="font-mono text-[10px] text-corthex-text-secondary/30">
             CORTHEX NOTIFICATION ENGINE // ASYNC_QUEUE_ACTIVE
           </div>
         </footer>

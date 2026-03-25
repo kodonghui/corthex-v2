@@ -99,7 +99,7 @@ function ConfidenceBar({ value, max = 100 }: { value: number; max?: number }) {
     <div className="flex items-center gap-2">
       <div className="h-1.5 w-16 rounded-full bg-stone-200 overflow-hidden">
         <div
-          className="h-full rounded-full bg-[#606C38] transition-all"
+          className="h-full rounded-full bg-corthex-accent transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -113,7 +113,7 @@ function AgentCard({ agent, onClick }: { agent: AgentOverview; onClick: () => vo
   return (
     <button
       onClick={onClick}
-      className="text-left w-full p-4 rounded-lg border border-[#e5e1d3] bg-white hover:border-[#606C38]/40 transition-colors"
+      className="text-left w-full p-4 rounded-lg border border-corthex-border bg-white hover:border-corthex-accent/40 transition-colors"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-medium text-stone-800 truncate">{agent.agentName || agent.agentId.slice(0, 8)}</h3>
@@ -214,7 +214,7 @@ function ObservationsTab({ agentId }: { agentId: string }) {
         </div>
       ) : (
         obs.map((o) => (
-          <div key={o.id} className={`p-3 rounded-lg border ${o.flagged ? 'border-red-200 bg-red-50/50' : 'border-[#e5e1d3] bg-white'}`}>
+          <div key={o.id} className={`p-3 rounded-lg border ${o.flagged ? 'border-red-200 bg-red-50/50' : 'border-corthex-border bg-white'}`}>
             <div className="flex items-start justify-between gap-2">
               <p className="text-sm text-stone-700 line-clamp-2 flex-1">{o.content}</p>
               <button
@@ -305,12 +305,12 @@ function MemoriesTab({ agentId }: { agentId: string }) {
         </div>
       ) : (
         memories.map((m) => (
-          <div key={m.id} className={`p-3 rounded-lg border ${m.pinned ? 'border-[#606C38]/40 bg-[#faf8f5]' : 'border-[#e5e1d3] bg-white'}`}>
+          <div key={m.id} className={`p-3 rounded-lg border ${m.pinned ? 'border-corthex-accent/40 bg-corthex-bg' : 'border-corthex-border bg-white'}`}>
             <div className="flex items-start justify-between gap-2">
               <p className="text-sm text-stone-700 flex-1">{m.content}</p>
               <button
                 onClick={() => pinMut.mutate(m.id)}
-                className={`shrink-0 transition-colors ${m.pinned ? 'text-[#606C38]' : 'text-stone-300 hover:text-[#606C38]'}`}
+                className={`shrink-0 transition-colors ${m.pinned ? 'text-corthex-accent' : 'text-stone-300 hover:text-corthex-accent'}`}
                 title={m.pinned ? '고정 해제' : '고정'}
               >
                 <Pin className="w-4 h-4" />
@@ -423,7 +423,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
   return (
     <div className="space-y-6">
       {/* Overall Score */}
-      <div className="flex items-center gap-6 p-4 rounded-lg border border-[#e5e1d3] bg-white">
+      <div className="flex items-center gap-6 p-4 rounded-lg border border-corthex-border bg-white">
         <ScoreRing score={score.overall} />
         <div className="flex-1">
           <h3 className="font-medium text-stone-800 mb-1">Overall Capability</h3>
@@ -443,7 +443,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
           if (!meta) return null
           const Icon = meta.icon
           return (
-            <div key={key} className="p-3 rounded-lg border border-[#e5e1d3] bg-white">
+            <div key={key} className="p-3 rounded-lg border border-corthex-border bg-white">
               <div className="flex items-center gap-2 mb-2">
                 <Icon className={`w-4 h-4 ${meta.color}`} />
                 <span className="text-sm font-medium text-stone-700">{meta.label}</span>
@@ -451,7 +451,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
               </div>
               <div className="h-1.5 rounded-full bg-stone-200 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#606C38] transition-all"
+                  className="h-full rounded-full bg-corthex-accent transition-all"
                   style={{ width: `${value}%` }}
                 />
               </div>
@@ -462,16 +462,16 @@ function CapabilityTab({ agentId }: { agentId: string }) {
 
       {/* History Trend */}
       {history.length > 1 && (
-        <div className="p-4 rounded-lg border border-[#e5e1d3] bg-white">
+        <div className="p-4 rounded-lg border border-corthex-border bg-white">
           <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-[#606C38]" />
+            <TrendingUp className="w-4 h-4 text-corthex-accent" />
             <h3 className="text-sm font-medium text-stone-700">Score History</h3>
           </div>
           <div className="flex items-end gap-1 h-16">
             {history.slice(0, 20).reverse().map((h) => (
               <div
                 key={h.id}
-                className="flex-1 bg-[#606C38]/70 rounded-t hover:bg-[#606C38] transition-colors"
+                className="flex-1 bg-corthex-accent/70 rounded-t hover:bg-corthex-accent transition-colors"
                 style={{ height: `${Math.max(h.overallScore, 4)}%` }}
                 title={`${h.overallScore} — ${formatDate(h.evaluatedAt)}`}
               />
@@ -555,14 +555,14 @@ function AgentDetail({ agentId, agentName, onBack }: { agentId: string; agentNam
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#e5e1d3]">
+      <div className="flex gap-1 border-b border-corthex-border">
         {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
             className={`flex items-center gap-1.5 px-3 py-2 text-sm border-b-2 transition-colors ${
               tab === key
-                ? 'border-[#606C38] text-[#283618] font-medium'
+                ? 'border-corthex-accent text-corthex-accent-deep font-medium'
                 : 'border-transparent text-stone-500 hover:text-stone-700'
             }`}
           >
@@ -606,7 +606,7 @@ export function MemoriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Brain className="w-6 h-6 text-[#606C38]" />
+        <Brain className="w-6 h-6 text-corthex-accent" />
         <h1 className="text-xl font-semibold text-stone-800">Memory Dashboard</h1>
       </div>
 

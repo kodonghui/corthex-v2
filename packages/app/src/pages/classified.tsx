@@ -123,9 +123,9 @@ function formatCost(micro: number | null | undefined) {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 4) return 'bg-[#4d7c0f]'
-  if (score >= 3) return 'bg-[#b45309]'
-  return 'bg-[#dc2626]'
+  if (score >= 4) return 'bg-corthex-accent'
+  if (score >= 3) return 'bg-amber-700'
+  return 'bg-red-600'
 }
 
 function useDebounce(value: string, delay: number) {
@@ -264,7 +264,7 @@ export function ClassifiedPage() {
         <div className="grid grid-cols-12 gap-6 h-full">
           {/* BEGIN: LeftSidebar (Security Classifications) */}
           <aside className="col-span-12 lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-            <div className="bg-[#f5f0e8] rounded-2xl p-5 border border-[#e5e1d3] h-full">
+            <div className="bg-corthex-elevated rounded-2xl p-5 border border-corthex-border h-full">
               <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: '#6b705c' }}>Security Clearance</h2>
               <nav className="space-y-2">
                 {classificationButtons.map((btn) => {
@@ -280,7 +280,7 @@ export function ClassifiedPage() {
                       className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
                         isActive
                           ? 'shadow-lg'
-                          : 'hover:bg-[#f0ebe0] group'
+                          : 'hover:bg-corthex-elevated group'
                       }`}
                       style={isActive ? { backgroundColor: '#606C38', color: '#ffffff' } : undefined}
                     >
@@ -314,7 +314,7 @@ export function ClassifiedPage() {
               <h2 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>Classified Archive</h2>
               <div className="flex gap-2">
                 <input
-                  className="text-sm rounded-full px-4 py-1.5 w-48 transition-all border focus:ring-1 focus:ring-[#606C38]"
+                  className="text-sm rounded-full px-4 py-1.5 w-48 transition-all border focus:ring-1 focus:ring-corthex-accent"
                   style={{ borderColor: '#908a78', color: '#1a1a1a' }}
                   placeholder="Filter documents..."
                   type="text"
@@ -348,7 +348,7 @@ export function ClassifiedPage() {
                     <article
                       key={item.id}
                       onClick={() => setDetailId(item.id)}
-                      className={`bg-[#f5f0e8] p-5 rounded-2xl border border-[#e5e1d3] border-l-4 transition-all cursor-pointer ${
+                      className={`bg-corthex-elevated p-5 rounded-2xl border border-corthex-border border-l-4 transition-all cursor-pointer ${
                         isActive ? 'border-l-8' : 'hover:border-l-8'
                       } ${idx > 0 && !isActive ? 'opacity-80 hover:opacity-100' : ''}`}
                       style={{
@@ -360,17 +360,17 @@ export function ClassifiedPage() {
                           <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                             {item.commandType || item.classification.toUpperCase()}
                           </span>
-                          <h3 className="font-bold text-[#1a1a1a]">{item.title}</h3>
+                          <h3 className="font-bold text-corthex-text-primary">{item.title}</h3>
                         </div>
-                        <span className="text-xs text-[#6b705c]">{formatDate(item.createdAt)}</span>
+                        <span className="text-xs text-corthex-text-secondary">{formatDate(item.createdAt)}</span>
                       </div>
                       {item.summary && (
-                        <p className="text-sm text-[#756e5a] line-clamp-2 mb-4">{item.summary}</p>
+                        <p className="text-sm text-corthex-text-secondary line-clamp-2 mb-4">{item.summary}</p>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {item.agentName && (
-                            <span className="text-xs text-[#6b705c]">{item.agentName}</span>
+                            <span className="text-xs text-corthex-text-secondary">{item.agentName}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -398,9 +398,9 @@ export function ClassifiedPage() {
 
           {/* BEGIN: RightSidebar (Document Detail View) */}
           <aside className="col-span-12 lg:col-span-4 xl:col-span-4 h-full hidden lg:block">
-            <div className="bg-[#f5f0e8] rounded-2xl border border-[#e5e1d3] h-full flex flex-col overflow-hidden">
+            <div className="bg-corthex-elevated rounded-2xl border border-corthex-border h-full flex flex-col overflow-hidden">
               {!detailId ? (
-                <div className="flex-1 flex items-center justify-center text-[#6b705c] text-sm">
+                <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
                   문서를 선택하세요
                 </div>
               ) : detailQuery.isLoading || !detail ? (
@@ -410,18 +410,18 @@ export function ClassifiedPage() {
               ) : (
                 <>
                   {/* Detail Header */}
-                  <div className="p-6 border-b border-[#e5e1d3]">
+                  <div className="p-6 border-b border-corthex-border">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-3 h-3 rounded-full" style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[detail.classification] }} />
-                      <span className="text-xs font-bold text-[#6b705c] tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
+                      <span className="text-xs font-bold text-corthex-text-secondary tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-[#1a1a1a] leading-tight">{detail.title}</h2>
+                    <h2 className="text-2xl font-bold text-corthex-text-primary leading-tight">{detail.title}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {detail.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-[#f5f0e8] text-[#6b705c] rounded-full text-xs font-medium">{tag}</span>
+                        <span key={tag} className="px-3 py-1 bg-corthex-elevated text-corthex-text-secondary rounded-full text-xs font-medium">{tag}</span>
                       ))}
                       {detail.departmentName && (
-                        <span className="px-3 py-1 bg-[#f5f0e8] text-[#6b705c] rounded-full text-xs font-medium">{detail.departmentName}</span>
+                        <span className="px-3 py-1 bg-corthex-elevated text-corthex-text-secondary rounded-full text-xs font-medium">{detail.departmentName}</span>
                       )}
                     </div>
                   </div>
@@ -430,21 +430,21 @@ export function ClassifiedPage() {
                   <div className="p-6 overflow-y-auto flex-1">
                     {detail.delegationChain.length > 0 && (
                       <>
-                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-6">Delegation Chain</h3>
+                        <h3 className="text-xs font-bold text-corthex-text-secondary uppercase tracking-wider mb-6">Delegation Chain</h3>
                         <div className="space-y-6 relative">
                           {/* Connector Line */}
-                          <div className="absolute left-5 top-2 bottom-8 w-px bg-[#f5f0e8]" />
+                          <div className="absolute left-5 top-2 bottom-8 w-px bg-corthex-elevated" />
                           {detail.delegationChain.map((step, i) => {
                             const initials = step.agentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-                            const bgColor = i === 0 ? 'bg-white text-white' : i === 1 ? 'bg-[#f0ebe0] text-[#6b705c]' : 'bg-[#f5f0e8] text-[#6b705c]'
+                            const bgColor = i === 0 ? 'bg-white text-white' : i === 1 ? 'bg-corthex-elevated text-corthex-text-secondary' : 'bg-corthex-elevated text-corthex-text-secondary'
                             return (
                               <div key={i} className="flex items-start gap-4 relative z-10">
                                 <div className={`w-10 h-10 rounded-full ${bgColor} flex items-center justify-center text-xs border-4 border-white shadow-sm`}>
                                   {initials}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-[#1a1a1a]">{step.agentName}</p>
-                                  <p className="text-xs text-[#756e5a]">{step.role} - {step.status}</p>
+                                  <p className="text-sm font-bold text-corthex-text-primary">{step.agentName}</p>
+                                  <p className="text-xs text-corthex-text-secondary">{step.role} - {step.status}</p>
                                 </div>
                               </div>
                             )
@@ -456,19 +456,19 @@ export function ClassifiedPage() {
                     {/* Quality Review Scores */}
                     {detail.qualityReview && (
                       <div className="mt-10">
-                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-4">Quality Review Scores</h3>
+                        <h3 className="text-xs font-bold text-corthex-text-secondary uppercase tracking-wider mb-4">Quality Review Scores</h3>
                         <div className="space-y-4">
                           <div>
                             <div className="flex justify-between text-xs font-medium mb-1">
-                              <span className="text-[#6b705c]">Overall Score</span>
-                              <span className="text-[#1a1a1a]">{(detail.qualityReview.score * 20)}%</span>
+                              <span className="text-corthex-text-secondary">Overall Score</span>
+                              <span className="text-corthex-text-primary">{(detail.qualityReview.score * 20)}%</span>
                             </div>
-                            <div className="w-full h-1.5 bg-[#f5f0e8] rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-corthex-elevated rounded-full overflow-hidden">
                               <div className="h-full bg-green-500 rounded-full" style={{ width: `${detail.qualityReview.score * 20}%` }} />
                             </div>
                           </div>
                           {detail.qualityReview.feedback && (
-                            <p className="text-xs text-[#756e5a] italic">{detail.qualityReview.feedback}</p>
+                            <p className="text-xs text-corthex-text-secondary italic">{detail.qualityReview.feedback}</p>
                           )}
                         </div>
                       </div>
@@ -477,8 +477,8 @@ export function ClassifiedPage() {
                     {/* Content preview */}
                     {detail.content && (
                       <div className="mt-8">
-                        <h3 className="text-xs font-bold text-[#6b705c] uppercase tracking-wider mb-4">Document Content</h3>
-                        <div className="prose prose-sm max-w-none text-[#6b705c]">
+                        <h3 className="text-xs font-bold text-corthex-text-secondary uppercase tracking-wider mb-4">Document Content</h3>
+                        <div className="prose prose-sm max-w-none text-corthex-text-secondary">
                           <MarkdownRenderer content={detail.content} />
                         </div>
                       </div>

@@ -53,12 +53,12 @@ function renderTextWithLinks(
         <button
           key={key++}
           onClick={() => onNavigate(href)}
-          className="text-[#5a7247] underline hover:text-[#869e71]"
+          className="text-corthex-accent underline hover:text-corthex-accent-hover"
         >
           {linkText}
         </button>
       ) : (
-        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-[#5a7247] underline hover:text-[#869e71]">
+        <a key={key++} href={href} target="_blank" rel="noopener noreferrer" className="text-corthex-accent underline hover:text-corthex-accent-hover">
           {linkText}
         </a>
       ),
@@ -390,15 +390,15 @@ export function ChatArea({
   if (!agent || !sessionId) {
     return (
       <div data-testid="chat-empty" className="flex-1 flex flex-col items-center justify-center h-full px-6 text-center">
-        <div className="bg-[#5a7247]/20 flex items-center justify-center rounded-full w-16 h-16 mb-4 border border-[#5a7247]/30">
-          <Bot className="w-8 h-8 text-[#5a7247]" />
+        <div className="bg-corthex-accent/20 flex items-center justify-center rounded-full w-16 h-16 mb-4 border border-corthex-accent/30">
+          <Bot className="w-8 h-8 text-corthex-accent" />
         </div>
         <p className="text-sm font-medium text-stone-500">에이전트와 대화를 시작하세요</p>
         <p className="text-xs text-stone-400 mt-1">무엇이든 질문해보세요</p>
         {onBack && (
           <button
             onClick={onBack}
-            className="mt-4 px-4 py-2 text-sm bg-[#5a7247] text-slate-950 rounded-lg font-medium hover:bg-[#869e71] transition-colors"
+            className="mt-4 px-4 py-2 text-sm bg-corthex-accent text-slate-950 rounded-lg font-medium hover:bg-corthex-accent-hover transition-colors"
           >
             새 대화 시작
           </button>
@@ -451,32 +451,32 @@ export function ChatArea({
               if (delegationChain && delegationChain.length >= 3) {
                 if (chainExpanded) {
                   return (
-                    <button onClick={() => setChainExpanded(false)} className="text-[#5a7247] hover:underline">
+                    <button onClick={() => setChainExpanded(false)} className="text-corthex-accent hover:underline">
                       {delegationChain.join(' -> ')}
                     </button>
                   )
                 }
                 return (
-                  <button onClick={() => setChainExpanded(true)} className="text-[#5a7247] animate-pulse hover:underline">
+                  <button onClick={() => setChainExpanded(true)} className="text-corthex-accent animate-pulse hover:underline">
                     {delegationChain.length - 1}단계 위임 중
                   </button>
                 )
               }
               if (delegationChain && delegationChain.length === 2) {
-                return <span className="text-[#5a7247] animate-pulse">{delegationChain[1]}에게 위임 중...</span>
+                return <span className="text-corthex-accent animate-pulse">{delegationChain[1]}에게 위임 중...</span>
               }
               const entries = Object.values(delegationStatuses)
               const total = entries.length
               const completed = entries.filter(s => s.status !== 'delegating').length
               const delegating = entries.filter(s => s.status === 'delegating')
               if (total > 1 && completed < total) {
-                return <span className="text-[#5a7247] animate-pulse">{total}개 부서 위임 중 ({completed}/{total})</span>
+                return <span className="text-corthex-accent animate-pulse">{total}개 부서 위임 중 ({completed}/{total})</span>
               }
               if (total > 1 && completed === total) {
                 return <span className="text-emerald-400">{total}개 부서 위임 완료</span>
               }
               if (delegating.length === 1) {
-                return <span className="text-[#5a7247] animate-pulse">{delegating[0].targetAgentName}에게 위임 중...</span>
+                return <span className="text-corthex-accent animate-pulse">{delegating[0].targetAgentName}에게 위임 중...</span>
               }
               return <span>{statusLabels[agent.status] || agent.role}</span>
             })()}
@@ -487,7 +487,7 @@ export function ChatArea({
               onClick={() => setShowDelegations(!showDelegations)}
               className={`flex items-center justify-center rounded-xl size-10 transition-colors ${
                 showDelegations
-                  ? 'text-[#5a7247] bg-[#5a7247]/10'
+                  ? 'text-corthex-accent bg-corthex-accent/10'
                   : 'text-stone-500 hover:text-slate-200 hover:bg-stone-100'
               }`}
             >
@@ -514,7 +514,7 @@ export function ChatArea({
                       : del.status === 'failed'
                         ? 'bg-red-500/20 text-red-400'
                         : del.status === 'processing'
-                          ? 'bg-[#5a7247]/20 text-[#5a7247]'
+                          ? 'bg-corthex-accent/20 text-corthex-accent'
                           : 'bg-slate-600 text-stone-500'
                   }`}
                 >
@@ -548,7 +548,7 @@ export function ChatArea({
             {/* 이전 메시지 로딩 스피너 */}
             {isFetchingNextPage && (
               <div className="flex justify-center py-2">
-                <Loader2 className="w-5 h-5 text-[#5a7247] animate-spin" />
+                <Loader2 className="w-5 h-5 text-corthex-accent animate-spin" />
               </div>
             )}
             {hasNextPage && !isFetchingNextPage && (
@@ -576,8 +576,8 @@ export function ChatArea({
 
             {messages.length === 0 && !isStreaming && (
               <div data-testid="chat-empty" className="flex flex-col items-center justify-center h-full px-6 text-center">
-                <div className="bg-[#5a7247]/20 flex items-center justify-center rounded-full w-12 h-12 mb-3 border border-[#5a7247]/30">
-                  <Bot className="w-6 h-6 text-[#5a7247]" />
+                <div className="bg-corthex-accent/20 flex items-center justify-center rounded-full w-12 h-12 mb-3 border border-corthex-accent/30">
+                  <Bot className="w-6 h-6 text-corthex-accent" />
                 </div>
                 <p className="text-sm font-medium text-stone-500">
                   {agent.name}과(와) 대화를 시작하세요
@@ -603,7 +603,7 @@ export function ChatArea({
                   >
                     <div className="flex flex-col gap-1 items-end max-w-[80%]">
                       <p className="text-stone-500 text-xs font-medium px-2">User</p>
-                      <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-[#5a7247]/10 text-[#5a7247]">
+                      <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-corthex-accent/10 text-corthex-accent">
                         <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
@@ -614,7 +614,7 @@ export function ChatArea({
                                 href={`/api/workspace/files/${att.id}/download`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#5a7247]/20 text-xs text-[#869e71]"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-corthex-accent/20 text-xs text-corthex-accent-hover"
                               >
                                 {att.mimeType.startsWith('image/') ? (
                                   <img
@@ -652,8 +652,8 @@ export function ChatArea({
                   className="flex items-start gap-3 group"
                 >
                   {/* Avatar */}
-                  <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
-                    <Bot className="w-4 h-4 text-[#5a7247]" />
+                  <div className="bg-corthex-accent/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-corthex-accent/30">
+                    <Bot className="w-4 h-4 text-corthex-accent" />
                   </div>
                   <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
                     <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
@@ -697,7 +697,7 @@ export function ChatArea({
                       )}
                       {toolContent && (
                         <div className="mt-3 pt-3 border-t border-stone-200">
-                          <p className="text-[10px] font-medium text-[#5a7247] mb-1 font-mono">도구 호출</p>
+                          <p className="text-[10px] font-medium text-corthex-accent mb-1 font-mono">도구 호출</p>
                           <p className="text-[11px] text-stone-500 whitespace-pre-wrap font-mono">{toolContent}</p>
                         </div>
                       )}
@@ -716,8 +716,8 @@ export function ChatArea({
             {/* 스트리밍 메시지 */}
             {isStreaming && (streamingText || toolCalls.length > 0) && (
               <div data-testid="msg-streaming" className="flex items-start gap-3">
-                <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
-                  <Bot className="w-4 h-4 text-[#5a7247]" />
+                <div className="bg-corthex-accent/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-corthex-accent/30">
+                  <Bot className="w-4 h-4 text-corthex-accent" />
                 </div>
                 <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
                   <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
@@ -732,7 +732,7 @@ export function ChatArea({
                     <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
                       <p className="whitespace-pre-wrap">
                         {renderTextWithLinks(streamingText, navigate)}
-                        <span className="inline-block w-2 h-4 bg-[#5a7247] ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
+                        <span className="inline-block w-2 h-4 bg-corthex-accent ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
                       </p>
                     </div>
                   )}
@@ -750,8 +750,8 @@ export function ChatArea({
             {/* 스트리밍 시작 대기 (아직 토큰 없음) */}
             {isStreaming && !streamingText && toolCalls.length === 0 && (
               <div data-testid="msg-streaming" className="flex items-start gap-3">
-                <div className="bg-[#5a7247]/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[#5a7247]/30">
-                  <Bot className="w-4 h-4 text-[#5a7247]" />
+                <div className="bg-corthex-accent/20 flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-corthex-accent/30">
+                  <Bot className="w-4 h-4 text-corthex-accent" />
                 </div>
                 <div className="flex flex-col gap-1 items-start max-w-[80%]">
                   <p className="text-stone-500 text-xs font-medium px-2">{agent.name}</p>
@@ -778,7 +778,7 @@ export function ChatArea({
             {/* Delegation status inline */}
             {isStreaming && delegationStatus && !delegationChain && (
               <div data-testid="delegation-status" className="flex items-center gap-2 px-3 py-1.5 bg-stone-100/50 rounded-full border border-stone-200/50 text-xs text-stone-500 font-mono mx-auto">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#5a7247] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-corthex-accent animate-pulse" />
                 {delegationStatus.targetAgentName}에게 위임 중...
               </div>
             )}
@@ -800,7 +800,7 @@ export function ChatArea({
             {/* Debate notice */}
             {debateNotice && (
               <div className="flex justify-center">
-                <div className="bg-[#5a7247]/10 border border-[#5a7247]/20 rounded-full px-4 py-2 text-xs text-[#5a7247] animate-pulse font-mono">
+                <div className="bg-corthex-accent/10 border border-corthex-accent/20 rounded-full px-4 py-2 text-xs text-corthex-accent animate-pulse font-mono">
                   {debateNotice}
                 </div>
               </div>
@@ -840,7 +840,7 @@ export function ChatArea({
                 ))}
               </div>
             )}
-            <div className="flex items-end gap-2 bg-[#1E293B] rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-[#5a7247]/50 transition-all">
+            <div className="flex items-end gap-2 bg-[#1E293B] rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-corthex-accent/50 transition-all">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -900,7 +900,7 @@ export function ChatArea({
                   data-testid="chat-send-btn"
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}
-                  className="flex items-center justify-center bg-[#5a7247] text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-[#869e71] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="flex items-center justify-center bg-corthex-accent text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
                   aria-label="메시지 전송"
                 >
                   <Send className="w-5 h-5 ml-0.5" />

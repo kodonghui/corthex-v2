@@ -58,12 +58,12 @@ type ApplyResult = {
 // Constants
 // ============================================================
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
-  manager: { label: 'Manager', color: 'bg-[#283618] text-[#a3c48a]' },
+  manager: { label: 'Manager', color: 'bg-corthex-accent-deep text-corthex-accent-hover' },
   specialist: { label: 'Specialist', color: 'bg-cyan-900 text-cyan-300' },
   worker: { label: 'Worker', color: 'bg-slate-700 text-slate-400' },
 }
 
-const modalInput = 'bg-slate-800 border border-slate-600 focus:border-[#5a7247] focus:ring-2 focus:ring-[#5a7247]/40 focus:outline-none rounded-lg px-3 py-2 text-sm text-slate-50 w-full'
+const modalInput = 'bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none rounded-lg px-3 py-2 text-sm text-slate-50 w-full'
 
 // ============================================================
 // Preview Modal
@@ -158,7 +158,7 @@ function PreviewModal({
           <button
             onClick={onApply}
             disabled={applying}
-            className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
           >
             {applying ? '적용 중...' : '이 템플릿 적용'}
           </button>
@@ -199,9 +199,9 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
               <p className="text-2xl font-bold text-emerald-300">{result.departmentsCreated}</p>
               <p className="text-xs text-emerald-400">부서 생성</p>
             </div>
-            <div className="bg-[#283618]/20 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-[#a3c48a]">{result.agentsCreated}</p>
-              <p className="text-xs text-[#a3c48a]">에이전트 생성</p>
+            <div className="bg-corthex-accent-deep/20 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-corthex-accent-hover">{result.agentsCreated}</p>
+              <p className="text-xs text-corthex-accent-hover">에이전트 생성</p>
             </div>
           </div>
 
@@ -237,7 +237,7 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
         <div className="flex justify-end px-6 py-4 border-t border-slate-700">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg transition-colors"
           >
             확인
           </button>
@@ -257,16 +257,16 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-[#5a7247] hover:shadow-lg hover:shadow-[#283618]/10 focus:outline-none focus:ring-2 focus:ring-[#5a7247]/40"
+      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
       data-testid={`template-card-${template.id}`}
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-50 group-hover:text-[#a3c48a] transition-colors">
+        <h3 className="text-base font-semibold text-slate-50 group-hover:text-corthex-accent-hover transition-colors">
           {template.name}
         </h3>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           {template.isBuiltin && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#283618] text-[#a3c48a]">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-accent-deep text-corthex-accent-hover">
               기본
             </span>
           )}
@@ -408,7 +408,7 @@ export function OrgTemplatesPage() {
             <p className="text-sm text-red-500">템플릿을 불러올 수 없습니다.</p>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2 text-sm rounded-lg bg-[#5a7247] text-white hover:bg-[#6b8a55] transition-colors"
+              className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"
             >
               다시 시도
             </button>
@@ -429,7 +429,7 @@ export function OrgTemplatesPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+          className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
         >
           현재 조직을 템플릿으로 저장
         </button>
@@ -494,7 +494,7 @@ export function OrgTemplatesPage() {
                   <button
                     onClick={() => setPublishConfirmId(t.id)}
                     disabled={publishMutation.isPending}
-                    className="px-3 py-1 text-xs text-[#a3c48a] border border-[#3a5a1c] rounded-lg hover:bg-[#283618]/20 transition-colors disabled:opacity-50"
+                    className="px-3 py-1 text-xs text-corthex-accent-hover border border-corthex-accent-deep rounded-lg hover:bg-corthex-accent-deep/20 transition-colors disabled:opacity-50"
                   >
                     마켓에 공개
                   </button>
@@ -531,7 +531,7 @@ export function OrgTemplatesPage() {
               </button>
               <button
                 onClick={() => { publishMutation.mutate(publishConfirmId); setPublishConfirmId(null) }}
-                className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg transition-colors"
               >
                 공개
               </button>
@@ -586,7 +586,7 @@ export function OrgTemplatesPage() {
               <button
                 onClick={() => createMutation.mutate({ name: newTemplateName, description: newTemplateDesc || undefined })}
                 disabled={!newTemplateName.trim() || createMutation.isPending}
-                className="px-4 py-2 bg-[#5a7247] hover:bg-[#6b8a55] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {createMutation.isPending ? '저장 중...' : '저장'}
               </button>

@@ -170,7 +170,7 @@ function DepartmentTable({ items }: { items: CostByDepartment[] }) {
         </thead>
         <tbody className="divide-y divide-stone-50">
           {sorted.map((r) => (
-            <tr key={r.departmentId} className="hover:bg-[#faf8f5]/50 transition-colors">
+            <tr key={r.departmentId} className="hover:bg-corthex-bg/50 transition-colors">
               <td className="py-4 font-bold">{r.departmentName}</td>
               <td className="py-4">{formatNumber(r.callCount)}</td>
               <td className="py-4" style={{ fontFamily: 'serif' }}>${microToUsd(r.totalCostMicro)}</td>
@@ -207,7 +207,7 @@ function AgentTable({ items }: { items: CostByAgent[] }) {
         </thead>
         <tbody>
           {sorted.map(r => (
-            <tr key={r.agentId} className="border-b border-stone-50 hover:bg-[#faf8f5]/50">
+            <tr key={r.agentId} className="border-b border-stone-50 hover:bg-corthex-bg/50">
               <td className="py-3 font-medium">{r.agentName}</td>
               <td className="py-3 font-mono" style={{ color: '#5a7247' }}>${microToUsd(r.totalCostMicro)}</td>
               <td className="py-3 text-stone-500">{formatNumber(r.inputTokens)}</td>
@@ -242,7 +242,7 @@ function ModelTable({ items }: { items: CostByModel[] }) {
         </thead>
         <tbody>
           {sorted.map(r => (
-            <tr key={`${r.provider}-${r.model}`} className="border-b border-stone-50 hover:bg-[#faf8f5]/50">
+            <tr key={`${r.provider}-${r.model}`} className="border-b border-stone-50 hover:bg-corthex-bg/50">
               <td className="py-3 font-medium">{r.displayName}</td>
               <td className="py-3 text-stone-500 capitalize">{r.provider}</td>
               <td className="py-3 font-mono" style={{ color: '#5a7247' }}>${microToUsd(r.totalCostMicro)}</td>
@@ -429,7 +429,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
               <div className="relative flex-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">$</span>
                 <input
-                  className="w-full pl-8 pr-4 py-3 border-stone-200 rounded-xl focus:border-[#5a7247] focus:ring-[#5a7247] transition-all"
+                  className="w-full pl-8 pr-4 py-3 border-stone-200 rounded-xl focus:border-corthex-accent focus:ring-corthex-accent transition-all"
                   style={{ backgroundColor: '#faf8f5' }}
                   type="number"
                   value={activeForm.monthlyBudget}
@@ -505,7 +505,7 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
             </thead>
             <tbody className="divide-y divide-stone-50">
               {items.slice(0, 10).map((d) => (
-                <tr key={d.date} className="hover:bg-[#faf8f5]/50 transition-colors">
+                <tr key={d.date} className="hover:bg-corthex-bg/50 transition-colors">
                   <td className="px-6 py-4 text-stone-500">{d.date}</td>
                   <td className="px-6 py-4">{formatNumber(d.inputTokens)}</td>
                   <td className="px-6 py-4">{formatNumber(d.outputTokens)}</td>

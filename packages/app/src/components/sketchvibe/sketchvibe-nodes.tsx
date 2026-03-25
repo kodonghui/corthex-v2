@@ -230,18 +230,18 @@ export function GroupNode({ id, data, selected }: NodeProps) {
   return (
     <div
       className={`rounded-lg border-2 border-dashed min-w-[200px] min-h-[120px] ${
-        selected ? 'border-[#5a7247] bg-cyan-900/15' : 'border-stone-300 bg-stone-100/20'
+        selected ? 'border-corthex-accent bg-cyan-900/15' : 'border-stone-300 bg-stone-100/20'
       }`}
       style={{ padding: 12 }}
     >
       <div className="flex items-center gap-1 mb-2">
-        <span className="text-[10px] text-[#5a7247] font-medium">GROUP</span>
-        <EditableLabel value={label} onChange={onChange} className="text-xs font-semibold text-[#869e71]" />
+        <span className="text-[10px] text-corthex-accent font-medium">GROUP</span>
+        <EditableLabel value={label} onChange={onChange} className="text-xs font-semibold text-corthex-accent-hover" />
       </div>
-      <Handle type="target" position={Position.Top} className="!bg-[#5a7247]" />
-      <Handle type="target" position={Position.Left} className="!bg-[#5a7247]" />
-      <Handle type="source" position={Position.Bottom} className="!bg-[#5a7247]" />
-      <Handle type="source" position={Position.Right} className="!bg-[#5a7247]" />
+      <Handle type="target" position={Position.Top} className="!bg-corthex-accent" />
+      <Handle type="target" position={Position.Left} className="!bg-corthex-accent" />
+      <Handle type="source" position={Position.Bottom} className="!bg-corthex-accent" />
+      <Handle type="source" position={Position.Right} className="!bg-corthex-accent" />
     </div>
   )
 }

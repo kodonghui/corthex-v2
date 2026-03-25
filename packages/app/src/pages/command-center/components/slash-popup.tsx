@@ -33,7 +33,7 @@ const ICON_BG: Record<string, string> = {
   document: 'bg-amber-500/20 text-amber-400',
   diagram: 'bg-emerald-500/20 text-emerald-400',
   summary: 'bg-violet-500/20 text-violet-400',
-  broadcast: 'bg-[#5a7247]/20 text-[#5a7247]',
+  broadcast: 'bg-corthex-accent/20 text-corthex-accent',
   chain: 'bg-orange-500/20 text-orange-400',
   tools: 'bg-slate-500/20 text-stone-500',
   sketch: 'bg-pink-500/20 text-pink-400',

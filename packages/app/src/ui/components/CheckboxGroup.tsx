@@ -17,14 +17,14 @@ const CheckboxGroupRoot = React.forwardRef<HTMLDivElement, CheckboxGroupRootProp
   function CheckboxGroupRoot({ label, helpText, error = false, horizontal = false, children, className, ...otherProps }, ref) {
     return (
       <div className={twClassNames("flex flex-col items-start gap-2", className)} ref={ref} {...otherProps}>
-        {label ? <span className="text-sm font-semibold text-[#1a1a1a]">{label}</span> : null}
+        {label ? <span className="text-sm font-semibold text-corthex-text-primary">{label}</span> : null}
         {children ? (
           <div className={twClassNames("flex flex-col items-start gap-2", { "flex-row flex-nowrap gap-6": horizontal })}>
             {children}
           </div>
         ) : null}
         {helpText ? (
-          <span className={twClassNames("text-xs text-[#6b705c]", { "text-red-600": error })}>{helpText}</span>
+          <span className={twClassNames("text-xs text-corthex-text-secondary", { "text-red-600": error })}>{helpText}</span>
         ) : null}
       </div>
     );

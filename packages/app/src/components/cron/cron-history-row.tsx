@@ -28,7 +28,7 @@ export function CronHistoryRow({ timestamp, status, duration, cost, isErrorBg }:
       <td className="px-4 py-3 text-stone-500">{duration}</td>
       <td className="px-4 py-3 text-stone-500">{cost}</td>
       <td className="px-4 py-3 text-right">
-        <button className="text-[#5a7247] hover:underline">View</button>
+        <button className="text-corthex-accent hover:underline">View</button>
       </td>
     </tr>
   )

@@ -13,10 +13,10 @@ export interface CronJobItemProps {
 export function CronJobItem({ name, agentName, cronExpression, nextRun, icon, isActive, statusColorClass }: CronJobItemProps) {
     return (
         <div className={`flex gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isActive
-                ? 'bg-[#faf8f5] border-[#5a7247]/30'
+                ? 'bg-corthex-bg border-corthex-accent/30'
                 : 'hover:bg-stone-100/50 border-transparent'
             }`}>
-            <div className={`flex items-center justify-center rounded shrink-0 size-10 ${isActive ? 'text-[#5a7247] bg-[#5a7247]/10' : 'text-stone-500 bg-stone-100'
+            <div className={`flex items-center justify-center rounded shrink-0 size-10 ${isActive ? 'text-corthex-accent bg-corthex-accent/10' : 'text-stone-500 bg-stone-100'
                 }`}>
                 {icon}
             </div>

@@ -18,7 +18,7 @@ export function DebateInfo({ duration, participants, objective }: DebateInfoProp
             {/* Duration */}
             <div className="flex flex-col gap-2">
                 <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Duration</span>
-                <div className="font-mono text-2xl text-[#5a7247] font-medium">{duration}</div>
+                <div className="font-mono text-2xl text-corthex-accent font-medium">{duration}</div>
             </div>
 
             {/* Participants */}

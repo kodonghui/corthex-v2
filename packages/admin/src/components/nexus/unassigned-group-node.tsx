@@ -14,9 +14,9 @@ export const UnassignedGroupNode = memo(function UnassignedGroupNode({ data, sel
     <div
       className={`px-4 py-3 rounded-xl bg-orange-950/30 border-2 border-dashed shadow-md min-w-[240px] transition-all duration-150 ${
         isDropTarget
-          ? 'border-[#8fae7a] ring-2 ring-[#8fae7a] ring-offset-2 ring-offset-slate-900 scale-105'
+          ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover ring-offset-2 ring-offset-slate-900 scale-105'
           : selected
-            ? 'border-[#8fae7a] ring-2 ring-[#8fae7a]/50'
+            ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover/50'
             : 'border-orange-500'
       }`}
       data-testid="nexus-unassigned-group-node"

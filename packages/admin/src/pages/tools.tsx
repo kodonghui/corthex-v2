@@ -311,7 +311,7 @@ export function ToolsPage() {
                       {filteredTools.map((tool) => {
                         const badge = categoryBadgeColors[tool.category] || categoryBadgeColors.common
                         return (
-                          <tr key={tool.name} className="hover:bg-[#faf8f5] transition-colors">
+                          <tr key={tool.name} className="hover:bg-corthex-bg transition-colors">
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: '#f3f4f6' }}>
@@ -393,7 +393,7 @@ export function ToolsPage() {
                           return (
                             <tr
                               key={agent.id}
-                              className={`border-b transition-colors ${isModified ? 'bg-amber-50' : 'hover:bg-[#faf8f5]'}`}
+                              className={`border-b transition-colors ${isModified ? 'bg-amber-50' : 'hover:bg-corthex-bg'}`}
                               style={{ borderColor: '#f3f4f6' }}
                             >
                               <td className="sticky left-0 z-10 bg-white px-4 py-3 whitespace-nowrap border-r" style={{ borderColor: '#e5e7eb' }}>

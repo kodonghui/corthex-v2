@@ -13,12 +13,12 @@ export interface ReportListItemProps {
 export function ReportListItem({ title, statusText, statusColorClass, agentName, time, icon, isActive }: ReportListItemProps) {
     return (
         <div className={`group flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors ${isActive
-                ? 'bg-white border border-[#5a7247]/30 hover:border-[#5a7247]/50'
-                : 'bg-[#faf8f5] border border-transparent hover:bg-white hover:border-stone-200'
+                ? 'bg-white border border-corthex-accent/30 hover:border-corthex-accent/50'
+                : 'bg-corthex-bg border border-transparent hover:bg-white hover:border-stone-200'
             }`}>
             <div className="flex items-start gap-4">
                 <div className={`flex items-center justify-center rounded size-10 shrink-0 mt-0.5 ${isActive
-                        ? 'bg-[#5a7247]/10 text-[#5a7247]'
+                        ? 'bg-corthex-accent/10 text-corthex-accent'
                         : 'bg-white border border-stone-200 text-stone-500'
                     }`}>
                     {icon}

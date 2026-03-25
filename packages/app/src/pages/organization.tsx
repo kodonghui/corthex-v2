@@ -33,11 +33,11 @@ export function OrganizationPage() {
   const [activeTab, setActiveTab] = useState<OrgTab>('nexus')
 
   return (
-    <div data-testid="organization-page" className="flex-1 flex flex-col overflow-hidden bg-[#faf8f5]">
+    <div data-testid="organization-page" className="flex-1 flex flex-col overflow-hidden bg-corthex-bg">
       {/* Tab Header */}
-      <header className="border-b border-[#e5e1d3] bg-white shrink-0">
+      <header className="border-b border-corthex-border bg-white shrink-0">
         <div className="px-6 pt-4 pb-0">
-          <h1 className="text-2xl font-bold text-[#283618] mb-3">Organization</h1>
+          <h1 className="text-2xl font-bold text-corthex-accent-deep mb-3">Organization</h1>
           <nav className="flex gap-1" aria-label="Organization tabs">
             {TAB_CONFIG.map(({ value, label, icon: Icon }) => {
               const isActive = activeTab === value
@@ -47,8 +47,8 @@ export function OrganizationPage() {
                   onClick={() => setActiveTab(value)}
                   className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors border-b-2 ${
                     isActive
-                      ? 'border-[#606C38] text-[#283618] bg-[#f5f0e8]'
-                      : 'border-transparent text-[#6b705c] hover:text-[#283618] hover:bg-[#f5f0e8]/50'
+                      ? 'border-corthex-accent text-corthex-accent-deep bg-corthex-elevated'
+                      : 'border-transparent text-corthex-text-secondary hover:text-corthex-accent-deep hover:bg-corthex-elevated/50'
                   }`}
                   data-testid={`org-tab-${value}`}
                   aria-selected={isActive}

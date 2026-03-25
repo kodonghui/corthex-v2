@@ -89,17 +89,17 @@ const TRIGGER_TYPE_LABELS: Record<string, string> = {
 type TabKey = 'oneTime' | 'schedule' | 'trigger'
 
 const STATUS_STYLES: Record<string, { label: string; dotClass: string; textClass: string }> = {
-  queued: { label: '대기', dotClass: 'bg-[#908a78]', textClass: 'text-[#908a78]' },
+  queued: { label: '대기', dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' },
   processing: { label: '진행 중', dotClass: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse', textClass: 'text-blue-600' },
-  completed: { label: '완료', dotClass: 'bg-[#4d7c0f] shadow-[0_0_8px_rgba(77,124,15,0.5)]', textClass: 'text-[#4d7c0f]' },
+  completed: { label: '완료', dotClass: 'bg-corthex-accent shadow-[0_0_8px_rgba(77,124,15,0.5)]', textClass: 'text-corthex-accent' },
   failed: { label: '실패', dotClass: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]', textClass: 'text-red-600' },
-  blocked: { label: '대기(체인)', dotClass: 'bg-[#908a78]', textClass: 'text-[#908a78]' },
+  blocked: { label: '대기(체인)', dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' },
 }
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 
-const inputClass = 'w-full bg-white border border-[#e5e1d3] rounded-lg px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#908a78] focus:outline-none focus:ring-2 focus:ring-[#606C38]/20 focus:border-[#606C38]'
-const selectClass = 'w-full bg-white border border-[#e5e1d3] rounded-lg px-3 py-2 text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#606C38]/20 focus:border-[#606C38] appearance-none'
+const inputClass = 'w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent'
+const selectClass = 'w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent appearance-none'
 
 export function JobsPage() {
   const queryClient = useQueryClient()
@@ -351,22 +351,22 @@ export function JobsPage() {
   const isTabLoading = activeTab === 'oneTime' ? jobsLoading : activeTab === 'schedule' ? schedulesLoading : triggersLoading
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-[#faf8f5] text-[#1a1a1a]" data-testid="jobs-page">
+    <div className="flex-1 flex flex-col overflow-y-auto bg-corthex-bg text-corthex-text-primary" data-testid="jobs-page">
 
         {/* Header Section */}
         <header className="px-8 pt-8 pb-0">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div className="space-y-1">
-              <h1 className="text-4xl font-black tracking-tight text-[#1a1a1a]">
-                작업 관리 <span className="text-[#606C38] opacity-90">Jobs</span>
+              <h1 className="text-4xl font-black tracking-tight text-corthex-text-primary">
+                작업 관리 <span className="text-corthex-accent opacity-90">Jobs</span>
               </h1>
-              <p className="text-[#6b705c] text-lg">에이전트 작업을 모니터링하고 관리합니다</p>
+              <p className="text-corthex-text-secondary text-lg">에이전트 작업을 모니터링하고 관리합니다</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#908a78] group-focus-within:text-[#606C38] transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-secondary group-focus-within:text-corthex-accent transition-colors" />
                 <input
-                  className="pl-12 pr-4 py-3 bg-white border border-[#e5e1d3] rounded-xl focus:ring-2 focus:ring-[#606C38]/20 focus:border-[#606C38] outline-none min-w-[300px] text-sm transition-all shadow-sm"
+                  className="pl-12 pr-4 py-3 bg-white border border-corthex-border rounded-xl focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent outline-none min-w-[300px] text-sm transition-all shadow-sm"
                   placeholder="작업 이름 또는 에이전트 검색..."
                   type="text"
                   value={searchQuery}
@@ -375,7 +375,7 @@ export function JobsPage() {
               </div>
               <button
                 onClick={() => { setModalType(activeTab === 'trigger' ? 'trigger' : activeTab === 'schedule' ? 'schedule' : 'oneTime'); setShowModal(true) }}
-                className="flex items-center gap-2 px-5 py-3 bg-[#606C38] text-white rounded-xl hover:bg-[#4e5a2b] transition-colors text-sm font-semibold"
+                className="flex items-center gap-2 px-5 py-3 bg-corthex-accent text-white rounded-xl hover:bg-corthex-accent-deep transition-colors text-sm font-semibold"
                 data-testid="create-job-btn"
               >
                 <Plus className="w-5 h-5" />
@@ -387,15 +387,15 @@ export function JobsPage() {
 
         {/* Tab Bar */}
         <div className="px-8">
-          <div className="relative flex border-b border-[#e5e1d3]/30 mb-8 overflow-x-auto" data-testid="jobs-tabs">
+          <div className="relative flex border-b border-corthex-border/30 mb-8 overflow-x-auto" data-testid="jobs-tabs">
             {tabs.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-8 py-4 text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
                   activeTab === tab.key
-                    ? 'font-bold text-[#606C38] border-b-2 border-[#606C38]'
-                    : 'text-[#6b705c] hover:text-[#606C38]'
+                    ? 'font-bold text-corthex-accent border-b-2 border-corthex-accent'
+                    : 'text-corthex-text-secondary hover:text-corthex-accent'
                 }`}
                 data-testid={`jobs-tab-${tab.key}`}
               >
@@ -412,24 +412,24 @@ export function JobsPage() {
         <div className="px-8 pb-8 space-y-4">
           {isTabLoading && (
             <div className="flex justify-center py-12" data-testid="jobs-loading">
-              <div className="h-6 w-6 border-2 border-[#606C38] border-t-transparent rounded-full animate-spin" />
+              <div className="h-6 w-6 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
             </div>
           )}
 
           {/* One-time jobs tab */}
           {!isTabLoading && activeTab === 'oneTime' && jobs.length === 0 && (
             <div className="text-center py-16" data-testid="jobs-empty">
-              <p className="text-sm text-[#6b705c]">등록된 일회성 작업이 없습니다</p>
+              <p className="text-sm text-corthex-text-secondary">등록된 일회성 작업이 없습니다</p>
             </div>
           )}
 
           {!isTabLoading && activeTab === 'oneTime' && jobs.map(job => {
-            const status = STATUS_STYLES[job.status] || { label: job.status, dotClass: 'bg-[#908a78]', textClass: 'text-[#6b705c]' }
+            const status = STATUS_STYLES[job.status] || { label: job.status, dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' }
             const progress = jobProgress[job.id]
             return (
               <div
                 key={job.id}
-                className="bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-[#ece8e0] cursor-pointer"
+                className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated cursor-pointer"
                 onClick={() => {
                   setExpandedJob(expandedJob === job.id ? null : job.id)
                   if (!job.isRead && (job.status === 'completed' || job.status === 'failed')) markRead.mutate(job.id)
@@ -437,12 +437,12 @@ export function JobsPage() {
                 data-testid={`job-card-${job.id}`}
               >
                 <div className="flex items-center gap-4 min-w-[280px]">
-                  <div className="w-10 h-10 rounded-full bg-[#606C38]/10 flex items-center justify-center border border-[#606C38]/20">
-                    {activeTab === 'oneTime' ? <Moon className="w-5 h-5 text-[#606C38]" /> : <Repeat className="w-5 h-5 text-[#606C38]" />}
+                  <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20">
+                    {activeTab === 'oneTime' ? <Moon className="w-5 h-5 text-corthex-accent" /> : <Repeat className="w-5 h-5 text-corthex-accent" />}
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#1a1a1a]">{job.agentName}</h3>
-                    <p className="text-xs text-[#6b705c] mt-0.5 line-clamp-1 max-w-[300px]">{job.instruction}</p>
+                    <h3 className="font-bold text-corthex-text-primary">{job.agentName}</h3>
+                    <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{job.instruction}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-2 px-8">
@@ -450,32 +450,32 @@ export function JobsPage() {
                     job.status === 'processing' ? 'bg-blue-100 text-blue-700' :
                     job.status === 'completed' ? 'bg-green-100 text-green-700' :
                     job.status === 'failed' ? 'bg-red-100 text-red-700' :
-                    job.status === 'blocked' ? 'bg-[#b45309]/10 text-[#b45309]' :
-                    'bg-[#f0ebe0] text-[#6b705c]'
+                    job.status === 'blocked' ? 'bg-amber-700/10 text-amber-700' :
+                    'bg-corthex-elevated text-corthex-text-secondary'
                   }`}>{status.label}</span>
                   {job.status === 'processing' && progress && (
                     <div className="flex items-center gap-3">
-                      <div className="bg-[#e5e1d3] h-2 rounded-full w-48 overflow-hidden">
-                        <div className="bg-[#606C38] h-full rounded-full transition-all" style={{ width: `${progress.progress}%` }} />
+                      <div className="bg-corthex-border h-2 rounded-full w-48 overflow-hidden">
+                        <div className="bg-corthex-accent h-full rounded-full transition-all" style={{ width: `${progress.progress}%` }} />
                       </div>
-                      <span className="font-mono text-xs font-bold text-[#606C38]">{progress.progress}%</span>
+                      <span className="font-mono text-xs font-bold text-corthex-accent">{progress.progress}%</span>
                     </div>
                   )}
                 </div>
                 <div className="flex items-center gap-12 text-right">
                   <div className="font-mono">
-                    <p className="text-[11px] font-medium text-[#6b705c]">
+                    <p className="text-[11px] font-medium text-corthex-text-secondary">
                       {job.completedAt ? new Date(job.completedAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) :
                        job.scheduledFor ? `예약: ${new Date(job.scheduledFor).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}` :
                        new Date(job.createdAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </p>
-                    <p className="text-[9px] text-[#908a78] uppercase tracking-tighter">TIMESTAMP</p>
+                    <p className="text-[9px] text-corthex-text-secondary uppercase tracking-tighter">TIMESTAMP</p>
                   </div>
                   <div className="flex items-center gap-1">
                     {job.status === 'queued' && (
-                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: job.id, type: 'job' }) }} className="p-1.5 text-[#6b705c] hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: job.id, type: 'job' }) }} className="p-1.5 text-corthex-text-secondary hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     )}
-                    <button className="p-1.5 text-[#6b705c] transition-colors" onClick={(e) => e.stopPropagation()}><MoreVertical className="w-4 h-4" /></button>
+                    <button className="p-1.5 text-corthex-text-secondary transition-colors" onClick={(e) => e.stopPropagation()}><MoreVertical className="w-4 h-4" /></button>
                   </div>
                 </div>
               </div>
@@ -486,13 +486,13 @@ export function JobsPage() {
           {activeTab === 'oneTime' && expandedJob && jobs.find(j => j.id === expandedJob) && (() => {
             const job = jobs.find(j => j.id === expandedJob)!
             return (job.result || job.error || (job.status === 'completed' && job.resultData)) ? (
-              <div className="bg-white border border-[#e5e1d3] rounded-xl p-5 -mt-2 ml-14">
-                {job.result && <div className="text-xs text-[#6b705c] bg-[#f5f0e8] rounded-lg p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">{job.result}</div>}
-                {job.error && <div className="text-xs text-[#dc2626] bg-red-50 rounded-lg p-3">{job.error}</div>}
+              <div className="bg-white border border-corthex-border rounded-xl p-5 -mt-2 ml-14">
+                {job.result && <div className="text-xs text-corthex-text-secondary bg-corthex-elevated rounded-lg p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">{job.result}</div>}
+                {job.error && <div className="text-xs text-red-600 bg-red-50 rounded-lg p-3">{job.error}</div>}
                 {job.status === 'completed' && job.resultData && (
                   <div className="mt-2 flex gap-2">
-                    {job.resultData.sessionId && <Link to={`/chat?session=${job.resultData.sessionId}`} className="text-xs font-medium text-[#606C38] hover:underline">결과 보기</Link>}
-                    {job.resultData.reportId && <Link to={`/reports/${job.resultData.reportId}`} className="text-xs font-medium text-[#606C38] hover:underline">보고서 보기</Link>}
+                    {job.resultData.sessionId && <Link to={`/chat?session=${job.resultData.sessionId}`} className="text-xs font-medium text-corthex-accent hover:underline">결과 보기</Link>}
+                    {job.resultData.reportId && <Link to={`/reports/${job.resultData.reportId}`} className="text-xs font-medium text-corthex-accent hover:underline">보고서 보기</Link>}
                   </div>
                 )}
               </div>
@@ -501,60 +501,60 @@ export function JobsPage() {
 
           {/* Schedules tab */}
           {!isTabLoading && activeTab === 'schedule' && schedules.length === 0 && (
-            <div className="text-center py-16" data-testid="schedules-empty"><p className="text-sm text-[#6b705c]">등록된 반복 스케줄이 없습니다</p></div>
+            <div className="text-center py-16" data-testid="schedules-empty"><p className="text-sm text-corthex-text-secondary">등록된 반복 스케줄이 없습니다</p></div>
           )}
           {!isTabLoading && activeTab === 'schedule' && schedules.map(s => (
-            <div key={s.id} className="bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-[#ece8e0]" data-testid={`schedule-item-${s.id}`}>
+            <div key={s.id} className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated" data-testid={`schedule-item-${s.id}`}>
               <div className="flex items-center gap-4 min-w-[280px]">
-                <div className="w-10 h-10 rounded-full bg-[#606C38]/10 flex items-center justify-center border border-[#606C38]/20"><Repeat className="w-5 h-5 text-[#606C38]" /></div>
+                <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20"><Repeat className="w-5 h-5 text-corthex-accent" /></div>
                 <div>
-                  <h3 className="font-bold text-[#1a1a1a]">{s.agentName}</h3>
-                  <p className="text-xs text-[#6b705c] mt-0.5 line-clamp-1 max-w-[300px]">{s.instruction}</p>
+                  <h3 className="font-bold text-corthex-text-primary">{s.agentName}</h3>
+                  <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{s.instruction}</p>
                 </div>
               </div>
               <div className="px-8">
-                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-[#f0ebe0] text-[#6b705c]'}`}>
+                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-corthex-elevated text-corthex-text-secondary'}`}>
                   {s.isActive ? 'ACTIVE' : 'PAUSED'}
                 </span>
               </div>
               <div className="font-mono text-right">
-                <p className="text-[11px] font-medium text-[#6b705c]">{s.description}</p>
-                {s.nextRunAt && <p className="text-[9px] text-[#908a78]">다음: {new Date(s.nextRunAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
+                <p className="text-[11px] font-medium text-corthex-text-secondary">{s.description}</p>
+                {s.nextRunAt && <p className="text-[9px] text-corthex-text-secondary">다음: {new Date(s.nextRunAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
               </div>
               <div className="flex items-center gap-2 ml-4">
-                <button onClick={() => openEditSchedule(s)} className="text-xs text-[#6b705c] hover:text-[#606C38] transition-colors">편집</button>
-                <button onClick={() => toggleSchedule.mutate(s.id)} className={`text-xs ${s.isActive ? 'text-[#b45309]' : 'text-[#4d7c0f]'}`}>{s.isActive ? '중지' : '시작'}</button>
-                <button onClick={() => setDeleteTarget({ id: s.id, type: 'schedule' })} className="text-xs text-[#dc2626] hover:text-red-700">삭제</button>
+                <button onClick={() => openEditSchedule(s)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors">편집</button>
+                <button onClick={() => toggleSchedule.mutate(s.id)} className={`text-xs ${s.isActive ? 'text-amber-700' : 'text-corthex-accent'}`}>{s.isActive ? '중지' : '시작'}</button>
+                <button onClick={() => setDeleteTarget({ id: s.id, type: 'schedule' })} className="text-xs text-red-600 hover:text-red-700">삭제</button>
               </div>
             </div>
           ))}
 
           {/* Triggers tab */}
           {!isTabLoading && activeTab === 'trigger' && triggers.length === 0 && (
-            <div className="text-center py-16" data-testid="triggers-empty"><p className="text-sm text-[#6b705c]">등록된 이벤트 트리거가 없습니다</p></div>
+            <div className="text-center py-16" data-testid="triggers-empty"><p className="text-sm text-corthex-text-secondary">등록된 이벤트 트리거가 없습니다</p></div>
           )}
           {!isTabLoading && activeTab === 'trigger' && triggers.map(t => (
-            <div key={t.id} className="bg-[#f5f0e8] border border-[#e5e1d3] rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-[#ece8e0]" data-testid={`trigger-item-${t.id}`}>
+            <div key={t.id} className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated" data-testid={`trigger-item-${t.id}`}>
               <div className="flex items-center gap-4 min-w-[280px]">
-                <div className="w-10 h-10 rounded-full bg-[#606C38]/10 flex items-center justify-center border border-[#606C38]/20"><Target className="w-5 h-5 text-[#606C38]" /></div>
+                <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20"><Target className="w-5 h-5 text-corthex-accent" /></div>
                 <div>
-                  <h3 className="font-bold text-[#1a1a1a]">{t.agentName}</h3>
-                  <p className="text-xs text-[#6b705c] mt-0.5 line-clamp-1 max-w-[300px]">{t.instruction}</p>
+                  <h3 className="font-bold text-corthex-text-primary">{t.agentName}</h3>
+                  <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{t.instruction}</p>
                 </div>
               </div>
               <div className="px-8">
-                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${t.isActive ? 'bg-green-100 text-green-700' : 'bg-[#f0ebe0] text-[#6b705c]'}`}>
+                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${t.isActive ? 'bg-green-100 text-green-700' : 'bg-corthex-elevated text-corthex-text-secondary'}`}>
                   {t.isActive ? 'ACTIVE' : 'PAUSED'}
                 </span>
               </div>
               <div className="font-mono text-right">
-                <p className="text-[11px] font-medium text-[#6b705c]">{TRIGGER_TYPE_LABELS[t.triggerType] || t.triggerType}</p>
-                {t.lastTriggeredAt && <p className="text-[9px] text-[#908a78]">마지막: {new Date(t.lastTriggeredAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
+                <p className="text-[11px] font-medium text-corthex-text-secondary">{TRIGGER_TYPE_LABELS[t.triggerType] || t.triggerType}</p>
+                {t.lastTriggeredAt && <p className="text-[9px] text-corthex-text-secondary">마지막: {new Date(t.lastTriggeredAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
               </div>
               <div className="flex items-center gap-2 ml-4">
-                <button onClick={() => openEditTrigger(t)} className="text-xs text-[#6b705c] hover:text-[#606C38] transition-colors">편집</button>
-                <button onClick={() => toggleTrigger.mutate(t.id)} className={`text-xs ${t.isActive ? 'text-[#b45309]' : 'text-[#4d7c0f]'}`}>{t.isActive ? '중지' : '다시 감시'}</button>
-                <button onClick={() => setDeleteTarget({ id: t.id, type: 'trigger' })} className="text-xs text-[#dc2626] hover:text-red-700">삭제</button>
+                <button onClick={() => openEditTrigger(t)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors">편집</button>
+                <button onClick={() => toggleTrigger.mutate(t.id)} className={`text-xs ${t.isActive ? 'text-amber-700' : 'text-corthex-accent'}`}>{t.isActive ? '중지' : '다시 감시'}</button>
+                <button onClick={() => setDeleteTarget({ id: t.id, type: 'trigger' })} className="text-xs text-red-600 hover:text-red-700">삭제</button>
               </div>
             </div>
           ))}
@@ -562,20 +562,20 @@ export function JobsPage() {
 
         {/* Summary Bar */}
         <div className="fixed bottom-8 left-[280px] right-8 max-w-[1440px] mx-auto z-40 pointer-events-none">
-          <div className="bg-[#f0ebe0]/90 backdrop-blur-xl border border-[#e5e1d3]/30 rounded-2xl shadow-2xl p-2 flex flex-wrap md:flex-nowrap gap-2 items-stretch pointer-events-auto">
+          <div className="bg-corthex-elevated/90 backdrop-blur-xl border border-corthex-border/30 rounded-2xl shadow-2xl p-2 flex flex-wrap md:flex-nowrap gap-2 items-stretch pointer-events-auto">
             <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-[#908a78] uppercase tracking-widest">완료된 작업</span>
-              <p className="font-mono text-2xl font-black text-[#606C38] mt-1">{jobs.filter(j => j.status === 'completed').length}건</p>
+              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">완료된 작업</span>
+              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'completed').length}건</p>
             </div>
             <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-[#908a78] uppercase tracking-widest">실행 중</span>
-              <p className="font-mono text-2xl font-black text-[#606C38] mt-1">{jobs.filter(j => j.status === 'processing').length}건</p>
+              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">실행 중</span>
+              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'processing').length}건</p>
             </div>
             <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-[#908a78] uppercase tracking-widest">활성 스케줄</span>
-              <p className="font-mono text-2xl font-black text-[#606C38] mt-1">{schedules.filter(s => s.isActive).length}건</p>
+              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">활성 스케줄</span>
+              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{schedules.filter(s => s.isActive).length}건</p>
             </div>
-            <div className="bg-[#606C38] p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
+            <div className="bg-corthex-accent p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
               <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">오류 알림</span>
               <p className="font-mono text-2xl font-black text-white mt-1">{jobs.filter(j => j.status === 'failed').length}건</p>
             </div>
@@ -585,22 +585,22 @@ export function JobsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => closeModal()}>
-          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()} data-testid="job-modal">
-            <h3 className="text-lg font-bold text-[#1a1a1a]">{editingSchedule ? '스케줄 수정' : editingTrigger ? '트리거 수정' : '작업 등록'}</h3>
+          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()} data-testid="job-modal">
+            <h3 className="text-lg font-bold text-corthex-text-primary">{editingSchedule ? '스케줄 수정' : editingTrigger ? '트리거 수정' : '작업 등록'}</h3>
 
             {!editingSchedule && !editingTrigger && (
               <div className="flex gap-3 flex-wrap">
                 {([['oneTime', '일회성'], ['schedule', '반복 스케줄'], ['trigger', '이벤트 트리거']] as const).map(([val, label]) => (
                   <label key={val} className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="jobType" checked={modalType === val} onChange={() => setModalType(val)} style={{ accentColor: '#606C38' }} />
-                    <span className="text-sm text-[#6b705c]">{label}</span>
+                    <span className="text-sm text-corthex-text-secondary">{label}</span>
                   </label>
                 ))}
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-medium text-[#6b705c] mb-1">담당 에이전트</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">담당 에이전트</label>
               <select value={modalAgent} onChange={e => setModalAgent(e.target.value)} className={selectClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} data-testid="agent-select">
                 <option value="">에이전트 선택...</option>
                 {agentList.map(a => (<option key={a.id} value={a.id}>{a.name} {a.isSecretary ? '(비서)' : ''} — {a.role}</option>))}
@@ -608,13 +608,13 @@ export function JobsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#6b705c] mb-1">작업 지시</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">작업 지시</label>
               <textarea value={modalInstruction} onChange={e => setModalInstruction(e.target.value)} placeholder="예: 이번 달 마케팅 채널별 성과를 분석해서 보고서로 정리해줘" rows={3} className={inputClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} data-testid="instruction-input" />
             </div>
 
             {modalType === 'oneTime' && chainSteps.length === 0 && (
               <div>
-                <label className="block text-xs font-medium text-[#6b705c] mb-1">실행 시간 (비워두면 즉시)</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1">실행 시간 (비워두면 즉시)</label>
                 <input type="datetime-local" value={modalScheduledFor} onChange={e => setModalScheduledFor(e.target.value)} className={inputClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} />
               </div>
             )}
@@ -627,7 +627,7 @@ export function JobsPage() {
                     {chainSteps.map((step, i) => (
                       <div key={i} className="pl-4 border-l-2 space-y-2" style={{ borderColor: '#606C3880' }}>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-[#908a78]">단계 {i + 2}</span>
+                          <span className="text-[10px] text-corthex-text-secondary">단계 {i + 2}</span>
                           <button type="button" onClick={() => setChainSteps(prev => prev.filter((_, j) => j !== i))} className="text-[10px] text-red-400">삭제</button>
                         </div>
                         <select value={step.agentId} onChange={e => setChainSteps(prev => prev.map((s, j) => j === i ? { ...s, agentId: e.target.value } : s))} className={selectClass}>
@@ -650,23 +650,23 @@ export function JobsPage() {
             {modalType === 'schedule' && (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-[#6b705c] mb-1">실행 시간</label>
+                  <label className="block text-xs font-medium text-corthex-text-secondary mb-1">실행 시간</label>
                   <input type="time" value={modalTime} onChange={e => setModalTime(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#908a78] mb-2">주기</label>
+                  <label className="block text-xs font-medium text-corthex-text-secondary mb-2">주기</label>
                   <div className="flex gap-3">
                     {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
                       <label key={val} className="flex items-center gap-1.5 cursor-pointer">
                         <input type="radio" name="frequency" checked={modalFrequency === val} onChange={() => setModalFrequency(val)} style={{ accentColor: '#606C38' }} />
-                        <span className="text-sm text-[#6b705c]">{label}</span>
+                        <span className="text-sm text-corthex-text-secondary">{label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
                 {modalFrequency === 'custom' && (
                   <div>
-                    <label className="block text-xs font-medium text-[#908a78] mb-2">요일 선택</label>
+                    <label className="block text-xs font-medium text-corthex-text-secondary mb-2">요일 선택</label>
                     <div className="flex gap-2">
                       {DAY_NAMES.map((name, i) => (
                         <button key={i} type="button" onClick={() => toggleDay(i)} className="w-9 h-9 rounded-full text-xs font-medium transition-colors" style={modalDays.includes(i) ? { backgroundColor: '#606C38', color: 'white' } : { backgroundColor: '#f5f0e8', color: '#6b705c' }}>
@@ -683,7 +683,7 @@ export function JobsPage() {
             {modalType === 'trigger' && (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-[#6b705c] mb-1">트리거 유형</label>
+                  <label className="block text-xs font-medium text-corthex-text-secondary mb-1">트리거 유형</label>
                   <select value={modalTriggerType} onChange={e => setModalTriggerType(e.target.value)} className={selectClass}>
                     <option value="price-above">가격 상회</option>
                     <option value="price-below">가격 하회</option>
@@ -694,11 +694,11 @@ export function JobsPage() {
                 {(modalTriggerType === 'price-above' || modalTriggerType === 'price-below') && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-[#6b705c] mb-1">종목 코드</label>
+                      <label className="block text-xs font-medium text-corthex-text-secondary mb-1">종목 코드</label>
                       <input type="text" value={modalStockCode} onChange={e => setModalStockCode(e.target.value)} placeholder="005930" className={inputClass} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[#6b705c] mb-1">목표가 (원)</label>
+                      <label className="block text-xs font-medium text-corthex-text-secondary mb-1">목표가 (원)</label>
                       <input type="number" value={modalTargetPrice} onChange={e => setModalTargetPrice(e.target.value)} placeholder="72000" className={inputClass} />
                     </div>
                   </div>
@@ -707,7 +707,7 @@ export function JobsPage() {
             )}
 
             <div className="flex gap-3 pt-2">
-              <button onClick={() => closeModal()} className="flex-1 py-2.5 text-sm font-medium text-[#6b705c] border border-[#e5e1d3] rounded-lg hover:bg-[#f5f0e8] transition-colors">취소</button>
+              <button onClick={() => closeModal()} className="flex-1 py-2.5 text-sm font-medium text-corthex-text-secondary border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors">취소</button>
               <button
                 onClick={handleSubmit}
                 disabled={!modalAgent || !modalInstruction.trim() || isPending}
@@ -725,16 +725,16 @@ export function JobsPage() {
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white border border-[#e5e1d3] rounded-2xl shadow-2xl p-6 w-96" data-testid="delete-confirm-modal">
-            <h3 className="text-sm font-semibold text-[#1a1a1a] mb-2">
+          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96" data-testid="delete-confirm-modal">
+            <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">
               {deleteTarget.type === 'chain' ? '체인 취소' : deleteTarget.type === 'schedule' ? '스케줄 삭제' : deleteTarget.type === 'trigger' ? '트리거 삭제' : '작업 취소'}
             </h3>
-            <p className="text-xs text-[#6b705c] mb-4">
+            <p className="text-xs text-corthex-text-secondary mb-4">
               {deleteTarget.type === 'chain' ? '이 체인의 대기 중인 작업을 모두 취소하시겠습니까?' : deleteTarget.type === 'schedule' ? '이 반복 스케줄을 삭제하시겠습니까?' : deleteTarget.type === 'trigger' ? '이 트리거를 삭제하시겠습니까?' : '이 작업을 취소하시겠습니까?'}
             </p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteTarget(null)} className="border border-[#e5e1d3] rounded-lg px-4 py-2 text-sm text-[#6b705c] hover:bg-[#f5f0e8] transition-colors">취소</button>
-              <button onClick={handleDelete} className="bg-[#dc2626] hover:bg-red-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">확인</button>
+              <button onClick={() => setDeleteTarget(null)} className="border border-corthex-border rounded-lg px-4 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">취소</button>
+              <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors">확인</button>
             </div>
           </div>
         </div>

@@ -182,9 +182,9 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
                 setTargetAgentId(agent.id)
                 handleChange(text + `@${agent.name} `)
               }}
-              className="flex-shrink-0 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-medium border border-stone-200 hover:border-[#5a7247] hover:text-[#5a7247] transition-colors flex items-center gap-1"
+              className="flex-shrink-0 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-medium border border-stone-200 hover:border-corthex-accent hover:text-corthex-accent transition-colors flex items-center gap-1"
             >
-              <span className="text-[#5a7247] font-bold">@</span>
+              <span className="text-corthex-accent font-bold">@</span>
               {agent.name}
             </button>
           ))}
@@ -255,7 +255,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={() => handleChange(text + '@')}
             title="에이전트 멘션"
             aria-label="에이전트 멘션"
-            className="p-2 rounded-xl text-stone-400 hover:text-[#5a7247] hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-stone-400 hover:text-corthex-accent hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
           >
             <span className="text-sm font-bold">@</span>
           </button>

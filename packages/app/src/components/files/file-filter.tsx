@@ -11,8 +11,8 @@ export function FileFilter({ filters, onSelect }: FileFilterProps) {
                     key={filter.id}
                     onClick={() => onSelect?.(filter.id)}
                     className={`flex h-8 items-center justify-center rounded px-4 text-sm transition-colors ${filter.active
-                            ? 'bg-[#5a7247] text-slate-900 font-medium'
-                            : 'bg-white border border-slate-200 font-medium hover:border-[#5a7247]/50'
+                            ? 'bg-corthex-accent text-slate-900 font-medium'
+                            : 'bg-white border border-slate-200 font-medium hover:border-corthex-accent/50'
                         }`}
                 >
                     {filter.label}

@@ -7,14 +7,14 @@ import type { HandoffEntry } from '../../hooks/use-hub-stream'
 const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string; icon: typeof Clock; label: string }> = {
   delegating: { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', icon: Loader2, label: 'In Progress' },
   pending: { color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', icon: Clock, label: 'Pending' },
-  completed: { color: 'text-[#5a7247]', bg: 'bg-[#5a7247]/5', border: 'border-[#5a7247]/20', icon: CheckCircle2, label: 'Completed' },
+  completed: { color: 'text-corthex-accent', bg: 'bg-corthex-accent/5', border: 'border-corthex-accent/20', icon: CheckCircle2, label: 'Completed' },
   failed: { color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', icon: AlertCircle, label: 'Failed' },
 }
 
 const STATUS_DOT_COLORS: Record<string, string> = {
   delegating: 'bg-blue-500',
   pending: 'bg-amber-500',
-  completed: 'bg-[#5a7247]',
+  completed: 'bg-corthex-accent',
   failed: 'bg-red-500',
 }
 
@@ -46,7 +46,7 @@ function HandoffTimelineEntry({
     <div className="relative" data-testid="handoff-entry">
       {/* Timeline connector line */}
       {!isLast && (
-        <div className="absolute left-[11px] top-[28px] bottom-0 w-0.5 bg-[#e5e1d3]" />
+        <div className="absolute left-[11px] top-[28px] bottom-0 w-0.5 bg-corthex-border" />
       )}
 
       <div className="flex gap-3">
@@ -66,9 +66,9 @@ function HandoffTimelineEntry({
             className="w-full px-4 py-3 flex items-center justify-between text-left"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-[#283618]">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-corthex-accent-deep">
                 <span className="truncate max-w-[120px]">{entry.fromAgent}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#6b705c] flex-shrink-0" />
+                <ArrowRight className="w-3.5 h-3.5 text-corthex-text-secondary flex-shrink-0" />
                 <span className="truncate max-w-[120px]">{entry.toAgent}</span>
               </div>
             </div>
@@ -78,29 +78,29 @@ function HandoffTimelineEntry({
                 <StatusIcon className={`w-3 h-3 ${isAnimated ? 'animate-spin' : ''}`} />
                 {status.label}
               </span>
-              {expanded ? <ChevronDown className="w-4 h-4 text-[#6b705c]" /> : <ChevronRight className="w-4 h-4 text-[#6b705c]" />}
+              {expanded ? <ChevronDown className="w-4 h-4 text-corthex-text-secondary" /> : <ChevronRight className="w-4 h-4 text-corthex-text-secondary" />}
             </div>
           </button>
 
           {expanded && (
-            <div className="px-4 pb-3 border-t border-[#e5e1d3]/50">
+            <div className="px-4 pb-3 border-t border-corthex-border/50">
               <div className="grid grid-cols-2 gap-3 mt-3 text-xs">
                 <div>
-                  <span className="text-[#6b705c] font-medium">From</span>
-                  <p className="text-[#283618] font-semibold mt-0.5">{entry.fromAgent}</p>
+                  <span className="text-corthex-text-secondary font-medium">From</span>
+                  <p className="text-corthex-accent-deep font-semibold mt-0.5">{entry.fromAgent}</p>
                 </div>
                 <div>
-                  <span className="text-[#6b705c] font-medium">To</span>
-                  <p className="text-[#283618] font-semibold mt-0.5">{entry.toAgent}</p>
+                  <span className="text-corthex-text-secondary font-medium">To</span>
+                  <p className="text-corthex-accent-deep font-semibold mt-0.5">{entry.toAgent}</p>
                 </div>
                 <div>
-                  <span className="text-[#6b705c] font-medium">Duration</span>
-                  <p className="text-[#283618] font-mono mt-0.5">{formatDuration(entry.durationMs)}</p>
+                  <span className="text-corthex-text-secondary font-medium">Duration</span>
+                  <p className="text-corthex-accent-deep font-mono mt-0.5">{formatDuration(entry.durationMs)}</p>
                 </div>
                 {entry.depth !== undefined && (
                   <div>
-                    <span className="text-[#6b705c] font-medium">Depth</span>
-                    <p className="text-[#283618] font-mono mt-0.5">Level {entry.depth}</p>
+                    <span className="text-corthex-text-secondary font-medium">Depth</span>
+                    <p className="text-corthex-accent-deep font-mono mt-0.5">Level {entry.depth}</p>
                   </div>
                 )}
               </div>
@@ -130,8 +130,8 @@ export function HandoffTracker({
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4 px-1">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#5a7247]" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b705c]">
+        <div className="w-1.5 h-1.5 rounded-full bg-corthex-accent" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-corthex-text-secondary">
           Handoff Timeline
         </span>
         {chain.some(e => e.status === 'delegating') && (
@@ -165,7 +165,7 @@ export function HandoffTracker({
             </div>
             <div className="flex-1 px-4 py-3 rounded-xl border border-blue-200 bg-blue-50">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-[#283618]">{processingAgent}</span>
+                <span className="text-sm font-medium text-corthex-accent-deep">{processingAgent}</span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Processing

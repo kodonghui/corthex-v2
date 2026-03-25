@@ -9,7 +9,7 @@ export interface WatchlistItemProps {
 
 export function WatchlistItem({ symbol, price, name, change, isPositive, active }: WatchlistItemProps) {
     const containerClass = active
-        ? 'bg-stone-100 border-l-[#5a7247]'
+        ? 'bg-stone-100 border-l-corthex-accent'
         : 'hover:bg-stone-100 border-l-transparent';
 
     return (

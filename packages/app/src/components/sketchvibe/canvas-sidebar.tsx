@@ -272,7 +272,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                     <span className="text-xs text-slate-200 truncate flex-1">{r.title}</span>
                     <div className="flex items-center gap-1 shrink-0">
                       {r.score !== null && (
-                        <span className="text-[9px] text-[#5a7247]">{Math.round(r.score * 100)}%</span>
+                        <span className="text-[9px] text-corthex-accent">{Math.round(r.score * 100)}%</span>
                       )}
                       {r.contentType === 'mermaid' && (
                         <span className="text-[9px] px-1 py-0 bg-emerald-900/50 text-emerald-400 rounded">mermaid</span>

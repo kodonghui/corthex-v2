@@ -12,7 +12,7 @@ export function NotificationFilter({ filters, onSelect }: NotificationFilterProp
                         key={filter.id}
                         onClick={() => onSelect?.(filter.id)}
                         className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${filter.active
-                                ? 'border-b-[#5a7247] text-slate-900'
+                                ? 'border-b-corthex-accent text-slate-900'
                                 : 'border-b-transparent text-stone-400 hover:text-slate-900'
                             }`}
                     >

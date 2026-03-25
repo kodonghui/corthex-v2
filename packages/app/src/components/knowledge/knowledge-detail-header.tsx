@@ -10,10 +10,10 @@ export interface KnowledgeDetailHeaderProps {
 
 export function KnowledgeDetailHeader({ title, version, author, lastModified, tags }: KnowledgeDetailHeaderProps) {
     return (
-        <div className="p-5 border-b border-stone-200 flex flex-col gap-4 bg-[#faf8f5]/30">
+        <div className="p-5 border-b border-stone-200 flex flex-col gap-4 bg-corthex-bg/30">
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#5a7247]/10 flex items-center justify-center text-[#5a7247] border border-[#5a7247]/20">
+                    <div className="w-10 h-10 rounded-lg bg-corthex-accent/10 flex items-center justify-center text-corthex-accent border border-corthex-accent/20">
                         <FileText className="w-6 h-6" />
                     </div>
                     <div>

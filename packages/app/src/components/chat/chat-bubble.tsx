@@ -13,7 +13,7 @@ export function ChatBubble({ type, sender, content, isProcessing = false }: Chat
             <div className="flex items-end gap-3 justify-end group">
                 <div className="flex flex-col gap-1 items-end max-w-[80%]">
                     <p className="text-stone-500 text-xs font-medium px-2">{sender || 'User'}</p>
-                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-[rgba(34,211,238,0.10)] text-[#5a7247]">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-br-sm px-5 py-3.5 bg-[rgba(34,211,238,0.10)] text-corthex-accent">
                         {content}
                     </div>
                 </div>
@@ -24,7 +24,7 @@ export function ChatBubble({ type, sender, content, isProcessing = false }: Chat
     return (
         <div className="flex items-start gap-3 group">
             <div className="bg-[rgba(34,211,238,0.20)] flex items-center justify-center aspect-square rounded-full w-8 h-8 shrink-0 mt-6 border border-[rgba(34,211,238,0.30)]">
-                <Bot className="w-4 h-4 text-[#5a7247]" />
+                <Bot className="w-4 h-4 text-corthex-accent" />
             </div>
             <div className="flex flex-col gap-1 items-start max-w-[80%] w-full">
                 <p className="text-stone-500 text-xs font-medium px-2">{sender || 'Agent'}</p>

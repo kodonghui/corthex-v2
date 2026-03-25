@@ -24,18 +24,18 @@ export function CostChart({ title, amount, subtitle, percentageChange, isPositiv
                 </div>
                 <div className="flex gap-2">
                     <button className="px-3 py-1 text-xs font-medium rounded bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors">1W</button>
-                    <button className="px-3 py-1 text-xs font-medium rounded bg-[#5a7247]/10 text-[#5a7247] border border-[#5a7247]/20">1M</button>
+                    <button className="px-3 py-1 text-xs font-medium rounded bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20">1M</button>
                     <button className="px-3 py-1 text-xs font-medium rounded bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors">3M</button>
                 </div>
             </div>
             <div className="flex min-h-[220px] flex-1 flex-col gap-4 py-6 w-full relative mt-4">
                 <svg className="absolute inset-0 h-full w-full" fill="none" height="180" preserveAspectRatio="none" viewBox="0 0 100 100" width="100%">
                     <path d="M0,80 Q10,70 20,75 T40,60 T60,50 T80,45 T100,20 L100,100 L0,100 Z" fill="url(#chart-gradient)" opacity="0.2"></path>
-                    <path className="text-[#5a7247]" d="M0,80 Q10,70 20,75 T40,60 T60,50 T80,45 T100,20" fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke"></path>
+                    <path className="text-corthex-accent" d="M0,80 Q10,70 20,75 T40,60 T60,50 T80,45 T100,20" fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke"></path>
                     <defs>
                         <linearGradient id="chart-gradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop className="text-[#5a7247]" offset="0%" stopColor="currentColor" stopOpacity="1"></stop>
-                            <stop className="text-[#5a7247]" offset="100%" stopColor="currentColor" stopOpacity="0"></stop>
+                            <stop className="text-corthex-accent" offset="0%" stopColor="currentColor" stopOpacity="1"></stop>
+                            <stop className="text-corthex-accent" offset="100%" stopColor="currentColor" stopOpacity="0"></stop>
                         </linearGradient>
                     </defs>
                 </svg>

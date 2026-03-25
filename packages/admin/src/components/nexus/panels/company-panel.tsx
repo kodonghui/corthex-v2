@@ -44,7 +44,7 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
         <div className="mt-2 space-y-1.5">
           {departments.map((d) => (
             <div key={d.id} className="flex items-center gap-2 px-2 py-1.5">
-              <span className="w-1.5 h-1.5 rounded bg-[#5a7247]" />
+              <span className="w-1.5 h-1.5 rounded bg-corthex-accent" />
               <span className="text-xs text-slate-300 truncate flex-1">{d.name}</span>
               <Badge variant="default">{d.agents.length}</Badge>
             </div>
@@ -63,7 +63,7 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
           href="/admin/settings"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-[#8fae7a] hover:text-[#a3c48a] underline"
+          className="text-xs text-corthex-accent-hover hover:text-corthex-accent-hover underline"
         >
           회사 설정 →
         </a>

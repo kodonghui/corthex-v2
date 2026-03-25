@@ -114,16 +114,16 @@ const tierLabels: Record<string, string> = {
 }
 
 const tierBadgeStyles: Record<string, { bg: string; text: string }> = {
-  manager: { bg: 'bg-[#f5f0e8]', text: 'text-[#283618]' },
-  specialist: { bg: 'bg-[#f5f0e8]', text: 'text-[#606C38]' },
-  worker: { bg: 'bg-[#f5f0e8]', text: 'text-[#6b705c]' },
+  manager: { bg: 'bg-corthex-elevated', text: 'text-corthex-accent-deep' },
+  specialist: { bg: 'bg-corthex-elevated', text: 'text-corthex-accent' },
+  worker: { bg: 'bg-corthex-elevated', text: 'text-corthex-text-secondary' },
 }
 
 const statusConfig: Record<string, { dot: string; label: string; labelKo: string }> = {
-  online: { dot: 'bg-[#4d7c0f]', label: 'Online', labelKo: '활성' },
-  working: { dot: 'bg-[#2563eb]', label: 'Working', labelKo: '작업중' },
-  error: { dot: 'bg-[#dc2626]', label: 'Error', labelKo: '오류' },
-  offline: { dot: 'bg-[#908a78]', label: 'Offline', labelKo: '오프라인' },
+  online: { dot: 'bg-corthex-accent', label: 'Online', labelKo: '활성' },
+  working: { dot: 'bg-corthex-info', label: 'Working', labelKo: '작업중' },
+  error: { dot: 'bg-red-600', label: 'Error', labelKo: '오류' },
+  offline: { dot: 'bg-corthex-text-secondary', label: 'Offline', labelKo: '오프라인' },
 }
 
 const agentIconComponents = [
@@ -218,45 +218,45 @@ function AgentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">
           에이전트 이름 <span className="text-red-500">*</span>
         </label>
         <Input value={name} onChange={(e) => { setName(e.target.value); setNameError('') }} placeholder="예: 마케팅분석관" maxLength={100} autoFocus />
         {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
       </div>
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">영문 이름</label>
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">영문 이름</label>
         <Input value={nameEn} onChange={(e) => setNameEn(e.target.value)} placeholder="예: Marketing Analyst" maxLength={100} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-[#6b705c] mb-1">소속 부서</label>
+          <label className="block text-xs font-medium text-corthex-text-secondary mb-1">소속 부서</label>
           <Select options={deptOptions} value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-[#6b705c] mb-1">등급</label>
+          <label className="block text-xs font-medium text-corthex-text-secondary mb-1">등급</label>
           <Select options={tierOptions} value={tier} onChange={(e) => setTier(e.target.value as 'manager' | 'specialist' | 'worker')} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-[#6b705c] mb-1">모델명</label>
+          <label className="block text-xs font-medium text-corthex-text-secondary mb-1">모델명</label>
           <Input value={modelName} onChange={(e) => setModelName(e.target.value)} placeholder="claude-haiku-4-5" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-[#6b705c] mb-1">역할/전문분야</label>
+          <label className="block text-xs font-medium text-corthex-text-secondary mb-1">역할/전문분야</label>
           <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="예: 시장 분석" />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">CLI 소유 인간직원</label>
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">CLI 소유 인간직원</label>
         <Select options={userOptions} value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} />
       </div>
       <div className="flex items-center gap-3">
         <Toggle checked={isSecretary} onChange={setIsSecretary} label="비서 에이전트" />
       </div>
       {/* Story 24.5: Big Five Personality Sliders */}
-      <div className="border-t border-[#e5e1d3] pt-4">
+      <div className="border-t border-corthex-border pt-4">
         <BigFiveSliderGroup value={personalityTraits} onChange={setPersonalityTraits} disabled={isSubmitting} />
       </div>
       <div className="flex gap-2 justify-end pt-2">
@@ -326,12 +326,12 @@ function SoulEditor({
     <div className="space-y-4">
       {/* Editor + Variable chips */}
       <div>
-        <label className="block text-xs font-medium text-[#6b705c] mb-1">Soul (마크다운) — <code className="text-[10px]">{'{{'}</code> 입력 시 자동완성</label>
-        <Suspense fallback={<div className="border border-[#e5e1d3] rounded-md p-3 min-h-[288px] animate-pulse bg-[#faf8f5]" />}>
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1">Soul (마크다운) — <code className="text-[10px]">{'{{'}</code> 입력 시 자동완성</label>
+        <Suspense fallback={<div className="border border-corthex-border rounded-md p-3 min-h-[288px] animate-pulse bg-corthex-bg" />}>
           <CodeMirrorEditor value={soul} onChange={setSoul} soulMode placeholder="에이전트의 Soul을 작성하세요... {{로 변수 삽입" />
         </Suspense>
         <div className="mt-2">
-          <p className="text-[10px] font-medium text-[#908a78] mb-1">사용 가능한 변수 ({SOUL_VARIABLES.length}개):</p>
+          <p className="text-[10px] font-medium text-corthex-text-secondary mb-1">사용 가능한 변수 ({SOUL_VARIABLES.length}개):</p>
           <div className="flex flex-wrap gap-1">
             {SOUL_VARIABLES.map((v) => (
               <span key={v.name} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: v.category === 'personality' ? 'rgba(37,99,235,0.1)' : v.category === 'memory' ? 'rgba(124,58,237,0.1)' : 'rgba(90,114,71,0.1)', color: v.category === 'personality' ? '#2563eb' : v.category === 'memory' ? '#7c3aed' : '#5a7247' }} onClick={() => setSoul((prev) => prev + `{{${v.name}}}`)} title={`${v.label}: ${v.description}`}>
@@ -347,17 +347,17 @@ function SoulEditor({
         <Button size="sm" variant="outline" onClick={handlePreview} disabled={isPreviewing}>
           {isPreviewing ? '로딩...' : '프리뷰'}
         </Button>
-        <label className="flex items-center gap-1.5 text-xs text-[#6b705c] cursor-pointer">
-          <input type="checkbox" checked={abMode} onChange={(e) => setAbMode(e.target.checked)} className="rounded border-[#e5e1d3]" />
+        <label className="flex items-center gap-1.5 text-xs text-corthex-text-secondary cursor-pointer">
+          <input type="checkbox" checked={abMode} onChange={(e) => setAbMode(e.target.checked)} className="rounded border-corthex-border" />
           A/B 성격 비교
         </label>
         {abMode && (
           <>
-            <select value={presetA} onChange={(e) => setPresetA(e.target.value)} className="text-xs border border-[#e5e1d3] rounded px-2 py-1 bg-white">
+            <select value={presetA} onChange={(e) => setPresetA(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-white">
               <option value="">A: 현재 성격</option>
               {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>A: {p.nameKo}</option>)}
             </select>
-            <select value={presetB} onChange={(e) => setPresetB(e.target.value)} className="text-xs border border-[#e5e1d3] rounded px-2 py-1 bg-white">
+            <select value={presetB} onChange={(e) => setPresetB(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-white">
               <option value="">B: 현재 성격</option>
               {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>B: {p.nameKo}</option>)}
             </select>
@@ -368,15 +368,15 @@ function SoulEditor({
       {/* Preview Panes */}
       <div className={`grid gap-4 ${abMode ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
         <div>
-          {abMode && <p className="text-[10px] font-bold text-[#6b705c] mb-1 uppercase tracking-widest">A: {presetA ? PERSONALITY_PRESETS.find(p => p.id === presetA)?.nameKo : '현재 성격'}</p>}
-          <div className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-[#faf8f5] text-sm overflow-y-auto whitespace-pre-wrap">
+          {abMode && <p className="text-[10px] font-bold text-corthex-text-secondary mb-1 uppercase tracking-widest">A: {presetA ? PERSONALITY_PRESETS.find(p => p.id === presetA)?.nameKo : '현재 성격'}</p>}
+          <div className="w-full h-64 p-3 rounded-lg border border-corthex-border bg-corthex-bg text-sm overflow-y-auto whitespace-pre-wrap">
             {previewA ? previewA.rendered || '(빈 결과)' : '프리뷰 버튼을 클릭하세요'}
           </div>
           {previewA?.variables && Object.keys(previewA.variables).length > 0 && (
             <div className="mt-2 space-y-1">
-              <p className="text-[10px] font-medium text-[#908a78]">치환된 변수:</p>
+              <p className="text-[10px] font-medium text-corthex-text-secondary">치환된 변수:</p>
               {Object.entries(previewA.variables).map(([key, val]) => (
-                <div key={key} className="text-[10px] font-mono text-[#908a78] truncate">
+                <div key={key} className="text-[10px] font-mono text-corthex-text-secondary truncate">
                   <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                 </div>
               ))}
@@ -385,15 +385,15 @@ function SoulEditor({
         </div>
         {abMode && previewB && (
           <div>
-            <p className="text-[10px] font-bold text-[#6b705c] mb-1 uppercase tracking-widest">B: {presetB ? PERSONALITY_PRESETS.find(p => p.id === presetB)?.nameKo : '현재 성격'}</p>
-            <div className="w-full h-64 p-3 rounded-lg border border-[#e5e1d3] bg-[#faf8f5] text-sm overflow-y-auto whitespace-pre-wrap">
+            <p className="text-[10px] font-bold text-corthex-text-secondary mb-1 uppercase tracking-widest">B: {presetB ? PERSONALITY_PRESETS.find(p => p.id === presetB)?.nameKo : '현재 성격'}</p>
+            <div className="w-full h-64 p-3 rounded-lg border border-corthex-border bg-corthex-bg text-sm overflow-y-auto whitespace-pre-wrap">
               {previewB.rendered || '(빈 결과)'}
             </div>
             {previewB.variables && Object.keys(previewB.variables).length > 0 && (
               <div className="mt-2 space-y-1">
-                <p className="text-[10px] font-medium text-[#908a78]">치환된 변수:</p>
+                <p className="text-[10px] font-medium text-corthex-text-secondary">치환된 변수:</p>
                 {Object.entries(previewB.variables).map(([key, val]) => (
-                  <div key={key} className="text-[10px] font-mono text-[#908a78] truncate">
+                  <div key={key} className="text-[10px] font-mono text-corthex-text-secondary truncate">
                     <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                   </div>
                 ))}
@@ -465,40 +465,40 @@ function AgentDetailPanel({
       <section className="flex justify-between items-start">
         <div className="flex gap-6 items-center">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-[#283618] flex items-center justify-center text-3xl font-bold text-white shadow-xl">
+            <div className="w-24 h-24 rounded-full bg-corthex-accent-deep flex items-center justify-center text-3xl font-bold text-white shadow-xl">
               {getInitials(agent.name, agent.nameEn)}
             </div>
-            <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-[#f5f0e8] border-4 border-[#f5f0e8] flex items-center justify-center">
+            <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-corthex-elevated border-4 border-corthex-elevated flex items-center justify-center">
               <div className={`w-3 h-3 rounded-full ${status.dot}`} />
             </div>
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h2 className="text-3xl font-extrabold tracking-tight text-[#1a1a1a]">
+              <h2 className="text-3xl font-extrabold tracking-tight text-corthex-text-primary">
                 {agent.name}
-                {agent.nameEn && <span className="text-[#6b705c] font-medium text-xl ml-2">{agent.nameEn}</span>}
+                {agent.nameEn && <span className="text-corthex-text-secondary font-medium text-xl ml-2">{agent.nameEn}</span>}
               </h2>
               <span className={`${tierBadge.bg} ${tierBadge.text} px-3 py-1 rounded-full text-xs font-bold tracking-wider`}>
                 {tierLabels[agent.tier] || agent.tier}
               </span>
             </div>
-            <p className="text-[#6b705c] font-medium flex items-center gap-2">
+            <p className="text-corthex-text-secondary font-medium flex items-center gap-2">
               <Bot className="w-4 h-4" />
               {agent.role || 'Agent'} — {deptName}
             </p>
             <div className="flex items-center gap-2 pt-1">
-              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest" style={{ color: status.dot === 'bg-[#4d7c0f]' ? '#4d7c0f' : status.dot === 'bg-[#dc2626]' ? '#dc2626' : '#6b705c' }}>
-                <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${status.dot === 'bg-[#4d7c0f]' ? 'animate-pulse' : ''}`} />
+              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest" style={{ color: status.dot === 'bg-corthex-accent' ? '#4d7c0f' : status.dot === 'bg-red-600' ? '#dc2626' : '#6b705c' }}>
+                <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${status.dot === 'bg-corthex-accent' ? 'animate-pulse' : ''}`} />
                 {status.labelKo} {status.label}
               </span>
             </div>
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#e5e1d3] hover:bg-[#f5f0e8] transition-colors font-medium text-sm text-[#1a1a1a]">
+          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-corthex-border hover:bg-corthex-elevated transition-colors font-medium text-sm text-corthex-text-primary">
             <Pencil className="w-4 h-4" /> 수정
           </button>
-          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
+          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-[#b91c1c] transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
             <Trash2 className="w-4 h-4" /> 비활성화
           </button>
         </div>
@@ -506,32 +506,32 @@ function AgentDetailPanel({
 
       {/* Stats Grid */}
       <section className="grid grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
-          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">총 작업</p>
-          <p className="text-3xl font-bold font-mono text-[#283618]">--</p>
-          <p className="text-[10px] text-[#4d7c0f] mt-2 font-medium">실적 집계 중</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+          <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">총 작업</p>
+          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--</p>
+          <p className="text-[10px] text-corthex-accent mt-2 font-medium">실적 집계 중</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
-          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">성공률</p>
-          <p className="text-3xl font-bold font-mono text-[#283618]">--%</p>
-          <div className="w-full bg-[#e5e1d3] h-1 rounded-full mt-4 overflow-hidden">
-            <div className="bg-[#4d7c0f] h-full" style={{ width: '0%' }} />
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+          <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">성공률</p>
+          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--%</p>
+          <div className="w-full bg-corthex-border h-1 rounded-full mt-4 overflow-hidden">
+            <div className="bg-corthex-accent h-full" style={{ width: '0%' }} />
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
-          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">평균 응답</p>
-          <p className="text-3xl font-bold font-mono text-[#283618]">--s</p>
-          <p className="text-[10px] text-[#6b705c] mt-2 font-medium">데이터 수집 중</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+          <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">평균 응답</p>
+          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--s</p>
+          <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">데이터 수집 중</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30">
-          <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">월간 비용</p>
-          <p className="text-3xl font-bold font-mono text-[#283618]">$--</p>
-          <p className="text-[10px] text-[#756e5a] mt-2 font-medium">예산 집계 중</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+          <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">월간 비용</p>
+          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">$--</p>
+          <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">예산 집계 중</p>
         </div>
       </section>
 
       {/* Detail Tabs */}
-      <div className="border-b border-[#e5e1d3] mt-2">
+      <div className="border-b border-corthex-border mt-2">
         <div className="flex gap-8">
           {detailTabItems.map((tab) => (
             <button
@@ -539,8 +539,8 @@ function AgentDetailPanel({
               onClick={() => setDetailTab(tab.value)}
               className={`pb-4 border-b-2 text-sm transition-colors ${
                 detailTab === tab.value
-                  ? 'font-bold text-[#606C38] border-[#606C38]'
-                  : 'border-transparent text-[#6b705c] hover:text-[#283618] font-medium'
+                  ? 'font-bold text-corthex-accent border-corthex-accent'
+                  : 'border-transparent text-corthex-text-secondary hover:text-corthex-accent-deep font-medium'
               }`}
             >
               {tab.label}
@@ -555,24 +555,24 @@ function AgentDetailPanel({
           {/* Recent Tasks */}
           <section className="col-span-8 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold tracking-tight text-[#1a1a1a]">
-                최근 활동 <span className="text-[#6b705c] font-normal text-sm ml-2">Recent Activity</span>
+              <h3 className="text-lg font-bold tracking-tight text-corthex-text-primary">
+                최근 활동 <span className="text-corthex-text-secondary font-normal text-sm ml-2">Recent Activity</span>
               </h3>
             </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-[#e5e1d3]/30">
-              <div className="divide-y divide-[#e5e1d3]/30">
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-corthex-border/30">
+              <div className="divide-y divide-corthex-border/30">
                 {recentActivities.map((act) => (
-                  <div key={act.id} className="px-6 py-4 flex items-center justify-between hover:bg-[#faf8f5]/50 transition-colors">
+                  <div key={act.id} className="px-6 py-4 flex items-center justify-between hover:bg-corthex-bg/50 transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${act.icon === 'success' ? 'bg-[#606C38]/10 text-[#606C38]' : 'bg-[#283618]/10 text-[#283618]'}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${act.icon === 'success' ? 'bg-corthex-accent/10 text-corthex-accent' : 'bg-corthex-accent-deep/10 text-corthex-accent-deep'}`}>
                         {activityIconMap[act.icon]}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#1a1a1a]">{act.title}</p>
-                        <p className="text-xs text-[#6b705c] mt-0.5">{act.detail}</p>
+                        <p className="text-sm font-semibold text-corthex-text-primary">{act.title}</p>
+                        <p className="text-xs text-corthex-text-secondary mt-0.5">{act.detail}</p>
                       </div>
                     </div>
-                    <span className="text-xs text-[#6b705c]">{act.time}</span>
+                    <span className="text-xs text-corthex-text-secondary">{act.time}</span>
                   </div>
                 ))}
               </div>
@@ -580,25 +580,25 @@ function AgentDetailPanel({
           </section>
           {/* Performance */}
           <section className="col-span-4 space-y-4">
-            <h3 className="text-lg font-bold tracking-tight text-[#1a1a1a]">
-              성능 지표 <span className="text-[#6b705c] font-normal text-sm block">Performance</span>
+            <h3 className="text-lg font-bold tracking-tight text-corthex-text-primary">
+              성능 지표 <span className="text-corthex-text-secondary font-normal text-sm block">Performance</span>
             </h3>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#e5e1d3]/30 space-y-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30 space-y-6">
               <div>
-                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">모델</p>
-                <p className="text-sm font-mono font-medium text-[#283618]">{agent.modelName}</p>
+                <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">모델</p>
+                <p className="text-sm font-mono font-medium text-corthex-accent-deep">{agent.modelName}</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">등급</p>
-                <p className="text-sm font-medium text-[#283618]">{tierLabels[agent.tier] || agent.tier}</p>
+                <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">등급</p>
+                <p className="text-sm font-medium text-corthex-accent-deep">{tierLabels[agent.tier] || agent.tier}</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">자동 학습</p>
-                <p className="text-sm font-medium text-[#283618]">{agent.autoLearn ? 'ON' : 'OFF'}</p>
+                <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">자동 학습</p>
+                <p className="text-sm font-medium text-corthex-accent-deep">{agent.autoLearn ? 'ON' : 'OFF'}</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#6b705c] uppercase tracking-widest mb-1">허용 도구</p>
-                <p className="text-sm font-medium text-[#283618]">{agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '제한 없음'}</p>
+                <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">허용 도구</p>
+                <p className="text-sm font-medium text-corthex-accent-deep">{agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '제한 없음'}</p>
               </div>
             </div>
           </section>
@@ -613,19 +613,19 @@ function AgentDetailPanel({
 
       {detailTab === 'history' && (
         <div className="mt-2">
-          <div className="bg-[#f5f0e8] rounded-xl border border-[#e5e1d3] p-8 text-center">
-            <Clock className="w-10 h-10 text-[#6b705c] mx-auto mb-3" />
-            <p className="text-[#6b705c] text-sm">작업 이력이 없습니다</p>
-            <p className="text-[#756e5a] text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
+          <div className="bg-corthex-elevated rounded-xl border border-corthex-border p-8 text-center">
+            <Clock className="w-10 h-10 text-corthex-text-secondary mx-auto mb-3" />
+            <p className="text-corthex-text-secondary text-sm">작업 이력이 없습니다</p>
+            <p className="text-corthex-text-secondary text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
           </div>
         </div>
       )}
 
       {detailTab === 'settings' && (
         <div className="mt-2 space-y-4">
-          <div className="bg-[#f5f0e8] rounded-xl border border-[#e5e1d3] p-6">
-            <h4 className="text-[#1a1a1a] font-bold text-sm mb-4 flex items-center gap-2">
-              <Settings className="w-4 h-4 text-[#6b705c]" /> 에이전트 설정
+          <div className="bg-corthex-elevated rounded-xl border border-corthex-border p-6">
+            <h4 className="text-corthex-text-primary font-bold text-sm mb-4 flex items-center gap-2">
+              <Settings className="w-4 h-4 text-corthex-text-secondary" /> 에이전트 설정
             </h4>
             <div className="space-y-3">
               {[
@@ -635,9 +635,9 @@ function AgentDetailPanel({
                 { label: '비서 에이전트', value: agent.isSecretary ? 'YES' : 'NO' },
                 { label: '허용된 도구', value: agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '없음' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-[#e5e1d3] last:border-b-0">
-                  <span className="text-[#6b705c] text-sm">{item.label}</span>
-                  <span className="text-[#1a1a1a] text-sm font-medium">{item.value}</span>
+                <div key={i} className="flex items-center justify-between py-2 border-b border-corthex-border last:border-b-0">
+                  <span className="text-corthex-text-secondary text-sm">{item.label}</span>
+                  <span className="text-corthex-text-primary text-sm font-medium">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -779,7 +779,7 @@ export function AgentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="agents-page" className="flex-1 p-8 space-y-6 bg-[#faf8f5]">
+      <div data-testid="agents-page" className="flex-1 p-8 space-y-6 bg-corthex-bg">
         <Skeleton className="h-10 w-64" />
         <div className="flex gap-8">
           <div className="w-[380px] space-y-2">
@@ -793,38 +793,38 @@ export function AgentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="agents-page" className="flex-1 p-8 bg-[#faf8f5]">
+      <div data-testid="agents-page" className="flex-1 p-8 bg-corthex-bg">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-sm text-[#dc2626]">에이전트 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-[#dc2626] hover:opacity-70 underline mt-2">다시 시도</button>
+          <p className="text-sm text-red-600">에이전트 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-red-600 hover:opacity-70 underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="agents-page" className="flex-1 bg-[#faf8f5] overflow-hidden">
+    <div data-testid="agents-page" className="flex-1 bg-corthex-bg overflow-hidden">
       <div className="p-8 max-w-[1440px] mx-auto h-full">
         <div className="flex gap-8 h-[calc(100vh-64px)]">
           {/* LEFT PANEL: Agent List */}
           <aside className="w-[380px] flex flex-col gap-6 flex-shrink-0">
             <header className="flex flex-col gap-4">
               <div className="flex justify-between items-start">
-                <h1 className="text-2xl font-bold tracking-tight text-[#1a1a1a]">
-                  에이전트 관리 <span className="text-[#6b705c] font-normal ml-1">Agents</span>
+                <h1 className="text-2xl font-bold tracking-tight text-corthex-text-primary">
+                  에이전트 관리 <span className="text-corthex-text-secondary font-normal ml-1">Agents</span>
                 </h1>
               </div>
               <button
                 onClick={() => setCreateOpen(true)}
-                className="w-full flex items-center justify-center gap-2 bg-[#606C38] hover:bg-[#4e5a2b] text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-sm active:scale-95"
+                className="w-full flex items-center justify-center gap-2 bg-corthex-accent hover:bg-corthex-accent-deep text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-sm active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>새 에이전트 생성</span>
               </button>
               <div className="relative">
-                <Bot className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908a78]" />
+                <Bot className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-corthex-text-secondary" />
                 <input
-                  className="w-full bg-[#f5f0e8] border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#606C38] placeholder:text-[#908a78] text-[#1a1a1a]"
+                  className="w-full bg-corthex-elevated border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-corthex-accent placeholder:text-corthex-text-secondary text-corthex-text-primary"
                   placeholder="에이전트 검색..."
                   type="text"
                   value={searchQuery}
@@ -838,8 +838,8 @@ export function AgentsPage() {
                     onClick={() => setFilterActive(f)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                       filterActive === f
-                        ? 'bg-[#606C38] text-white'
-                        : 'bg-[#e5e1d3] text-[#6b705c] hover:bg-[#d5d0c3]'
+                        ? 'bg-corthex-accent text-white'
+                        : 'bg-corthex-border text-corthex-text-secondary hover:bg-corthex-border-strong'
                     }`}
                   >
                     {f === 'active' ? '활성' : f === 'all' ? '전체' : '비활성'}
@@ -865,27 +865,27 @@ export function AgentsPage() {
                     onClick={() => setSelectedAgent(isSelected ? null : agent)}
                     className={`p-4 rounded-xl cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-[#e5e1d3] border-l-4 border-[#606C38] shadow-sm'
-                        : 'bg-[#f5f0e8] hover:bg-[#ede8de]'
+                        ? 'bg-corthex-border border-l-4 border-corthex-accent shadow-sm'
+                        : 'bg-corthex-elevated hover:bg-corthex-elevated'
                     } ${!agent.isActive ? 'opacity-50' : ''}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#283618] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-corthex-accent-deep text-white flex items-center justify-center font-bold text-sm">
                         {getInitials(agent.name, agent.nameEn)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-center">
-                          <h3 className={`${isSelected ? 'font-bold' : 'font-medium'} text-[#1a1a1a] truncate`}>
+                          <h3 className={`${isSelected ? 'font-bold' : 'font-medium'} text-corthex-text-primary truncate`}>
                             {agent.name}
-                            {agent.nameEn && <span className="text-[10px] text-[#908a78] ml-1">{agent.nameEn}</span>}
+                            {agent.nameEn && <span className="text-[10px] text-corthex-text-secondary ml-1">{agent.nameEn}</span>}
                           </h3>
                           <span className={`flex h-2 w-2 rounded-full ${status.dot}`} />
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-[#6b705c] mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] text-corthex-text-secondary mt-0.5">
                           <span className="font-medium">{deptName}</span>
-                          <span className="w-1 h-1 rounded-full bg-[#e5e1d3]" />
+                          <span className="w-1 h-1 rounded-full bg-corthex-border" />
                           <span className="font-mono">{agent.tier === 'manager' ? 'T1' : agent.tier === 'specialist' ? 'T2' : 'T3'}</span>
-                          <span className="w-1 h-1 rounded-full bg-[#e5e1d3]" />
+                          <span className="w-1 h-1 rounded-full bg-corthex-border" />
                           <span>{status.labelKo}</span>
                         </div>
                       </div>
@@ -897,7 +897,7 @@ export function AgentsPage() {
           </aside>
 
           {/* RIGHT PANEL: Agent Details */}
-          <main className="flex-1 bg-[#f5f0e8] rounded-[2rem] p-8 overflow-y-auto flex flex-col">
+          <main className="flex-1 bg-corthex-elevated rounded-[2rem] p-8 overflow-y-auto flex flex-col">
             {selectedAgent ? (
               <AgentDetailPanel
                 agent={selectedAgent}
@@ -912,9 +912,9 @@ export function AgentsPage() {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center space-y-3">
-                  <Bot className="w-16 h-16 text-[#e5e1d3] mx-auto" />
-                  <p className="text-[#6b705c] font-medium">에이전트를 선택하세요</p>
-                  <p className="text-[#908a78] text-sm">좌측 목록에서 에이전트를 클릭하면 상세 정보가 표시됩니다</p>
+                  <Bot className="w-16 h-16 text-corthex-border mx-auto" />
+                  <p className="text-corthex-text-secondary font-medium">에이전트를 선택하세요</p>
+                  <p className="text-corthex-text-secondary text-sm">좌측 목록에서 에이전트를 클릭하면 상세 정보가 표시됩니다</p>
                 </div>
               </div>
             )}
@@ -932,18 +932,18 @@ export function AgentsPage() {
         {deleteAgent && (
           <div className="space-y-4">
             {deleteAgent.isSecretary && (
-              <div className="bg-[#b45309]/10 border border-[#b45309]/20 rounded-lg p-3">
-                <p className="text-sm text-[#b45309]">비서 에이전트는 삭제할 수 없습니다.</p>
+              <div className="bg-amber-700/10 border border-amber-700/20 rounded-lg p-3">
+                <p className="text-sm text-amber-700">비서 에이전트는 삭제할 수 없습니다.</p>
               </div>
             )}
             {deleteAgent.isSystem && (
-              <div className="bg-[#b45309]/10 border border-[#b45309]/20 rounded-lg p-3">
-                <p className="text-sm text-[#b45309]">시스템 에이전트는 삭제할 수 없습니다.</p>
+              <div className="bg-amber-700/10 border border-amber-700/20 rounded-lg p-3">
+                <p className="text-sm text-amber-700">시스템 에이전트는 삭제할 수 없습니다.</p>
               </div>
             )}
             {!deleteAgent.isSecretary && !deleteAgent.isSystem && (
               <>
-                <p className="text-sm text-[#6b705c]">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
+                <p className="text-sm text-corthex-text-secondary">이 에이전트를 비활성화하시겠습니까? 에이전트가 부서에서 해제되고 비활성화됩니다.</p>
                 <div className="flex gap-2 justify-end pt-2">
                   <Button variant="outline" size="sm" onClick={() => setDeleteAgent(null)} disabled={deleteMutation.isPending}>취소</Button>
                   <Button variant="destructive" size="sm" onClick={() => deleteMutation.mutate(deleteAgent.id)} disabled={deleteMutation.isPending}>

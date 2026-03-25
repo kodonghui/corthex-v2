@@ -315,7 +315,7 @@ function ScheduleCard({
         {/* Row 3: Schedule info + Actions */}
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-[#5a7247]">{cronDesc}</span>
+            <span className="text-xs font-medium text-corthex-accent">{cronDesc}</span>
             <span className="text-[10px] text-stone-400">
               다음: {s.nextRunAt && s.isActive ? formatRelativeTime(s.nextRunAt) : '—'}
             </span>

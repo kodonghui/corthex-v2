@@ -177,7 +177,7 @@ export function HomePage() {
         {/* ── My Team ── */}
         <div data-testid="my-team-section" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-[#5a7247]/80">내 팀</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-corthex-accent/80">내 팀</h2>
             {allAgents.length > 0 && (
               <span className="text-xs text-stone-400 font-mono">{allAgents.length}명</span>
             )}
@@ -233,16 +233,16 @@ export function HomePage() {
                       className={`relative overflow-hidden rounded-2xl p-5 cursor-pointer group transition-all duration-300 ${
                         isError
                           ? 'bg-gradient-to-br from-red-600/10 via-slate-800/80 to-slate-800/80 border border-red-500/20 hover:border-red-500/40'
-                          : 'bg-gradient-to-br from-cyan-600/10 via-slate-800/80 to-slate-800/80 border border-[#5a7247]/15 hover:border-[#5a7247]/30'
+                          : 'bg-gradient-to-br from-cyan-600/10 via-slate-800/80 to-slate-800/80 border border-corthex-accent/15 hover:border-corthex-accent/30'
                       }`}
                     >
                       <div className={`absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-1/2 translate-x-1/2 transition-colors ${
-                        isError ? 'bg-red-500/5 group-hover:bg-red-500/10' : 'bg-[#5a7247]/5 group-hover:bg-[#5a7247]/10'
+                        isError ? 'bg-red-500/5 group-hover:bg-red-500/10' : 'bg-corthex-accent/5 group-hover:bg-corthex-accent/10'
                       }`} />
                       <div className="relative">
                         <div className="flex items-center gap-2.5 mb-2">
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isError ? 'bg-red-500/20' : 'bg-[#5a7247]/15'}`}>
-                            <svg className={`w-4 h-4 ${isError ? 'text-red-400' : 'text-[#5a7247]'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isError ? 'bg-red-500/20' : 'bg-corthex-accent/15'}`}>
+                            <svg className={`w-4 h-4 ${isError ? 'text-red-400' : 'text-corthex-accent'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                           </div>
@@ -267,7 +267,7 @@ export function HomePage() {
               </div>
               {overflowCount > 0 && (
                 <div className="text-right">
-                  <button onClick={() => navigate('/chat')} className="text-xs text-stone-400 hover:text-[#5a7247] transition-colors font-medium">
+                  <button onClick={() => navigate('/chat')} className="text-xs text-stone-400 hover:text-corthex-accent transition-colors font-medium">
                     +{overflowCount}명 더 보기 →
                   </button>
                 </div>

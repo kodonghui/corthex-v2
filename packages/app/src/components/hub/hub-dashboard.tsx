@@ -35,14 +35,14 @@ function StatsCard({
   color: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-[#e5e1d3]/60 p-5 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] transition-shadow">
+    <div className="bg-white rounded-xl border border-corthex-border/60 p-5 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] transition-shadow">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#6b705c]">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-corthex-text-secondary">{label}</span>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
           {icon}
         </div>
       </div>
-      <div className="text-2xl font-bold font-mono text-[#283618]">{value}</div>
+      <div className="text-2xl font-bold font-mono text-corthex-accent-deep">{value}</div>
     </div>
   )
 }
@@ -52,18 +52,18 @@ function StatsCard({
 function ActivityFeedItem({ item }: { item: ActivityItem }) {
   const timeAgo = getTimeAgo(item.createdAt)
   return (
-    <div className="flex gap-3 py-3 border-b border-[#e5e1d3]/30 last:border-0 group hover:bg-[#f5f0e8]/50 -mx-4 px-4 transition-colors rounded-lg">
-      <div className="w-8 h-8 rounded-lg bg-[#5a7247]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Activity className="w-4 h-4 text-[#5a7247]" />
+    <div className="flex gap-3 py-3 border-b border-corthex-border/30 last:border-0 group hover:bg-corthex-elevated/50 -mx-4 px-4 transition-colors rounded-lg">
+      <div className="w-8 h-8 rounded-lg bg-corthex-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Activity className="w-4 h-4 text-corthex-accent" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-[#283618] leading-relaxed">
+        <p className="text-sm text-corthex-accent-deep leading-relaxed">
           {item.agentName && (
             <span className="font-semibold">{item.agentName}: </span>
           )}
           {item.summary}
         </p>
-        <span className="text-[10px] text-[#a3b18a] font-mono mt-0.5 block">{timeAgo}</span>
+        <span className="text-[10px] text-corthex-accent-hover font-mono mt-0.5 block">{timeAgo}</span>
       </div>
     </div>
   )
@@ -85,17 +85,17 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="bg-white p-5 rounded-xl border border-[#e5e1d3]/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group w-full"
+      className="bg-white p-5 rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group w-full"
     >
-      <div className="p-2.5 rounded-xl bg-[#5a7247]/10 text-[#5a7247] group-hover:bg-[#5a7247]/15 transition-colors">
+      <div className="p-2.5 rounded-xl bg-corthex-accent/10 text-corthex-accent group-hover:bg-corthex-accent/15 transition-colors">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-[#283618] group-hover:text-[#5a7247] transition-colors flex items-center gap-1.5">
+        <h3 className="font-bold text-corthex-accent-deep group-hover:text-corthex-accent transition-colors flex items-center gap-1.5">
           {label}
           <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
         </h3>
-        <p className="text-xs text-[#6b705c] mt-0.5">{description}</p>
+        <p className="text-xs text-corthex-text-secondary mt-0.5">{description}</p>
       </div>
     </button>
   )
@@ -146,15 +146,15 @@ export function HubDashboard() {
   const activities = activityRes?.data || []
 
   return (
-    <div data-testid="hub-dashboard" className="bg-[#faf8f5] min-h-full">
+    <div data-testid="hub-dashboard" className="bg-corthex-bg min-h-full">
       <div className="p-6 md:p-8 max-w-[1200px] mx-auto space-y-8">
         {/* Welcome Header */}
         <header data-testid="hub-welcome-header" className="space-y-1">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#283618]">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-corthex-accent-deep">
             {greeting} 👋
           </h1>
           {user && (
-            <p className="text-[#6b705c] font-medium">
+            <p className="text-corthex-text-secondary font-medium">
               Welcome back. Here's what's happening today.
             </p>
           )}
@@ -164,9 +164,9 @@ export function HubDashboard() {
         {summaryLoading ? (
           <div data-testid="hub-stats-skeleton" className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-[#e5e1d3]/60 p-5">
-                <div className="h-3 w-16 bg-[#e5e1d3] animate-pulse rounded mb-3" />
-                <div className="h-8 w-12 bg-[#f5f0e8] animate-pulse rounded" />
+              <div key={i} className="bg-white rounded-xl border border-corthex-border/60 p-5">
+                <div className="h-3 w-16 bg-corthex-border animate-pulse rounded mb-3" />
+                <div className="h-8 w-12 bg-corthex-elevated animate-pulse rounded" />
               </div>
             ))}
           </div>
@@ -176,7 +176,7 @@ export function HubDashboard() {
               label="Agents Online"
               value={summary.agents.active}
               icon={<Bot className="w-4 h-4" />}
-              color="bg-[#5a7247]/10 text-[#5a7247]"
+              color="bg-corthex-accent/10 text-corthex-accent"
             />
             <StatsCard
               label="Active Tasks"
@@ -201,12 +201,12 @@ export function HubDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Activity Feed */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-[#e5e1d3]/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] p-6">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-[#283618]">Recent Activity</h2>
+              <h2 className="text-lg font-bold text-corthex-accent-deep">Recent Activity</h2>
               <button
                 onClick={() => navigate('/activity-log')}
-                className="text-xs font-medium text-[#5a7247] hover:underline underline-offset-2 flex items-center gap-1"
+                className="text-xs font-medium text-corthex-accent hover:underline underline-offset-2 flex items-center gap-1"
               >
                 View all <ArrowRight className="w-3 h-3" />
               </button>
@@ -216,10 +216,10 @@ export function HubDashboard() {
                 <div className="space-y-4">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex gap-3 py-3">
-                      <div className="w-8 h-8 bg-[#f5f0e8] animate-pulse rounded-lg" />
+                      <div className="w-8 h-8 bg-corthex-elevated animate-pulse rounded-lg" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3 w-full bg-[#f5f0e8] animate-pulse rounded" />
-                        <div className="h-2 w-20 bg-[#f5f0e8] animate-pulse rounded" />
+                        <div className="h-3 w-full bg-corthex-elevated animate-pulse rounded" />
+                        <div className="h-2 w-20 bg-corthex-elevated animate-pulse rounded" />
                       </div>
                     </div>
                   ))}
@@ -229,7 +229,7 @@ export function HubDashboard() {
                   <ActivityFeedItem key={item.id} item={item} />
                 ))
               ) : (
-                <div className="text-center py-8 text-sm text-[#6b705c]">
+                <div className="text-center py-8 text-sm text-corthex-text-secondary">
                   No recent activity
                 </div>
               )}
@@ -238,7 +238,7 @@ export function HubDashboard() {
 
           {/* Quick Actions */}
           <div className="space-y-4">
-            <h2 className="text-lg font-bold text-[#283618]">Quick Actions</h2>
+            <h2 className="text-lg font-bold text-corthex-accent-deep">Quick Actions</h2>
             <div data-testid="hub-quick-actions" className="space-y-3">
               <QuickAction
                 icon={<MessageSquare className="w-5 h-5" />}

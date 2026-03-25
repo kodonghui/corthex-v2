@@ -149,7 +149,7 @@ export function HubPage() {
     return (
       <div data-testid="hub-page" className="flex items-center justify-center h-full" style={{ backgroundColor: '#faf8f5' }}>
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-stone-300 border-t-[#5a7247] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-stone-300 border-t-corthex-accent rounded-full animate-spin" />
           <p className="text-sm text-stone-500">허브 로딩 중...</p>
         </div>
       </div>

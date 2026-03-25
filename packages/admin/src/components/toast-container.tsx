@@ -11,7 +11,7 @@ const colorMap = {
     'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300',
   error:
     'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300',
-  info: 'bg-[#5a7247]/10 dark:bg-[#5a7247]/20 border-[#5a7247]/30 dark:border-[#5a7247]/50 text-[#5a7247] dark:text-[#8fae7a]',
+  info: 'bg-corthex-accent/10 dark:bg-corthex-accent/20 border-corthex-accent/30 dark:border-corthex-accent/50 text-corthex-accent dark:text-corthex-accent-hover',
 }
 
 export function ToastContainer() {

@@ -31,22 +31,22 @@ function CodeBlock({ children, className }: { children: ReactNode; className?: s
   }, [])
 
   return (
-    <div className="relative group my-3 rounded-lg overflow-hidden border border-[#e5e1d3]" data-testid="code-block">
+    <div className="relative group my-3 rounded-lg overflow-hidden border border-corthex-border" data-testid="code-block">
       {/* Language label + copy button */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-[#f5f0e8] border-b border-[#e5e1d3]">
-        <span className="text-[10px] font-mono font-medium text-[#6b705c] uppercase tracking-wider">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-corthex-elevated border-b border-corthex-border">
+        <span className="text-[10px] font-mono font-medium text-corthex-text-secondary uppercase tracking-wider">
           {language || 'code'}
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium text-[#6b705c] hover:bg-[#e5e1d3] transition-colors"
+          className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium text-corthex-text-secondary hover:bg-corthex-border transition-colors"
           title="Copy code"
           data-testid="copy-button"
         >
           {copied ? (
             <>
-              <Check className="w-3 h-3 text-[#5a7247]" />
-              <span className="text-[#5a7247]">Copied</span>
+              <Check className="w-3 h-3 text-corthex-accent" />
+              <span className="text-corthex-accent">Copied</span>
             </>
           ) : (
             <>
@@ -58,8 +58,8 @@ function CodeBlock({ children, className }: { children: ReactNode; className?: s
       </div>
 
       {/* Code content */}
-      <pre className="p-3 bg-[#faf8f5] overflow-x-auto text-sm">
-        <code ref={codeRef} className={`font-mono text-[13px] leading-relaxed text-[#283618] ${className || ''}`}>
+      <pre className="p-3 bg-corthex-bg overflow-x-auto text-sm">
+        <code ref={codeRef} className={`font-mono text-[13px] leading-relaxed text-corthex-accent-deep ${className || ''}`}>
           {children}
         </code>
       </pre>
@@ -72,7 +72,7 @@ function CodeBlock({ children, className }: { children: ReactNode; className?: s
 function StreamingCursor() {
   return (
     <span
-      className="inline-block w-[2px] h-[1.1em] bg-[#5a7247] ml-0.5 align-text-bottom animate-[cursor-blink_1s_step-end_infinite]"
+      className="inline-block w-[2px] h-[1.1em] bg-corthex-accent ml-0.5 align-text-bottom animate-[cursor-blink_1s_step-end_infinite]"
       aria-hidden="true"
       data-testid="streaming-cursor"
     />
@@ -106,41 +106,41 @@ export function StreamingMessage({
       <div
         className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
           isAgent
-            ? 'bg-[#5a7247]/10 border border-[#5a7247]/20'
-            : 'bg-[#e5e1d3] border border-[#d4c9b8]'
+            ? 'bg-corthex-accent/10 border border-corthex-accent/20'
+            : 'bg-corthex-border border border-corthex-border-strong'
         } ${isAgent ? 'mt-6' : 'mb-6'}`}
       >
         {avatarUrl ? (
           <img src={avatarUrl} alt={displayName} className="w-8 h-8 rounded-lg object-cover" />
         ) : isAgent ? (
-          <Bot className="w-4 h-4 text-[#5a7247]" />
+          <Bot className="w-4 h-4 text-corthex-accent" />
         ) : (
-          <User className="w-4 h-4 text-[#6b705c]" />
+          <User className="w-4 h-4 text-corthex-text-secondary" />
         )}
       </div>
 
       {/* Message content */}
       <div className={`flex flex-col gap-1 ${isAgent ? 'items-start' : 'items-end'} max-w-[80%]`}>
         {/* Sender name */}
-        <span className="text-xs font-medium text-[#6b705c] px-1">{displayName}</span>
+        <span className="text-xs font-medium text-corthex-text-secondary px-1">{displayName}</span>
 
         {/* Bubble */}
         <div
           className={`text-[15px] leading-relaxed rounded-2xl px-5 py-3.5 w-full shadow-sm ${
             isAgent
-              ? 'rounded-bl-sm bg-[#f5f0e8] text-[#283618] border border-[#e5e1d3]/50'
-              : 'rounded-br-sm bg-[#5a7247]/10 text-[#283618] border border-[#5a7247]/15'
+              ? 'rounded-bl-sm bg-corthex-elevated text-corthex-accent-deep border border-corthex-border/50'
+              : 'rounded-br-sm bg-corthex-accent/10 text-corthex-accent-deep border border-corthex-accent/15'
           }`}
         >
           {isAgent && content ? (
-            <div className="prose prose-sm max-w-none prose-headings:text-[#283618] prose-p:text-[#283618] prose-strong:text-[#283618] prose-code:text-[#5a7247] prose-code:bg-[#faf8f5] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-a:text-[#5a7247] prose-a:underline-offset-2">
+            <div className="prose prose-sm max-w-none prose-headings:text-corthex-accent-deep prose-p:text-corthex-accent-deep prose-strong:text-corthex-accent-deep prose-code:text-corthex-accent prose-code:bg-corthex-bg prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-a:text-corthex-accent prose-a:underline-offset-2">
               <Markdown
                 components={{
                   code: ({ className: cn, children, ...props }) => {
                     const isInline = !cn
                     if (isInline) {
                       return (
-                        <code className="text-[#5a7247] bg-[#faf8f5] px-1 py-0.5 rounded text-[13px] font-mono" {...props}>
+                        <code className="text-corthex-accent bg-corthex-bg px-1 py-0.5 rounded text-[13px] font-mono" {...props}>
                           {children}
                         </code>
                       )
@@ -168,7 +168,7 @@ export function StreamingMessage({
 
         {/* Footer: timestamp + token count */}
         {(formattedTime || tokenCount) && !isStreaming && (
-          <div className="flex items-center gap-2 px-1 text-[10px] text-[#a3b18a]">
+          <div className="flex items-center gap-2 px-1 text-[10px] text-corthex-accent-hover">
             {formattedTime && (
               <span className="flex items-center gap-0.5">
                 <Clock className="w-2.5 h-2.5" />

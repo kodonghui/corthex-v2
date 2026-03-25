@@ -145,7 +145,7 @@ export function DeliverableViewer({ commandId, command, onDetailClick, onClose }
           <>
             {/* Content sanitization is handled by MarkdownRenderer (no dangerouslySetInnerHTML) */}
             <div
-              className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-stone-600 prose-strong:text-slate-200 prose-code:text-[#5a7247] prose-code:bg-stone-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-a:text-blue-400 prose-blockquote:border-stone-300 prose-blockquote:text-stone-500 prose-pre:bg-stone-100/80 prose-pre:border prose-pre:border-stone-200/50 prose-pre:rounded-xl cursor-pointer"
+              className="prose prose-sm prose-invert max-w-none prose-headings:text-slate-100 prose-p:text-stone-600 prose-strong:text-slate-200 prose-code:text-corthex-accent prose-code:bg-stone-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-a:text-blue-400 prose-blockquote:border-stone-300 prose-blockquote:text-stone-500 prose-pre:bg-stone-100/80 prose-pre:border prose-pre:border-stone-200/50 prose-pre:rounded-xl cursor-pointer"
               onClick={onDetailClick}
             >
               <MarkdownRenderer content={command.result} />

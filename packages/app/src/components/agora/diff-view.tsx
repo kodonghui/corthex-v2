@@ -59,7 +59,7 @@ const AVATAR_COLORS = [
   'bg-purple-500/20 text-purple-400',
   'bg-emerald-500/20 text-emerald-400',
   'bg-amber-500/20 text-amber-400',
-  'bg-[#5a7247]/20 text-[#5a7247]',
+  'bg-corthex-accent/20 text-corthex-accent',
   'bg-pink-500/20 text-pink-400',
   'bg-orange-500/20 text-orange-400',
 ]

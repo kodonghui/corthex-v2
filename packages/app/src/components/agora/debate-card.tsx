@@ -10,8 +10,8 @@ export interface DebateCardProps {
 
 export function DebateCard({ title, participants, icon, iconBgClass, active }: DebateCardProps) {
     const containerClass = active
-        ? 'bg-[#5a7247]/10 border-l-[#5a7247] cursor-pointer'
-        : 'hover:bg-[#5a7247]/5 cursor-pointer border-l-transparent transition-colors';
+        ? 'bg-corthex-accent/10 border-l-corthex-accent cursor-pointer'
+        : 'hover:bg-corthex-accent/5 cursor-pointer border-l-transparent transition-colors';
 
     const dotClass = active ? 'bg-emerald-500' : 'bg-slate-500';
 

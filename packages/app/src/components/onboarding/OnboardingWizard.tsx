@@ -73,10 +73,10 @@ function StepProgress({ currentStep }: { currentStep: number }) {
             <div
               className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${
                 isComplete
-                  ? 'bg-[#606C38] text-white'
+                  ? 'bg-corthex-accent text-white'
                   : isActive
-                    ? 'bg-[#606C38]/10 text-[#606C38] ring-2 ring-[#606C38]'
-                    : 'bg-[#f5f0e8] text-[#a3a08e]'
+                    ? 'bg-corthex-accent/10 text-corthex-accent ring-2 ring-corthex-accent'
+                    : 'bg-corthex-elevated text-corthex-text-disabled'
               }`}
             >
               {isComplete ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
@@ -84,7 +84,7 @@ function StepProgress({ currentStep }: { currentStep: number }) {
             {i < STEPS.length - 1 && (
               <div
                 className={`w-8 h-0.5 mx-1 transition-colors ${
-                  currentStep > step.id ? 'bg-[#606C38]' : 'bg-[#e5e1d3]'
+                  currentStep > step.id ? 'bg-corthex-accent' : 'bg-corthex-border'
                 }`}
               />
             )}
@@ -100,26 +100,26 @@ function StepCompany({ data, onChange }: { data: WizardData; onChange: (d: Parti
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">회사 정보를 입력해 주세요</h2>
-        <p className="text-sm text-[#6b705c]">CORTHEX에서 사용할 회사 이름을 설정합니다.</p>
+        <h2 className="text-lg font-bold text-corthex-text-primary mb-1">회사 정보를 입력해 주세요</h2>
+        <p className="text-sm text-corthex-text-secondary">CORTHEX에서 사용할 회사 이름을 설정합니다.</p>
       </div>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">회사 이름 *</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">회사 이름 *</label>
           <input
             value={data.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
             placeholder="예: CORTHEX Corp."
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">로고 URL (선택)</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">로고 URL (선택)</label>
           <input
             value={data.companyLogo}
             onChange={(e) => onChange({ companyLogo: e.target.value })}
             placeholder="https://example.com/logo.png"
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
       </div>
@@ -131,27 +131,27 @@ function StepDepartment({ data, onChange }: { data: WizardData; onChange: (d: Pa
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">첫 부서를 만들어 보세요</h2>
-        <p className="text-sm text-[#6b705c]">AI 에이전트를 배치할 부서를 생성합니다.</p>
+        <h2 className="text-lg font-bold text-corthex-text-primary mb-1">첫 부서를 만들어 보세요</h2>
+        <p className="text-sm text-corthex-text-secondary">AI 에이전트를 배치할 부서를 생성합니다.</p>
       </div>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">부서 이름 *</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">부서 이름 *</label>
           <input
             value={data.departmentName}
             onChange={(e) => onChange({ departmentName: e.target.value })}
             placeholder="예: 경영전략부"
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">설명 (선택)</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">설명 (선택)</label>
           <textarea
             value={data.departmentDescription}
             onChange={(e) => onChange({ departmentDescription: e.target.value })}
             placeholder="부서의 역할과 목적을 간단히 설명해 주세요"
             rows={3}
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38] resize-none"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent resize-none"
           />
         </div>
       </div>
@@ -163,34 +163,34 @@ function StepAgent({ data, onChange }: { data: WizardData; onChange: (d: Partial
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">첫 AI 에이전트를 만들어 보세요</h2>
-        <p className="text-sm text-[#6b705c]">{data.departmentName || '부서'}에 배치할 에이전트를 설정합니다.</p>
+        <h2 className="text-lg font-bold text-corthex-text-primary mb-1">첫 AI 에이전트를 만들어 보세요</h2>
+        <p className="text-sm text-corthex-text-secondary">{data.departmentName || '부서'}에 배치할 에이전트를 설정합니다.</p>
       </div>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">에이전트 이름 *</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">에이전트 이름 *</label>
           <input
             value={data.agentName}
             onChange={(e) => onChange({ agentName: e.target.value })}
             placeholder="예: 전략 분석관"
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">역할</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">역할</label>
           <input
             value={data.agentRole}
             onChange={(e) => onChange({ agentRole: e.target.value })}
             placeholder="예: 시장 분석 및 전략 보고서 작성"
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">AI 모델</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">AI 모델</label>
           <select
             value={data.agentModel}
             onChange={(e) => onChange({ agentModel: e.target.value })}
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38] appearance-none"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
           >
             {MODEL_OPTIONS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
@@ -206,30 +206,30 @@ function StepApiKey({ data, onChange }: { data: WizardData; onChange: (d: Partia
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">API 키를 설정하세요</h2>
-        <p className="text-sm text-[#6b705c]">AI 에이전트가 동작하려면 API 키가 필요합니다. 나중에 설정할 수도 있습니다.</p>
+        <h2 className="text-lg font-bold text-corthex-text-primary mb-1">API 키를 설정하세요</h2>
+        <p className="text-sm text-corthex-text-secondary">AI 에이전트가 동작하려면 API 키가 필요합니다. 나중에 설정할 수도 있습니다.</p>
       </div>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">API Provider</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">API Provider</label>
           <select
             value={data.apiProvider}
             onChange={(e) => onChange({ apiProvider: e.target.value })}
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38] appearance-none"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
           >
             <option value="anthropic">Anthropic (Claude)</option>
           </select>
         </div>
         <div>
-          <label className="text-sm font-medium text-[#1a1a1a] mb-1 block">API Key (선택)</label>
+          <label className="text-sm font-medium text-corthex-text-primary mb-1 block">API Key (선택)</label>
           <input
             type="password"
             value={data.apiKey}
             onChange={(e) => onChange({ apiKey: e.target.value })}
             placeholder="sk-ant-..."
-            className="w-full rounded-lg border border-[#e5e1d3] bg-white px-3 py-2 text-sm font-mono text-[#1a1a1a] placeholder:text-[#a3a08e] focus:outline-none focus:ring-2 focus:ring-[#606C38]/40 focus:border-[#606C38]"
+            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
-          <p className="text-xs text-[#6b705c] mt-1">나중에 설정 페이지에서 변경할 수 있습니다.</p>
+          <p className="text-xs text-corthex-text-secondary mt-1">나중에 설정 페이지에서 변경할 수 있습니다.</p>
         </div>
       </div>
     </div>
@@ -239,31 +239,31 @@ function StepApiKey({ data, onChange }: { data: WizardData; onChange: (d: Partia
 function StepComplete({ data }: { data: WizardData }) {
   return (
     <div className="text-center py-4">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#606C38]/10 mb-4">
-        <PartyPopper className="w-7 h-7 text-[#606C38]" />
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-corthex-accent/10 mb-4">
+        <PartyPopper className="w-7 h-7 text-corthex-accent" />
       </div>
-      <h2 className="text-lg font-bold text-[#1a1a1a] mb-2">모든 준비가 완료되었습니다!</h2>
-      <p className="text-sm text-[#6b705c] mb-6">
+      <h2 className="text-lg font-bold text-corthex-text-primary mb-2">모든 준비가 완료되었습니다!</h2>
+      <p className="text-sm text-corthex-text-secondary mb-6">
         {data.companyName || 'CORTHEX'}의 AI 조직이 구성되었습니다.
         허브에서 에이전트와 대화를 시작해 보세요.
       </p>
-      <div className="bg-[#f5f0e8] rounded-xl p-4 text-left space-y-2 max-w-xs mx-auto">
+      <div className="bg-corthex-elevated rounded-xl p-4 text-left space-y-2 max-w-xs mx-auto">
         {data.companyName && (
           <div className="flex items-center gap-2 text-sm">
-            <Building2 className="w-4 h-4 text-[#606C38]" />
-            <span className="text-[#1a1a1a]">{data.companyName}</span>
+            <Building2 className="w-4 h-4 text-corthex-accent" />
+            <span className="text-corthex-text-primary">{data.companyName}</span>
           </div>
         )}
         {data.departmentName && (
           <div className="flex items-center gap-2 text-sm">
-            <Users className="w-4 h-4 text-[#606C38]" />
-            <span className="text-[#1a1a1a]">{data.departmentName}</span>
+            <Users className="w-4 h-4 text-corthex-accent" />
+            <span className="text-corthex-text-primary">{data.departmentName}</span>
           </div>
         )}
         {data.agentName && (
           <div className="flex items-center gap-2 text-sm">
-            <Bot className="w-4 h-4 text-[#606C38]" />
-            <span className="text-[#1a1a1a]">{data.agentName}</span>
+            <Bot className="w-4 h-4 text-corthex-accent" />
+            <span className="text-corthex-text-primary">{data.agentName}</span>
           </div>
         )}
       </div>
@@ -314,9 +314,9 @@ export function OnboardingWizard() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#faf8f5]">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-corthex-bg">
       <main className="w-full max-w-lg" data-testid="onboarding-wizard">
-        <section className="bg-white rounded-2xl shadow-sm border border-[#e5e1d3] overflow-hidden">
+        <section className="bg-white rounded-2xl shadow-sm border border-corthex-border overflow-hidden">
           <div className="px-6 pt-6">
             <StepProgress currentStep={step} />
           </div>
@@ -330,21 +330,21 @@ export function OnboardingWizard() {
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-[#e5e1d3]">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-corthex-border">
             <button
               onClick={handleBack}
               disabled={step === 1}
-              className="flex items-center gap-1 text-sm text-[#6b705c] hover:text-[#283618] disabled:invisible transition-colors"
+              className="flex items-center gap-1 text-sm text-corthex-text-secondary hover:text-corthex-accent-deep disabled:invisible transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> 이전
             </button>
-            <div className="text-xs text-[#a3a08e]">
+            <div className="text-xs text-corthex-text-disabled">
               {step} / {STEPS.length}
             </div>
             <button
               onClick={handleNext}
               disabled={!canProceed() || completeMutation.isPending}
-              className="flex items-center gap-1 px-4 py-2 bg-[#606C38] text-white text-sm font-medium rounded-lg hover:bg-[#7a8f5a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-4 py-2 bg-corthex-accent text-white text-sm font-medium rounded-lg hover:bg-corthex-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {step === 5 ? (completeMutation.isPending ? '완료 중...' : 'CORTHEX 시작') : '다음'}
               {step < 5 && <ArrowRight className="w-4 h-4" />}

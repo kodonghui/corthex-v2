@@ -135,13 +135,13 @@ export function CommandPalette() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
         <Dialog.Content
-          className="fixed top-[20%] left-1/2 z-50 w-full max-w-lg -translate-x-1/2 rounded-xl bg-white border border-[#e5e1d3] shadow-xl overflow-hidden"
+          className="fixed top-[20%] left-1/2 z-50 w-full max-w-lg -translate-x-1/2 rounded-xl bg-white border border-corthex-border shadow-xl overflow-hidden"
           onKeyDown={handleKeyDown}
         >
           <Dialog.Title className="sr-only">Command Palette</Dialog.Title>
           {/* Search input */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[#e5e1d3]">
-            <Search className="w-4 h-4 text-[#a3a08e] shrink-0" />
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-corthex-border">
+            <Search className="w-4 h-4 text-corthex-text-disabled shrink-0" />
             <input
               ref={inputRef}
               value={query}
@@ -150,9 +150,9 @@ export function CommandPalette() {
                 setSelectedIndex(0)
               }}
               placeholder="Search commands..."
-              className="flex-1 bg-transparent text-sm text-[#1a1a1a] placeholder:text-[#a3a08e] outline-none"
+              className="flex-1 bg-transparent text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled outline-none"
             />
-            <kbd className="hidden sm:flex items-center gap-0.5 text-[10px] text-[#a3a08e] bg-[#f5f0e8] rounded px-1.5 py-0.5 border border-[#e5e1d3]">
+            <kbd className="hidden sm:flex items-center gap-0.5 text-[10px] text-corthex-text-disabled bg-corthex-elevated rounded px-1.5 py-0.5 border border-corthex-border">
               ESC
             </kbd>
           </div>
@@ -161,14 +161,14 @@ export function CommandPalette() {
           <div className="max-h-[300px] overflow-y-auto py-2" role="listbox">
             {filtered.recent.length > 0 && !query.trim() && (
               <div className="px-3 py-1.5">
-                <span className="text-[10px] font-semibold text-[#a3a08e] uppercase tracking-wider flex items-center gap-1">
+                <span className="text-[10px] font-semibold text-corthex-text-disabled uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3 h-3" /> Recent
                 </span>
               </div>
             )}
 
             {allItems.length === 0 && (
-              <div className="px-4 py-8 text-center text-sm text-[#a3a08e]">
+              <div className="px-4 py-8 text-center text-sm text-corthex-text-disabled">
                 No results found
               </div>
             )}
@@ -181,7 +181,7 @@ export function CommandPalette() {
                 <div key={`${item.id}-${isRecent ? 'recent' : 'nav'}`}>
                   {showDivider && (
                     <div className="px-3 py-1.5 mt-1">
-                      <span className="text-[10px] font-semibold text-[#a3a08e] uppercase tracking-wider flex items-center gap-1">
+                      <span className="text-[10px] font-semibold text-corthex-text-disabled uppercase tracking-wider flex items-center gap-1">
                         <Command className="w-3 h-3" /> All Pages
                       </span>
                     </div>
@@ -191,15 +191,15 @@ export function CommandPalette() {
                     aria-selected={i === selectedIndex}
                     className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-left transition-colors ${
                       i === selectedIndex
-                        ? 'bg-[#f5f0e8] text-[#283618]'
-                        : 'text-[#1a1a1a] hover:bg-[#faf8f5]'
+                        ? 'bg-corthex-elevated text-corthex-accent-deep'
+                        : 'text-corthex-text-primary hover:bg-corthex-bg'
                     }`}
                     onClick={() => executeItem(item)}
                     onMouseEnter={() => setSelectedIndex(i)}
                   >
-                    <ArrowRight className="w-3.5 h-3.5 text-[#a3a08e]" />
+                    <ArrowRight className="w-3.5 h-3.5 text-corthex-text-disabled" />
                     <span className="flex-1 truncate">{item.label}</span>
-                    {item.path && <span className="text-[10px] text-[#a3a08e]">{item.path}</span>}
+                    {item.path && <span className="text-[10px] text-corthex-text-disabled">{item.path}</span>}
                   </button>
                 </div>
               )
@@ -207,13 +207,13 @@ export function CommandPalette() {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-[#e5e1d3] bg-[#faf8f5]">
-            <span className="text-[10px] text-[#a3a08e]">
-              <kbd className="bg-[#f5f0e8] rounded px-1 border border-[#e5e1d3]">↑↓</kbd> navigate
-              <kbd className="bg-[#f5f0e8] rounded px-1 ml-2 border border-[#e5e1d3]">↵</kbd> select
+          <div className="flex items-center justify-between px-4 py-2 border-t border-corthex-border bg-corthex-bg">
+            <span className="text-[10px] text-corthex-text-disabled">
+              <kbd className="bg-corthex-elevated rounded px-1 border border-corthex-border">↑↓</kbd> navigate
+              <kbd className="bg-corthex-elevated rounded px-1 ml-2 border border-corthex-border">↵</kbd> select
             </span>
-            <span className="text-[10px] text-[#a3a08e]">
-              <kbd className="bg-[#f5f0e8] rounded px-1 border border-[#e5e1d3]">⌘K</kbd> toggle
+            <span className="text-[10px] text-corthex-text-disabled">
+              <kbd className="bg-corthex-elevated rounded px-1 border border-corthex-border">⌘K</kbd> toggle
             </span>
           </div>
         </Dialog.Content>

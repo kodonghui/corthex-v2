@@ -35,7 +35,7 @@ export function AgentDetail({
         <div className="flex flex-col gap-6 p-4">
             <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-center gap-6">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#5a7247] to-cyan-600 flex items-center justify-center shadow-lg relative">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-corthex-accent to-cyan-600 flex items-center justify-center shadow-lg relative">
                         <Headset className="text-white w-10 h-10" />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#102022] rounded-full flex items-center justify-center">
                             <div className="w-4 h-4 rounded-full bg-green-500"></div>
@@ -64,7 +64,7 @@ export function AgentDetail({
 
             <div className="border-b border-stone-200 mt-6">
                 <div className="flex gap-8">
-                    <button className="pb-4 border-b-2 border-[#5a7247] text-[#5a7247] font-bold text-sm">개요</button>
+                    <button className="pb-4 border-b-2 border-corthex-accent text-corthex-accent font-bold text-sm">개요</button>
                     <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">Soul</button>
                     <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">작업 이력</button>
                     <button className="pb-4 border-b-2 border-transparent text-stone-500 hover:text-stone-600 font-medium text-sm transition-colors">설정</button>

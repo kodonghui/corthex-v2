@@ -34,7 +34,7 @@ export function OpsLogItem({ time, agentId, operation, target, quality, cost, st
         <tr className="hover:bg-stone-100/30 transition-colors group">
             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-600">{time}</td>
             <td className="px-6 py-4 whitespace-nowrap">
-                <div className="h-8 w-8 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-xs font-bold text-[#5a7247]">{agentId}</div>
+                <div className="h-8 w-8 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-xs font-bold text-corthex-accent">{agentId}</div>
             </td>
             <td className="px-6 py-4 text-sm font-medium text-slate-200">{operation}</td>
             <td className="px-6 py-4 text-sm text-stone-500 font-mono">{target}</td>

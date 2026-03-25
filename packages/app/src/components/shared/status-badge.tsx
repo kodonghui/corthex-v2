@@ -5,7 +5,7 @@ export interface StatusBadgeProps {
 export function StatusBadge({ status }: StatusBadgeProps) {
     switch (status) {
         case 'active':
-            return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(34,211,238,0.10)] text-[#5a7247] border border-[rgba(34,211,238,0.20)] uppercase tracking-wider">ACTIVE</span>;
+            return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(34,211,238,0.10)] text-corthex-accent border border-[rgba(34,211,238,0.20)] uppercase tracking-wider">ACTIVE</span>;
         case 'scheduled':
             return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-900/30 text-amber-400 border border-amber-800/50 uppercase tracking-wider">SCHEDULED</span>;
         case 'completed':

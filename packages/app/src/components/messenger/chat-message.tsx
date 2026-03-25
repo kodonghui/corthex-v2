@@ -13,7 +13,7 @@ export function ChatMessage({ isUser, message, time, avatarUrl, senderName }: Ch
         return (
             <div className="flex justify-end gap-3 max-w-[80%] ml-auto">
                 <div className="flex flex-col items-end gap-1">
-                    <div className="bg-[#5a7247]/10 text-slate-900 p-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed border border-[#5a7247]/20">
+                    <div className="bg-corthex-accent/10 text-slate-900 p-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed border border-corthex-accent/20">
                         {message}
                     </div>
                     <span className="text-xs text-stone-400">{time}</span>

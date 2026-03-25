@@ -127,14 +127,14 @@ export function BigFiveSliderGroup({ value, onChange, disabled = false }: BigFiv
     <div className="space-y-4">
       {/* Header + Enable toggle */}
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-bold text-[#1a1a1a] flex items-center gap-2">
-          성격 특성 <span className="text-[#6b705c] font-normal text-xs">Big Five (OCEAN)</span>
+        <h4 className="text-sm font-bold text-corthex-text-primary flex items-center gap-2">
+          성격 특성 <span className="text-corthex-text-secondary font-normal text-xs">Big Five (OCEAN)</span>
         </h4>
         <button
           type="button"
           onClick={() => isEnabled ? handleClear() : handlePresetSelect(PERSONALITY_PRESETS[0])}
           disabled={disabled}
-          className="text-xs font-medium px-3 py-1 rounded-lg border border-[#e5e1d3] hover:bg-[#f5f0e8] transition-colors text-[#6b705c] disabled:opacity-40"
+          className="text-xs font-medium px-3 py-1 rounded-lg border border-corthex-border hover:bg-corthex-elevated transition-colors text-corthex-text-secondary disabled:opacity-40"
         >
           {isEnabled ? '성격 해제' : '성격 설정'}
         </button>
@@ -154,8 +154,8 @@ export function BigFiveSliderGroup({ value, onChange, disabled = false }: BigFiv
                 disabled={disabled}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all
                   ${activePreset === preset.id
-                    ? 'bg-[#283618] text-white border-[#283618] shadow-sm'
-                    : 'bg-white text-[#6b705c] border-[#e5e1d3] hover:bg-[#f5f0e8] hover:border-[#5a7247]'
+                    ? 'bg-corthex-accent-deep text-white border-corthex-accent-deep shadow-sm'
+                    : 'bg-white text-corthex-text-secondary border-corthex-border hover:bg-corthex-elevated hover:border-corthex-accent'
                   } disabled:opacity-40`}
               >
                 {preset.nameKo} <span className="opacity-70">{preset.name}</span>
@@ -177,7 +177,7 @@ export function BigFiveSliderGroup({ value, onChange, disabled = false }: BigFiv
           </div>
 
           {/* Info */}
-          <p className="text-[10px] text-[#908a78]">
+          <p className="text-[10px] text-corthex-text-secondary">
             성격 변경은 다음 대화부터 적용됩니다. 프롬프트 주입 방식으로 작동하며, 코드 수정은 필요 없습니다.
           </p>
         </>
@@ -217,8 +217,8 @@ function TraitSlider({
     <div className="group">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#1a1a1a]">{config.labelKo}</span>
-          <span className="text-[10px] text-[#6b705c]">{config.label}</span>
+          <span className="text-xs font-bold text-corthex-text-primary">{config.labelKo}</span>
+          <span className="text-[10px] text-corthex-text-secondary">{config.label}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-bold tabular-nums" style={{ color: config.color, minWidth: '2ch', textAlign: 'right' }}>
@@ -227,7 +227,7 @@ function TraitSlider({
           <button
             type="button"
             onClick={() => setShowTooltip(!showTooltip)}
-            className="w-4 h-4 rounded-full bg-[#e5e1d3] text-[#6b705c] text-[10px] font-bold flex items-center justify-center hover:bg-[#d5d1c3] transition-colors"
+            className="w-4 h-4 rounded-full bg-corthex-border text-corthex-text-secondary text-[10px] font-bold flex items-center justify-center hover:bg-corthex-border-strong transition-colors"
             aria-label={`${config.labelKo} 설명`}
           >
             ?
@@ -237,8 +237,8 @@ function TraitSlider({
 
       {/* Low/High labels */}
       <div className="flex items-center justify-between mb-0.5">
-        <span className="text-[9px] text-[#908a78]">{config.lowDesc}</span>
-        <span className="text-[9px] text-[#908a78]">{config.highDesc}</span>
+        <span className="text-[9px] text-corthex-text-secondary">{config.lowDesc}</span>
+        <span className="text-[9px] text-corthex-text-secondary">{config.highDesc}</span>
       </div>
 
       {/* Range input */}
@@ -276,7 +276,7 @@ function TraitSlider({
 
       {/* Tooltip */}
       {showTooltip && (
-        <div className="mt-1 px-3 py-2 bg-[#283618] text-white text-[11px] rounded-lg leading-relaxed">
+        <div className="mt-1 px-3 py-2 bg-corthex-accent-deep text-white text-[11px] rounded-lg leading-relaxed">
           {tooltipText}
         </div>
       )}

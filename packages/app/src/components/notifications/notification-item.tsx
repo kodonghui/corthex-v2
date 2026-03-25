@@ -13,12 +13,12 @@ export interface NotificationItemProps {
 
 export function NotificationItem({ title, time, category, message, icon, iconBgClass, iconColorClass, unread }: NotificationItemProps) {
     const containerClass = unread
-        ? 'bg-[#5a7247]/[0.02] border-[#5a7247]/20'
+        ? 'bg-corthex-accent/[0.02] border-corthex-accent/20'
         : 'bg-white border-slate-200';
 
     return (
         <div className={`relative flex gap-4 border rounded-xl p-4 transition-colors hover:bg-slate-50 group ${containerClass}`}>
-            {unread && <div className="absolute top-4 left-2 w-1.5 h-1.5 rounded-full bg-[#5a7247]"></div>}
+            {unread && <div className="absolute top-4 left-2 w-1.5 h-1.5 rounded-full bg-corthex-accent"></div>}
             <div className="flex items-start gap-4 w-full ml-2">
                 <div className={`flex items-center justify-center rounded-full shrink-0 size-10 ${iconBgClass} ${iconColorClass}`}>
                     {icon}

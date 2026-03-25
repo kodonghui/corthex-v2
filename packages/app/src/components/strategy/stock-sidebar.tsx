@@ -87,9 +87,9 @@ function SortableStockItem({
       onKeyDown={(e) => e.key === 'Enter' && onSelect()}
       className={`w-full flex flex-col gap-1 px-4 py-3 text-left text-sm transition-colors cursor-pointer border-l-2 ${
         isCompareActive && isCompareChecked
-          ? 'bg-stone-100 border-[#5a7247]'
+          ? 'bg-stone-100 border-corthex-accent'
           : isSelected
-            ? 'bg-stone-100 border-[#5a7247]'
+            ? 'bg-stone-100 border-corthex-accent'
             : 'border-transparent hover:bg-stone-100'
       }`}
     >
@@ -110,7 +110,7 @@ function SortableStockItem({
               type="checkbox"
               checked={isCompareChecked}
               readOnly
-              className="accent-[#5a7247] shrink-0"
+              className="accent-corthex-accent shrink-0"
             />
           )}
           <span className="font-bold text-sm text-slate-100 truncate">{stock.stockName}</span>

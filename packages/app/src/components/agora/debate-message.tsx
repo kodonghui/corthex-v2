@@ -15,8 +15,8 @@ export function DebateMessage({ sender, time, message, icon, iconBgClass, avatar
     const getThemeClasses = () => {
         switch (theme) {
             case 'cyan': return {
-                bgClass: 'bg-[#5a7247]/10 text-slate-900 border border-[#5a7247]/20',
-                iconClass: iconBgClass || 'bg-[#5a7247]/20 text-[#5a7247] border border-[#5a7247]/30'
+                bgClass: 'bg-corthex-accent/10 text-slate-900 border border-corthex-accent/20',
+                iconClass: iconBgClass || 'bg-corthex-accent/20 text-corthex-accent border border-corthex-accent/30'
             };
             case 'violet': return {
                 bgClass: 'bg-violet-500/10 text-slate-900 border border-violet-500/20',

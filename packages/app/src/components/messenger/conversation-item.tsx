@@ -13,7 +13,7 @@ export interface ConversationItemProps {
 
 export function ConversationItem({ name, time, previewMessage, icon, imageUrl, active, unreadCount, status }: ConversationItemProps) {
     const containerClass = active
-        ? 'bg-[#5a7247]/10 border-l-[#5a7247]'
+        ? 'bg-corthex-accent/10 border-l-corthex-accent'
         : 'hover:bg-slate-100 border-l-transparent';
 
     return (
@@ -38,7 +38,7 @@ export function ConversationItem({ name, time, previewMessage, icon, imageUrl, a
                 <p className={`text-sm truncate ${active ? 'text-slate-600' : 'text-stone-400'}`}>{previewMessage}</p>
             </div>
             {unreadCount !== undefined && unreadCount > 0 && (
-                <div className="h-2 w-2 rounded-full bg-[#5a7247] shrink-0"></div>
+                <div className="h-2 w-2 rounded-full bg-corthex-accent shrink-0"></div>
             )}
         </div>
     )

@@ -5,13 +5,13 @@ const STATUS_COLORS: Record<string, { dot: string; label: string }> = {
   online: { dot: 'bg-emerald-500', label: 'Online' },
   working: { dot: 'bg-amber-500 animate-pulse', label: 'Working' },
   error: { dot: 'bg-red-500', label: 'Error' },
-  offline: { dot: 'bg-[#a3b18a]', label: 'Offline' },
+  offline: { dot: 'bg-corthex-accent-hover', label: 'Offline' },
 }
 
 const TIER_BADGES: Record<string, { bg: string; text: string; label: string }> = {
-  manager: { bg: 'bg-[#283618]', text: 'text-[#faf8f5]', label: 'MGR' },
-  specialist: { bg: 'bg-[#5a7247]', text: 'text-[#faf8f5]', label: 'SPE' },
-  worker: { bg: 'bg-[#e5e1d3]', text: 'text-[#283618]', label: 'WRK' },
+  manager: { bg: 'bg-corthex-accent-deep', text: 'text-corthex-bg', label: 'MGR' },
+  specialist: { bg: 'bg-corthex-accent', text: 'text-corthex-bg', label: 'SPE' },
+  worker: { bg: 'bg-corthex-border', text: 'text-corthex-accent-deep', label: 'WRK' },
 }
 
 type AgentData = {
@@ -32,26 +32,26 @@ export function AgentNode({ data, selected }: NodeProps) {
     <div
       className={`px-4 py-3 rounded-xl bg-white shadow-[0_2px_12px_rgba(40,54,24,0.06)] border min-w-[170px] transition-all hover:shadow-[0_4px_20px_rgba(40,54,24,0.12)] ${
         selected
-          ? 'border-[#5a7247] ring-2 ring-[#5a7247]/20'
-          : 'border-[#e5e1d3]'
+          ? 'border-corthex-accent ring-2 ring-corthex-accent/20'
+          : 'border-corthex-border'
       } ${d.isSecretary ? 'ring-1 ring-amber-400/30 border-amber-300/50' : ''}`}
     >
-      <Handle type="target" position={Position.Top} className="!bg-[#5a7247] !w-2 !h-2 !border-2 !border-white" />
+      <Handle type="target" position={Position.Top} className="!bg-corthex-accent !w-2 !h-2 !border-2 !border-white" />
 
       <div className="flex items-center gap-2.5">
         {/* Agent Avatar */}
-        <div className="w-8 h-8 rounded-lg bg-[#f5f0e8] flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-corthex-elevated flex items-center justify-center flex-shrink-0">
           {d.avatarUrl ? (
             <img src={d.avatarUrl} alt={d.label} className="w-8 h-8 rounded-lg object-cover" />
           ) : (
-            <Bot className="w-4 h-4 text-[#5a7247]" />
+            <Bot className="w-4 h-4 text-corthex-accent" />
           )}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusInfo.dot}`} />
-            <span className="text-sm font-semibold text-[#283618] truncate">{d.label}</span>
+            <span className="text-sm font-semibold text-corthex-accent-deep truncate">{d.label}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             {tierInfo && (
@@ -69,7 +69,7 @@ export function AgentNode({ data, selected }: NodeProps) {
         </div>
       </div>
 
-      {d.role && <div className="text-[11px] text-[#6b705c] mt-1.5 truncate">{d.role}</div>}
+      {d.role && <div className="text-[11px] text-corthex-text-secondary mt-1.5 truncate">{d.role}</div>}
     </div>
   )
 }

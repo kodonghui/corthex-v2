@@ -3,13 +3,13 @@ import { Handle, Position } from '@xyflow/react'
 
 const STATUS_DOT: Record<string, { color: string; pulse?: boolean; label: string }> = {
   online: { color: 'bg-emerald-500', label: '온라인' },
-  working: { color: 'bg-[#5a7247]', pulse: true, label: '작업 중' },
+  working: { color: 'bg-corthex-accent', pulse: true, label: '작업 중' },
   error: { color: 'bg-red-500', label: '오류' },
   offline: { color: 'bg-slate-500', label: '오프라인' },
 }
 
 const TIER_BADGE: Record<string, { bg: string; label: string }> = {
-  manager: { bg: 'bg-[#283618] text-[#a3c48a]', label: 'Manager' },
+  manager: { bg: 'bg-corthex-accent-deep text-corthex-accent-hover', label: 'Manager' },
   specialist: { bg: 'bg-cyan-900 text-cyan-300', label: 'Specialist' },
   worker: { bg: 'bg-slate-700 text-slate-400', label: 'Worker' },
 }
@@ -32,7 +32,7 @@ export const AgentNode = memo(function AgentNode({ data, selected }: { data: Age
 
   const bgColor = isSecretary ? 'bg-amber-950' : 'bg-emerald-950'
   const borderColor = selected
-    ? 'border-[#8fae7a] ring-2 ring-[#8fae7a]/50'
+    ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover/50'
     : isSecretary ? 'border-amber-500' : 'border-emerald-600'
 
   // Secretary uses octagonal clip-path for visual distinction
@@ -47,7 +47,7 @@ export const AgentNode = memo(function AgentNode({ data, selected }: { data: Age
         <Handle type="target" position={Position.Top} className="!bg-amber-400 !w-2 !h-2" />
         {/* Octagon outer border */}
         <div
-          className={`${selected ? 'bg-[#8fae7a]' : 'bg-amber-500'} min-w-[220px]`}
+          className={`${selected ? 'bg-corthex-accent-hover' : 'bg-amber-500'} min-w-[220px]`}
           style={{ clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)', padding: '2px' }}
         >
           {/* Octagon inner content */}

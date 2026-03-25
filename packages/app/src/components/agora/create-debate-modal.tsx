@@ -71,7 +71,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
       {/* Modal content */}
       <div className="relative bg-white border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#5a7247]/10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-accent/10">
           <h2 className="text-base font-bold text-slate-100">새 토론 시작</h2>
           <button
             onClick={onClose}
@@ -90,7 +90,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="예: 신규 사업 진출 전략에 대한 논의"
-              className="w-full bg-stone-100/50 border border-stone-200 text-slate-100 rounded-lg px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline-none focus:border-[#5a7247]/50 focus:ring-1 focus:ring-[#5a7247]/20 transition-all"
+              className="w-full bg-stone-100/50 border border-stone-200 text-slate-100 rounded-lg px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline-none focus:border-corthex-accent/50 focus:ring-1 focus:ring-corthex-accent/20 transition-all"
             />
           </div>
 
@@ -109,7 +109,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
                   className={cn(
                     'flex-1 py-2.5 rounded-lg text-xs font-medium border transition-colors',
                     debateType === opt.value
-                      ? 'border-[#5a7247]/50 bg-[#5a7247]/10 text-[#5a7247]'
+                      ? 'border-corthex-accent/50 bg-corthex-accent/10 text-corthex-accent'
                       : 'border-stone-200 text-stone-400 hover:border-stone-300',
                   )}
                 >
@@ -134,14 +134,14 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
                     onClick={() => toggleAgent(agent.id)}
                     className={cn(
                       'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors',
-                      selected ? 'bg-[#5a7247]/5' : 'hover:bg-stone-100/50',
+                      selected ? 'bg-corthex-accent/5' : 'hover:bg-stone-100/50',
                     )}
                   >
                     <div
                       className={cn(
                         'w-5 h-5 rounded border flex items-center justify-center',
                         selected
-                          ? 'bg-[#5a7247] border-[#5a7247] text-slate-900'
+                          ? 'bg-corthex-accent border-corthex-accent text-slate-900'
                           : 'border-stone-300',
                       )}
                     >
@@ -187,7 +187,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
               className={cn(
                 'text-sm rounded-lg px-4 py-2 font-medium transition-colors',
                 canSubmit
-                  ? 'bg-[#5a7247]/20 hover:bg-[#5a7247]/30 text-[#5a7247] border border-[#5a7247]/30'
+                  ? 'bg-corthex-accent/20 hover:bg-corthex-accent/30 text-corthex-accent border border-corthex-accent/30'
                   : 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200',
               )}
             >

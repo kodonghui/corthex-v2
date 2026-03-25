@@ -86,7 +86,7 @@ export function CommandCenterPage() {
   return (
     <div
       data-testid="command-center-page"
-      className="flex flex-col h-full bg-[#faf8f5] antialiased"
+      className="flex flex-col h-full bg-corthex-bg antialiased"
     >
       {/* Mobile tab bar */}
       <div className="flex md:hidden border-b border-stone-200 shrink-0">
@@ -95,7 +95,7 @@ export function CommandCenterPage() {
           onClick={() => setMobileTab('chat')}
           className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
             mobileTab === 'chat'
-              ? 'text-[#5a7247] border-b-2 border-[#5a7247]'
+              ? 'text-corthex-accent border-b-2 border-corthex-accent'
               : 'text-stone-400 hover:text-stone-500'
           }`}
         >
@@ -106,7 +106,7 @@ export function CommandCenterPage() {
           onClick={() => setMobileTab('report')}
           className={`flex-1 py-3 text-sm font-medium text-center transition-colors ${
             mobileTab === 'report'
-              ? 'text-[#5a7247] border-b-2 border-[#5a7247]'
+              ? 'text-corthex-accent border-b-2 border-corthex-accent'
               : 'text-stone-400 hover:text-stone-500'
           }`}
         >
@@ -122,10 +122,10 @@ export function CommandCenterPage() {
             ${mobileTab === 'chat' ? 'flex' : 'hidden'} md:flex`}
         >
           {/* Thread Header */}
-          <div className="sticky top-0 bg-[#faf8f5]/95 backdrop-blur-sm z-10 border-b border-stone-200 p-4 flex justify-between items-center shrink-0">
+          <div className="sticky top-0 bg-corthex-bg/95 backdrop-blur-sm z-10 border-b border-stone-200 p-4 flex justify-between items-center shrink-0">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              <h3 className="font-semibold text-lg text-[#1a1a1a]">Command Center</h3>
+              <h3 className="font-semibold text-lg text-corthex-text-primary">Command Center</h3>
             </div>
             <div className="flex items-center gap-2">
               <span
@@ -172,16 +172,16 @@ export function CommandCenterPage() {
               <div className="bg-stone-100 rounded-xl border border-stone-200 p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-stone-500">Commands</span>
-                  <span className="text-sm font-mono tabular-nums text-[#1a1a1a]">{userMsgCount}</span>
+                  <span className="text-sm font-mono tabular-nums text-corthex-text-primary">{userMsgCount}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-stone-500">Responses</span>
-                  <span className="text-sm font-mono tabular-nums text-[#1a1a1a]">{agentMsgCount}</span>
+                  <span className="text-sm font-mono tabular-nums text-corthex-text-primary">{agentMsgCount}</span>
                 </div>
                 <div className="h-px w-full bg-stone-200 my-1" />
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-stone-500">Active Agents</span>
-                  <span className="text-sm font-mono tabular-nums text-[#5a7247]">{activeAgentCount}/{managers.length}</span>
+                  <span className="text-sm font-mono tabular-nums text-corthex-accent">{activeAgentCount}/{managers.length}</span>
                 </div>
               </div>
             </div>

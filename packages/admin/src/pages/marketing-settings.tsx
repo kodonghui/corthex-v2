@@ -99,8 +99,8 @@ export function MarketingSettingsPage() {
   if (configLoading) {
     return (
       <div className="p-6 space-y-4">
-        <div className="h-8 w-48 bg-[#283618]/20 rounded animate-pulse" />
-        <div className="h-64 w-full bg-[#283618]/10 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-corthex-accent-deep/20 rounded animate-pulse" />
+        <div className="h-64 w-full bg-corthex-accent-deep/10 rounded animate-pulse" />
       </div>
     )
   }
@@ -145,16 +145,16 @@ export function MarketingSettingsPage() {
     <div className="p-6 space-y-8 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#283618]">마케팅 AI 엔진 설정</h1>
-        <p className="text-sm text-[#5a7247] mt-1">
+        <h1 className="text-2xl font-bold text-corthex-accent-deep">마케팅 AI 엔진 설정</h1>
+        <p className="text-sm text-corthex-accent mt-1">
           콘텐츠 자동 생성에 사용할 AI 엔진을 카테고리별로 선택하세요. 변경사항은 다음 워크플로우 실행부터 적용됩니다.
         </p>
       </div>
 
       {/* Engine Selection by Category (FR-MKT1) */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#283618] flex items-center gap-2">
-          <RefreshCw className="w-5 h-5 text-[#5a7247]" />
+        <h2 className="text-lg font-semibold text-corthex-accent-deep flex items-center gap-2">
+          <RefreshCw className="w-5 h-5 text-corthex-accent" />
           엔진 선택
         </h2>
 
@@ -167,25 +167,25 @@ export function MarketingSettingsPage() {
             return (
               <div
                 key={key}
-                className="border border-[#e5e1d3] rounded-xl p-4 bg-white"
+                className="border border-corthex-border rounded-xl p-4 bg-white"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#5a7247]/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#5a7247]" />
+                  <div className="w-10 h-10 rounded-lg bg-corthex-accent/10 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-corthex-accent" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-[#283618]">{label}</h3>
-                    <p className="text-xs text-[#5a7247]">{desc}</p>
+                    <h3 className="font-medium text-corthex-accent-deep">{label}</h3>
+                    <p className="text-xs text-corthex-accent">{desc}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-[#5a7247] mb-1 block">제공자</label>
+                    <label className="text-xs font-medium text-corthex-accent mb-1 block">제공자</label>
                     <select
                       value={current?.provider || ''}
                       onChange={(e) => handleProviderChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#e5e1d3] rounded-lg bg-white text-[#283618] focus:ring-2 focus:ring-[#5a7247]/30 focus:outline-none"
+                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
                     >
                       {categoryProviders.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -193,11 +193,11 @@ export function MarketingSettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-[#5a7247] mb-1 block">모델</label>
+                    <label className="text-xs font-medium text-corthex-accent mb-1 block">모델</label>
                     <select
                       value={current?.model || ''}
                       onChange={(e) => handleModelChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-[#e5e1d3] rounded-lg bg-white text-[#283618] focus:ring-2 focus:ring-[#5a7247]/30 focus:outline-none"
+                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
                     >
                       {(selectedProvider?.models || []).map((m) => (
                         <option key={m} value={m}>{m}</option>
@@ -208,7 +208,7 @@ export function MarketingSettingsPage() {
 
                 {/* API key status badge */}
                 <div className="mt-2 flex items-center gap-1.5">
-                  <Key className="w-3 h-3 text-[#5a7247]" />
+                  <Key className="w-3 h-3 text-corthex-accent" />
                   {config.apiKeys[current?.provider] ? (
                     <span className="text-xs text-green-600 font-medium">API 키 등록됨</span>
                   ) : (
@@ -223,11 +223,11 @@ export function MarketingSettingsPage() {
 
       {/* API Keys Management (AR39, MKT-1, MKT-3) */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#283618] flex items-center gap-2">
-          <Shield className="w-5 h-5 text-[#5a7247]" />
+        <h2 className="text-lg font-semibold text-corthex-accent-deep flex items-center gap-2">
+          <Shield className="w-5 h-5 text-corthex-accent" />
           API 키 관리
         </h2>
-        <p className="text-xs text-[#5a7247]">
+        <p className="text-xs text-corthex-accent">
           각 제공자의 API 키를 입력하세요. 키는 AES-256으로 암호화되어 저장됩니다.
           회사 API 키를 사용하여 비용이 직접 귀속됩니다.
         </p>
@@ -242,11 +242,11 @@ export function MarketingSettingsPage() {
             return (
               <div
                 key={providerId}
-                className="border border-[#e5e1d3] rounded-xl p-4 bg-white"
+                className="border border-corthex-border rounded-xl p-4 bg-white"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm text-[#283618]">
+                    <span className="font-medium text-sm text-corthex-accent-deep">
                       {providerDef?.name || providerId}
                     </span>
                     {hasKey && (
@@ -275,13 +275,13 @@ export function MarketingSettingsPage() {
                       onChange={(e) =>
                         setApiKeyInputs((prev) => ({ ...prev, [providerId]: e.target.value }))
                       }
-                      className="w-full px-3 py-2 pr-8 text-sm border border-[#e5e1d3] rounded-lg bg-white text-[#283618] focus:ring-2 focus:ring-[#5a7247]/30 focus:outline-none font-mono"
+                      className="w-full px-3 py-2 pr-8 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none font-mono"
                     />
                     <button
                       onClick={() =>
                         setShowApiKey((prev) => ({ ...prev, [providerId]: !prev[providerId] }))
                       }
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5a7247]"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-corthex-accent"
                     >
                       {isShowingKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -289,7 +289,7 @@ export function MarketingSettingsPage() {
                   <button
                     onClick={() => handleSaveApiKey(providerId)}
                     disabled={!apiKeyInputs[providerId]?.trim() || storeKey.isPending}
-                    className="px-4 py-2 text-sm font-medium rounded-lg bg-[#5a7247] text-white hover:bg-[#4a6237] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+                    className="px-4 py-2 text-sm font-medium rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent-deep disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
                   >
                     <Save className="w-4 h-4" />
                     저장
@@ -303,18 +303,18 @@ export function MarketingSettingsPage() {
 
       {/* Watermark Toggle (FR-MKT6) */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#283618]">저작권 워터마크</h2>
-        <div className="border border-[#e5e1d3] rounded-xl p-4 bg-white flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-corthex-accent-deep">저작권 워터마크</h2>
+        <div className="border border-corthex-border rounded-xl p-4 bg-white flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[#283618]">생성 콘텐츠 워터마크</p>
-            <p className="text-xs text-[#5a7247] mt-0.5">
+            <p className="text-sm font-medium text-corthex-accent-deep">생성 콘텐츠 워터마크</p>
+            <p className="text-xs text-corthex-accent mt-0.5">
               AI 생성 콘텐츠에 회사 워터마크를 자동으로 추가합니다.
             </p>
           </div>
           <button
             onClick={() => updateWatermark.mutate(!config.watermark)}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              config.watermark ? 'bg-[#5a7247]' : 'bg-gray-300'
+              config.watermark ? 'bg-corthex-accent' : 'bg-gray-300'
             }`}
           >
             <span
@@ -328,7 +328,7 @@ export function MarketingSettingsPage() {
 
       {/* Last updated */}
       {config.updatedAt && (
-        <p className="text-xs text-[#5a7247]/60">
+        <p className="text-xs text-corthex-accent/60">
           마지막 수정: {new Date(config.updatedAt).toLocaleString('ko-KR')}
         </p>
       )}

@@ -74,16 +74,16 @@ function KpiCard({
   trendLabel?: string
 }) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 group hover:bg-[#f5f3f0] transition-colors">
+    <div className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 group hover:bg-corthex-bg transition-colors">
       <div className="flex justify-between items-start mb-4">
-        <span className="text-[10px] uppercase tracking-widest font-bold text-[#6b705c]">{label}</span>
-        <span className="text-[#606C38]">{icon}</span>
+        <span className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary">{label}</span>
+        <span className="text-corthex-accent">{icon}</span>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-mono font-bold text-[#1a1a1a]">{value}</span>
+        <span className="text-3xl font-mono font-bold text-corthex-text-primary">{value}</span>
         {trendLabel && (
           <span className={`text-xs font-bold flex items-center gap-0.5 ${
-            trend === 'up' ? 'text-[#4d7c0f]' : trend === 'down' ? 'text-[#dc2626]' : 'text-[#6b705c]'
+            trend === 'up' ? 'text-corthex-accent' : trend === 'down' ? 'text-red-600' : 'text-corthex-text-secondary'
           }`}>
             {trend === 'up' && <TrendingUp className="w-3 h-3" />}
             {trend === 'down' && <TrendingDown className="w-3 h-3" />}
@@ -125,12 +125,12 @@ function CostTrendChart({ usage, budget }: { usage: DashboardUsage | undefined; 
     <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-[#283618]">Cost Trend</h3>
-          <p className="text-sm text-[#6b705c]">Daily token consumption across all active agents</p>
+          <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep">Cost Trend</h3>
+          <p className="text-sm text-corthex-text-secondary">Daily token consumption across all active agents</p>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-mono font-bold text-[#606C38]">${totalSpend.toFixed(2)}</p>
-          <p className="text-[10px] uppercase font-bold text-[#6b705c]">MTD Total</p>
+          <p className="text-2xl font-mono font-bold text-corthex-accent">${totalSpend.toFixed(2)}</p>
+          <p className="text-[10px] uppercase font-bold text-corthex-text-secondary">MTD Total</p>
         </div>
       </div>
       <div className="relative h-64 w-full mt-auto">
@@ -151,7 +151,7 @@ function CostTrendChart({ usage, budget }: { usage: DashboardUsage | undefined; 
           <path d={linePath} fill="none" stroke="#606C38" strokeWidth="3" strokeLinecap="round" />
         </svg>
         {dateLabels.length > 0 && (
-          <div className="absolute bottom-[-30px] left-0 right-0 flex justify-between text-[10px] font-mono text-[#6b705c]/60 px-2">
+          <div className="absolute bottom-[-30px] left-0 right-0 flex justify-between text-[10px] font-mono text-corthex-text-secondary/60 px-2">
             {dateLabels.map((label, i) => (
               <span key={i}>{label}</span>
             ))}
@@ -178,24 +178,24 @@ function DeptLoadChart({ budget }: { budget: DashboardBudget | undefined }) {
 
   return (
     <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
-      <h3 className="text-xl font-bold tracking-tight text-[#283618] mb-2">Departmental Load</h3>
-      <p className="text-sm text-[#6b705c] mb-8">Cost per department</p>
+      <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep mb-2">Departmental Load</h3>
+      <p className="text-sm text-corthex-text-secondary mb-8">Cost per department</p>
       <div className="space-y-6 flex-1">
         {departments.length > 0 ? departments.map((dept) => (
           <div key={dept.name} className="space-y-2">
             <div className="flex justify-between text-xs font-bold uppercase tracking-wide">
-              <span className="text-[#1a1a1a]">{dept.name}</span>
-              <span className="text-[#6b705c] font-mono">${dept.value.toFixed(2)}</span>
+              <span className="text-corthex-text-primary">{dept.name}</span>
+              <span className="text-corthex-text-secondary font-mono">${dept.value.toFixed(2)}</span>
             </div>
-            <div className="h-2 w-full bg-[#f5f0e8] rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-corthex-elevated rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#606C38] rounded-full transition-all duration-500"
+                className="h-full bg-corthex-accent rounded-full transition-all duration-500"
                 style={{ width: `${dept.percent}%`, opacity: Math.max(0.3, dept.percent / 100) }}
               />
             </div>
           </div>
         )) : (
-          <div className="flex items-center justify-center h-full text-sm text-[#6b705c]">No department data</div>
+          <div className="flex items-center justify-center h-full text-sm text-corthex-text-secondary">No department data</div>
         )}
       </div>
     </div>
@@ -227,7 +227,7 @@ function TaskStatusDonut({ summary }: { summary: DashboardSummary }) {
 
   return (
     <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)]">
-      <h3 className="text-xl font-bold tracking-tight text-[#283618] mb-8">Task Status</h3>
+      <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep mb-8">Task Status</h3>
       <div className="flex items-center justify-center relative py-4">
         <svg className="w-48 h-48 transform -rotate-90">
           {arcs.map((arc, i) => (
@@ -244,15 +244,15 @@ function TaskStatusDonut({ summary }: { summary: DashboardSummary }) {
           ))}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-mono font-bold text-[#283618]">{total}</span>
-          <span className="text-[10px] uppercase font-bold text-[#6b705c]">Total</span>
+          <span className="text-3xl font-mono font-bold text-corthex-accent-deep">{total}</span>
+          <span className="text-[10px] uppercase font-bold text-corthex-text-secondary">Total</span>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-8">
         {arcs.map((arc) => (
           <div key={arc.label} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: arc.color }} />
-            <span className="text-xs font-medium text-[#6b705c]">
+            <span className="text-xs font-medium text-corthex-text-secondary">
               {arc.label} ({total > 0 ? Math.round(arc.ratio * 100) : 0}%)
             </span>
           </div>
@@ -270,50 +270,50 @@ function RecentTasksTable({ summary }: { summary: DashboardSummary }) {
   return (
     <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] overflow-hidden">
       <div className="flex justify-between items-center mb-8">
-        <h3 className="text-xl font-bold tracking-tight text-[#283618]">Recent Tasks</h3>
+        <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep">Recent Tasks</h3>
         <button
           onClick={() => navigate('/activity-log')}
-          className="text-sm font-bold text-[#606C38] hover:underline underline-offset-4 flex items-center gap-1"
+          className="text-sm font-bold text-corthex-accent hover:underline underline-offset-4 flex items-center gap-1"
         >
           View History <ArrowRight className="w-4 h-4" />
         </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="text-[10px] uppercase tracking-widest font-bold text-[#6b705c]/60 border-b border-[#e5e1d3]/30">
+          <thead className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary/60 border-b border-corthex-border/30">
             <tr>
               <th className="pb-4 font-bold">Status</th>
               <th className="pb-4 font-bold">Category</th>
               <th className="pb-4 font-bold">Count</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#e5e1d3]/10">
-            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+          <tbody className="divide-y divide-corthex-border/10">
+            <tr className="group hover:bg-corthex-bg transition-colors">
               <td className="py-5">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#606C38]/10 text-[#606C38] text-[10px] font-bold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-corthex-accent/10 text-corthex-accent text-[10px] font-bold">
                   <CheckCircle className="w-3.5 h-3.5" /> COMPLETED
                 </span>
               </td>
-              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Finished tasks</td>
-              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.completed}</td>
+              <td className="py-5 text-sm font-medium text-corthex-text-primary">Finished tasks</td>
+              <td className="py-5 font-mono text-sm text-corthex-text-primary">{summary.tasks.completed}</td>
             </tr>
-            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+            <tr className="group hover:bg-corthex-bg transition-colors">
               <td className="py-5">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2563eb]/10 text-[#2563eb] text-[10px] font-bold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-corthex-info/10 text-corthex-info text-[10px] font-bold">
                   <Zap className="w-3.5 h-3.5" /> IN PROGRESS
                 </span>
               </td>
-              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Active tasks</td>
-              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.inProgress}</td>
+              <td className="py-5 text-sm font-medium text-corthex-text-primary">Active tasks</td>
+              <td className="py-5 font-mono text-sm text-corthex-text-primary">{summary.tasks.inProgress}</td>
             </tr>
-            <tr className="group hover:bg-[#f5f3f0] transition-colors">
+            <tr className="group hover:bg-corthex-bg transition-colors">
               <td className="py-5">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#dc2626]/10 text-[#dc2626] text-[10px] font-bold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/10 text-red-600 text-[10px] font-bold">
                   <XCircle className="w-3.5 h-3.5" /> FAILED
                 </span>
               </td>
-              <td className="py-5 text-sm font-medium text-[#1a1a1a]">Failed tasks</td>
-              <td className="py-5 font-mono text-sm text-[#1a1a1a]">{summary.tasks.failed}</td>
+              <td className="py-5 text-sm font-medium text-corthex-text-primary">Failed tasks</td>
+              <td className="py-5 font-mono text-sm text-corthex-text-primary">{summary.tasks.failed}</td>
             </tr>
           </tbody>
         </table>
@@ -330,21 +330,21 @@ function DashboardSkeleton() {
       {/* KPI cards skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#e5e1d3]/10 p-6">
-            <div className="h-3 w-20 bg-[#e5e1d3] animate-pulse rounded mb-4" />
-            <div className="h-8 w-16 bg-[#f5f0e8] animate-pulse rounded" />
+          <div key={i} className="bg-white rounded-xl border border-corthex-border/10 p-6">
+            <div className="h-3 w-20 bg-corthex-border animate-pulse rounded mb-4" />
+            <div className="h-8 w-16 bg-corthex-elevated animate-pulse rounded" />
           </div>
         ))}
       </div>
       {/* Charts skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-80 animate-pulse" />
-        <div className="lg:col-span-4 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-80 animate-pulse" />
+        <div className="lg:col-span-8 bg-white rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
+        <div className="lg:col-span-4 bg-white rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
       </div>
       {/* Bottom row skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-72 animate-pulse" />
-        <div className="lg:col-span-8 bg-white rounded-xl border border-[#e5e1d3]/10 p-8 h-72 animate-pulse" />
+        <div className="lg:col-span-4 bg-white rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
+        <div className="lg:col-span-8 bg-white rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
       </div>
     </div>
   )
@@ -402,23 +402,23 @@ export function DashboardPage() {
   ]
 
   return (
-    <div data-testid="dashboard-page" className="bg-[#faf8f5] min-h-screen font-sans text-[#1a1a1a] antialiased">
+    <div data-testid="dashboard-page" className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased">
       <div className="p-8 max-w-[1440px] mx-auto space-y-10">
         {/* SECTION 1: PAGE HEADER */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tighter text-[#283618]">Analytics Overview</h1>
-            <p className="text-[#6b705c] font-medium">Real-time performance metrics and resource allocation.</p>
+            <h1 className="text-4xl font-black tracking-tighter text-corthex-accent-deep">Analytics Overview</h1>
+            <p className="text-corthex-text-secondary font-medium">Real-time performance metrics and resource allocation.</p>
           </div>
-          <div className="inline-flex p-1 bg-[#f5f3f0] rounded-xl">
+          <div className="inline-flex p-1 bg-corthex-bg rounded-xl">
             {usageDayOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setUsageDays(opt.value)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   usageDays === opt.value
-                    ? 'bg-[#e5e1d3] text-[#1a1a1a] shadow-sm font-semibold'
-                    : 'text-[#6b705c] hover:text-[#1a1a1a]'
+                    ? 'bg-corthex-border text-corthex-text-primary shadow-sm font-semibold'
+                    : 'text-corthex-text-secondary hover:text-corthex-text-primary'
                 }`}
               >
                 {opt.label}
@@ -431,8 +431,8 @@ export function DashboardPage() {
           <DashboardSkeleton />
         ) : summaryError && !summary ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <p className="text-base font-medium text-[#6b705c]">Failed to load data</p>
-            <p className="text-sm text-[#756e5a] mt-1">Retrying automatically...</p>
+            <p className="text-base font-medium text-corthex-text-secondary">Failed to load data</p>
+            <p className="text-sm text-corthex-text-secondary mt-1">Retrying automatically...</p>
           </div>
         ) : summary ? (
           <>
@@ -496,38 +496,38 @@ export function DashboardPage() {
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => navigate('/command-center')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
-                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <MessageSquare className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">New Conversation</h3>
-                  <p className="text-sm text-[#6b705c]">Give agents a new task</p>
+                  <h3 className="font-bold text-lg text-corthex-text-primary group-hover:text-corthex-accent-deep">New Conversation</h3>
+                  <p className="text-sm text-corthex-text-secondary">Give agents a new task</p>
                 </div>
               </button>
               <button
                 onClick={() => navigate('/workflows')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
-                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <Workflow className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">Create Workflow</h3>
-                  <p className="text-sm text-[#6b705c]">Design automated tasks</p>
+                  <h3 className="font-bold text-lg text-corthex-text-primary group-hover:text-corthex-accent-deep">Create Workflow</h3>
+                  <p className="text-sm text-corthex-text-secondary">Design automated tasks</p>
                 </div>
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-[#e5e1d3]/10 hover:bg-[#f5f3f0] transition-all text-left flex items-start gap-4 group"
+                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
-                <div className="p-3 rounded-xl bg-[#606C38]/10 text-[#606C38]">
+                <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <BarChart3 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-[#1a1a1a] group-hover:text-[#283618]">Weekly Report</h3>
-                  <p className="text-sm text-[#6b705c]">View agent performance</p>
+                  <h3 className="font-bold text-lg text-corthex-text-primary group-hover:text-corthex-accent-deep">Weekly Report</h3>
+                  <p className="text-sm text-corthex-text-secondary">View agent performance</p>
                 </div>
               </button>
             </section>

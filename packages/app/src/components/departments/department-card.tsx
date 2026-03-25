@@ -18,9 +18,9 @@ export function DepartmentCard({
     monthlyCost,
     featured = false
 }: DepartmentCardProps) {
-    const borderClass = featured ? 'border-2 border-[#5a7247]' : 'border border-stone-200 hover:border-[#5a7247]/50';
-    const headerClass = featured ? 'text-slate-100' : 'text-slate-100 group-hover:text-[#5a7247]';
-    const badgeClass = featured ? 'bg-[rgba(34,211,238,0.10)] text-[#5a7247]' : 'bg-stone-100 text-stone-600';
+    const borderClass = featured ? 'border-2 border-corthex-accent' : 'border border-stone-200 hover:border-corthex-accent/50';
+    const headerClass = featured ? 'text-slate-100' : 'text-slate-100 group-hover:text-corthex-accent';
+    const badgeClass = featured ? 'bg-[rgba(34,211,238,0.10)] text-corthex-accent' : 'bg-stone-100 text-stone-600';
 
     return (
         <div className={`group flex flex-col bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer ${borderClass}`}>

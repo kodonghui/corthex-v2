@@ -160,16 +160,16 @@ export function MessengerPage() {
     <div className="min-h-screen flex" data-testid="messenger-page" style={{ backgroundColor: '#faf8f5' }}>
       <div className="p-8 max-w-[1440px] mx-auto flex-1 flex gap-6">
         {/* LEFT PANEL: Conversation List */}
-        <aside className="w-[380px] flex flex-col bg-[#f5f0e8] rounded-2xl overflow-hidden shadow-sm border border-[#e5e1d3]">
+        <aside className="w-[380px] flex flex-col bg-corthex-elevated rounded-2xl overflow-hidden shadow-sm border border-corthex-border">
           {/* Header */}
           <div className="p-6 pb-4">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-xl font-bold tracking-tight text-[#1a1a1a]">
-                메신저 <span className="text-[#6b705c] font-medium">Messenger</span>
+              <h1 className="text-xl font-bold tracking-tight text-corthex-text-primary">
+                메신저 <span className="text-corthex-text-secondary font-medium">Messenger</span>
               </h1>
               <button
                 onClick={() => toast.info('이 기능은 준비 중입니다')}
-                className="bg-[#606C38] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#4e5a2b] transition-all active:scale-95"
+                className="bg-corthex-accent text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-corthex-accent-deep transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>새 대화 New Chat</span>
@@ -177,9 +177,9 @@ export function MessengerPage() {
             </div>
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908a78]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-corthex-text-secondary" />
               <input
-                className="w-full bg-[#f0ebe0] border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#606C38]/20 transition-all placeholder:text-[#908a78]"
+                className="w-full bg-corthex-elevated border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-corthex-accent/20 transition-all placeholder:text-corthex-text-secondary"
                 placeholder="검색 Search..."
                 type="text"
               />
@@ -191,7 +191,7 @@ export function MessengerPage() {
               <div
                 key={conv.id}
                 className={`flex items-center gap-4 p-4 mb-1 rounded-xl cursor-pointer transition-all ${
-                  conv.active ? 'bg-[#f0ebe0]' : 'hover:bg-[#f0ebe0]/50'
+                  conv.active ? 'bg-corthex-elevated' : 'hover:bg-corthex-elevated/50'
                 }`}
               >
                 <div
@@ -203,12 +203,12 @@ export function MessengerPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <h3 className={`text-sm truncate ${conv.active ? 'font-bold' : 'font-medium'}`}>{conv.name}</h3>
-                    <span className="font-mono text-[10px] text-[#756e5a]">{conv.time}</span>
+                    <span className="font-mono text-[10px] text-corthex-text-secondary">{conv.time}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <p className="text-xs text-[#6b705c] truncate pr-4">{conv.preview}</p>
+                    <p className="text-xs text-corthex-text-secondary truncate pr-4">{conv.preview}</p>
                     {conv.unread > 0 && (
-                      <span className="bg-[#606C38] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                      <span className="bg-corthex-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                         {conv.unread}
                       </span>
                     )}
@@ -220,30 +220,30 @@ export function MessengerPage() {
         </aside>
 
         {/* RIGHT PANEL: Message Thread */}
-        <main className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden border border-[#e5e1d3]">
+        <main className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden border border-corthex-border">
           {/* Thread Header */}
-          <header className="h-20 flex items-center justify-between px-8 bg-[#f5f0e8]/50 backdrop-blur-md sticky top-0 z-10 border-b border-[#e5e1d3]">
+          <header className="h-20 flex items-center justify-between px-8 bg-corthex-elevated/50 backdrop-blur-md sticky top-0 z-10 border-b border-corthex-border">
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-[#283618] text-white flex items-center justify-center font-bold shadow-lg shadow-[#283618]/10">
+              <div className="w-11 h-11 rounded-xl bg-corthex-accent-deep text-white flex items-center justify-center font-bold shadow-lg shadow-corthex-accent-deep/10">
                 ST
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[#1a1a1a]">전략팀 Strategy Team</h2>
-                <p className="text-xs text-[#6b705c] flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4d7c0f]" />
+                <h2 className="text-lg font-bold text-corthex-text-primary">전략팀 Strategy Team</h2>
+                <p className="text-xs text-corthex-text-secondary flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-corthex-accent" />
                   5명 참여중
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button className="p-2.5 rounded-full text-[#6b705c] hover:bg-[#f0ebe0] transition-colors">
+              <button className="p-2.5 rounded-full text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
                 <Video className="w-5 h-5" />
               </button>
-              <button className="p-2.5 rounded-full text-[#6b705c] hover:bg-[#f0ebe0] transition-colors">
+              <button className="p-2.5 rounded-full text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
                 <Phone className="w-5 h-5" />
               </button>
-              <div className="w-px h-6 bg-[#e5e1d3] mx-1" />
-              <button className="p-2.5 rounded-full text-[#6b705c] hover:bg-[#f0ebe0] transition-colors">
+              <div className="w-px h-6 bg-corthex-border mx-1" />
+              <button className="p-2.5 rounded-full text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
                 <MoreVertical className="w-5 h-5" />
               </button>
             </div>
@@ -255,15 +255,15 @@ export function MessengerPage() {
               if (msg.own) {
                 return (
                   <div key={msg.id} className="flex gap-4 max-w-[80%] ml-auto flex-row-reverse">
-                    <div className="w-9 h-9 rounded-lg bg-[#283618] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-1">
+                    <div className="w-9 h-9 rounded-lg bg-corthex-accent-deep text-white flex items-center justify-center font-bold text-sm shrink-0 mt-1">
                       {msg.initials}
                     </div>
                     <div className="space-y-1 text-right">
                       <div className="flex items-baseline justify-end gap-2">
-                        <span className="font-mono text-[10px] text-[#756e5a]">{msg.time}</span>
-                        <span className="text-xs font-bold text-[#606C38]">{msg.sender}</span>
+                        <span className="font-mono text-[10px] text-corthex-text-secondary">{msg.time}</span>
+                        <span className="text-xs font-bold text-corthex-accent">{msg.sender}</span>
                       </div>
-                      <div className="bg-[#606C38] text-white p-4 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl text-sm leading-relaxed shadow-lg shadow-[#606C38]/10">
+                      <div className="bg-corthex-accent text-white p-4 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl text-sm leading-relaxed shadow-lg shadow-corthex-accent/10">
                         {msg.content}
                       </div>
                     </div>
@@ -276,18 +276,18 @@ export function MessengerPage() {
                   <div key={msg.id} className="flex gap-4 max-w-[80%]">
                     <div className="w-9 h-9 opacity-0 shrink-0" />
                     <div className="space-y-1 w-full">
-                      <div className="bg-[#f5f0e8] p-4 rounded-2xl border border-[#e5e1d3] flex items-center gap-4 hover:border-[#606C38]/30 transition-all cursor-pointer group">
-                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-[#606C38] group-hover:bg-[#606C38] group-hover:text-white transition-colors">
+                      <div className="bg-corthex-elevated p-4 rounded-2xl border border-corthex-border flex items-center gap-4 hover:border-corthex-accent/30 transition-all cursor-pointer group">
+                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-corthex-accent group-hover:bg-corthex-accent group-hover:text-white transition-colors">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="flex-1 overflow-hidden">
                           <p className="text-sm font-bold truncate">{msg.file.name}</p>
-                          <p className="font-mono text-[10px] text-[#756e5a]">{msg.file.size} - {msg.file.type}</p>
+                          <p className="font-mono text-[10px] text-corthex-text-secondary">{msg.file.size} - {msg.file.type}</p>
                         </div>
-                        <Download className="w-5 h-5 text-[#908a78] group-hover:text-[#606C38] transition-colors" />
+                        <Download className="w-5 h-5 text-corthex-text-secondary group-hover:text-corthex-accent transition-colors" />
                       </div>
                       <div className="flex items-center gap-2 mt-1 px-1">
-                        <span className="font-mono text-[10px] text-[#756e5a]">{msg.time}</span>
+                        <span className="font-mono text-[10px] text-corthex-text-secondary">{msg.time}</span>
                       </div>
                     </div>
                   </div>
@@ -305,9 +305,9 @@ export function MessengerPage() {
                   <div className="space-y-1">
                     <div className="flex items-baseline gap-2">
                       <span className="text-xs font-bold">{msg.sender}</span>
-                      <span className="font-mono text-[10px] text-[#756e5a]">{msg.time}</span>
+                      <span className="font-mono text-[10px] text-corthex-text-secondary">{msg.time}</span>
                     </div>
-                    <div className="bg-[#f5f0e8] p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-[#1a1a1a]">
+                    <div className="bg-corthex-elevated p-4 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl text-sm leading-relaxed text-corthex-text-primary">
                       {msg.content}
                     </div>
                   </div>
@@ -317,12 +317,12 @@ export function MessengerPage() {
           </div>
 
           {/* Message Input Area */}
-          <footer className="p-6 bg-[#f5f0e8]/30 border-t border-[#e5e1d3]">
-            <div className="max-w-4xl mx-auto flex items-end gap-3 bg-white border border-[#e5e1d3] p-2 rounded-2xl focus-within:ring-2 focus-within:ring-[#606C38]/10 transition-all">
-              <button className="p-2 rounded-xl text-[#908a78] hover:text-[#606C38] hover:bg-[#f5f0e8] transition-all">
+          <footer className="p-6 bg-corthex-elevated/30 border-t border-corthex-border">
+            <div className="max-w-4xl mx-auto flex items-end gap-3 bg-white border border-corthex-border p-2 rounded-2xl focus-within:ring-2 focus-within:ring-corthex-accent/10 transition-all">
+              <button className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all">
                 <Paperclip className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-xl text-[#908a78] hover:text-[#606C38] hover:bg-[#f5f0e8] transition-all">
+              <button className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all">
                 <Smile className="w-5 h-5" />
               </button>
               <textarea
@@ -330,12 +330,12 @@ export function MessengerPage() {
                 placeholder="메시지를 입력하세요... Enter message"
                 rows={1}
               />
-              <button className="bg-[#283618] text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#283618]/90 transition-all active:scale-90 shadow-md">
+              <button className="bg-corthex-accent-deep text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-corthex-accent-deep/90 transition-all active:scale-90 shadow-md">
                 <Send className="w-4 h-4" />
               </button>
             </div>
             <div className="mt-3 flex justify-center">
-              <p className="text-[10px] text-[#908a78] font-mono uppercase tracking-widest">Sovereign Sage v3.0 // Secured Protocol Active</p>
+              <p className="text-[10px] text-corthex-text-secondary font-mono uppercase tracking-widest">Sovereign Sage v3.0 // Secured Protocol Active</p>
             </div>
           </footer>
         </main>
