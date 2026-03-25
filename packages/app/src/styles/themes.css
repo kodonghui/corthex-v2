@@ -34,6 +34,7 @@
   --color-corthex-text-secondary: #A8A29E;
   --color-corthex-text-disabled: #57534E;
   --color-corthex-text-on-accent: #0C0A09;
+  --color-corthex-focus-ring: #CA8A04;
 
   /* Sidebar */
   --color-corthex-sidebar-bg: #0C0A09;
@@ -145,6 +146,7 @@
   --color-corthex-text-secondary: #64748B;
   --color-corthex-text-disabled: #CBD5E1;
   --color-corthex-text-on-accent: #FFFFFF;
+  --color-corthex-focus-ring: #FFFFFF;
 
   /* Sidebar */
   --color-corthex-sidebar-bg: #1E293B;
