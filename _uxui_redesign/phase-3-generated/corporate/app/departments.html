@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Departments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7f9fb",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "primary-fixed": "#dbe1ff",
+              "inverse-surface": "#2d3133",
+              "secondary-fixed-dim": "#b4c5ff",
+              "surface": "#f7f9fb",
+              "outline-variant": "#c3c6d7",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#eff1f3",
+              "surface-tint": "#0053db",
+              "on-tertiary-fixed-variant": "#7d2d00",
+              "on-secondary-container": "#394c84",
+              "secondary-fixed": "#dbe1ff",
+              "on-secondary-fixed": "#00174b",
+              "on-surface-variant": "#434655",
+              "background": "#f7f9fb",
+              "primary-fixed-dim": "#b4c5ff",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#495c95",
+              "tertiary-fixed-dim": "#ffb596",
+              "surface-variant": "#e0e3e5",
+              "inverse-primary": "#b4c5ff",
+              "tertiary": "#943700",
+              "primary": "#004ac6",
+              "surface-container-low": "#f2f4f6",
+              "on-background": "#191c1e",
+              "surface-container": "#eceef0",
+              "tertiary-fixed": "#ffdbcd",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed": "#360f00",
+              "on-secondary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed-variant": "#31447b",
+              "surface-container-highest": "#e0e3e5",
+              "secondary-container": "#acbfff",
+              "primary-container": "#2563eb",
+              "on-primary-container": "#eeefff",
+              "tertiary-container": "#bc4800",
+              "outline": "#737686",
+              "on-surface": "#191c1e",
+              "on-primary": "#ffffff",
+              "surface-container-high": "#e6e8ea",
+              "on-tertiary-container": "#ffede6",
+              "on-primary-fixed": "#00174b",
+              "surface-dim": "#d8dadc",
+              "on-primary-fixed-variant": "#003ea8"
+            },
+            fontFamily: {
+              "headline": ["Lexend"],
+              "body": ["Lexend"],
+              "label": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Lexend', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex justify-between items-center h-16 px-8 w-full shadow-[0_12px_40px_rgba(0,74,198,0.06)]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-slate-900 dark:text-white font-['Lexend'] tracking-tight">CORTHEX</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors font-['Lexend'] tracking-tight" href="#">Dashboard</a>
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1 font-medium font-['Lexend'] tracking-tight" href="#">Departments</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors font-['Lexend'] tracking-tight" href="#">Agents</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors font-['Lexend'] tracking-tight" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-200 ease-in-out hover:opacity-80">
+<span class="material-symbols-outlined text-slate-600">notifications</span>
+</button>
+<button class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-200 ease-in-out hover:opacity-80">
+<span class="material-symbols-outlined text-slate-600">help_outline</span>
+</button>
+<img alt="Executive Profile" class="w-8 h-8 rounded-full border border-outline-variant/20 object-cover" data-alt="Professional portrait of a corporate executive in a sharp navy suit, clean studio lighting, authoritative expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1-bCnT-oUeic4UrAWwQb8JZ3YpeDG81kvR3wqt28Twl7-4RooTYsFnOpoFiCVbLdmUX2OV_Jwdngm5iYM6vXLmE4cZX8ThKgriysKlgCUAIshSYFC_fc-EDiamUa_VB55N_VTjqbdgoOa8QbQh7Jw2fvrJ-5csR-L1DOJKAg156RlRkOVJxHbo3DJ2tVkbSoD6az4aVjn_zrMMpxfOoSv_GjpwQwaQa8PAozyD_Lxukncb5A95exYHeSlo73PCJpyRqnh7LsFkwf3"/>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-slate-50 dark:bg-slate-950 flex flex-col py-6 px-4 gap-2 font-['Lexend'] text-sm font-light">
+<div class="mb-8 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">domain</span>
+</div>
+<div>
+<h2 class="text-lg font-semibold text-slate-900 dark:text-white leading-tight">CORTHEX</h2>
+<p class="text-[10px] uppercase tracking-widest text-slate-500">Enterprise Intelligence</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 font-semibold shadow-sm hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">domain</span>
+                Departments
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+                Agents
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto pt-6 space-y-1">
+<button class="w-full bg-gradient-to-b from-primary to-primary-container text-white py-3 rounded-lg font-medium mb-4 active:scale-95 transition-transform shadow-lg shadow-primary/20">
+                New Report
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:pl-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-16 min-h-screen bg-surface">
+<div class="max-w-[1400px] mx-auto p-12 space-y-12">
+<!-- Header Section -->
+<header class="flex justify-between items-end">
+<div class="max-w-2xl">
+<h1 class="text-[2.75rem] font-bold text-on-surface leading-none tracking-tight mb-4">Department Intelligence</h1>
+<p class="text-body-md text-on-surface-variant tracking-wide max-w-lg">
+                        Operational overview and fiscal distribution across global divisions. Managed through real-time architectural oversight.
+                    </p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container px-6 py-3 rounded-lg">
+<span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1">Total Budget Cap</span>
+<span class="text-xl font-bold text-primary">$12.4M</span>
+</div>
+</div>
+</header>
+<!-- Department Grid (Bento Style) -->
+<section class="grid grid-cols-12 gap-6">
+<!-- Large Budget Overview Card -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl p-8 flex flex-col justify-between group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,74,198,0.08)]">
+<div>
+<div class="flex justify-between items-start mb-8">
+<span class="material-symbols-outlined text-primary text-3xl">account_balance_wallet</span>
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold px-3 py-1 rounded-full uppercase">Fiscal Q3</span>
+</div>
+<h3 class="text-headline-sm font-bold text-on-surface mb-2">Budget Utilization</h3>
+<p class="text-body-md text-on-surface-variant mb-8">Overall expenditure across 8 key departments.</p>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-label-md">
+<span class="text-on-surface-variant">Allocated</span>
+<span class="font-bold text-on-surface">78%</span>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[78%]"></div>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-8 flex items-center gap-2 text-primary font-semibold text-sm hover:translate-x-1 transition-transform">
+                        Detailed Audit <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Strategic Operations Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest rounded-xl p-8 group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,74,198,0.08)]">
+<div class="flex justify-between items-start mb-6">
+<h4 class="text-xl font-bold text-on-surface">Strategic Ops</h4>
+<div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary">hub</span>
+</div>
+</div>
+<div class="mb-6">
+<span class="block text-[10px] text-on-surface-variant uppercase font-bold tracking-widest mb-1">Head of Dept</span>
+<p class="font-medium text-on-surface">Dr. Helena Vance</p>
+</div>
+<div class="flex items-center gap-4 mb-8">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Female corporate director portrait, soft light, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMKaD6rmuLl3CPlFg44Rrx1BWCdee6kLy6NAPwdHS3cMF_YdWXBK523M89rhkFix7hM-d3hWzjC2MorKUoepRBrkFRlphW-RNigrneh06AcccuK1klozoePRzeU1YcaeMQSOVQmRwULYyU35aSWE31IKG7tzzwvemGehcCpD96v_9oGAplGaKhrE6IlzN2j1yuRQphnWBn2FAjFLBlGWfET26cKHBxdWFwglomAYBqBX8BBgJwiMgp2be2mR3vCl1-kPzHAbAaf4L5"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Male executive headshot, professional corporate attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANLHb-4pnFJMQ8W6_5sm7zkoaryl1tPXcp0v9Xvahlo-tCXqQY5lNKmBYi0jot2S_ZazNPK9C3IsHJuMzJumh2lg1Ed65GtClHpBAUvHqIzhwr_UaH7cIbUnAVNieCa9B9DsU2QqO6nNhyGfoJuGd3NG7Xjb6Q7_mBOnE9VKjLzxGvW8wdNIh8-HoPsZ_WORbUuToK4siTdM16yOtniX6LPcSj_-eoUr_Gfr6Ym2tWsZf7MJQ5NO0zBZqvAyKNKyqX8PkmXkwt6Fnk"/>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-[10px] font-bold border-2 border-white">+14</div>
+</div>
+<span class="text-label-md text-on-surface-variant">16 Members</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-label-md">
+<span class="text-on-surface-variant">Budget Usage</span>
+<span class="font-bold text-on-surface">$2.4M / $3M</span>
+</div>
+<div class="h-[4px] w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[80%]"></div>
+</div>
+</div>
+</div>
+<!-- Neural Research Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest rounded-xl p-8 group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,74,198,0.08)]">
+<div class="flex justify-between items-start mb-6">
+<h4 class="text-xl font-bold text-on-surface">Neural Research</h4>
+<div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+</div>
+<div class="mb-6">
+<span class="block text-[10px] text-on-surface-variant uppercase font-bold tracking-widest mb-1">Head of Dept</span>
+<p class="font-medium text-on-surface">Marcus Sterling</p>
+</div>
+<div class="flex items-center gap-4 mb-8">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Corporate professional woman headshot with modern office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIyaTZCJecXLrNOw7oAPoT5tle7y_CKTK_lAEctmwvkOF-RHdauk78j7sdBvzujGnUAY9E0V_noOaBzLB49hXdD3TAKHEJTxme7I1Xsc4PilhQ8x6-g6rOEQ80kLfXP0cdGdmUPQyzrTMASSgqrQ6JLX2R1qQdmVugeRAgQ-_UaUlJvqaWTJcmBymGb4dm_yfcIsoYckSgcBkB--M9PNpNmamH-PjJ5RMBRWLrKLglj690226tloy2TMfP8ha-QmmHoZn5DnXqYp8W"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Senior male scientist portrait, professional and authoritative" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1eupKY4jBq4GfIRF3o6IVj6OOsMOD8Yd5NSa8nKaqO23tv-PXCykq0Icw3WUiRnbklO4p8nWsNYPW5hFCU9yccnTIzUZg6j-w2rpmKSnLdRNxVMIA1LZhkeKI_g3bAW9cYA2v0dHTe8PB4b4b5xAuxIzei9Nyii1dqe5tZWMtejDWColtB6ieGmHTf6KFyZYleHRSx39zZ0BkdY_Fxp0_x-el3FBQNZ8-XGuGMKOsfcg9Hst5P6V9aAJ2pSFnnux4Olc6a7O0V14x"/>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-[10px] font-bold border-2 border-white">+38</div>
+</div>
+<span class="text-label-md text-on-surface-variant">40 Members</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-label-md">
+<span class="text-on-surface-variant">Budget Usage</span>
+<span class="font-bold text-on-surface">$4.1M / $5M</span>
+</div>
+<div class="h-[4px] w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed Analysis Section (Asymmetric) -->
+<section class="grid grid-cols-12 gap-12 pt-8">
+<!-- Selected Department Member List -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl p-8">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h2 class="text-2xl font-bold text-on-surface mb-1">Neural Research Personnel</h2>
+<p class="text-body-md text-on-surface-variant">Core intelligence agents and research leads.</p>
+</div>
+<div class="flex gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-lg text-sm focus:ring-2 focus:ring-primary w-64" placeholder="Search agents..." type="text"/>
+</div>
+</div>
+</div>
+<div class="space-y-1">
+<!-- Table Header -->
+<div class="grid grid-cols-12 px-4 py-3 text-[10px] uppercase font-bold tracking-widest text-on-surface-variant border-b border-surface-variant/10">
+<div class="col-span-5">Agent Identity</div>
+<div class="col-span-3">Core Designation</div>
+<div class="col-span-2">Access Level</div>
+<div class="col-span-2 text-right">Activity</div>
+</div>
+<!-- Data Rows -->
+<div class="grid grid-cols-12 px-4 py-5 items-center bg-white hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center overflow-hidden">
+<img alt="Agent" class="w-full h-full object-cover" data-alt="Male research analyst profile, serious expression, modern aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbAleUWss_t4oNSTQOtrXjvfLgoBYUc7zU6_0gReMx6WSlnHEs4A1O92V0gz-IUKRDreNtoZB71ENSeZfQrhDFQvWmI37mqC9Cxn0YWD-HlX756KJeYF4jM6OGA-VVZcWKJ5z6vcfI-j7C92pc9lLNNLEmAhfVqNh_fgTo4C9pwUv7y1LEvm4uOsl4vqkIi_n-65wVcRzd30RrqVWiOPOD3z4pOsRhFuuuqZef2DxDSETsiX6DTygf_NhE17iAh3RyKnJZ05hbFSa1"/>
+</div>
+<div>
+<p class="font-semibold text-on-surface leading-tight">Julian Thorne</p>
+<p class="text-[10px] text-on-surface-variant">julian.t@corthex.int</p>
+</div>
+</div>
+<div class="col-span-3">
+<span class="text-sm text-on-surface">Senior Analyst</span>
+</div>
+<div class="col-span-2">
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold px-2 py-0.5 rounded uppercase">Level 4</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="text-xs font-medium text-primary">Active</span>
+</div>
+</div>
+<div class="grid grid-cols-12 px-4 py-5 items-center bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center overflow-hidden">
+<img alt="Agent" class="w-full h-full object-cover" data-alt="Female technology researcher portrait, high-key lighting, intellectual look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0m5n4UML_yf2UBhF5kLnspv8yOOy6_fApNqPLj6DH0SrAqvZC7xVuJgvcIrFFQuP5E_zQxpgS5vTK2VQyAAvDcZO-nfHT49pPqoAwhlq7xSZe0lgAs30_KSx9q6Yrf3PwWe29Q5MHz_Qea7ouwmiKPaEA3bsfC4jdGKtO6H-3O8a48hHPzChpECx0JPaZ0_xvHVjzcL0rqthodqZoaHoHTZukSBps4adlb_0Rbue9vlC72yFSftDLIqZN_TUXb1vOT22eaeHqvKf7"/>
+</div>
+<div>
+<p class="font-semibold text-on-surface leading-tight">Elena Rossi</p>
+<p class="text-[10px] text-on-surface-variant">e.rossi@corthex.int</p>
+</div>
+</div>
+<div class="col-span-3">
+<span class="text-sm text-on-surface">Ethics Specialist</span>
+</div>
+<div class="col-span-2">
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded uppercase">Level 3</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="text-xs font-medium text-on-surface-variant">Standby</span>
+</div>
+</div>
+<div class="grid grid-cols-12 px-4 py-5 items-center bg-white hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center overflow-hidden">
+<img alt="Agent" class="w-full h-full object-cover" data-alt="Professional male data scientist, clean environment, authoritative gaze" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbqxwserxD_5M4Y5OI3xIpm9eGjstrnJYQfcubEd0x305PUv8HTFchoikYovMZJNR87eNugi8SbtfDJkdQWp3yuxmlmNmlZvFveHpEF_NuNj_3fXZcLkFQ_edHWbSD9Z8LmmCR5neFbZGA5qaB4jxgJ5-GIj-aHflI69lYuT-mxX5F6cRsbTz9RBHIaVFlAu_caEmjNGixLG7nQcjJo173sCyawYeNSH8sfhuhbYf6u1SfJN-BjBw3xsV2564TQcF6wJbjJXe6igMC"/>
+</div>
+<div>
+<p class="font-semibold text-on-surface leading-tight">Silas Vane</p>
+<p class="text-[10px] text-on-surface-variant">s.vane@corthex.int</p>
+</div>
+</div>
+<div class="col-span-3">
+<span class="text-sm text-on-surface">Lead Architect</span>
+</div>
+<div class="col-span-2">
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold px-2 py-0.5 rounded uppercase">Level 5</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="text-xs font-medium text-primary">Active</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-4 border-2 border-dashed border-surface-variant/30 rounded-xl text-on-surface-variant font-medium text-sm hover:border-primary/30 hover:text-primary transition-all">
+                        + Deploy New Agent to Research
+                    </button>
+</div>
+<!-- Strategic Summary / Sidebar Card -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-primary p-8 rounded-xl text-white relative overflow-hidden">
+<!-- Abstract Background Decoration -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-primary-container/20 rounded-full -ml-8 -mb-8 blur-xl"></div>
+<h3 class="text-xl font-bold mb-6 relative z-10">Department Efficiency</h3>
+<div class="space-y-8 relative z-10">
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-sm opacity-80">Output Target</span>
+<span class="text-sm font-bold">94%</span>
+</div>
+<div class="h-1 bg-white/20 rounded-full">
+<div class="h-full bg-white w-[94%] shadow-[0_0_10px_rgba(255,255,255,0.4)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="text-sm opacity-80">Agent Retention</span>
+<span class="text-sm font-bold">98.2%</span>
+</div>
+<div class="h-1 bg-white/20 rounded-full">
+<div class="h-full bg-white w-[98%] shadow-[0_0_10px_rgba(255,255,255,0.4)]"></div>
+</div>
+</div>
+</div>
+<p class="mt-10 text-xs opacity-70 leading-relaxed italic">
+                            "Excellence is not an act, but a habit. Our architectural precision ensures 100% operational transparency."
+                        </p>
+</div>
+<!-- Performance Chip Area -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h4 class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-4">Focus Priorities</h4>
+<div class="flex flex-wrap gap-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 rounded-full text-xs font-semibold">AI Safety</span>
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1.5 rounded-full text-xs font-semibold">Cloud Migration</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1.5 rounded-full text-xs font-semibold">Q4 Scaling</span>
+<span class="bg-surface-container-highest text-on-surface px-3 py-1.5 rounded-full text-xs font-semibold">ISO Audit</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: "#CA8A04",
+                            500: "#CA8A04",
+                            600: "#A16207",
+                        },
+                        stone: {
+                            950: "#0C0A09",
+                            900: "#1C1917",
+                            800: "#292524",
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #E7E5E4;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1C1917;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #292524;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold/30">
+<!-- TopNavBar Shell -->
+<nav class="fixed top-0 w-full z-50 bg-[#0C0A09] border-b border-[#292524] flex justify-between items-center h-16 px-6 w-full font-['DM_Sans'] antialiased tracking-tight shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX Admin</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Dashboard</a>
+<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Analytics</a>
+<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Team</a>
+<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Logs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
+<input class="bg-[#1C1917] border border-[#292524] rounded-md pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:border-yellow-600 transition-all w-64" placeholder="Search..." type="text"/>
+</div>
+<button class="text-stone-400 hover:text-yellow-500 transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-yellow-600 border-b-2 border-yellow-600 pb-1 hover:text-yellow-500 transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="Admin profile avatar" class="w-8 h-8 rounded bg-stone-800" data-alt="minimalist professional portrait of a tech executive in dark studio lighting with subtle gold rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUJUZ6GzZ3pY7BHSdw3WvxQ8Mm2tzheZlG9J738kmmWhsv0yDNp0SnqKVV598tt9VBHhjCS_efs0EUcethmicw_iHLZ5Hj_EspXlR0q7HIPyBlfERmDIhHgSdQBXkaJNFy-Ws0oe5R4VKCKrAFHIkNFBPQBwAQSq2CEex3otTqjUgm3ekG14NwRQcLupLJzzPDVMT5kgXqO8gkL2f9oHar9voFdz4VyI4uXkMbrK1P8zZe3YZO_LDj9nzWPpG1tNET3MuK0XOCfA_T"/>
+</div>
+</nav>
+<div class="flex min-h-screen pt-16">
+<!-- SideNavBar Shell (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-64 border-r border-[#292524] bg-[#0C0A09] p-4 gap-2 font-['DM_Sans'] text-sm font-medium sticky top-16">
+<div class="mb-6 px-4">
+<h2 class="text-yellow-600 font-bold">CORTHEX</h2>
+<p class="text-stone-500 text-xs uppercase tracking-widest">Command Center</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 bg-[#1C1917] text-yellow-600 rounded-lg px-4 py-2 border-l-2 border-yellow-600 active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>General</span>
+</a>
+<a class="flex items-center gap-3 text-stone-400 px-4 py-2 hover:bg-[#1C1917] hover:text-stone-200 transition-all active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span>Email</span>
+</a>
+<a class="flex items-center gap-3 text-stone-400 px-4 py-2 hover:bg-[#1C1917] hover:text-stone-200 transition-all active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span>Security</span>
+</a>
+<a class="flex items-center gap-3 text-stone-400 px-4 py-2 hover:bg-[#1C1917] hover:text-stone-200 transition-all active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Billing</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-[#292524] pt-4 space-y-1">
+<a class="flex items-center gap-3 text-stone-400 px-4 py-2 hover:bg-[#1C1917] hover:text-stone-200 transition-all active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 text-stone-400 px-4 py-2 hover:bg-[#1C1917] hover:text-stone-200 transition-all active:scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 p-6 md:p-10 max-w-5xl">
+<header class="mb-10">
+<h1 class="text-3xl font-black tracking-tight text-stone-100 mb-2 font-headline">Admin Settings</h1>
+<p class="text-stone-500 font-body">Manage your platform configuration and global operational parameters.</p>
+</header>
+<!-- Settings Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Form Content -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Horizontal Navigation Tabs (Mobile/Internal) -->
+<div class="flex items-center gap-1 border-b border-[#292524] mb-8 overflow-x-auto no-scrollbar">
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-gold text-gold whitespace-nowrap">General</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-300 transition-colors whitespace-nowrap">Email</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-300 transition-colors whitespace-nowrap">Security</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-300 transition-colors whitespace-nowrap">Billing</button>
+</div>
+<!-- Bento Form Card -->
+<div class="bg-[#1C1917] border border-[#292524] rounded-xl p-8 shadow-2xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gold/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-gold/10 transition-colors duration-500"></div>
+<div class="space-y-6 relative z-10">
+<!-- Site Name -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-stone-500 font-label">Site Name</label>
+<input class="w-full bg-[#0C0A09] border border-[#292524] rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-gold focus:border-gold outline-none transition-all font-body" placeholder="Enter platform name" type="text" value="CORTHEX Intelligence"/>
+</div>
+<!-- Admin Email -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-stone-500 font-label">Admin Email</label>
+<input class="w-full bg-[#0C0A09] border border-[#292524] rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-gold focus:border-gold outline-none transition-all font-body" placeholder="admin@example.com" type="email" value="ops@corthex.io"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+<!-- Default User Role -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-stone-500 font-label">Default User Role</label>
+<div class="relative">
+<select class="w-full bg-[#0C0A09] border border-[#292524] rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-gold focus:border-gold outline-none appearance-none transition-all font-body">
+<option>Viewer</option>
+<option selected="">Contributor</option>
+<option>Moderator</option>
+<option>Administrator</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Maintenance Mode Toggle -->
+<div class="space-y-2 flex flex-col justify-end">
+<label class="block text-xs font-bold uppercase tracking-widest text-stone-500 font-label mb-3">Maintenance Mode</label>
+<div class="flex items-center gap-3 bg-[#0C0A09] border border-[#292524] rounded-lg px-4 py-2.5">
+<button class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-stone-700">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+<span class="text-sm text-stone-400 font-body">Currently Offline</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="flex items-center justify-end gap-4 pt-4">
+<button class="px-6 py-2.5 text-sm font-bold text-stone-400 hover:text-stone-100 transition-colors uppercase tracking-widest">Discard</button>
+<button class="bg-gold hover:bg-gold-600 text-stone-950 px-10 py-2.5 rounded-lg font-black text-sm uppercase tracking-widest transition-all active:scale-[0.97] shadow-[0_0_20px_rgba(202,138,4,0.2)]">
+                            Save Changes
+                        </button>
+</div>
+</div>
+<!-- Info Sidebar (Bento Style) -->
+<div class="lg:col-span-4 space-y-6">
+<div class="bg-[#1C1917] border border-[#292524] rounded-xl p-6">
+<h3 class="text-stone-100 font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-gold text-lg">info</span>
+                            System Status
+                        </h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-[#292524]">
+<span class="text-xs text-stone-500 uppercase">Version</span>
+<span class="text-xs font-mono text-gold">v4.8.2-stable</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-[#292524]">
+<span class="text-xs text-stone-500 uppercase">Last Sync</span>
+<span class="text-xs font-mono text-stone-300">2m ago</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-xs text-stone-500 uppercase">Database</span>
+<span class="flex items-center gap-1.5 text-xs text-emerald-500">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Healthy
+                                </span>
+</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-[#1C1917] to-[#0C0A09] border border-gold/20 rounded-xl p-6 relative overflow-hidden">
+<div class="absolute -bottom-4 -right-4 opacity-10">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<h3 class="text-stone-100 font-bold mb-2">Security Audit</h3>
+<p class="text-sm text-stone-500 mb-4 font-body leading-relaxed">Your last security protocol audit was 14 days ago. We recommend a monthly refresh.</p>
+<button class="w-full py-2 bg-[#292524] hover:bg-[#322e2c] text-stone-200 text-xs font-bold rounded transition-colors uppercase tracking-widest">
+                            Start New Audit
+                        </button>
+</div>
+<div class="h-40 w-full rounded-xl overflow-hidden border border-[#292524]">
+<img class="w-full h-full object-cover grayscale opacity-40 hover:grayscale-0 transition-all duration-700" data-alt="high-tech computer server room with neon blue and amber status lights in a dark futuristic data center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4BgI35g2JEm5UoKQ8-vTj-4_Rj6bd3ex3SszfWY98wtzRHd7FIoLqOWAt4Hq6H2iSDN9UKzIqqyzzCGOlTJ8YdLNkc8MALFqvMkX197dZ-Dv5jjPXITXX-wLgNdA81n5cAPUkFFKt3kmne8mqboguFqSp4sL2C9ybVU35ogrPjvR_XMuf1bFcTfWfyVUzfYoKfN6YrbauaDVRJUMmSvMr2e_5dLTRgVdp8zyoOyokB8kgorH2wWYdPvAeW3L_Wv_sTpJnvAfuNWOs"/>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
