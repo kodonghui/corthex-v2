@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Command Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                primary: "#CA8A04",
+                "on-primary": "#0C0A09",
+                background: "#0C0A09",
+                surface: "#1C1917",
+                outline: "#292524",
+                stone: {
+                    500: "#78716c",
+                    600: "#57534e",
+                    900: "#1C1917"
+                },
+                yellow: {
+                    500: "#EAB308",
+                    600: "#CA8A04"
+                }
+              },
+              fontFamily: {
+                "headline": ["DM Sans", "sans-serif"],
+                "body": ["DM Sans", "sans-serif"],
+                "label": ["DM Sans", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .cyber-grid {
+            background-image: 
+                linear-gradient(to right, rgba(202, 138, 4, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(202, 138, 4, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .glow-border {
+            box-shadow: 0 0 15px rgba(202, 138, 4, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="text-stone-300 antialiased overflow-hidden">
+<!-- Background Layer -->
+<div class="fixed inset-0 cyber-grid pointer-events-none"></div>
+<div class="fixed inset-0 bg-gradient-to-tr from-black via-transparent to-yellow-600/5 pointer-events-none"></div>
+<!-- Main Content -->
+<main class="relative min-h-screen flex flex-col items-center justify-center p-6">
+<!-- Logo Section -->
+<div class="mb-10 flex flex-col items-center">
+<div class="w-16 h-16 mb-4 bg-yellow-600 flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-black text-4xl" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<h1 class="text-5xl font-black tracking-tighter text-yellow-600">CORTHEX</h1>
+<p class="text-stone-500 text-xs tracking-[0.2em] uppercase mt-2 font-medium">Virtual Office Command Interface</p>
+</div>
+<!-- Login Card -->
+<div class="w-full max-w-md bg-stone-900 border border-stone-800 p-8 glow-border rounded-sm relative overflow-hidden">
+<!-- Decorative corner accent -->
+<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-yellow-600/30"></div>
+<div class="mb-8">
+<h2 class="text-xl font-bold text-stone-100">Establish Connection</h2>
+<p class="text-sm text-stone-500 mt-1">Authorized personnel only. Data-dense encryption active.</p>
+</div>
+<form class="space-y-6">
+<!-- Email Input -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-wider text-stone-400" for="email">Identity Identifier (Email)</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-600 group-focus-within:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined text-xl">alternate_email</span>
+</div>
+<input class="w-full bg-black/50 border border-stone-800 focus:border-yellow-600 focus:ring-1 focus:ring-yellow-600/20 text-stone-200 py-3 pl-11 pr-4 transition-all placeholder:text-stone-700 outline-none" id="email" name="email" placeholder="admin@corthex.system" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block text-xs font-bold uppercase tracking-wider text-stone-400" for="password">Security Key (Password)</label>
+<a class="text-xs text-yellow-600/70 hover:text-yellow-600 transition-colors font-medium" href="#">Forgot key?</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-600 group-focus-within:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined text-xl">lock</span>
+</div>
+<input class="w-full bg-black/50 border border-stone-800 focus:border-yellow-600 focus:ring-1 focus:ring-yellow-600/20 text-stone-200 py-3 pl-11 pr-4 transition-all placeholder:text-stone-700 outline-none" id="password" name="password" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center space-x-2">
+<input class="w-4 h-4 rounded-none bg-black border-stone-700 text-yellow-600 focus:ring-offset-black focus:ring-yellow-600" id="remember" type="checkbox"/>
+<label class="text-xs text-stone-500 cursor-pointer select-none" for="remember">Persist session on this terminal</label>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black uppercase tracking-widest py-4 transition-all active:scale-[0.98] shadow-lg shadow-yellow-600/10" type="submit">
+                    Initialize Login
+                </button>
+</form>
+<div class="mt-8 pt-6 border-t border-stone-800 flex flex-col items-center">
+<p class="text-xs text-stone-600">New operator?</p>
+<a class="mt-2 text-sm font-bold text-stone-300 hover:text-yellow-600 transition-colors" href="#">Apply for Access</a>
+</div>
+</div>
+<!-- Footer Visual -->
+<div class="mt-12 flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<div class="w-2 h-2 bg-yellow-600 rounded-full animate-pulse"></div>
+<span class="text-[10px] text-stone-600 uppercase tracking-widest font-bold">System Status: Online</span>
+</div>
+<div class="h-4 w-[1px] bg-stone-800"></div>
+<span class="text-[10px] text-stone-600 uppercase tracking-widest font-bold">Node: V-77-CMD</span>
+</div>
+</main>
+<!-- Decorative Corner Visuals -->
+<div class="fixed bottom-8 left-8 hidden md:block">
+<div class="text-[10px] font-mono text-stone-700 space-y-1">
+<div>LOG_INIT: COMPLETED</div>
+<div>NET_SYNC: ESTABLISHED</div>
+<div>SEC_ENCRYPT: AES_256_ACTIVE</div>
+</div>
+</div>
+<div class="fixed top-8 right-8 hidden md:block">
+<div class="w-32 h-[1px] bg-gradient-to-l from-yellow-600/50 to-transparent"></div>
+<div class="text-right mt-1">
+<span class="text-[10px] font-mono text-yellow-600/30">TERMINAL_REF: 0042-X</span>
+</div>
+</div>
+</body></html>

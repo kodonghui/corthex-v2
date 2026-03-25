@@ -114,38 +114,38 @@ export function Layout() {
     <NotificationListener />
     <NightJobListener />
     <BudgetAlertListener />
-    <div className="h-screen flex flex-col lg:flex-row bg-[#faf8f5] text-[#1a1a1a]">
+    <div className="h-screen flex flex-col lg:flex-row bg-corthex-bg text-corthex-text-primary">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={toggleCollapse} />
       </div>
 
       {/* Mobile top bar */}
-      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-white border-b border-[#e5e1d3]">
+      <header className="lg:hidden flex flex-col sticky top-0 z-30 shrink-0 bg-corthex-surface border-b border-corthex-border">
         <div className="h-[env(safe-area-inset-top)]" />
         <div className="h-14 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button
               onClick={openSidebar}
-              className="p-1.5 -ml-1.5 rounded-lg hover:bg-[#f5f0e8] transition-colors"
+              className="p-1.5 -ml-1.5 rounded-lg hover:bg-corthex-elevated transition-colors"
               aria-label="메뉴 열기"
             >
-              <Menu className="w-5 h-5 text-[#6b705c]" />
+              <Menu className="w-5 h-5 text-corthex-text-secondary" />
             </button>
-            <span className="text-lg font-semibold tracking-tight text-[#1a1a1a]">CORTHEX</span>
+            <span className="text-lg font-semibold tracking-tight text-corthex-text-primary">CORTHEX</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[#6b705c] hover:bg-[#f5f0e8] hover:text-[#1a1a1a] transition-colors"
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#606C38] border-2 border-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-white" />
               )}
             </button>
-            <div className="w-7 h-7 rounded-full bg-[#606C38] text-white flex items-center justify-center text-xs font-medium">
+            <div className="w-7 h-7 rounded-full bg-corthex-accent text-white flex items-center justify-center text-xs font-medium">
               {user?.name?.charAt(0) || '?'}
             </div>
           </div>
@@ -155,36 +155,36 @@ export function Layout() {
       {/* Main content column */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Desktop top bar */}
-        <header className="hidden lg:flex h-14 items-center justify-between px-6 border-b border-[#e5e1d3] bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+        <header className="hidden lg:flex h-14 items-center justify-between px-6 border-b border-corthex-border bg-corthex-surface/90 backdrop-blur-md sticky top-0 z-10 shrink-0">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#6b705c] hover:text-[#1a1a1a] cursor-pointer transition-colors" onClick={() => navigate('/dashboard')}>CORTHEX</span>
-            <ChevronRight className="w-4 h-4 text-[#a3a08e]" />
-            <span className="font-medium text-[#1a1a1a]">{pageName}</span>
+            <span className="text-corthex-text-secondary hover:text-corthex-text-primary cursor-pointer transition-colors" onClick={() => navigate('/dashboard')}>CORTHEX</span>
+            <ChevronRight className="w-4 h-4 text-corthex-text-disabled" />
+            <span className="font-medium text-corthex-text-primary">{pageName}</span>
           </div>
           {/* Search + Notifications */}
           <div className="flex items-center gap-4">
             <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#a3a08e]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-corthex-text-disabled" />
               <input
-                className="w-full bg-[#f5f0e8] border border-[#e5e1d3] rounded-lg pl-9 pr-16 py-1.5 text-sm focus:outline-none focus:border-[#606C38] focus:ring-1 focus:ring-[#606C38] transition-all placeholder:text-[#a3a08e] text-[#1a1a1a] h-8"
+                className="w-full bg-corthex-elevated border border-corthex-border rounded-lg pl-9 pr-16 py-1.5 text-sm focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent transition-all placeholder:text-corthex-text-disabled text-corthex-text-primary h-8"
                 placeholder="Search..."
                 type="text"
                 readOnly
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-[#6b705c] bg-[#e5e1d3] border border-[#d4cfc4] rounded">Ctrl</kbd>
-                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-[#6b705c] bg-[#e5e1d3] border border-[#d4cfc4] rounded">K</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-corthex-text-secondary bg-corthex-elevated border border-corthex-border-strong rounded">Ctrl</kbd>
+                <kbd className="inline-flex items-center px-1.5 font-mono text-[10px] text-corthex-text-secondary bg-corthex-elevated border border-corthex-border-strong rounded">K</kbd>
               </div>
             </div>
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[#6b705c] hover:bg-[#f5f0e8] hover:text-[#1a1a1a] transition-colors"
+              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#606C38] border-2 border-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-white" />
               )}
             </button>
           </div>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#CA8A04",
+              surface: "#1C1917",
+              background: "#0C0A09",
+              border: "#292524",
+              onSurface: "#A8A29E",
+            },
+            fontFamily: {
+              "headline": ["DM Sans"],
+              "body": ["DM Sans"],
+              "label": ["DM Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; background-color: #0C0A09; color: #E7E5E4; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary/30 selection:text-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#0C0A09] text-[#CA8A04] font-['DM_Sans'] tracking-tight border-b border-[#292524] shadow-none flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-[#CA8A04] tracking-tighter">CORTHEX</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#CA8A04] font-bold hover:text-[#CA8A04] transition-colors active:opacity-80" href="#">Command</a>
+<a class="text-stone-400 hover:text-[#CA8A04] transition-colors active:opacity-80" href="#">Intelligence</a>
+<a class="text-stone-400 hover:text-[#CA8A04] transition-colors active:opacity-80" href="#">Network</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
+<input class="bg-[#1C1917] border border-[#292524] rounded px-9 py-1.5 text-xs focus:ring-1 focus:ring-primary outline-none w-64 text-stone-300" placeholder="Search system..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-stone-400 hover:text-[#CA8A04] transition-colors active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-stone-400 hover:text-[#CA8A04] transition-colors active:opacity-80">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded bg-[#292524] border border-[#292524] overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a high-tech digital human avatar with glowing amber circuits on dark skin, cyberpunk aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUM_zgeMyWqlxEPzzPEcVhNbmtGpldGWXLK25dIEn6rr8Q8DZ6-ul2-4dQf5SZkIRo4Za8E4FXNHx5BXdlyaegQ1yrAbslVP-kaggpsK2pstXSwDJuRmyzfM2MmCz1WKkpNNUs9IEkkbK84AW0s-HoUu0VI_7HtFd0A7DzE8oZgySVJKpoR-htsVYP5Ajzs6c8iOCNMVbrbb0AZcuTCI_w6mYOUL1hd7mOBFtsiv4t5sMt0O8pg5XyKUxyjywbzR-COwWyZY_BRwRw"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#1C1917] text-[#CA8A04] font-['DM_Sans'] text-sm font-medium border-r border-[#292524] shadow-2xl flex flex-col py-8 z-40 pt-24">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">terminal</span>
+</div>
+<div>
+<div class="text-[#CA8A04] font-bold">CORTHEX</div>
+<div class="text-xs text-stone-500">V-Office OS</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="mx-3 px-3 py-2.5 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+<span>Command</span>
+</a>
+<a class="mx-3 px-3 py-2.5 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+<span>Intelligence</span>
+</a>
+<a class="mx-3 px-3 py-2.5 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+<span>Network</span>
+</a>
+<a class="mx-3 px-3 py-2.5 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">database</span>
+<span>Assets</span>
+</a>
+<a class="mx-3 px-3 py-2.5 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+<span>Archive</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-[#292524] pt-4 space-y-1">
+<a class="mx-3 px-3 py-2 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span>Support</span>
+</a>
+<a class="mx-3 px-3 py-2 rounded flex items-center gap-3 text-stone-500 hover:text-stone-200 hover:bg-[#292524] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+<span>Logs</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen bg-[#0C0A09]">
+<div class="max-w-5xl mx-auto p-8">
+<!-- Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<h1 class="text-3xl font-black tracking-tighter text-white mb-2">Notifications</h1>
+<p class="text-stone-500 text-sm max-w-md">Real-time status updates and communications across the CORTHEX neural network.</p>
+</div>
+<button class="bg-[#CA8A04] text-[#0C0A09] font-bold px-4 py-2 rounded-sm text-xs flex items-center gap-2 hover:bg-[#EAB308] transition-colors active:scale-95">
+<span class="material-symbols-outlined text-sm">done_all</span>
+                    Mark All Read
+                </button>
+</header>
+<!-- Filters & Stats Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+<div class="lg:col-span-3">
+<div class="flex items-center gap-2 p-1 bg-[#1C1917] rounded-lg border border-[#292524] w-fit">
+<button class="px-5 py-1.5 rounded text-sm font-bold bg-[#CA8A04]/10 text-[#CA8A04] border border-[#CA8A04]/20 transition-all">All</button>
+<button class="px-5 py-1.5 rounded text-sm font-medium text-stone-500 hover:text-stone-300 transition-all">Mentions</button>
+<button class="px-5 py-1.5 rounded text-sm font-medium text-stone-500 hover:text-stone-300 transition-all">System</button>
+<button class="px-5 py-1.5 rounded text-sm font-medium text-stone-500 hover:text-stone-300 transition-all">Alerts</button>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] rounded-lg p-4 flex items-center justify-between">
+<div>
+<div class="text-[10px] uppercase tracking-widest text-stone-500 mb-1">Unread</div>
+<div class="text-2xl font-black text-[#CA8A04]">12</div>
+</div>
+<div class="h-10 w-10 rounded bg-[#CA8A04]/5 border border-[#CA8A04]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#CA8A04]">mark_email_unread</span>
+</div>
+</div>
+</div>
+<!-- Notification List -->
+<div class="space-y-3">
+<!-- Unread Notification Item -->
+<div class="group relative bg-[#1C1917] border-l-2 border-l-[#CA8A04] border-y border-r border-[#292524] p-4 flex gap-4 hover:bg-[#292524]/40 transition-all cursor-pointer">
+<div class="flex-shrink-0 w-10 h-10 rounded bg-[#CA8A04]/10 border border-[#CA8A04]/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#CA8A04]" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-stone-100 truncate pr-4">Critical Deployment Success</h3>
+<span class="text-[10px] text-stone-500 whitespace-nowrap">2m ago</span>
+</div>
+<p class="text-xs text-stone-400 leading-relaxed mb-2">System cluster 'OMEGA-4' successfully re-indexed. Integrity checks complete with 0 errors detected.</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-tighter">System</span>
+<div class="w-2 h-2 rounded-full bg-[#CA8A04] shadow-[0_0_8px_#CA8A04]"></div>
+</div>
+</div>
+</div>
+<!-- Notification Item -->
+<div class="group bg-[#1C1917] border border-[#292524] p-4 flex gap-4 hover:bg-[#292524]/40 transition-all cursor-pointer">
+<div class="flex-shrink-0 w-10 h-10 rounded bg-stone-800/50 border border-[#292524] flex items-center justify-center">
+<span class="material-symbols-outlined text-stone-400">account_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-stone-300 truncate pr-4">Marcus V. mentioned you in Neural Net #402</h3>
+<span class="text-[10px] text-stone-600 whitespace-nowrap">14m ago</span>
+</div>
+<p class="text-xs text-stone-500 leading-relaxed mb-2">"@admin please review the data-node synchronization latency on the Asian-Pacific corridor..."</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">Mentions</span>
+</div>
+</div>
+</div>
+<!-- Alert Notification Item -->
+<div class="group relative bg-[#1C1917] border-l-2 border-l-red-500 border-y border-r border-[#292524] p-4 flex gap-4 hover:bg-[#292524]/40 transition-all cursor-pointer">
+<div class="flex-shrink-0 w-10 h-10 rounded bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-stone-100 truncate pr-4">Security Protocol Deviation</h3>
+<span class="text-[10px] text-stone-500 whitespace-nowrap">45m ago</span>
+</div>
+<p class="text-xs text-stone-400 leading-relaxed mb-2">Unauthorized access attempt detected at Terminal B-14. Identity mask verified. Lockdown initiated.</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-500 border border-red-500/20 uppercase tracking-tighter">Alerts</span>
+<div class="w-2 h-2 rounded-full bg-[#CA8A04] shadow-[0_0_8px_#CA8A04]"></div>
+</div>
+</div>
+</div>
+<!-- Unread Notification Item -->
+<div class="group bg-[#1C1917] border border-[#292524] p-4 flex gap-4 hover:bg-[#292524]/40 transition-all cursor-pointer">
+<div class="flex-shrink-0 w-10 h-10 rounded bg-[#CA8A04]/10 border border-[#CA8A04]/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#CA8A04]">dns</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-stone-100 truncate pr-4">Database Optimization Recommended</h3>
+<span class="text-[10px] text-stone-500 whitespace-nowrap">1h ago</span>
+</div>
+<p class="text-xs text-stone-400 leading-relaxed mb-2">Intelligence engine predicts a 15% increase in efficiency if Archive re-balancing is performed today.</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-stone-500/10 text-stone-500 border border-stone-500/20 uppercase tracking-tighter">System</span>
+<div class="w-2 h-2 rounded-full bg-[#CA8A04] shadow-[0_0_8px_#CA8A04]"></div>
+</div>
+</div>
+</div>
+<!-- Read Notification Item -->
+<div class="group bg-[#1C1917]/40 border border-[#292524] p-4 flex gap-4 opacity-70 grayscale-[0.5] hover:opacity-100 transition-all cursor-pointer">
+<div class="flex-shrink-0 w-10 h-10 rounded bg-stone-800/50 border border-[#292524] flex items-center justify-center">
+<span class="material-symbols-outlined text-stone-500">inventory_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-stone-400 truncate pr-4">Weekly Audit Report Available</h3>
+<span class="text-[10px] text-stone-600 whitespace-nowrap">5h ago</span>
+</div>
+<p class="text-xs text-stone-500 leading-relaxed mb-2">The comprehensive weekly log for Network Traffic and Asset Allocation is now ready for review.</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-stone-800 text-stone-600 uppercase tracking-tighter">Archive</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Pagination / Status -->
+<div class="mt-8 pt-8 border-t border-[#292524] flex items-center justify-between">
+<div class="text-[10px] uppercase tracking-widest text-stone-600 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    CORTHEX Live Stream: Connected
+                </div>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-[#292524] text-stone-500 hover:bg-[#292524] transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-primary/40 bg-primary/10 text-primary text-[10px] font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-[#292524] text-stone-500 hover:bg-[#292524] text-[10px] font-bold">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-[#292524] text-stone-500 hover:bg-[#292524] transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Suppression logic: No FAB on notification screens -->
+</body></html>

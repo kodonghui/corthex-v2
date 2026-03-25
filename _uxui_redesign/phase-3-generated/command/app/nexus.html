@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX NEXUS - Organization Chart Canvas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CA8A04",
+                        background: "#0C0A09",
+                        surface: "#1C1917",
+                        border: "#292524",
+                        text: {
+                            gold: "#CA8A04",
+                            muted: "#A8A29E",
+                            bright: "#F5F5F4"
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #F5F5F4;
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+        }
+        .canvas-grid {
+            background-image: 
+                linear-gradient(to right, #1C1917 1px, transparent 1px),
+                linear-gradient(to bottom, #1C1917 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-text-bright">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#0C0A09]/90 backdrop-blur-md border-b border-[#292524] font-['DM_Sans'] tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX NEXUS</span>
+<nav class="hidden md:flex items-center gap-6 h-full">
+<a class="text-[#A8A29E] hover:text-yellow-500 hover:bg-[#1C1917] transition-colors h-full flex items-center px-2" href="#">Nodes</a>
+<a class="text-[#A8A29E] hover:text-yellow-500 hover:bg-[#1C1917] transition-colors h-full flex items-center px-2" href="#">Agents</a>
+<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1 h-full flex items-center px-2" href="#">Operations</a>
+<a class="text-[#A8A29E] hover:text-yellow-500 hover:bg-[#1C1917] transition-colors h-full flex items-center px-2" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#A8A29E] hover:text-yellow-500 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="text-[#A8A29E] hover:text-yellow-500 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface border border-border overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a professional male user in soft dramatic studio lighting with dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb6-9rMI9vuq73dcAalw9Jd1faBhVtw6g89mT4o08Ajz_UHlEQL0xKa8qS3KQz_OM12R-VppYRbcxPD4It56cpiZLtqnosofx2rtZaHDHl_Sn1IW3ZWuNQRLTft_SfCvaotYm0JuiItqDOH7rEvlgDaqoPaXAWSgL4lV7z-_XwmfI6jOV3TVh4UJWGJAUmJkmvtAonD-G08EcbaiX45tIC_KdM2379i_Eoyh3FBaF8wwMh_vLE5T9M3Tp2wfq56IDKvhzHFwcRkPA9"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas Area -->
+<main class="relative w-full h-screen pt-16 flex overflow-hidden">
+<!-- Interactive Canvas Background -->
+<div class="absolute inset-0 canvas-grid pointer-events-none opacity-40"></div>
+<!-- Org Chart Container (Scrollable/Draggable Area Simulation) -->
+<div class="relative w-full h-full p-20 flex flex-col items-center">
+<!-- Root Node -->
+<div class="mb-24 relative flex flex-col items-center">
+<div class="bg-surface border-2 border-primary p-4 w-72 shadow-[0_0_20px_rgba(202,138,4,0.15)] relative">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-primary tracking-widest uppercase">ID: NEX-001</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+<span class="text-[9px] font-bold text-emerald-500 uppercase">Online</span>
+</div>
+</div>
+<h3 class="text-lg font-bold text-text-bright mb-1 tracking-tight">Prime Overseer</h3>
+<div class="inline-flex items-center px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-[10px] text-primary font-bold uppercase tracking-wider mb-3">
+                        Central Command
+                    </div>
+<div class="flex items-center gap-3 pt-3 border-t border-border">
+<img class="w-10 h-10 rounded object-cover border border-border" data-alt="Portrait of a senior executive male in a dark suit with minimalist professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjv8xqwt7fTlC10m1FYst08dvOzCUad_SdEzq6pHDDwWO7ZqGVUzfwvy8vVNaGDR9-UJmo1Akr2jWkOfq-YsrCJtJJvnwdulKC_FGXGHN-8071W2CaX5hO1P5YfxrI0GL9ziTwFsi4bhoEdQ1_W7ZmnRCkza18_CYhZwQbk_cintzWoYrGV5LzzQLQUtijS2iD6TXdwf_4RGG0pdc2cUJkGg1HtQKD7pFRmNikBXkheRpfz8FHCJCxImbDPv09SwZbVROX7iz4Hs9U"/>
+<div class="text-xs">
+<p class="text-text-bright font-medium">Aurelius Thorne</p>
+<p class="text-text-muted text-[10px]">Head of Core Operations</p>
+</div>
+</div>
+</div>
+<!-- Connector Down -->
+<div class="absolute -bottom-24 w-0.5 h-24 bg-border"></div>
+</div>
+<!-- Department Row -->
+<div class="flex gap-40 relative">
+<!-- Connector Horizontal Line -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%+160px)] h-0.5 bg-border -mt-0.5"></div>
+<!-- Node 2 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-0 w-0.5 h-12 bg-border -translate-y-full"></div>
+<div class="bg-surface border border-border p-4 w-64 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-text-muted tracking-widest uppercase">ID: NEX-112</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<span class="text-[9px] font-bold text-amber-500 uppercase">Busy</span>
+</div>
+</div>
+<h3 class="text-md font-bold text-text-bright mb-1 tracking-tight">Logistics Agent</h3>
+<div class="inline-flex items-center px-2 py-0.5 bg-zinc-800 border border-border rounded text-[10px] text-text-muted font-bold uppercase tracking-wider mb-3">
+                            Operations
+                        </div>
+<div class="flex items-center gap-3 pt-3 border-t border-border group-hover:border-primary/30">
+<img class="w-8 h-8 rounded object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of a focused professional woman in a tech environment with subtle blue backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsTGCzrfvD480mRpeFLC0Ne-yYH2E0fQEMnhRsfYxRrkiDNkgcWkbC-BkjvDXnJIJvJULC2qVetGVVWs3pl0ZNGZEy2nalC1zXkUQAyxvwcqGy8V0Llbpcjs6Hke4aTMwjCZqPJVmGBH-V1BF_q__qa0bMkVptoscC5wCQgh4McJ9h1-cdwYk4D_-OygpoHfUQRnoWQ91bwhI9Mcd2tspd8xF8dThT8unjcyz-oJLBPohsfNJ1UjShrHjRy6EB02k2CclWISuXD5SN"/>
+<div class="text-xs">
+<p class="text-text-bright font-medium">Elena Vance</p>
+<p class="text-text-muted text-[10px]">Route Optimization</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Node 3 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-0 w-0.5 h-12 bg-border -translate-y-full"></div>
+<div class="bg-surface border border-primary/40 p-4 w-64 shadow-[0_0_15px_rgba(202,138,4,0.1)] hover:border-primary transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-primary/70 tracking-widest uppercase">ID: NEX-145</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+<span class="text-[9px] font-bold text-emerald-500 uppercase">Online</span>
+</div>
+</div>
+<h3 class="text-md font-bold text-text-bright mb-1 tracking-tight">Security Protocol</h3>
+<div class="inline-flex items-center px-2 py-0.5 bg-primary/5 border border-primary/20 rounded text-[10px] text-primary font-bold uppercase tracking-wider mb-3">
+                            Cyber Defense
+                        </div>
+<div class="flex items-center gap-3 pt-3 border-t border-border group-hover:border-primary/30">
+<img class="w-8 h-8 rounded object-cover border border-border" data-alt="Confident young professional male in sharp office wear with neutral lighting and dark tech aesthetic background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-P_091gB0CakUzoQHczJ1yriB9mghUmZHxG7wIITQaFNQoWlvlvctvcEBtgkG5J6liW9aJgmeV8KLQdrwH7rJ4MvBvJjvYA1UcMavPVNF2jV6uSgcTPTJJmw6dZtyrpp3B86_s54-1yG4HhpXa2_6FcZhltIguw4lLGvEDPqFby65ca2yrjliEySaimO0nqkGskJtiqR2HNIBFrxml6wtcKzKfwrtI4bKEKATUO-WnXLZ2qeM8bk1T2U3UTmhXyLy_jxxJWLqqoXr"/>
+<div class="text-xs">
+<p class="text-text-bright font-medium">Marcus Kael</p>
+<p class="text-text-muted text-[10px]">Threat Mitigation</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Node 4 -->
+<div class="relative flex flex-col items-center">
+<div class="absolute -top-0 w-0.5 h-12 bg-border -translate-y-full"></div>
+<div class="bg-surface border border-border p-4 w-64 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-text-muted tracking-widest uppercase">ID: NEX-209</span>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-zinc-600"></span>
+<span class="text-[9px] font-bold text-text-muted uppercase">Idle</span>
+</div>
+</div>
+<h3 class="text-md font-bold text-text-bright mb-1 tracking-tight">Neural Architect</h3>
+<div class="inline-flex items-center px-2 py-0.5 bg-zinc-800 border border-border rounded text-[10px] text-text-muted font-bold uppercase tracking-wider mb-3">
+                            R&amp;D Division
+                        </div>
+<div class="flex items-center gap-3 pt-3 border-t border-border group-hover:border-primary/30">
+<img class="w-8 h-8 rounded object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Modern professional woman with short hair in creative studio lighting looking intensely at the camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0_Req8j0DqOyeoZA2ODnYI7duhGDvJU2DVccjbBTTuLuG2EhpeGQx1HlnjedCAJt0-Xut7J1Mi3kfDfX7OlqePQ4OWup6-ZBbp3GyelAD2z69oEgqZwpN8UexLVoBZyPlRk5K3t6BfiT7_9vhetpdhNc6bi6Gl0s9lvmF59nA2AtRyFVGVtS3UJuFylsTXEv9WbLCtjds71a2d-htlBV44rIXUcKrSEJzzJrDP1LeAmsPI6sTap-UZPIG_HZQ4K8OYKWulbNs-x-o"/>
+<div class="text-xs">
+<p class="text-text-bright font-medium">Sarah Chen</p>
+<p class="text-text-muted text-[10px]">LLM Training</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Control Toolbar -->
+<div class="absolute top-20 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-surface/80 backdrop-blur-xl border border-border p-1 rounded-lg shadow-2xl">
+<div class="flex border-r border-border pr-1 mr-1">
+<button class="p-2 text-text-muted hover:text-primary transition-colors flex items-center gap-2 px-3">
+<span class="material-symbols-outlined text-[20px]">zoom_in</span>
+<span class="text-[11px] font-bold uppercase">Zoom In</span>
+</button>
+<button class="p-2 text-text-muted hover:text-primary transition-colors flex items-center gap-2 px-3">
+<span class="material-symbols-outlined text-[20px]">zoom_out</span>
+<span class="text-[11px] font-bold uppercase">Zoom Out</span>
+</button>
+</div>
+<button class="p-2 text-text-muted hover:text-primary transition-colors flex items-center gap-2 px-3">
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+<span class="text-[11px] font-bold uppercase">Fit</span>
+</button>
+<div class="h-4 w-px bg-border mx-1"></div>
+<button class="p-2 text-text-muted hover:text-primary transition-colors flex items-center gap-2 px-3 bg-zinc-800/50 rounded">
+<span class="material-symbols-outlined text-[20px]">align_vertical_center</span>
+<span class="text-[11px] font-bold uppercase">Vertical</span>
+</button>
+<button class="p-2 text-text-muted hover:text-primary transition-colors flex items-center gap-2 px-3">
+<span class="material-symbols-outlined text-[20px]">align_horizontal_center</span>
+<span class="text-[11px] font-bold uppercase">Horizontal</span>
+</button>
+<div class="h-4 w-px bg-border mx-1"></div>
+<button class="p-2 text-primary hover:bg-primary hover:text-background transition-all flex items-center gap-2 px-4 rounded font-bold text-[11px] uppercase tracking-wider">
+<span class="material-symbols-outlined text-[20px]">file_export</span>
+                Export Data
+            </button>
+</div>
+<!-- Floating Minimap -->
+<div class="absolute bottom-6 right-6 w-56 h-40 bg-surface/90 backdrop-blur-md border border-border shadow-2xl overflow-hidden group">
+<div class="absolute top-2 left-2 flex items-center gap-2 z-10">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[9px] font-black text-text-muted uppercase tracking-widest">Live HUD Minimap</span>
+</div>
+<!-- Mock Viewport in Minimap -->
+<div class="relative w-full h-full p-4 canvas-grid opacity-20 group-hover:opacity-40 transition-opacity">
+<!-- Abstract Nodes in Minimap -->
+<div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-4 h-2.5 bg-primary/40 rounded-sm"></div>
+<div class="absolute top-1/2 left-1/4 w-3 h-2 bg-text-muted/20 rounded-sm"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 w-3 h-2 bg-text-muted/20 rounded-sm"></div>
+<div class="absolute top-1/2 right-1/4 w-3 h-2 bg-text-muted/20 rounded-sm"></div>
+<!-- Viewport Rectangle -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-16 border border-primary/40 bg-primary/5"></div>
+</div>
+<!-- Minimap Resizer Icon -->
+<div class="absolute bottom-0 right-0 p-1">
+<span class="material-symbols-outlined text-text-muted text-[12px] rotate-45">filter_list</span>
+</div>
+</div>
+<!-- HUD Overlays (Corner Details) -->
+<div class="absolute bottom-6 left-6 flex flex-col gap-1 font-mono text-[10px] text-text-muted uppercase tracking-tighter">
+<div class="flex gap-4">
+<span>COORD: 142.09 / -22.11</span>
+<span>STATUS: STABLE</span>
+</div>
+<div class="flex gap-4">
+<span>SYS_TIME: 14:02:55:01</span>
+<span>PING: 14MS</span>
+</div>
+</div>
+</main>
+</body></html>

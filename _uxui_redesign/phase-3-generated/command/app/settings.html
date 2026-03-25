@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#CA8A04",
+              background: "#0C0A09",
+              surface: "#1C1917",
+              border: "#292524",
+              stone: {
+                400: "#a8a29e",
+                500: "#78716c",
+              }
+            },
+            fontFamily: {
+              "headline": ["DM Sans", "sans-serif"],
+              "body": ["DM Sans", "sans-serif"],
+              "label": ["DM Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #0C0A09;
+        color: #e7e5e4;
+        font-family: 'DM Sans', sans-serif;
+      }
+      .hud-border {
+        border: 1px solid #292524;
+        position: relative;
+      }
+      .hud-border::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        width: 10px;
+        height: 2px;
+        background: #CA8A04;
+      }
+      .hud-border::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 10px;
+        height: 2px;
+        background: #CA8A04;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="antialiased selection:bg-yellow-600/30">
+<!-- Top Navigation Anchor -->
+<nav class="bg-[#0C0A09] text-yellow-600 font-['DM Sans'] tracking-tight leading-tight flex justify-between items-center w-full px-6 py-3 h-16 docked full-width top-0 border-b border-[#292524] flat no shadows z-50 sticky">
+<div class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-stone-400 font-medium hover:text-yellow-500 hover:bg-[#1C1917] transition-colors" href="#">Dashboard</a>
+<a class="text-stone-400 font-medium hover:text-yellow-500 hover:bg-[#1C1917] transition-colors" href="#">Assets</a>
+<a class="text-stone-400 font-medium hover:text-yellow-500 hover:bg-[#1C1917] transition-colors" href="#">Analytics</a>
+<a class="text-stone-400 font-medium hover:text-yellow-500 hover:bg-[#1C1917] transition-colors" href="#">Logs</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-stone-400 hover:text-yellow-500 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-yellow-600">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded bg-stone-800 border border-stone-700 overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="minimalist professional user avatar with neon yellow accents and dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZiGA7YtadDW5HDbdrdw0IjiBe-Go2bjpcCOOl6wBe7-iPWW2eQ1d0mC0sWCZ5R5nCYkyaSFkT1PxlXSRnci0I4fuJSp6uyROWXcQekhXjhvnAjXX7hy00MgpGeJzqIpAlJCQKTiBOEiD5e9N7d8ThvfgjSZG8cJbjzfwSvXgnEK3V9Dmom2WpS8sncvsNyliD5uKngxKgV0EuKkEkrYzwFrZ_xewnH07A6_9djWYqxv_SB3dtmdoPBMGCXEwbHFb06JLLKSq2OlJa"/>
+</div>
+</div>
+</nav>
+<main class="max-w-6xl mx-auto px-6 py-10">
+<!-- Settings Header -->
+<header class="mb-10">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 bg-yellow-600"></div>
+<span class="text-[10px] uppercase tracking-widest text-yellow-600 font-bold">System Configuration</span>
+</div>
+<h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Command Center</h1>
+<p class="text-stone-500 text-sm mt-1">v4.0.1-stable // Update authorized</p>
+</header>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-[#292524] mb-10 overflow-x-auto no-scrollbar">
+<button class="px-6 py-3 text-stone-500 font-medium text-sm hover:text-stone-200 transition-all whitespace-nowrap">General</button>
+<button class="px-6 py-3 text-yellow-600 font-bold border-b-2 border-yellow-600 text-sm whitespace-nowrap bg-yellow-600/5">Appearance</button>
+<button class="px-6 py-3 text-stone-500 font-medium text-sm hover:text-stone-200 transition-all whitespace-nowrap">Notifications</button>
+<button class="px-6 py-3 text-stone-500 font-medium text-sm hover:text-stone-200 transition-all whitespace-nowrap">API Keys</button>
+<button class="px-6 py-3 text-stone-500 font-medium text-sm hover:text-stone-200 transition-all whitespace-nowrap">Billing</button>
+<button class="px-6 py-3 text-stone-500 font-medium text-sm hover:text-stone-200 transition-all whitespace-nowrap">Security</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Column: Form Fields -->
+<div class="lg:col-span-7 space-y-10">
+<section>
+<h2 class="text-xs font-bold text-stone-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+<span class="w-4 h-[1px] bg-stone-700"></span> Interface Parameters
+                    </h2>
+<div class="space-y-8">
+<!-- UI Scaling -->
+<div class="group">
+<label class="block text-sm font-bold text-stone-300 mb-2 uppercase tracking-tight">UI Scaling</label>
+<div class="flex items-center gap-4">
+<input class="w-full h-1.5 bg-[#1C1917] rounded-lg appearance-none cursor-pointer accent-yellow-600 border border-[#292524]" max="120" min="80" type="range" value="100"/>
+<span class="text-xs font-mono text-yellow-600 bg-yellow-600/10 px-2 py-1 border border-yellow-600/20">100%</span>
+</div>
+<p class="text-[11px] text-stone-600 mt-2 italic">Adjust the global density of the HUD interface elements.</p>
+</div>
+<!-- HUD Contrast -->
+<div>
+<label class="block text-sm font-bold text-stone-300 mb-2 uppercase tracking-tight">HUD Contrast</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="hud-border bg-[#1C1917] py-2 text-[10px] font-bold text-stone-500 hover:text-white transition-all">LOW</button>
+<button class="hud-border border-yellow-600/50 bg-[#1C1917] py-2 text-[10px] font-bold text-yellow-600">MEDIUM</button>
+<button class="hud-border bg-[#1C1917] py-2 text-[10px] font-bold text-stone-500 hover:text-white transition-all">HIGH</button>
+<button class="hud-border bg-[#1C1917] py-2 text-[10px] font-bold text-stone-500 hover:text-white transition-all">MAX</button>
+</div>
+</div>
+<!-- Neural Animation Speed -->
+<div>
+<label class="block text-sm font-bold text-stone-300 mb-2 uppercase tracking-tight">Neural Animation Speed</label>
+<select class="w-full bg-[#1C1917] border border-[#292524] text-stone-300 text-sm rounded-none px-4 py-3 focus:ring-1 focus:ring-yellow-600 focus:border-yellow-600 outline-none appearance-none">
+<option>Static (Disabled)</option>
+<option>Efficient (0.5x)</option>
+<option selected="">Standard (1.0x)</option>
+<option>Overclocked (2.0x)</option>
+</select>
+</div>
+</div>
+</section>
+<div class="pt-6">
+<button class="bg-yellow-600 hover:bg-yellow-500 text-black font-black uppercase tracking-tighter px-10 py-4 text-sm flex items-center gap-3 transition-all active:scale-95">
+<span>Save Changes</span>
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Theme Selector -->
+<div class="lg:col-span-5">
+<h2 class="text-xs font-bold text-stone-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+<span class="w-4 h-[1px] bg-stone-700"></span> Theme Modules
+                </h2>
+<div class="space-y-4">
+<!-- Theme Card: Command -->
+<div class="hud-border bg-[#1C1917] p-1 border-yellow-600/50">
+<div class="p-3 flex gap-4">
+<div class="w-24 h-24 bg-stone-900 border border-yellow-600/30 overflow-hidden shrink-0 relative">
+<div class="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent"></div>
+<img class="w-full h-full object-cover opacity-40 mix-blend-overlay" data-alt="abstract dark cyberpunk interface preview with glowing yellow lines and digital data patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAza1AbkxqEyfOYXDTZisNvQNh8z8QIPBwcAuqm9tMFHVl5fDuZPo1ibcih6QT6GNM6cVZGPxIyRzV8emFVQInsRR-akeVFEcAthwjJgByIGyO_11vXlAbWFjLUxLnCHI6uqAD6zrpDhriHcBUkkMpfC-fzEFXysebxEieHIigMX5bOz4pAxFcUUkkRvBDkqQVvsx7XqKZuVIRldexzXdCJgpeYi0gcJqzs-xp67RJJImlfCpAa502gq5r350bpk1BJLI8J6A0W8KC1"/>
+<div class="absolute bottom-1 right-1">
+<span class="material-symbols-outlined text-yellow-600 text-xs" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="text-sm font-black text-yellow-600 uppercase">Command</h3>
+<span class="text-[9px] bg-yellow-600 text-black px-1 font-bold">ACTIVE</span>
+</div>
+<p class="text-xs text-stone-400 mt-1 leading-relaxed">High-contrast dark mode with amber accents. Optimized for low-light environments and long operations.</p>
+</div>
+</div>
+</div>
+<!-- Theme Card: Studio -->
+<div class="bg-[#1C1917] p-1 border border-[#292524] hover:border-stone-600 transition-colors group">
+<div class="p-3 flex gap-4">
+<div class="w-24 h-24 bg-stone-900 border border-stone-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity" data-alt="vibrant neon blue and violet gradient background with clean geometric patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXKlYQFGyzVFyH55iOQDXlyCqt0PPPMf1y_Xr6ffyD7KyqgDq4botqa4kxKCeL-yT90DPepq6TzDoakB_qHYMUHJmDeCqNR0MgcEXgn2O1AAkhrvgiT0TqghXCEbH_d2sY-TzpKYv5F6omSCook76KGOqOaTYWKUpPBG2y9TRoyXWzYNCnGkpLuQARPM6-L13NasCY8Gc0EzO2OXzxxoIiInzqV5HFEjDO6YyKzRDyo7Q4CyNbTv5Kvd7MvL2404znOuIAqSyOP6Zl"/>
+</div>
+<div class="flex-1">
+<h3 class="text-sm font-black text-stone-300 uppercase group-hover:text-white">Studio</h3>
+<p class="text-xs text-stone-500 mt-1 leading-relaxed">Vibrant accent palette with soft shadows. Designed for creative workflows and asset visualization.</p>
+</div>
+</div>
+</div>
+<!-- Theme Card: Corporate -->
+<div class="bg-[#1C1917] p-1 border border-[#292524] hover:border-stone-600 transition-colors group">
+<div class="p-3 flex gap-4">
+<div class="w-24 h-24 bg-stone-900 border border-stone-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity" data-alt="sleek corporate digital landscape with soft white and deep blue light streaks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJpK4Gk9-Z2yyCNf9-ak2DwN2cd4_9QN9kSMqNkRiuCUFFeYL6WhLehue8gSeBEKuFgMfYyStggOwKoUpAI1BY5WbjWHnweLEhMdiySRZUUjnHtYj1noP3bRCPLzNwxFXr6MDvU0ArbzBnQBryM6t6HYdsOq7SNi5zeDv21J0iirnYNXN-fLiM8IKM5f-1OrErsL-5BIHhyAksxeEmQuYPaAMZGfiMDI4Hfz_P0zMkCTaL3_oNpERwRIoZnqDlZ8AEAHF5RDfTQl2r"/>
+</div>
+<div class="flex-1">
+<h3 class="text-sm font-black text-stone-300 uppercase group-hover:text-white">Corporate</h3>
+<p class="text-xs text-stone-500 mt-1 leading-relaxed">Neutral gray scale with blue highlights. Minimalist layout for maximum focus on data analytics.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- HUD Info Widget -->
+<div class="mt-8 border-t border-[#292524] pt-6">
+<div class="bg-stone-900/50 p-4 border-l-2 border-yellow-600/50">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-yellow-600 text-sm" data-icon="info">info</span>
+<span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">System Status</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<div class="text-[9px] text-stone-600 uppercase">GPU Load</div>
+<div class="text-xs font-mono text-stone-400">12.4%</div>
+</div>
+<div>
+<div class="text-[9px] text-stone-600 uppercase">Latency</div>
+<div class="text-xs font-mono text-stone-400">14ms</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Decoration -->
+<footer class="mt-20 border-t border-[#292524] py-8 text-center">
+<div class="flex justify-center items-center gap-4 mb-4">
+<div class="w-8 h-[1px] bg-[#292524]"></div>
+<span class="text-[10px] font-mono text-stone-600 tracking-[0.3em] uppercase">Security Level 4 Clearanced Required</span>
+<div class="w-8 h-[1px] bg-[#292524]"></div>
+</div>
+<p class="text-[10px] text-stone-700 font-medium">© 2024 CORTHEX NEURAL SYSTEMS. ALL RIGHTS RESERVED.</p>
+</footer>
+</body></html>

@@ -97,7 +97,7 @@ function SwitchToAdminButton({ collapsed }: { collapsed?: boolean }) {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className={`flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-[#c5d8a4] bg-white/10 hover:bg-white/15 ${collapsed ? 'justify-center' : ''}`}
+      className={`flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-corthex-sidebar-text bg-white/10 hover:bg-white/15 ${collapsed ? 'justify-center' : ''}`}
       title={collapsed ? (switching ? '전환 중...' : '관리자 콘솔') : undefined}
     >
       <span>⇄</span>
@@ -122,19 +122,19 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
 
   return (
     <aside
-      className={`h-full flex flex-col bg-[#283618] border-r border-[#3a4d28] shrink-0 transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-[280px]'}`}
+      className={`h-full flex flex-col bg-corthex-sidebar-bg border-r border-corthex-sidebar-border shrink-0 transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-[280px]'}`}
       aria-label="Main navigation"
     >
       {/* Brand */}
       <div className="h-14 flex items-center px-4 border-b border-white/10 shrink-0">
         <div className={`flex items-center gap-3 ${collapsed ? 'justify-center w-full' : ''}`}>
-          <div className="w-8 h-8 rounded bg-[#606C38]/30 flex items-center justify-center text-[#c5d8a4] shrink-0">
+          <div className="w-8 h-8 rounded bg-corthex-sidebar-brand/30 flex items-center justify-center text-corthex-sidebar-text shrink-0">
             <Hexagon className="w-5 h-5" />
           </div>
           {!collapsed && (
             <div className="flex flex-col">
               <span className="font-bold tracking-widest text-sm leading-tight text-white">CORTHEX</span>
-              <span className="text-[10px] text-[#a3c48a] font-mono uppercase tracking-wider">Management Platform</span>
+              <span className="text-[10px] text-corthex-sidebar-text font-mono uppercase tracking-wider">Management Platform</span>
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
         {navSections.map((section, si) => (
           <div key={si} className="flex flex-col gap-1">
             {section.label && !collapsed && (
-              <span className="px-3 text-[11px] font-mono text-[#a3c48a] uppercase tracking-widest mb-1">
+              <span className="px-3 text-[11px] font-mono text-corthex-sidebar-text uppercase tracking-widest mb-1">
                 {section.label}
               </span>
             )}
@@ -164,8 +164,8 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
                     collapsed ? 'justify-center' : ''
                   } ${
                     isActive
-                      ? 'bg-[#e5e1d3]/20 text-white font-medium'
-                      : 'text-[#a3c48a] hover:bg-white/10 hover:text-white'
+                      ? 'bg-corthex-sidebar-active text-corthex-sidebar-text-active font-medium'
+                      : 'text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active'
                   }`
                 }
               >
@@ -186,7 +186,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
       {onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
-          className="hidden lg:flex items-center justify-center h-8 mx-2 mb-2 rounded-lg text-[#a3c48a] hover:bg-white/10 hover:text-white transition-colors"
+          className="hidden lg:flex items-center justify-center h-8 mx-2 mb-2 rounded-lg text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active transition-colors"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
@@ -197,19 +197,19 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
       <div className="p-3 border-t border-white/10 shrink-0 space-y-2">
         <SwitchToAdminButton collapsed={collapsed} />
         <div className={`flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors ${collapsed ? 'justify-center' : ''}`}>
-          <div className="w-8 h-8 rounded-full bg-[#606C38] text-white flex items-center justify-center text-xs font-medium shrink-0">
+          <div className="w-8 h-8 rounded-full bg-corthex-accent text-white flex items-center justify-center text-xs font-medium shrink-0">
             {user?.name?.charAt(0) || '?'}
           </div>
           {!collapsed && (
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-sm font-medium text-white truncate">{user?.name}</span>
-              <span className="text-xs text-[#a3c48a] truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
+              <span className="text-xs text-corthex-sidebar-text truncate">{user?.role === 'admin' ? 'System Administrator' : 'User'}</span>
             </div>
           )}
           {!collapsed && (
             <button
               onClick={logout}
-              className="text-xs text-[#a3c48a]/70 hover:text-red-400 transition-colors shrink-0"
+              className="text-xs text-corthex-sidebar-text/70 hover:text-red-400 transition-colors shrink-0"
               aria-label="로그아웃"
             >
               로그아웃
@@ -217,7 +217,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
           )}
         </div>
         {!collapsed && (
-          <div className="px-2 text-[10px] text-[#a3c48a]/50 font-mono">
+          <div className="px-2 text-[10px] text-corthex-sidebar-text/50 font-mono">
             #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
           </div>
         )}

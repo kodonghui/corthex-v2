@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ThemeName = 'sovereign' | 'imperial' | 'tactical' | 'mystic' | 'stealth'
+export type ThemeName = 'command' | 'studio' | 'corporate'
 
 export interface ThemeInfo {
   name: ThemeName
@@ -13,39 +13,25 @@ export interface ThemeInfo {
 
 export const THEMES: ThemeInfo[] = [
   {
-    name: 'sovereign',
-    label: 'Sovereign Sage',
-    description: 'Cyan & Slate dark',
-    accent: '#22D3EE',
-    surface: '#0F172A',
+    name: 'command',
+    label: 'Command',
+    description: 'Dark cyberpunk, gold accent',
+    accent: '#CA8A04',
+    surface: '#1C1917',
   },
   {
-    name: 'imperial',
-    label: 'Imperial Command',
-    description: 'Imperial Red & Obsidian',
-    accent: '#dc2626',
-    surface: '#18181b',
+    name: 'studio',
+    label: 'Studio',
+    description: 'Light cyan, collaborative',
+    accent: '#0891B2',
+    surface: '#FFFFFF',
   },
   {
-    name: 'tactical',
-    label: 'Tactical Ops',
-    description: 'Military Green & Dark',
-    accent: '#22c55e',
-    surface: '#14201a',
-  },
-  {
-    name: 'mystic',
-    label: 'Mystic Depths',
-    description: 'Deep Indigo & Purple',
-    accent: '#6366f1',
-    surface: '#111827',
-  },
-  {
-    name: 'stealth',
-    label: 'Stealth Mode',
-    description: 'Minimal near-black',
-    accent: '#a1a1aa',
-    surface: '#111111',
+    name: 'corporate',
+    label: 'Corporate',
+    description: 'Professional blue, enterprise',
+    accent: '#2563EB',
+    surface: '#FFFFFF',
   },
 ]
 
@@ -57,7 +43,7 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      theme: 'sovereign',
+      theme: 'command',
       setTheme: (theme) => {
         set({ theme })
         document.documentElement.setAttribute('data-theme', theme)

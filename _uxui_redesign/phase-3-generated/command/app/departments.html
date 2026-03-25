@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            950: "#0C0A09",
+                            900: "#1C1917",
+                            800: "#292524",
+                        },
+                        yellow: {
+                            600: "#CA8A04",
+                            500: "#EAB308",
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #E7E5E4;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .cyber-grid {
+            background-image: radial-gradient(circle at 2px 2px, #292524 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .glass-card {
+            background: rgba(28, 25, 23, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #292524;
+        }
+        .glow-accent {
+            box-shadow: 0 0 15px rgba(202, 138, 4, 0.15);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-yellow-600/30">
+<!-- Top Navigation Bar -->
+<nav class="flex justify-between items-center px-6 h-16 w-full bg-[#0C0A09] docked full-width top-0 border-b border-stone-800 font-sans antialiased text-sm tracking-tight z-50 sticky">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1 transition-colors duration-200" href="#">Departments</a>
+<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Agents</a>
+<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Logs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-lg">search</span>
+<input class="bg-stone-900 border-stone-800 text-stone-300 pl-10 pr-4 py-1.5 rounded text-xs focus:ring-yellow-600 focus:border-yellow-600 w-64" placeholder="Search Command..." type="text"/>
+</div>
+<button class="bg-yellow-600 text-stone-950 px-4 py-1.5 rounded font-bold text-xs uppercase tracking-wider hover:bg-yellow-500 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                Create Department
+            </button>
+<div class="flex items-center gap-3 ml-2 border-l border-stone-800 pl-4">
+<span class="material-symbols-outlined text-stone-400 hover:text-yellow-600 cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-stone-400 hover:text-yellow-600 cursor-pointer">settings</span>
+<img alt="User profile" class="w-8 h-8 rounded border border-stone-700 object-cover" data-alt="close-up portrait of a professional man with sharp features and cinematic lighting against a dark industrial background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChD0mSL-AlqzgXpTY3LNOQv8MfKqeprtDUZBP9qV1oYbdn3tS6kLDVSimIe5qTvcEgaBm6mlRQCj5qIAo0PHI2_TSFDfrc1IMKfmQ-Ki-yrjezFEWkJ_P_Yg4-JpD2s_ydYI3OfqI2Vm7EHpfiHxbemNaYo5QHP9pX-hxi8tifCSwKKN6uva0sSRMF0ro7vXWN4wUS6PyvVuF9FR1eLE8wINHc_0f0gLzGcSfW-A5Sr-_uSnWZ-yw2iVTy0cvHBa9Vh26R_fpIC-f_"/>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="min-h-screen p-6 md:p-10 cyber-grid relative pb-24">
+<!-- Header Section -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="h-[1px] w-8 bg-yellow-600"></span>
+<span class="text-yellow-600 uppercase tracking-[0.3em] text-[10px] font-bold">Organizational Overview</span>
+</div>
+<h1 class="text-4xl font-black tracking-tight text-white flex items-baseline gap-4">
+                    Departments <span class="text-stone-600 text-2xl font-light">(08)</span>
+</h1>
+</div>
+<div class="flex items-center gap-4 bg-stone-900/50 p-1.5 rounded border border-stone-800">
+<button class="px-4 py-2 bg-stone-800 text-white rounded text-xs font-bold transition-all shadow-inner">Grid View</button>
+<button class="px-4 py-2 text-stone-500 hover:text-stone-300 rounded text-xs font-bold transition-all">List View</button>
+</div>
+</header>
+<!-- Department Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card: Marketing -->
+<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-yellow-600/5 blur-3xl rounded-full -mr-8 -mt-8"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="p-2 bg-yellow-600/10 rounded border border-yellow-600/20">
+<span class="material-symbols-outlined text-yellow-600" data-icon="campaign">campaign</span>
+</div>
+<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-MRK-01</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-1">Marketing</h3>
+<p class="text-stone-500 text-xs mb-6 font-medium">Growth and Brand Positioning</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
+<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-stone-200">Sarah Chen</span>
+<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="professional female avatar with soft studio lighting and dark minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh9_GbKdJsgLFg_NxCRd9foWdvOHekMDf2yyNye5eGmqpluIE010FEf0JycHw15wle-4mnVHZluxaPzlA2l5Bh50fzbPb0-97CuN5mtn5WOnvDm9aL0YuWc-7K7gRK_JddlTKLAQGcd4KfjMZlfm_R6DKT3pmIvjk_mSKWnb31TM5DEW09KSDbpJEWDOcZu-J_-DOFljNUBOYQMn3h3F4VvUfMJrVpRSkL-tvyMpSkmsLqciPhYwmP8bk-CKZs4HHPCYW26Ggw5quQ"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
+<span class="text-sm font-bold text-stone-200">12 Agents</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
+<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
+                                4 Active
+                            </span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
+<span class="text-xs font-mono text-yellow-600">74%</span>
+</div>
+<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-600 glow-accent" style="width: 74%"></div>
+</div>
+</div>
+</div>
+<!-- Card: Security -->
+<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="p-2 bg-stone-800 rounded border border-stone-700">
+<span class="material-symbols-outlined text-stone-300" data-icon="shield">shield</span>
+</div>
+<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-SEC-04</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-1">Security</h3>
+<p class="text-stone-500 text-xs mb-6 font-medium">Protocol and Cyber-Defense</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
+<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-stone-200">Marcus Thorne</span>
+<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="stern male professional avatar with dramatic lighting and dark suit background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1N0puBVKlR66qxsVYObb2MLdFqNWuV7bGC7cOZ1OrjFN4YjgEtqFKjHtB_NGMr0_xabV2T5mU1jIUKNFsg2ZfjITdSBvc44WBDksMYktjZ-YMgUJ1UhtMqHglBwtARz3vbTKE5RPsR-Itu3FkLqCtxj0W0DyW4aH1iYQ8vKDCYrO2fWqDYPkEOb4zOIgPyMGaGoTK11v7dnlz3YHbzdYwj6tCUhBqNV0UkDylAz5_A04qezrUoNUpeSwQQl69DGDv9w-ru4ZyTYfW"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
+<span class="text-sm font-bold text-stone-200">8 Agents</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
+<span class="text-xs font-bold text-stone-400 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-stone-600 rounded-full"></span>
+                                0 Active
+                            </span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
+<span class="text-xs font-mono text-stone-400">12%</span>
+</div>
+<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-600" style="width: 12%"></div>
+</div>
+</div>
+</div>
+<!-- Card: Logistics -->
+<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden border-yellow-600/20">
+<div class="flex justify-between items-start mb-6">
+<div class="p-2 bg-yellow-600/10 rounded border border-yellow-600/20">
+<span class="material-symbols-outlined text-yellow-600" data-icon="inventory_2">inventory_2</span>
+</div>
+<span class="text-[10px] font-mono text-yellow-600/70 tracking-tighter">ID: DEPT-LOG-02</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-1">Logistics</h3>
+<p class="text-stone-500 text-xs mb-6 font-medium">Supply Chain &amp; Resource Allocation</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
+<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-stone-200">Elena Vance</span>
+<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="focused female avatar with corporate tech background and neutral color palette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl6aXvstUpgssBZkaeN0a4tp1Hmeo8bs5QPfKhaCy2ziDo1APU7bg1SKV-vQfmwp8iVnVLvZ1fQ7ShUr-uI1xidHX3OtJvpPIJ2f1-edSwE68UrUyM7ic2lwhxO8J3Fwu9E_gwTvIf1D-fRb3YcrIkiUPgvT8FlMCGt0ka71oSjVNvDLIQb6CQaq39_oat-hqEwgKBiFYmVdbImPmpo1gt9IeQLy7VFyGU8uN5XRdMczFvLmtRRDaJX5Q34GJdxn-iMb7jj6z_n-28"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
+<span class="text-sm font-bold text-stone-200">15 Agents</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
+<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
+                                9 Active
+                            </span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
+<span class="text-xs font-mono text-yellow-600 font-bold">92%</span>
+</div>
+<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-600 shadow-[0_0_8px_rgba(202,138,4,0.5)]" style="width: 92%"></div>
+</div>
+</div>
+</div>
+<!-- Card: Research -->
+<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="p-2 bg-stone-800 rounded border border-stone-700">
+<span class="material-symbols-outlined text-stone-300" data-icon="science">science</span>
+</div>
+<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-RSD-08</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-1">Research</h3>
+<p class="text-stone-500 text-xs mb-6 font-medium">Core AI Development &amp; Logic</p>
+<div class="space-y-4 mb-8">
+<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
+<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-stone-200">Dr. Aris Thorne</span>
+<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="distinguished older male professional avatar with glasses and scholarly aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5DbyRtAqG0DwWuVlwv7YMu43BiTWcdACDtUurVU36-JFtxapSvvU4SCzpzPxfEi8PIm5qPc8eXalARMNhU4xpzdRQZ8sgR_sO36mHKLTHh5ajdDNHmu81dGhX0eR6_HiZjdaMKhEvO-NmdckFzPJiOJg52H6N8RoLc6xWgtpGfpfdnd2srHYdqMLXx1Kvq6Jykpy5IhlVnvaKINdZwsEy3OETfalaRRmSRf8fj1N2MbxrKPYw7B0ggxk5H6_NYzYpLprfSu9cqo9m"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
+<span class="text-sm font-bold text-stone-200">24 Agents</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
+<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
+                                18 Active
+                            </span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
+<span class="text-xs font-mono text-stone-400">45%</span>
+</div>
+<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-600" style="width: 45%"></div>
+</div>
+</div>
+</div>
+<!-- Additional Cards Placeholder -->
+<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 flex flex-col items-center justify-center border-dashed border-stone-800">
+<div class="w-12 h-12 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-stone-600 group-hover:text-yellow-600">add</span>
+</div>
+<span class="text-stone-500 text-xs font-bold uppercase tracking-widest">New Unit</span>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-[#0C0A09]/95 backdrop-blur-md z-50 border-t border-stone-800 shadow-2xl">
+<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-yellow-600 bg-yellow-600/10 rounded-xl py-1 px-3 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg" data-icon="account_tree">account_tree</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Departments</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg" data-icon="smart_toy">smart_toy</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Agents</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Logs</span>
+</div>
+</nav>
+</body></html>

@@ -24,8 +24,7 @@ class PageErrorBoundary extends Component<{ children: ReactNode }, { error: Erro
           <p className="text-sm text-slate-500 mb-4">{this.state.error.message}</p>
           <button
             onClick={() => this.setState({ error: null })}
-            className="px-4 py-2 rounded-lg text-white text-sm font-bold"
-            style={{ backgroundColor: '#5a7247' }}
+            className="px-4 py-2 rounded-lg text-white text-sm font-bold bg-corthex-accent"
           >
             다시 시도
           </button>
@@ -62,7 +61,7 @@ export function Layout() {
   }, [company, isOnboardingPage, isFetching, navigate])
 
   return (
-    <div className="flex h-screen bg-[#faf8f5]">
+    <div className="flex h-screen bg-corthex-bg">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="p-6">

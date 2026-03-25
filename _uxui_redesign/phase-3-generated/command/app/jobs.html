@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX COMMAND | Operations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CA8A04",
+                        background: "#0C0A09",
+                        surface: "#1C1917",
+                        border: "#292524",
+                        accent: "#CA8A04",
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        body {
+            background-color: #0C0A09;
+            color: #E7E5E4;
+        }
+        .hud-border {
+            position: relative;
+        }
+        .hud-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 4px;
+            border-top: 1px solid #CA8A04;
+            border-left: 1px solid #CA8A04;
+        }
+        .hud-border::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 4px;
+            height: 4px;
+            border-bottom: 1px solid #CA8A04;
+            border-right: 1px solid #CA8A04;
+        }
+    </style>
+</head>
+<body class="font-body antialiased selection:bg-yellow-600/30">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0C0A09] border-b border-[#292524] shadow-[0_4px_20px_rgba(0,0,0,0.5)] font-['DM_Sans'] antialiased tracking-tight">
+<div class="flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-yellow-600 uppercase">CORTHEX COMMAND</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Dashboard</a>
+<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1" href="#">Operations</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Intelligence</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Archives</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
+<input class="bg-[#1C1917] border border-[#292524] pl-10 pr-4 py-1.5 rounded text-xs focus:ring-1 focus:ring-yellow-600 focus:border-yellow-600 outline-none w-64 text-stone-300 uppercase tracking-widest" placeholder="SEARCH SYSTEM..." type="text"/>
+</div>
+<button class="p-2 text-stone-400 hover:bg-[#1C1917] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-stone-400 hover:bg-[#1C1917] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded bg-stone-800 border border-[#292524] overflow-hidden">
+<img alt="User avatar" data-alt="Close-up portrait of a tech-focused professional with soft teal backlighting on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb2AJf4eM4G0GZuqP2zVdcQyGXShddnWFKXaFEaDhf5LQXcp2Qu-ZbvctdHKYdXAKnO81dteFgwQf2lY2cyljczAA0HbqRdz_38ByHuvnw7MPZ5yfV1PMof0DPkg0tzWmayyholb6CpUWVmuT35-1WQ-8W9yViONwR4SWJN9ppy2lPt8yntvx31pX3ijVmfw6ta5Qgm-cgDG8vcSSacRKdm6iGnnMVVzzRlPRVLwyPls3mfYk-chhzmC0Ww5guDx7tX3eDI-OSqxfT"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Suppressed for Main Content Area focus per instructions, but kept as semantic anchor) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#0C0A09] border-r border-[#292524] flex flex-col py-4 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="text-yellow-600 font-black text-sm tracking-widest uppercase">OPERATIONS</h2>
+<p class="text-[10px] text-stone-500 font-bold tracking-[0.2em]">V-0.9.4 ALPHA</p>
+</div>
+<nav class="flex-1">
+<div class="bg-[#1C1917] text-yellow-600 border-l-4 border-yellow-600 flex items-center px-4 py-3 gap-3 font-['DM_Sans'] text-sm font-bold uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span>Active Tasks</span>
+</div>
+<div class="flex items-center px-4 py-3 gap-3 text-stone-500 hover:text-stone-300 hover:bg-[#1C1917]/50 transition-transform hover:translate-x-1 cursor-pointer font-['DM_Sans'] text-sm font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span>Queue</span>
+</div>
+<div class="flex items-center px-4 py-3 gap-3 text-stone-500 hover:text-stone-300 hover:bg-[#1C1917]/50 transition-transform hover:translate-x-1 cursor-pointer font-['DM_Sans'] text-sm font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined" data-icon="priority_high">priority_high</span>
+<span>Priority</span>
+</div>
+<div class="flex items-center px-4 py-3 gap-3 text-stone-500 hover:text-stone-300 hover:bg-[#1C1917]/50 transition-transform hover:translate-x-1 cursor-pointer font-['DM_Sans'] text-sm font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Team</span>
+</div>
+<div class="flex items-center px-4 py-3 gap-3 text-stone-500 hover:text-stone-300 hover:bg-[#1C1917]/50 transition-transform hover:translate-x-1 cursor-pointer font-['DM_Sans'] text-sm font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Logs</span>
+</div>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full py-3 bg-yellow-600 text-black font-black text-xs tracking-[0.2em] uppercase rounded hover:bg-yellow-500 active:scale-95 transition-all">
+                NEW TASK
+            </button>
+<div class="border-t border-[#292524] pt-4 flex flex-col gap-2">
+<div class="flex items-center px-4 py-2 gap-3 text-stone-500 hover:text-stone-300 cursor-pointer font-['DM_Sans'] text-xs font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm" data-icon="help_outline">help_outline</span>
+<span>Support</span>
+</div>
+<div class="flex items-center px-4 py-2 gap-3 text-stone-500 hover:text-stone-300 cursor-pointer font-['DM_Sans'] text-xs font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm" data-icon="lan">lan</span>
+<span>System</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 pt-16 min-h-screen bg-[#0C0A09]">
+<div class="p-8 max-w-[1600px] mx-auto">
+<!-- Header & Action Row -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-[#292524] pb-6">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 bg-yellow-600 inline-block"></span>
+<span class="text-[10px] text-yellow-600 font-bold tracking-[0.3em] uppercase">Operations Control</span>
+</div>
+<h1 class="text-4xl font-black text-stone-100 tracking-tighter uppercase">Job Management</h1>
+</div>
+<button class="bg-[#CA8A04] hover:bg-yellow-500 text-black px-6 py-3 font-black text-sm tracking-[0.15em] flex items-center gap-2 transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                    CREATE JOB
+                </button>
+</div>
+<!-- Dashboard Stats Bento (Optional UI Enhancement) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="bg-[#1C1917] border border-[#292524] p-5 hud-border">
+<div class="text-stone-500 text-[10px] font-bold tracking-widest uppercase mb-1">Active Throughput</div>
+<div class="text-2xl font-black text-yellow-600 tracking-tight">84.2%</div>
+<div class="w-full bg-stone-800 h-1 mt-3">
+<div class="bg-yellow-600 h-full w-[84%]"></div>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-5 hud-border">
+<div class="text-stone-500 text-[10px] font-bold tracking-widest uppercase mb-1">Queue Depth</div>
+<div class="text-2xl font-black text-stone-100 tracking-tight">127 Tasks</div>
+<div class="flex gap-1 mt-3">
+<div class="h-1 flex-1 bg-yellow-600/20"></div>
+<div class="h-1 flex-1 bg-yellow-600/50"></div>
+<div class="h-1 flex-1 bg-yellow-600"></div>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-5 hud-border">
+<div class="text-stone-500 text-[10px] font-bold tracking-widest uppercase mb-1">Avg. Latency</div>
+<div class="text-2xl font-black text-stone-100 tracking-tight">24ms</div>
+<div class="text-[10px] text-green-500 font-bold mt-2">OPTIMAL PERFORMANCE</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-5 hud-border">
+<div class="text-stone-500 text-[10px] font-bold tracking-widest uppercase mb-1">Failed Clusters</div>
+<div class="text-2xl font-black text-red-500 tracking-tight">02</div>
+<div class="text-[10px] text-stone-500 font-bold mt-2">REQUIRES ATTENTION</div>
+</div>
+</div>
+<!-- Tab Bar & Filters Row -->
+<div class="flex flex-col gap-6 bg-[#1C1917]/50 border border-[#292524] p-4 mb-6">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<!-- Status Tabs -->
+<div class="flex items-center bg-[#0C0A09] p-1 border border-[#292524]">
+<button class="px-6 py-2 text-xs font-bold uppercase tracking-widest bg-yellow-600 text-black transition-all">Active</button>
+<button class="px-6 py-2 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-stone-300 transition-all">Queued</button>
+<button class="px-6 py-2 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-stone-300 transition-all">Completed</button>
+<button class="px-6 py-2 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-stone-300 transition-all">Failed</button>
+</div>
+<!-- Filter Dropdowns -->
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex flex-col gap-1">
+<label class="text-[9px] text-stone-500 font-bold uppercase tracking-[0.2em] ml-1">Agent</label>
+<select class="bg-[#0C0A09] border border-[#292524] text-xs font-bold text-stone-300 py-2 px-4 focus:ring-1 focus:ring-yellow-600 outline-none uppercase tracking-widest">
+<option>All Agents</option>
+<option>A-01 "Apex"</option>
+<option>B-04 "Echo"</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[9px] text-stone-500 font-bold uppercase tracking-[0.2em] ml-1">Department</label>
+<select class="bg-[#0C0A09] border border-[#292524] text-xs font-bold text-stone-300 py-2 px-4 focus:ring-1 focus:ring-yellow-600 outline-none uppercase tracking-widest">
+<option>Neural Net</option>
+<option>Data Scraping</option>
+<option>Encryption</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[9px] text-stone-500 font-bold uppercase tracking-[0.2em] ml-1">Status</label>
+<select class="bg-[#0C0A09] border border-[#292524] text-xs font-bold text-stone-300 py-2 px-4 focus:ring-1 focus:ring-yellow-600 outline-none uppercase tracking-widest">
+<option>Processing</option>
+<option>Idle</option>
+<option>Critical</option>
+</select>
+</div>
+<button class="mt-4 p-2.5 text-stone-500 hover:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Job List Table -->
+<div class="bg-[#1C1917] border border-[#292524] overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#0C0A09] border-b border-[#292524]">
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">ID</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Title</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Assigned Agent</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Status Badge</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Priority</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Created Date</th>
+<th class="px-6 py-4 text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Duration</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#292524]">
+<!-- Row 1 -->
+<tr class="hover:bg-[#0C0A09] transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-yellow-600/70">#CT-8821</td>
+<td class="px-6 py-4">
+<div class="text-stone-100 text-sm font-bold uppercase tracking-tight">Neural Link Calibration</div>
+<div class="text-[10px] text-stone-500 uppercase">Sub-process: X-09</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full border border-yellow-600/30 overflow-hidden">
+<img alt="Agent Avatar" data-alt="Cyberpunk agent avatar with glowing orange visor and dark matte tactical gear" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIXHh3sqcxFCkw9D4aLMPM9DfOqPmoudZLcGm1z-EV4M7pI-RA4wxutihyMOJ27ZEgDGiCuZWPwS__yUPzNifOCZhD6mMfigWQf4ldjPoT6u1x6nifBjn0n98uqSaJ6PWtkKTfVf8KgVpLekVgpGUeURmlOhoi2iYoGlOuYe9MLd05EDhjOGfohjc40HlewksS2b2Y8g75KOcP5DWX79YPsVDhX73PRKTQJcfNjQg11TNuVYzr8CnBgLl-oH2Wf3esRPcKFQESGiPN"/>
+</div>
+<span class="text-xs font-bold text-stone-300">A-01 APEX</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 bg-yellow-600/10 border border-yellow-600/30 text-yellow-600 text-[10px] font-black uppercase tracking-widest">
+<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
+                                    Processing
+                                </span>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-black text-red-500 uppercase tracking-[0.1em]">HIGH</span>
+</td>
+<td class="px-6 py-4 text-xs text-stone-500">2023-10-24 14:20</td>
+<td class="px-6 py-4 text-xs font-mono text-stone-400">02:44:12</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#0C0A09] transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-yellow-600/70">#CT-8819</td>
+<td class="px-6 py-4">
+<div class="text-stone-100 text-sm font-bold uppercase tracking-tight">Data Fragment Synthesis</div>
+<div class="text-[10px] text-stone-500 uppercase">Archive Retrieval</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full border border-stone-700 overflow-hidden">
+<img alt="Agent Avatar" data-alt="Mechanical android profile with internal circuitry visible through translucent shell" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_gho_pDP7GHIy6VhqykcLjJhVRFbngZLggEhVmRTo3wy_U9zILewoJOj1hYSKTOoGp-FECWJUDYFgj6-u0xOca3n--9ug6Vu2NWlB_vU0gu4Eta_rSZhlBLMOE_IiM4anS6atu7qyO8NkFTZvqs1Mkxf4EvoKj3kmyDDlxJpXTb1_Ki2w4-Bpm4TTx118O9P8HgKObkfqIJI0PujmDzniK3GX8OS10mKnQftwhCBAa4lFxis3eX0cTW64WXiK9_5Qvb4M0SHgI9tR"/>
+</div>
+<span class="text-xs font-bold text-stone-300">B-04 ECHO</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-widest">
+<span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                                    Syncing
+                                </span>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-black text-stone-400 uppercase tracking-[0.1em]">MEDIUM</span>
+</td>
+<td class="px-6 py-4 text-xs text-stone-500">2023-10-24 13:05</td>
+<td class="px-6 py-4 text-xs font-mono text-stone-400">04:12:45</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#0C0A09] transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-yellow-600/70">#CT-8815</td>
+<td class="px-6 py-4">
+<div class="text-stone-100 text-sm font-bold uppercase tracking-tight">Encrypted Uplink Sync</div>
+<div class="text-[10px] text-stone-500 uppercase">Sector 7 Secure</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full border border-stone-700 overflow-hidden">
+<img alt="Agent Avatar" data-alt="Silhouette of a hacker with digital binary code overlaying their features" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByqu9x8OptVKfGnUCPf0RtCzTw2cmY9K6z-9Ogpo7pl4ONXr2ru-tw6BDkm7eyyv0tRHK4qnIGGdlvItCk7ZGTj58E9HpiN2iHwVToUbkn6W97Bv_KSr1qN2En72R_3xz4_aZTi_iGWIxAnNXOqZgkHRn3z_RPEZ3QbJh1mSiUv4A_Qu912rwVzRk0y0YUCP7N8gk7hxjjq0XeDFuqOxysv2PLm4Ddip6bIcMGWMPAmOCIS8o27d4ZtiX8oCdlY4n_U1SagnyLj_nL"/>
+</div>
+<span class="text-xs font-bold text-stone-300">Z-09 GHOST</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-black uppercase tracking-widest">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                    Standby
+                                </span>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-black text-stone-600 uppercase tracking-[0.1em]">LOW</span>
+</td>
+<td class="px-6 py-4 text-xs text-stone-500">2023-10-24 11:55</td>
+<td class="px-6 py-4 text-xs font-mono text-stone-400">00:30:00</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#0C0A09] transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-yellow-600/70">#CT-8810</td>
+<td class="px-6 py-4">
+<div class="text-stone-100 text-sm font-bold uppercase tracking-tight">Firewall Stress Test</div>
+<div class="text-[10px] text-stone-500 uppercase">Protocol 99 Error</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full border border-stone-700 overflow-hidden">
+<img alt="Agent Avatar" data-alt="Aggressive cybernetic combat unit with red glowing optics and scarred metal plating" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGgZFcrUrRTrQ1vAJHJkxMLoaVe-R347DDe590mfLExy8aEZ85OopyrOHt7OEdznzP_uA985k61uV7jn-er_Gz0Xst6bV41_kXeUL5RhsQXeDQ9y4lPCC94onBCxZfiR1euYh3RxPGMgx5ygE0DAk3uxABEzy1lMNJFr-1uebIh7LivsHgE_vAKFX-y-ic8ggGJtD9jAYeDcyICm_ei3WfgmjCdk80VFic96ylgRp3hwd1e24NTMzrISOwwgCSXGQ_LAE5peOZUaN4"/>
+</div>
+<span class="text-xs font-bold text-stone-300">V-01 TITAN</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 bg-red-500/10 border border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest">
+<span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                                    Critical
+                                </span>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-black text-red-500 uppercase tracking-[0.1em]">HIGH</span>
+</td>
+<td class="px-6 py-4 text-xs text-stone-500">2023-10-24 09:12</td>
+<td class="px-6 py-4 text-xs font-mono text-stone-400">08:55:21</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination/Footer HUD -->
+<div class="flex items-center justify-between px-6 py-4 border-t border-[#292524] bg-[#0C0A09]">
+<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Showing 4 of 1,288 Records</span>
+<div class="flex items-center gap-2">
+<button class="p-1 border border-[#292524] text-stone-500 hover:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<div class="flex gap-1">
+<button class="w-6 h-6 flex items-center justify-center bg-yellow-600 text-black text-[10px] font-black">1</button>
+<button class="w-6 h-6 flex items-center justify-center border border-[#292524] text-stone-500 text-[10px] font-bold hover:text-stone-300">2</button>
+<button class="w-6 h-6 flex items-center justify-center border border-[#292524] text-stone-500 text-[10px] font-bold hover:text-stone-300">3</button>
+</div>
+<button class="p-1 border border-[#292524] text-stone-500 hover:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Information Panel (Cyberpunk Flourish) -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[#292524] pt-8 opacity-60">
+<div class="space-y-2">
+<div class="text-[10px] text-yellow-600 font-bold tracking-widest uppercase">System Integrity Status</div>
+<div class="flex gap-1 h-1.5">
+<div class="flex-1 bg-yellow-600"></div>
+<div class="flex-1 bg-yellow-600"></div>
+<div class="flex-1 bg-yellow-600"></div>
+<div class="flex-1 bg-yellow-600"></div>
+<div class="flex-1 bg-yellow-600/30"></div>
+<div class="flex-1 bg-yellow-600/10"></div>
+</div>
+<p class="text-[10px] text-stone-500 leading-relaxed uppercase tracking-tight">All neural nodes operational. Latency within nominal parameters. Synchronizing with central archives... Complete.</p>
+</div>
+<div class="flex justify-end items-end">
+<div class="text-right">
+<div class="text-[10px] text-stone-500 font-bold tracking-[0.3em] uppercase">CORTHEX_OS NODE_082</div>
+<div class="text-xs font-mono text-stone-700 tracking-tighter uppercase">Connection Stable: 44.92.112.01</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Suppression Logic (Handled by not including it) -->
+</body></html>
