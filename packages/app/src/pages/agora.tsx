@@ -16,7 +16,7 @@ import { DebateListPanel } from '../components/agora/debate-list-panel'
 import { DebateTimeline } from '../components/agora/debate-timeline'
 import { DebateInfoPanel } from '../components/agora/debate-info-panel'
 import { CreateDebateModal } from '../components/agora/create-debate-modal'
-import { Plus, MessageSquare, Eye, Clock, ChevronLeft, ChevronRight, Pin } from 'lucide-react'
+import { Plus, MessageSquare, Eye, Clock, ChevronLeft, ChevronRight, Pin, Zap, Users } from 'lucide-react'
 import { toast } from '@corthex/ui'
 import type { Debate, DebateTimelineEntry } from '@corthex/shared'
 
@@ -154,130 +154,200 @@ export function AgoraPage() {
     setMobileView('list')
   }, [])
 
+  const SIDEBAR_CATEGORIES = [
+    { label: '전체 All', count: 142 },
+    { label: '전략 Strategy', count: 42 },
+    { label: '기술 Tech', count: 28 },
+    { label: '운영 Ops', count: 35 },
+    { label: '자유 Free', count: 19 },
+    { label: 'Q&A', count: 18 },
+  ]
+
+  const [sortTab, setSortTab] = useState<'latest' | 'trending' | 'unresolved'>('latest')
+
   return (
-    <div data-testid="agora-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
-      <div className="p-8 max-w-[1440px] mx-auto">
-        {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-          <div>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tight text-corthex-text-primary mb-3">
-              아고라 Agora
-            </h1>
-            <p className="text-corthex-text-secondary text-lg">
-              팀 토론과 아이디어를 공유하는 공간입니다
-            </p>
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 bg-corthex-accent hover:bg-corthex-accent-deep text-white px-6 py-3.5 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-corthex-accent/10"
-          >
-            <Plus className="w-5 h-5" />
-            새 토론 시작 New Thread
-          </button>
-        </header>
-
-        {/* Category Filter Chips */}
-        <nav className="flex flex-wrap items-center gap-3 mb-10">
-          {CATEGORY_FILTERS.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors ${
-                activeCategory === cat
-                  ? 'bg-corthex-accent text-white'
-                  : 'bg-corthex-elevated text-corthex-text-secondary border border-corthex-border hover:bg-corthex-elevated'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </nav>
-
-        {/* Thread List */}
-        <div className="flex flex-col space-y-5">
-          {DEMO_THREADS.map((thread) => {
-            const catColor = CATEGORY_COLORS[thread.category] || CATEGORY_COLORS['전략']
-            return (
-              <article
-                key={thread.id}
-                className={`group rounded-xl p-6 transition-all hover:bg-corthex-elevated cursor-pointer ${
-                  thread.pinned
-                    ? 'bg-corthex-elevated border-l-4 border-amber-700'
-                    : 'bg-corthex-elevated border border-corthex-border'
-                }`}
-              >
-                {/* Pinned badge */}
-                {thread.pinned && (
-                  <div className="flex items-center gap-2 mb-3">
-                    <Pin className="w-3.5 h-3.5 text-amber-700" />
-                    <span className="bg-[#fef3c7] text-amber-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">
-                      고정 Pinned
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-corthex-text-primary mb-2 group-hover:text-corthex-accent transition-colors">
-                      {thread.title}
-                    </h2>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-medium text-corthex-text-primary">{thread.author}</span>
-                      <span
-                        className="px-2 py-0.5 rounded text-[10px] font-bold"
-                        style={{ backgroundColor: `${catColor.bg}10`, color: catColor.text }}
-                      >
-                        {thread.category}
-                      </span>
-                    </div>
-                    <p className="text-corthex-text-secondary line-clamp-2 mb-4 leading-relaxed">
-                      {thread.preview}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-6 text-corthex-text-secondary text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <MessageSquare className="w-4 h-4" />
-                        <span>답글 {thread.replies}개</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Eye className="w-4 h-4" />
-                        <span>조회 {thread.views}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 font-mono">
-                        <Clock className="w-4 h-4" />
-                        <span>{thread.time}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            )
-          })}
-        </div>
-
-        {/* Pagination */}
-        <footer className="flex justify-center items-center mt-12 gap-2 pb-10">
-          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center bg-corthex-accent text-white rounded-lg font-bold shadow-md shadow-corthex-accent/20">
-            1
-          </button>
-          {[2, 3].map((n) => (
-            <button key={n} className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg font-semibold transition-colors">
-              {n}
-            </button>
-          ))}
-          <span className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary">...</span>
-          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg font-semibold transition-colors">
-            12
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors">
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </footer>
+    <div data-testid="agora-page" className="p-6 max-w-[1200px] mx-auto w-full">
+      {/* Mobile create button */}
+      <div className="lg:hidden mb-4">
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="w-full bg-corthex-accent text-corthex-bg font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-corthex-accent/10"
+        >
+          <Plus className="w-5 h-5" />
+          CREATE THREAD
+        </button>
       </div>
 
-      {/* Create modal */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Sidebar */}
+        <aside className="col-span-12 lg:col-span-3 space-y-6">
+          {/* Categories */}
+          <div>
+            <h3 className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary mb-4">
+              Categories
+            </h3>
+            <nav className="space-y-1">
+              {SIDEBAR_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.label}
+                  onClick={() => setActiveCategory(cat.label)}
+                  className={`w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm transition-colors ${
+                    activeCategory === cat.label
+                      ? 'bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20'
+                      : 'text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary'
+                  }`}
+                >
+                  <span className={activeCategory === cat.label ? 'font-medium' : ''}>{cat.label}</span>
+                  <span
+                    className={`text-[10px] font-mono ${
+                      activeCategory === cat.label
+                        ? 'bg-corthex-accent text-corthex-bg px-1.5 py-0.5 rounded'
+                        : 'text-corthex-text-disabled'
+                    }`}
+                  >
+                    {cat.count}
+                  </span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Active Agents Widget */}
+          <div className="p-4 rounded-xl border border-corthex-border bg-gradient-to-br from-corthex-surface to-transparent">
+            <h4 className="text-xs font-bold text-corthex-text-primary mb-2 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-corthex-accent" />
+              Active Agents
+            </h4>
+            <p className="text-[11px] text-corthex-text-secondary leading-relaxed mb-4">
+              8 AI Agents currently contributing to discussions in AGORA.
+            </p>
+            <div className="flex -space-x-2">
+              {['A', 'B', 'C'].map((l) => (
+                <div
+                  key={l}
+                  className="w-7 h-7 rounded-full border-2 border-corthex-surface bg-corthex-accent flex items-center justify-center text-[10px] font-bold text-corthex-bg"
+                >
+                  {l}
+                </div>
+              ))}
+              <div className="w-7 h-7 rounded-full border-2 border-corthex-surface bg-corthex-elevated flex items-center justify-center text-[10px] text-corthex-text-secondary font-bold">
+                +5
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Right Content */}
+        <section className="col-span-12 lg:col-span-9">
+          {/* Section Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-corthex-text-primary">Agora Terminal</h2>
+              <p className="text-sm text-corthex-text-secondary">
+                Centralized intelligence and internal department discourse.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="hidden lg:flex items-center gap-2 bg-corthex-accent hover:bg-corthex-accent-deep text-corthex-bg font-bold py-2 px-6 rounded-lg transition-all active:scale-95 shadow-lg shadow-corthex-accent/10"
+            >
+              <Plus className="w-4 h-4" />
+              CREATE THREAD
+            </button>
+          </div>
+
+          {/* Sort Tabs */}
+          <div className="flex flex-wrap gap-4 mb-6 pb-6 border-b border-corthex-border/30">
+            {(['latest', 'trending', 'unresolved'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setSortTab(tab)}
+                className={`text-xs font-bold uppercase tracking-widest pb-1 transition-colors ${
+                  sortTab === tab
+                    ? 'text-corthex-text-primary border-b-2 border-corthex-accent'
+                    : 'text-corthex-text-secondary hover:text-corthex-text-primary'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Thread Cards */}
+          <div className="space-y-4">
+            {DEMO_THREADS.map((thread) => {
+              const isAccentCat = thread.category === '전략' || thread.category === '운영'
+              const initials = thread.author.charAt(0)
+              return (
+                <article
+                  key={thread.id}
+                  className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-xl p-5 transition-all cursor-pointer"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                        isAccentCat
+                          ? 'border-corthex-accent/40 bg-corthex-accent/10 text-corthex-accent'
+                          : 'border-corthex-accent/20 bg-corthex-elevated text-corthex-text-secondary'
+                      }`}
+                    >
+                      {thread.category.toUpperCase()}
+                    </span>
+                    <div className="flex items-center gap-3 text-corthex-text-disabled">
+                      {thread.pinned && <Pin className="w-4 h-4" />}
+                      <Eye className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold text-corthex-text-primary mb-4 group-hover:text-corthex-accent transition-colors">
+                    {thread.title}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-corthex-accent flex items-center justify-center text-[10px] font-bold text-corthex-bg shrink-0">
+                        {initials}
+                      </div>
+                      <span className="text-sm text-corthex-text-secondary">{thread.author}</span>
+                      <span className="text-corthex-border">•</span>
+                      <span className="font-mono text-xs text-corthex-text-disabled">{thread.time}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-corthex-text-secondary">
+                      <MessageSquare className="w-4 h-4" />
+                      <span className="font-mono text-sm">{thread.replies}</span>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-8 flex items-center justify-center gap-2">
+            <button className="p-2 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button className="w-10 h-10 rounded-lg border border-corthex-accent text-corthex-accent bg-corthex-accent/10 font-mono text-sm">
+              1
+            </button>
+            {[2, 3].map((n) => (
+              <button
+                key={n}
+                className="w-10 h-10 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm"
+              >
+                {n}
+              </button>
+            ))}
+            <span className="text-corthex-text-disabled px-2">...</span>
+            <button className="w-10 h-10 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm">
+              12
+            </button>
+            <button className="p-2 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </section>
+      </div>
+
+      {/* Create Modal */}
       <CreateDebateModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}

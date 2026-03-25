@@ -11,7 +11,9 @@ import { useCallback } from 'react'
 import { toast } from '@corthex/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Image, Paperclip, BarChart2, MoreHorizontal, ThumbsUp, Heart, MessageCircle, Download, Bot } from 'lucide-react'
+import {
+  Bot, Heart, Share2, BarChart2, SlidersHorizontal, Pencil, Trash2, Globe,
+} from 'lucide-react'
 import { api } from '../lib/api'
 import { ContentTab } from '../components/sns/content-tab'
 import { QueueTab } from '../components/sns/queue-tab'
@@ -21,11 +23,9 @@ import { AccountsTab } from '../components/sns/accounts-tab'
 import type { SnsAccount, Agent } from '../components/sns/sns-types'
 
 const TAB_ITEMS = [
-  { value: 'content', label: 'Content Library' },
-  { value: 'queue', label: 'Publication Queue' },
-  { value: 'cardnews', label: 'Card News' },
-  { value: 'stats', label: 'Performance Stats' },
-  { value: 'accounts', label: 'Linked Accounts' },
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'published', label: 'Published' },
+  { value: 'drafts', label: 'Drafts' },
 ]
 
 const FILTER_CHIPS = ['전체 All', '공지 Notice', '업데이트 Update', '토론 Discussion', '성과 Achievement']
@@ -73,15 +73,15 @@ const DEMO_POSTS = [
     badge: 'Strategy Team',
     badgeBg: 'var(--color-corthex-accent-deep)',
     badgeText: 'white',
-    timeAgo: '2시간 전 - Public',
-    content: 'Q1 시장 분석 보고서가 완성되었습니다. 경쟁사 대비 성장률 12% 달성! 자세한 내용은 리포트를 확인해주세요.',
-    file: { name: 'Q1_시장분석.pdf', size: '2.4 MB', type: 'Document' },
+    timeAgo: '2023-11-24 14:00:00',
+    content: 'Q1 시장 분석 보고서가 완성되었습니다. 경쟁사 대비 성장률 12% 달성! 자세한 내용은 리포트를 확인해주세요. #Q1Analysis #Growth',
     reactions: [
-      { emoji: '\u{1F44D}', count: 12 },
-      { emoji: '\u{2764}\u{FE0F}', count: 5 },
-      { emoji: '\u{1F44F}', count: 8 },
+      { emoji: '\u{1F44D}', count: 1200 },
+      { emoji: '\u{2764}\u{FE0F}', count: 428 },
+      { emoji: '\u{1F44F}', count: 8500 },
     ],
     isSystem: false,
+    status: 'READY',
   },
   {
     id: 'p2',
@@ -89,11 +89,15 @@ const DEMO_POSTS = [
     badge: '공지',
     badgeBg: '#2563eb',
     badgeText: 'white',
-    timeAgo: '4시간 전 - Auto-generated',
-    content: '시스템 업데이트 v3.2가 적용되었습니다. 주요 변경사항: 에이전트 성능 최적화, 비용 절감 알고리즘 개선, 보안 패치 적용',
-    tags: ['#시스템업데이트', '#v3.2'],
-    reactions: [{ emoji: '\u{1F44D}', count: 24 }],
+    timeAgo: '2023-11-25 09:15:00',
+    content: 'Join the community town hall this Friday. We\'re discussing the future of neural-link integrations and the upcoming SDK 5.0 release.',
+    tags: ['#DevLog', '#Corthex'],
+    reactions: [
+      { emoji: '\u{1F44D}', count: 24 },
+      { emoji: '\u{1F525}', count: 8 },
+    ],
     isSystem: true,
+    status: 'QUEUEING',
   },
   {
     id: 'p3',
@@ -101,53 +105,21 @@ const DEMO_POSTS = [
     badge: 'Analysis Team',
     badgeBg: 'var(--color-corthex-accent)',
     badgeText: 'white',
-    timeAgo: '6시간 전',
-    content: '새로운 데이터 파이프라인 구축 완료! 처리 속도가 기존 대비 40% 향상되었습니다. 팀원들의 노력에 감사드립니다.',
+    timeAgo: '2023-11-20 18:30:00',
+    content: '새로운 데이터 파이프라인 구축 완료! 처리 속도가 기존 대비 40% 향상되었습니다. 팀원들의 노력에 감사드립니다. #Hiring #ProtocolEngineering',
     reactions: [
-      { emoji: '\u{1F44F}', count: 15 },
-      { emoji: '\u{1F525}', count: 8 },
-      { emoji: '\u{2764}\u{FE0F}', count: 6 },
+      { emoji: '\u{1F44F}', count: 3400 },
+      { emoji: '\u{1F525}', count: 1100 },
+      { emoji: '\u{2764}\u{FE0F}', count: 14200 },
     ],
     isSystem: false,
-  },
-  {
-    id: 'p4',
-    author: 'Han Ye-jin',
-    badge: 'Security Team',
-    badgeBg: 'var(--color-corthex-accent-deep)',
-    badgeText: 'white',
-    timeAgo: '어제',
-    content: '보안 감사 결과: 전체 시스템 보안 등급 A+ 달성. 취약점 0건. 다음 분기 감사 일정은 추후 공지하겠습니다.',
-    securityBanner: { title: '보안 등급 A+ 획득', sub: 'Security Audit Result' },
-    reactions: [
-      { emoji: '\u{1F44D}', count: 18 },
-      { emoji: '\u{1F6E1}\u{FE0F}', count: 7 },
-    ],
-    isSystem: false,
-  },
-  {
-    id: 'p5',
-    author: 'Song Hyun-woo',
-    badge: 'Finance Team',
-    badgeBg: 'var(--color-corthex-accent)',
-    badgeText: 'white',
-    timeAgo: '2일 전',
-    content: '3월 비용 보고서 요약: 총 비용 $4,287.50 (전월 대비 -12.3%). 예산 절감 목표 초과 달성했습니다!',
-    stats: [
-      { label: 'Monthly Cost', value: '$4,287.50', color: 'var(--color-corthex-accent-deep)' },
-      { label: 'MoM Growth', value: '-12.3%', color: '#4d7c0f' },
-    ],
-    reactions: [
-      { emoji: '\u{1F44D}', count: 20 },
-      { emoji: '\u{1F4CA}', count: 5 },
-    ],
-    isSystem: false,
+    status: 'PUBLISHED',
   },
 ]
 
 export function SnsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const tab = searchParams.get('tab') || 'content'
+  const tab = searchParams.get('tab') || 'scheduled'
   const [activeFilter, setActiveFilter] = [FILTER_CHIPS[0], (_v: string) => {}] // Static for demo
 
   const setTab = useCallback((t: string) => {
@@ -164,209 +136,194 @@ export function SnsPage() {
     queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
   })
 
+  const { data: statsData } = useQuery({
+    queryKey: ['sns-stats', 7],
+    queryFn: () => api.get<{ data: { total: number; byStatus: Array<{ status: string; count: number }>; byPlatform: Array<{ platform: string; total: number; published: number }> } }>('/workspace/sns/stats?days=7'),
+  })
+
   const accounts = accountsData?.data || []
   const agents = agentsData?.data || []
+  const stats = statsData?.data
+  const queueCount = stats?.byStatus.find((s) => s.status === 'scheduled')?.count ?? DEMO_POSTS.length
+  const publishedCount = stats?.byStatus.find((s) => s.status === 'published')?.count ?? 0
 
   return (
-    <div data-testid="sns-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
-      <div className="p-8 max-w-[1440px] mx-auto">
-        {/* Header */}
-        <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary mb-2">
-              소셜 피드 <span className="text-corthex-text-secondary font-medium">Social Feed</span>
-            </h1>
-            <p className="text-corthex-text-secondary text-lg">팀 소식과 업데이트를 공유합니다</p>
+    <div data-testid="sns-page" className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-xl flex flex-col gap-1">
+          <span className="text-[10px] uppercase tracking-widest text-corthex-text-disabled font-bold">Total Reach</span>
+          <div className="flex items-end justify-between">
+            <span className="text-2xl font-black text-corthex-text-primary">{stats ? `${stats.total}` : '—'}</span>
+            <span className="text-xs font-mono" style={{ color: '#22c55e' }}>+12.4%</span>
           </div>
-          {/* Filter Chips */}
-          <div className="flex flex-wrap gap-2">
-            {FILTER_CHIPS.map((chip, i) => (
-              <button
-                key={chip}
-                className={`rounded-full px-5 py-2.5 font-semibold transition-all text-sm ${
-                  i === 0
-                    ? 'bg-corthex-accent text-white shadow-sm'
-                    : 'border border-corthex-border text-corthex-text-secondary bg-corthex-surface hover:bg-corthex-elevated'
-                }`}
-              >
-                {chip}
-              </button>
+        </div>
+        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-xl flex flex-col gap-1">
+          <span className="text-[10px] uppercase tracking-widest text-corthex-text-disabled font-bold">Engagement Rate</span>
+          <div className="flex items-end justify-between">
+            <span className="text-2xl font-black text-corthex-text-primary">4.82%</span>
+            <span className="text-xs text-corthex-accent flex items-center font-mono">STABLE</span>
+          </div>
+        </div>
+        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-xl flex flex-col gap-1">
+          <span className="text-[10px] uppercase tracking-widest text-corthex-text-disabled font-bold">Queue Size</span>
+          <div className="flex items-end justify-between">
+            <span className="text-2xl font-black text-corthex-text-primary">{queueCount}</span>
+            <span className="text-xs text-corthex-text-disabled font-mono">{stats?.byPlatform.length ?? 0} PLATFORMS</span>
+          </div>
+        </div>
+        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-xl flex flex-col gap-3 relative overflow-hidden">
+          <span className="text-[10px] uppercase tracking-widest text-corthex-text-disabled font-bold">Peak Engagement</span>
+          <div className="flex gap-1 h-8 items-end">
+            {[20, 40, 100, 60, 30].map((h, i) => (
+              <div
+                key={i}
+                className={`w-full rounded-t-sm transition-all ${i === 2 ? 'bg-corthex-accent' : 'bg-corthex-border'}`}
+                style={{ height: `${h}%` }}
+              />
             ))}
           </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left Sidebar */}
-          <div className="hidden lg:block lg:col-span-3">
-            <div className="sticky top-8 space-y-8">
-              <div className="bg-corthex-elevated p-8 rounded-xl border border-corthex-border/50">
-                <h3 className="text-sm font-mono uppercase tracking-widest text-corthex-text-secondary mb-4">Current Status</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-corthex-accent" />
-                    <span className="text-sm text-corthex-text-secondary">System Operational</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-corthex-text-secondary">LATENCY:</span>
-                    <span className="text-xs font-mono text-corthex-accent">24ms</span>
-                  </div>
-                </div>
-              </div>
-              <div className="px-4">
-                <h4 className="text-xs font-bold uppercase text-corthex-text-secondary mb-4">Trending Tags</h4>
-                <div className="flex flex-wrap gap-2">
-                  {['#Q1Growth', '#SecurityPlus', '#Efficiency'].map((tag) => (
-                    <span key={tag} className="text-sm text-corthex-accent hover:underline cursor-pointer">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Feed */}
-          <div className="lg:col-span-9 xl:col-span-8">
-            {/* Post Composer */}
-            <div className="bg-corthex-elevated rounded-xl p-6 mb-12 shadow-sm border border-corthex-border transition-all focus-within:ring-2 ring-corthex-accent/20">
-              <div className="flex gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-corthex-accent-deep text-white flex items-center justify-center font-bold shrink-0">You</div>
-                <textarea
-                  className="w-full bg-transparent border-none focus:ring-0 text-corthex-text-primary placeholder-corthex-text-secondary resize-none pt-2 text-lg"
-                  placeholder="새 소식을 공유하세요... Share an update"
-                  rows={2}
-                />
-              </div>
-              <div className="flex items-center justify-between pt-4 border-t border-corthex-border">
-                <div className="flex gap-2">
-                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
-                    <Image className="w-5 h-5" />
-                    <span className="text-xs font-semibold">Image</span>
-                  </button>
-                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
-                    <Paperclip className="w-5 h-5" />
-                    <span className="text-xs font-semibold">File</span>
-                  </button>
-                  <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-lg transition-colors flex items-center gap-1">
-                    <BarChart2 className="w-5 h-5" />
-                    <span className="text-xs font-semibold">Poll</span>
-                  </button>
-                </div>
-                <button
-                  onClick={() => toast.info('이 기능은 준비 중입니다')}
-                  className="bg-corthex-accent hover:opacity-90 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95"
-                >
-                  게시 Post
-                </button>
-              </div>
-            </div>
-
-            {/* Feed Posts */}
-            <div className="space-y-8">
-              {DEMO_POSTS.map((post) => (
-                <article
-                  key={post.id}
-                  className={`rounded-xl p-8 shadow-sm border transition-shadow hover:shadow-md ${
-                    post.isSystem
-                      ? 'bg-corthex-elevated border-l-4 border-l-corthex-info border-y border-r border-corthex-border'
-                      : 'bg-corthex-elevated border-corthex-border'
-                  }`}
-                >
-                  {/* Author Header */}
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="flex gap-4">
-                      {post.isSystem ? (
-                        <div className="w-12 h-12 rounded-full bg-corthex-accent-deep flex items-center justify-center">
-                          <Bot className="w-6 h-6 text-white" />
-                        </div>
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-corthex-accent text-white flex items-center justify-center font-bold text-lg">
-                          {post.author.charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-corthex-text-primary">{post.author}</h3>
-                          <span
-                            className="px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold"
-                            style={{ backgroundColor: post.badgeBg, color: post.badgeText }}
-                          >
-                            {post.badge}
-                          </span>
-                        </div>
-                        <p className="text-xs font-mono text-corthex-text-secondary mt-0.5">{post.timeAgo}</p>
-                      </div>
-                    </div>
-                    {!post.isSystem && (
-                      <button className="text-corthex-text-secondary hover:bg-corthex-elevated rounded-full p-1">
-                        <MoreHorizontal className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="mb-6">
-                    {post.securityBanner && (
-                      <div className="bg-corthex-accent-deep text-white p-4 rounded-lg mb-4 flex items-center gap-4">
-                        <div className="text-3xl">{'\u{1F6E1}\u{FE0F}'}</div>
-                        <div>
-                          <p className="font-bold">{post.securityBanner.title}</p>
-                          <p className="text-xs opacity-80">{post.securityBanner.sub}</p>
-                        </div>
-                      </div>
-                    )}
-                    <p className={`text-corthex-text-secondary leading-relaxed ${post.isSystem ? 'font-semibold' : 'text-lg'}`}>
-                      {post.content}
-                    </p>
-                    {post.tags && (
-                      <div className="flex gap-2 mt-4">
-                        {post.tags.map((tag) => (
-                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-corthex-surface/40 rounded border border-corthex-border text-corthex-info">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {post.file && (
-                      <div className="flex items-center gap-4 p-4 bg-corthex-surface/50 border border-corthex-border rounded-lg cursor-pointer hover:bg-corthex-surface transition-colors mt-4">
-                        <div className="bg-red-600/10 p-3 rounded-lg">
-                          <span className="text-red-600 text-xl">{'\u{1F4C4}'}</span>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-corthex-text-primary">{post.file.name}</p>
-                          <p className="text-xs text-corthex-text-secondary font-mono">{post.file.size} - {post.file.type}</p>
-                        </div>
-                        <Download className="w-5 h-5 text-corthex-text-secondary" />
-                      </div>
-                    )}
-                    {post.stats && (
-                      <div className="grid grid-cols-2 gap-4 mt-4">
-                        {post.stats.map((stat) => (
-                          <div key={stat.label} className="bg-corthex-surface/60 p-5 rounded-xl border border-corthex-border">
-                            <p className="text-[10px] uppercase tracking-tighter text-corthex-text-secondary font-bold mb-1">{stat.label}</p>
-                            <p className="text-2xl font-mono font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Reactions */}
-                  <div className="flex items-center gap-6 pt-4 border-t border-corthex-border/60">
-                    {post.reactions.map((r, i) => (
-                      <button key={i} className="flex items-center gap-2 text-sm text-corthex-text-secondary hover:text-corthex-accent transition-colors">
-                        <span className="text-base">{r.emoji}</span>
-                        <span className="font-mono">{r.count}</span>
-                      </button>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+          <span className="text-[10px] text-corthex-text-secondary text-center font-mono">EST: 19:45:00 UTC</span>
         </div>
       </div>
 
+      {/* Filter Bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-corthex-surface/20 p-2 rounded-lg border border-corthex-border/40">
+        <div className="flex p-1 bg-corthex-bg rounded-md border border-corthex-border">
+          {TAB_ITEMS.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setTab(t.value)}
+              className={`px-4 py-1.5 text-xs font-bold rounded transition-colors ${
+                tab === t.value
+                  ? 'bg-corthex-surface text-corthex-accent shadow-sm'
+                  : 'text-corthex-text-disabled hover:text-corthex-text-secondary'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono text-corthex-text-disabled">SORT_BY: TIME_DESC</span>
+          <button className="p-1.5 rounded border border-corthex-border hover:bg-corthex-surface text-corthex-text-secondary transition-colors">
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Post List */}
+      <div className="space-y-4">
+        {DEMO_POSTS.map((post) => {
+          const isReady = post.status === 'READY'
+          const isPublished = post.status === 'PUBLISHED'
+          return (
+            <div
+              key={post.id}
+              className="group relative bg-corthex-bg border border-corthex-border rounded-xl overflow-hidden hover:border-corthex-accent/50 transition-all duration-300 flex flex-col lg:flex-row"
+            >
+              {/* Left accent bar */}
+              <div
+                className={`lg:w-1 lg:h-auto h-1 group-hover:shadow-lg transition-shadow ${
+                  isReady ? 'bg-corthex-accent' : 'bg-corthex-border'
+                }`}
+              />
+
+              {/* Content area */}
+              <div className="flex-1 p-5 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 rounded-full bg-corthex-surface border-2 border-corthex-bg flex items-center justify-center text-corthex-text-secondary">
+                        {post.isSystem ? <Bot className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-tighter">
+                      ID: CTX-{post.id.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-corthex-text-disabled uppercase font-bold tracking-widest">
+                      {isPublished ? 'Published Time' : 'Execute Time'}
+                    </div>
+                    <div className={`font-mono text-sm tracking-tight ${isReady ? 'text-corthex-accent' : 'text-corthex-text-secondary'}`}>
+                      {post.timeAgo}
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-corthex-text-primary leading-relaxed text-sm max-w-3xl">{post.content}</p>
+
+                {post.tags && (
+                  <div className="flex gap-2">
+                    {post.tags.map((tag) => (
+                      <span key={tag} className="text-[10px] bg-corthex-surface text-corthex-text-disabled px-2 py-0.5 rounded border border-corthex-border">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-6 pt-2 border-t border-corthex-surface">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-corthex-text-disabled" />
+                    <span className="font-mono text-xs text-corthex-text-secondary">
+                      {isPublished ? post.reactions[0].count.toLocaleString() : '--'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-corthex-text-disabled" />
+                    <span className="font-mono text-xs text-corthex-text-secondary">
+                      {isPublished ? post.reactions[1]?.count.toLocaleString() ?? '--' : '--'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BarChart2 className="w-4 h-4 text-corthex-text-disabled" />
+                    <span className="font-mono text-xs text-corthex-text-secondary">
+                      {isPublished ? post.reactions[2]?.count.toLocaleString() ?? '--' : '--'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status sidebar */}
+              <div className="lg:w-48 bg-corthex-surface/30 border-t lg:border-t-0 lg:border-l border-corthex-border p-4 flex lg:flex-col justify-between items-center">
+                <div className="flex flex-col items-center lg:items-end w-full">
+                  <span className="text-[10px] text-corthex-text-disabled font-bold uppercase tracking-widest mb-1">Status</span>
+                  <span
+                    className="text-xs font-mono flex items-center gap-1"
+                    style={{ color: isReady ? '#22c55e' : isPublished ? 'var(--color-corthex-text-secondary)' : 'var(--color-corthex-text-disabled)' }}
+                  >
+                    {isReady && (
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#22c55e' }} />
+                    )}
+                    {post.status}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toast.info('이 기능은 준비 중입니다')}
+                    className="p-2 rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  {!isPublished && (
+                    <button
+                      onClick={() => toast.info('이 기능은 준비 중입니다')}
+                      className="p-2 rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
       {/* Mobile Stats Summary */}
-      {tab === 'content' && <MobileStatsSummary />}
+      <MobileStatsSummary />
     </div>
   )
 }
