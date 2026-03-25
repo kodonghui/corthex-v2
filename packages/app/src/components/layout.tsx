@@ -132,7 +132,7 @@ export function Layout() {
           <div className="flex items-center gap-3">
             <button
               onClick={openSidebar}
-              className="p-1.5 -ml-1.5 rounded-lg hover:bg-corthex-elevated transition-colors"
+              className="p-2.5 -ml-2.5 rounded-lg min-w-[44px] min-h-[44px] hover:bg-corthex-elevated transition-colors"
               aria-label="메뉴 열기"
             >
               <Menu className="w-5 h-5 text-corthex-text-secondary" />
@@ -142,7 +142,7 @@ export function Layout() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
+              className="relative w-11 h-11 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />
@@ -184,7 +184,7 @@ export function Layout() {
             </div>
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-8 h-8 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
+              className="relative w-11 h-11 flex items-center justify-center rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary transition-colors"
               aria-label="알림"
             >
               <Bell className="w-5 h-5" />

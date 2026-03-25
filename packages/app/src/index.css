@@ -81,6 +81,22 @@ body {
   font-family: var(--font-body, 'DM Sans', 'Inter', sans-serif);
 }
 
+/* WCAG 2.3.3 — Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-corthex-accent);
+  outline-offset: 2px;
+}
+
 @keyframes slide-in {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }

@@ -129,9 +129,9 @@ export function LoginPage() {
                 <span>아이디 저장</span>
               </label>
               <div className="space-x-3">
-                <span className="text-corthex-text-disabled cursor-pointer hover:text-corthex-text-secondary transition-colors">아이디 찾기</span>
+                <span className="text-corthex-text-secondary cursor-pointer hover:text-corthex-text-primary transition-colors">아이디 찾기</span>
                 <span className="text-corthex-border">|</span>
-                <span className="text-corthex-text-disabled cursor-pointer hover:text-corthex-text-secondary transition-colors">비밀번호 찾기</span>
+                <span className="text-corthex-text-secondary cursor-pointer hover:text-corthex-text-primary transition-colors">비밀번호 찾기</span>
               </div>
             </div>
           </form>

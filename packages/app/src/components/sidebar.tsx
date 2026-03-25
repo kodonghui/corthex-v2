@@ -162,7 +162,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
                 onClick={onNavClick}
                 title={collapsed ? item.label : undefined}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  `flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-corthex-accent transition-colors ${
                     collapsed ? 'justify-center' : ''
                   } ${
                     isActive
