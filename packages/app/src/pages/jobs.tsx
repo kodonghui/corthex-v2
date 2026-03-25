@@ -93,9 +93,9 @@ type TabKey = 'oneTime' | 'schedule' | 'trigger'
 
 const STATUS_STYLES: Record<string, { label: string; dotClass: string; textClass: string }> = {
   queued: { label: '대기', dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' },
-  processing: { label: '진행 중', dotClass: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse', textClass: 'text-blue-600' },
-  completed: { label: '완료', dotClass: 'bg-corthex-accent shadow-[0_0_8px_rgba(77,124,15,0.5)]', textClass: 'text-corthex-accent' },
-  failed: { label: '실패', dotClass: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]', textClass: 'text-red-600' },
+  processing: { label: '진행 중', dotClass: 'bg-corthex-info shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse', textClass: 'text-corthex-info' },
+  completed: { label: '완료', dotClass: 'bg-corthex-accent shadow-[0_0_8px_var(--color-corthex-accent-muted)]', textClass: 'text-corthex-accent' },
+  failed: { label: '실패', dotClass: 'bg-corthex-error shadow-[0_0_8px_rgba(239,68,68,0.5)]', textClass: 'text-corthex-error' },
   blocked: { label: '대기(체인)', dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' },
 }
 
@@ -119,11 +119,11 @@ function shortId(id: string): string {
 
 function getStatusBadge(status: string): { bg: string; color: string; border: string; dot: string } {
   switch (status) {
-    case 'processing': return { bg: 'rgba(59,130,246,0.1)', color: '#60a5fa', border: 'rgba(59,130,246,0.25)', dot: '#60a5fa' }
-    case 'completed':  return { bg: 'rgba(34,197,94,0.1)',  color: '#4ade80', border: 'rgba(34,197,94,0.25)',  dot: '#4ade80' }
-    case 'failed':     return { bg: 'rgba(239,68,68,0.1)',  color: '#f87171', border: 'rgba(239,68,68,0.25)',  dot: '#f87171' }
-    case 'blocked':    return { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)', dot: '#fbbf24' }
-    default:           return { bg: 'rgba(120,113,108,0.12)', color: 'var(--color-corthex-text-secondary)', border: 'rgba(120,113,108,0.2)', dot: 'rgba(120,113,108,0.6)' }
+    case 'processing': return { bg: 'var(--color-corthex-info-muted, rgba(59,130,246,0.1))', color: 'var(--color-corthex-info)', border: 'var(--color-corthex-info-muted, rgba(59,130,246,0.25))', dot: 'var(--color-corthex-info)' }
+    case 'completed':  return { bg: 'var(--color-corthex-success-muted, rgba(34,197,94,0.1))', color: 'var(--color-corthex-success)', border: 'var(--color-corthex-success-muted, rgba(34,197,94,0.25))', dot: 'var(--color-corthex-success)' }
+    case 'failed':     return { bg: 'var(--color-corthex-error-muted, rgba(239,68,68,0.1))', color: 'var(--color-corthex-error)', border: 'var(--color-corthex-error-muted, rgba(239,68,68,0.25))', dot: 'var(--color-corthex-error)' }
+    case 'blocked':    return { bg: 'var(--color-corthex-warning-muted, rgba(245,158,11,0.1))', color: 'var(--color-corthex-warning)', border: 'var(--color-corthex-warning-muted, rgba(245,158,11,0.25))', dot: 'var(--color-corthex-warning)' }
+    default:           return { bg: 'var(--color-corthex-accent-muted)', color: 'var(--color-corthex-text-secondary)', border: 'var(--color-corthex-accent-muted)', dot: 'var(--color-corthex-text-disabled)' }
   }
 }
 
@@ -350,7 +350,7 @@ export function JobsPage() {
       else createTrigger.mutate({ agentId: modalAgent, instruction: modalInstruction.trim(), triggerType: modalTriggerType, condition })
     } else {
       if (modalFrequency === 'custom' && modalDays.length === 0) return
-      const body = { agentId: modalAgent, instruction: modalInstruction.trim(), frequency: modalFrequency, time: modalTime, days: modalFrequency === 'custom' ? modalDays : undefined }
+      const body = { name: modalInstruction.trim().slice(0, 50) || 'Schedule', agentId: modalAgent, instruction: modalInstruction.trim(), frequency: modalFrequency, time: modalTime, days: modalFrequency === 'custom' ? modalDays : undefined }
       if (editingSchedule) updateSchedule.mutate({ id: editingSchedule.id, ...body })
       else createSchedule.mutate(body)
     }
@@ -1127,7 +1127,7 @@ export function JobsPage() {
                   <div className="space-y-3 mb-3">
                     <p className="text-xs font-medium" style={{ color: 'var(--color-corthex-accent)' }}>체인 후속 단계</p>
                     {chainSteps.map((step, i) => (
-                      <div key={i} className="pl-4 border-l-2 space-y-2" style={{ borderColor: '#606C3880' }}>
+                      <div key={i} className="pl-4 border-l-2 space-y-2" style={{ borderColor: 'var(--color-corthex-accent-muted)' }}>
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-corthex-text-secondary">단계 {i + 2}</span>
                           <button type="button" onClick={() => setChainSteps(prev => prev.filter((_, j) => j !== i))} className="text-[10px] text-red-400">삭제</button>

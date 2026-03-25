@@ -29,9 +29,9 @@ import type {
 // === Constants ===
 
 const PROVIDER_COLORS: Record<LLMProviderName, string> = {
-  anthropic: '#8B5CF6',
-  openai: '#10B981',
-  google: '#F59E0B',
+  anthropic: 'var(--color-corthex-handoff)',
+  openai: 'var(--color-corthex-success)',
+  google: 'var(--color-corthex-warning)',
 }
 
 const PROVIDER_LABELS: Record<LLMProviderName, string> = {
@@ -468,10 +468,10 @@ export function DashboardPage() {
     .slice(0, 5)
 
   const eventTypeColor: Record<string, string> = {
-    INFO: 'text-blue-400',
-    OKAY: 'text-green-500',
-    WARN: 'text-yellow-500',
-    FAIL: 'text-red-500',
+    INFO: 'text-corthex-info',
+    OKAY: 'text-corthex-success',
+    WARN: 'text-corthex-warning',
+    FAIL: 'text-corthex-error',
   }
 
   return (
@@ -482,8 +482,8 @@ export function DashboardPage() {
         <section>
           <h1 className="text-3xl font-bold text-corthex-text-primary mb-1">Welcome, Commander</h1>
           <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse shadow-[0_0_8px_#22C55E]' : 'bg-red-500'}`} />
-            <p className="text-[10px] font-mono tracking-widest uppercase text-green-500">
+            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse shadow-sm' : 'bg-red-500'}`} />
+            <p className="text-[10px] font-mono tracking-widest uppercase text-corthex-success">
               {isConnected ? 'SYSTEM: NOMINAL' : 'SYSTEM: OFFLINE'}
             </p>
           </div>
@@ -504,7 +504,7 @@ export function DashboardPage() {
               <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <Bot className="w-6 h-6 text-corthex-accent" />
-                  <span className="bg-green-500/10 text-green-500 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
+                  <span className="bg-green-500/10 text-corthex-success text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
                 </div>
                 <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
                   {String(activeAgents).padStart(2, '0')}
@@ -526,7 +526,7 @@ export function DashboardPage() {
               <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <Timer className="w-6 h-6 text-corthex-accent" />
-                  <span className="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-yellow-500/20">
+                  <span className="bg-yellow-500/10 text-corthex-warning text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-yellow-500/20">
                     {summary.tasks.inProgress > 0 ? `${summary.tasks.inProgress} ACTIVE` : 'IDLE'}
                   </span>
                 </div>
@@ -602,7 +602,7 @@ export function DashboardPage() {
                           </td>
                           <td className="px-6 py-4 text-right">
                             <button
-                              onClick={() => navigate(`/agents/${agent.id}`)}
+                              onClick={() => navigate('/agents')}
                               className="text-corthex-text-secondary/40 hover:text-corthex-accent transition-colors"
                             >
                               <MoreVertical className="w-4 h-4" />
@@ -694,7 +694,7 @@ export function DashboardPage() {
                   </div>
                   <div className="relative h-2 bg-corthex-elevated rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
+                      className="h-full bg-gradient-to-r from-corthex-info to-corthex-info"
                       style={{ width: `${Math.min(memoryLoad, 100)}%` }}
                     />
                   </div>
@@ -715,7 +715,7 @@ export function DashboardPage() {
                   </div>
                   <div className="relative h-2 bg-corthex-elevated rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-green-500 to-green-400"
+                      className="h-full bg-gradient-to-r from-corthex-success to-corthex-success"
                       style={{ width: `${Math.min(nexusLoad, 100)}%` }}
                     />
                   </div>

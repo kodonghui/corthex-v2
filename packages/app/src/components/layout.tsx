@@ -38,6 +38,11 @@ const PAGE_NAMES: Record<string, string> = {
   settings: 'Settings',
   memories: 'Memory Dashboard',
   notifications: 'Notifications',
+  'n8n-workflows': 'Workflows',
+  'marketing-pipeline': 'Marketing Pipeline',
+  'marketing-approval': 'Content Approval',
+  organization: 'Organization',
+  onboarding: 'Onboarding',
 }
 
 export function Layout() {

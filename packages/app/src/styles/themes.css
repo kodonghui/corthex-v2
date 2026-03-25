@@ -46,9 +46,13 @@
 
   /* Semantic */
   --color-corthex-success: #22C55E;
+  --color-corthex-success-muted: #22C55E19;
   --color-corthex-warning: #EAB308;
+  --color-corthex-warning-muted: #EAB30819;
   --color-corthex-error: #EF4444;
+  --color-corthex-error-muted: #EF444419;
   --color-corthex-info: #3B82F6;
+  --color-corthex-info-muted: #3B82F619;
   --color-corthex-handoff: #A78BFA;
 
   /* Shadows — Fix 7: dark theme uses border-highlight, not drop-shadow */
@@ -99,9 +103,13 @@
 
   /* Semantic */
   --color-corthex-success: #22C55E;
+  --color-corthex-success-muted: #22C55E19;
   --color-corthex-warning: #EAB308;
+  --color-corthex-warning-muted: #EAB30819;
   --color-corthex-error: #EF4444;
+  --color-corthex-error-muted: #EF444419;
   --color-corthex-info: #3B82F6;
+  --color-corthex-info-muted: #3B82F619;
   --color-corthex-handoff: #A78BFA;
 
   /* Typography */
@@ -149,9 +157,13 @@
 
   /* Semantic */
   --color-corthex-success: #22C55E;
+  --color-corthex-success-muted: #22C55E19;
   --color-corthex-warning: #EAB308;
+  --color-corthex-warning-muted: #EAB30819;
   --color-corthex-error: #EF4444;
+  --color-corthex-error-muted: #EF444419;
   --color-corthex-info: #3B82F6;
+  --color-corthex-info-muted: #3B82F619;
   --color-corthex-cta: #F97316;               /* Fix 6: new dedicated CTA token (was absent) */
   --color-corthex-handoff: #A78BFA;           /* Fix 6: was #F97316 (same as CTA — semantic collision) */
 

@@ -451,11 +451,8 @@ function AgentDetailPanel({
   const tierBadge = tierBadgeStyles[agent.tier] || tierBadgeStyles.worker
   const status = statusConfig[agent.status] || statusConfig.offline
 
-  const recentActivities = [
-    { id: '1', icon: 'success' as const, title: '작업 완료', detail: '최근 처리 완료', time: '방금 전' },
-    { id: '2', icon: 'message' as const, title: '문의 응답', detail: '사용자 대화', time: '15분 전' },
-    { id: '3', icon: 'success' as const, title: '일정 조율 완료', detail: '자동 처리', time: '1시간 전' },
-  ]
+  // Recent activities — empty until real activity API is available
+  const recentActivities: { id: string; icon: 'success' | 'message'; title: string; detail: string; time: string }[] = []
 
   const activityIconMap = {
     success: <CheckCircle className="w-5 h-5" />,
@@ -747,6 +744,7 @@ export function AgentsPage() {
     if (formData.departmentId) body.departmentId = formData.departmentId
     if (formData.role) body.role = formData.role
     if (formData.ownerUserId) body.ownerUserId = formData.ownerUserId
+    if (formData.personalityTraits) body.personalityTraits = formData.personalityTraits
     createMutation.mutate(body)
   }
 

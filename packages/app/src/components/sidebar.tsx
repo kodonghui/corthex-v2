@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Terminal, MessageSquare, TrendingUp, Users,
   Clock, FileText, FolderOpen, Network, Building2, Bot, Layers, Share2,
   Send, DollarSign, History, Shield, Lock, BookOpen, GitBranch, UserCheck,
-  Settings, BarChart3, Hexagon, Brain, ChevronsLeft, ChevronsRight,
+  Settings, BarChart3, Hexagon, Brain, ChevronsLeft, ChevronsRight, Bell,
 } from 'lucide-react'
 
 declare const __BUILD_NUMBER__: string
@@ -30,6 +30,7 @@ const navSections: NavSection[] = [
   {
     label: 'ORGANIZATION',
     items: [
+      { to: '/organization', label: '조직', icon: Building2 },
       { to: '/agents', label: '에이전트', icon: Bot },
       { to: '/departments', label: '부서', icon: Building2 },
       { to: '/jobs', label: '작업', icon: Clock },
@@ -60,6 +61,7 @@ const navSections: NavSection[] = [
       { to: '/activity-log', label: '통신로그', icon: History },
       { to: '/ops-log', label: '작전일지', icon: Shield },
       { to: '/classified', label: '기밀문서', icon: Lock },
+      { to: '/notifications', label: '알림', icon: Bell },
       { to: '/settings', label: '설정', icon: Settings },
     ],
   },

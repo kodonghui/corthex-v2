@@ -45,6 +45,10 @@
   --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
 }
 
+body {
+  font-family: var(--font-body, 'DM Sans', 'Inter', sans-serif);
+}
+
 @keyframes slide-in {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
