@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              gold: "#CA8A04",
+              black: "#0C0A09",
+              surface: "#1C1917",
+              border: "#292524",
+              muted: "#78716C",
+              text: "#A8A29E"
+            }
+          },
+          fontFamily: {
+            "headline": ["DM Sans", "sans-serif"],
+            "body": ["DM Sans", "sans-serif"],
+            "label": ["DM Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0C0A09;
+      color: #A8A29E;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .glitch-text {
+      text-shadow: 1px 0 #CA8A04, -1px 0 #78716C;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0C0A09;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #292524;
+    }
+  </style>
+</head>
+<body class="antialiased">
+<!-- TopNavBar Implementation from JSON -->
+<header class="bg-[#0C0A09] border-b border-[#292524] flex justify-between items-center px-6 h-16 w-full fixed top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX</span>
+<nav class="hidden md:flex items-center gap-6 font-sans tracking-tight text-sm">
+<a class="text-yellow-600 font-bold border-b-2 border-yellow-600 pb-1" href="#">Documents</a>
+<a class="text-[#A8A29E] hover:text-yellow-600/80 transition-colors" href="#">Intelligence</a>
+<a class="text-[#A8A29E] hover:text-yellow-600/80 transition-colors" href="#">Operations</a>
+<a class="text-[#A8A29E] hover:text-yellow-600/80 transition-colors" href="#">Access</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted text-sm">search</span>
+<input class="bg-[#1C1917] border-[#292524] text-xs rounded pl-9 pr-4 py-1.5 focus:ring-yellow-600 focus:border-yellow-600 w-64" placeholder="Search clearance..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-[#A8A29E] hover:bg-[#1C1917] p-2 rounded transition-all active:scale-95"><span class="material-symbols-outlined">security</span></button>
+<button class="text-[#A8A29E] hover:bg-[#1C1917] p-2 rounded transition-all active:scale-95"><span class="material-symbols-outlined">notifications</span></button>
+<div class="h-8 w-8 rounded bg-brand-gold/20 border border-brand-gold/30 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a high-security intelligence officer with a holographic badge overlay and subtle blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhu7y3svBMqyj41SZQakW2zAdP8VCfBGJSb_25l3X6fG7FEDt_ZXjEyQW-5lIkimmiGcIg-uawehzHeZu00rUCLTvIzfVJ14u9eVGL7FDz52wDFfWBYem1yeJ8Xf3oH82LSdlnIzNAHbkiDp9UAbPm9I8mfiu2KkObj1uGfQjl7_t68s4yA-E5ofAucBMXj07I-ofIEvxsyuZvUQPp0siptM_AcQiTsQGR7q7c9wkFtF4ym06HAHFNoWdOX75GY0QyVfNS1QIGUk-e"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar Implementation from JSON -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#0C0A09] border-r border-[#292524] flex flex-col justify-between z-40 hidden lg:flex">
+<div class="py-6">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-1">
+<span class="material-symbols-outlined text-yellow-600" data-weight="fill">shield</span>
+<span class="text-yellow-600 font-black tracking-widest text-xs uppercase">COMMAND</span>
+</div>
+<div class="text-[10px] text-brand-muted tracking-[0.2em]">LEVEL 5 ACCESS</div>
+</div>
+<nav class="flex flex-col font-sans text-xs uppercase tracking-widest">
+<a class="bg-[#1C1917] text-yellow-600 border-l-4 border-yellow-600 py-3 px-4 flex items-center gap-3 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg">lock</span>
+<span>Classified</span>
+</a>
+<a class="text-[#78716C] py-3 px-4 flex items-center gap-3 hover:text-[#A8A29E] hover:bg-[#1C1917] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg">enhanced_encryption</span>
+<span>Encrypted</span>
+</a>
+<a class="text-[#78716C] py-3 px-4 flex items-center gap-3 hover:text-[#A8A29E] hover:bg-[#1C1917] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg">inventory_2</span>
+<span>Archived</span>
+</a>
+<a class="text-[#78716C] py-3 px-4 flex items-center gap-3 hover:text-[#A8A29E] hover:bg-[#1C1917] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg">verified_user</span>
+<span>Clearance</span>
+</a>
+<a class="text-[#78716C] py-3 px-4 flex items-center gap-3 hover:text-[#A8A29E] hover:bg-[#1C1917] transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+<div class="p-4 border-t border-[#292524]">
+<a class="text-[#78716C] py-3 px-4 flex items-center gap-3 hover:text-red-500 transition-all font-sans text-xs uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 pt-16 min-h-screen bg-[#0C0A09]">
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="h-1 w-8 bg-brand-gold"></span>
+<span class="text-xs font-bold tracking-[0.3em] text-brand-gold uppercase">Sovereign Directory</span>
+</div>
+<h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Classified <span class="text-brand-gold/50">Documents</span></h1>
+<p class="text-brand-muted mt-2 max-w-xl text-sm leading-relaxed">Active surveillance and secure data repositories. Access is limited to personnel with verified Level 4+ clearance. All terminal actions are logged in the immutable audit trail.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-[#1C1917] border border-[#292524] text-white px-4 py-2 text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#292524] transition-all">
+<span class="material-symbols-outlined text-sm">filter_alt</span>
+            Filter
+          </button>
+<button class="bg-brand-gold text-black px-4 py-2 text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">upload_file</span>
+            Secure Upload
+          </button>
+</div>
+</header>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex flex-col justify-between">
+<span class="text-[10px] uppercase tracking-widest text-brand-muted">Total Encypted</span>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-2xl font-black text-white">4,821</span>
+<span class="text-[10px] text-emerald-500 font-bold tracking-tighter">+12 NEW</span>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex flex-col justify-between">
+<span class="text-[10px] uppercase tracking-widest text-brand-muted">Active Breaches</span>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-2xl font-black text-red-600">00</span>
+<span class="text-[10px] text-brand-muted font-bold tracking-tighter">NOMINAL</span>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex flex-col justify-between">
+<span class="text-[10px] uppercase tracking-widest text-brand-muted">Storage Load</span>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-2xl font-black text-white">42%</span>
+<div class="flex-1 h-1 bg-[#292524] rounded-full overflow-hidden">
+<div class="h-full bg-brand-gold w-[42%]"></div>
+</div>
+</div>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex flex-col justify-between">
+<span class="text-[10px] uppercase tracking-widest text-brand-muted">Access Level</span>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-2xl font-black text-brand-gold">LVL 5</span>
+<span class="material-symbols-outlined text-brand-gold text-sm" data-weight="fill">verified</span>
+</div>
+</div>
+</div>
+<!-- Document Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+<!-- Document Card 1 -->
+<div class="group bg-[#1C1917] border border-[#292524] hover:border-brand-gold/40 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 flex gap-2">
+<span class="bg-red-950/40 text-red-500 border border-red-500/30 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">TOP SECRET</span>
+<span class="bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">LVL 5</span>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4 mb-6">
+<div class="p-3 bg-brand-black border border-brand-border text-brand-gold group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-white font-bold text-lg leading-tight truncate font-mono">_X09_ORBITAL_STRIKE.ENC</h3>
+<p class="text-brand-muted text-xs mt-1">Uploaded by <span class="text-white">Admin_Corvus</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8">
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Metadata Hash</span>
+<span class="block text-[10px] font-mono text-brand-text truncate">f3a9...8e21</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">File Size</span>
+<span class="block text-[10px] font-mono text-brand-text">14.2 GB</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Timestamp</span>
+<span class="block text-[10px] font-mono text-brand-text">2024.05.12 14:30</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Status</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  ENCRYPTED
+                </span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-brand-gold text-black py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">key</span> Decrypt
+              </button>
+<button class="flex-1 border border-brand-border text-white py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-border transition-all">
+<span class="material-symbols-outlined text-sm">visibility</span> View
+              </button>
+<button class="w-10 border border-brand-border text-brand-muted flex items-center justify-center hover:text-brand-gold hover:border-brand-gold/30 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Decorative UI scanning line -->
+<div class="absolute bottom-0 left-0 h-[2px] bg-brand-gold/20 w-full overflow-hidden">
+<div class="h-full bg-brand-gold w-1/4 animate-scan"></div>
+</div>
+</div>
+<!-- Document Card 2 -->
+<div class="group bg-[#1C1917] border border-[#292524] hover:border-brand-gold/40 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 flex gap-2">
+<span class="bg-yellow-950/40 text-yellow-500 border border-yellow-500/30 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">CONFIDENTIAL</span>
+<span class="bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">LVL 4</span>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4 mb-6">
+<div class="p-3 bg-brand-black border border-brand-border text-brand-gold group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">analytics</span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-white font-bold text-lg leading-tight truncate font-mono">_Q3_MARKET_DOMINANCE.ENC</h3>
+<p class="text-brand-muted text-xs mt-1">Uploaded by <span class="text-white">Op_Viper</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8">
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Metadata Hash</span>
+<span class="block text-[10px] font-mono text-brand-text truncate">a102...99bc</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">File Size</span>
+<span class="block text-[10px] font-mono text-brand-text">2.8 MB</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Timestamp</span>
+<span class="block text-[10px] font-mono text-brand-text">2024.05.10 09:12</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Status</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  ENCRYPTED
+                </span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-brand-gold text-black py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">key</span> Decrypt
+              </button>
+<button class="flex-1 border border-brand-border text-white py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-border transition-all">
+<span class="material-symbols-outlined text-sm">visibility</span> View
+              </button>
+<button class="w-10 border border-brand-border text-brand-muted flex items-center justify-center hover:text-brand-gold hover:border-brand-gold/30 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Document Card 3 -->
+<div class="group bg-[#1C1917] border border-[#292524] hover:border-brand-gold/40 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 flex gap-2">
+<span class="bg-blue-950/40 text-blue-500 border border-blue-500/30 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">INTERNAL</span>
+<span class="bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">LVL 2</span>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4 mb-6">
+<div class="p-3 bg-brand-black border border-brand-border text-brand-gold group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">article</span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-white font-bold text-lg leading-tight truncate font-mono">_STAFF_DIRECTORY_V2.PDF</h3>
+<p class="text-brand-muted text-xs mt-1">Uploaded by <span class="text-white">HR_Auto</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8">
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Metadata Hash</span>
+<span class="block text-[10px] font-mono text-brand-text truncate">55d2...11ff</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">File Size</span>
+<span class="block text-[10px] font-mono text-brand-text">412 KB</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Timestamp</span>
+<span class="block text-[10px] font-mono text-brand-text">2024.04.30 18:45</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Status</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-brand-muted">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-muted"></span>
+                  PLAINTEXT
+                </span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 border border-brand-border text-brand-muted py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 cursor-not-allowed">
+<span class="material-symbols-outlined text-sm">lock_open</span> Decrypted
+              </button>
+<button class="flex-1 border border-brand-border text-white py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-border transition-all">
+<span class="material-symbols-outlined text-sm">visibility</span> View
+              </button>
+<button class="w-10 border border-brand-border text-brand-muted flex items-center justify-center hover:text-brand-gold hover:border-brand-gold/30 transition-all">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Document Card 4 (Deep Encryption) -->
+<div class="group bg-[#1C1917] border border-[#292524] hover:border-brand-gold/40 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 flex gap-2">
+<span class="bg-red-950/40 text-red-500 border border-red-500/30 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase italic">EYES ONLY</span>
+<span class="bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">LVL 5</span>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4 mb-6">
+<div class="p-3 bg-brand-black border border-brand-border text-brand-gold group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">token</span>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-white font-bold text-lg leading-tight truncate font-mono">_PROJECT_LEVIATHAN.SHAD</h3>
+<p class="text-brand-muted text-xs mt-1">Uploaded by <span class="text-brand-gold font-bold">SOVEREIGN_ROOT</span></p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8">
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Metadata Hash</span>
+<span class="block text-[10px] font-mono text-brand-text truncate">7d4f...0001</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">File Size</span>
+<span class="block text-[10px] font-mono text-brand-text">840 MB</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Timestamp</span>
+<span class="block text-[10px] font-mono text-brand-text">REDACTED</span>
+</div>
+<div>
+<span class="block text-[9px] uppercase tracking-widest text-brand-muted">Status</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-brand-gold">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-gold"></span>
+                  QUANTUM-LOCKED
+                </span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-brand-gold text-black py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">enhanced_encryption</span> Auth Reqd
+              </button>
+<button class="flex-1 border border-brand-border text-white py-2.5 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-border transition-all">
+<span class="material-symbols-outlined text-sm">info</span> Details
+              </button>
+<button class="w-10 border border-brand-border text-brand-muted flex items-center justify-center hover:text-brand-gold hover:border-brand-gold/30 transition-all">
+<span class="material-symbols-outlined text-sm">security</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity / Logs (High Density Area) -->
+<section class="mt-12 bg-[#1C1917] border border-[#292524] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#292524] flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-brand-gold text-lg">history_edu</span>
+<h2 class="text-xs font-black uppercase tracking-[0.2em] text-white italic">Clearance Audit Trail</h2>
+</div>
+<span class="text-[10px] font-mono text-brand-muted uppercase">Updates every 250ms</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-[11px]">
+<thead>
+<tr class="border-b border-brand-border/50 text-brand-muted font-bold uppercase tracking-widest">
+<th class="px-6 py-4">Action</th>
+<th class="px-6 py-4">Entity ID</th>
+<th class="px-6 py-4">Operator</th>
+<th class="px-6 py-4">Clearance</th>
+<th class="px-6 py-4">Timestamp</th>
+<th class="px-6 py-4 text-right">Node</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border/30 font-mono text-brand-text">
+<tr class="hover:bg-brand-gold/5 transition-colors">
+<td class="px-6 py-4"><span class="text-emerald-500">DECRYPT_SUCCESS</span></td>
+<td class="px-6 py-4">_DOC_482_A</td>
+<td class="px-6 py-4 text-white">Op_Viper</td>
+<td class="px-6 py-4 text-brand-gold">LVL 4</td>
+<td class="px-6 py-4">14:55:02 UTC</td>
+<td class="px-6 py-4 text-right text-brand-muted">US_EAST_01</td>
+</tr>
+<tr class="hover:bg-brand-gold/5 transition-colors">
+<td class="px-6 py-4"><span class="text-brand-gold">ACCESS_DENIED</span></td>
+<td class="px-6 py-4">_PROJECT_LEVIATHAN</td>
+<td class="px-6 py-4 text-white">Op_Hawk</td>
+<td class="px-6 py-4 text-blue-400">LVL 3</td>
+<td class="px-6 py-4">14:52:11 UTC</td>
+<td class="px-6 py-4 text-right text-brand-muted">EU_WEST_04</td>
+</tr>
+<tr class="hover:bg-brand-gold/5 transition-colors">
+<td class="px-6 py-4"><span class="text-brand-muted">RE_CLASSIFIED</span></td>
+<td class="px-6 py-4">_STAFF_DIRECTORY</td>
+<td class="px-6 py-4 text-white">System_Root</td>
+<td class="px-6 py-4 text-brand-gold">LVL 5</td>
+<td class="px-6 py-4">14:48:33 UTC</td>
+<td class="px-6 py-4 text-right text-brand-muted">LOCAL_HOST</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual Floating Indicator (Bottom Right) -->
+<div class="fixed bottom-6 right-6 z-50">
+<div class="bg-brand-gold text-black px-4 py-3 shadow-2xl flex items-center gap-4 border border-white/20">
+<div class="relative">
+<span class="material-symbols-outlined animate-pulse">broadcast_on_home</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full border border-black"></span>
+</div>
+<div>
+<div class="text-[9px] font-black uppercase leading-none mb-1">Live Feed</div>
+<div class="text-[11px] font-mono leading-none">SECURE LINK: ESTABLISHED</div>
+</div>
+</div>
+</div>
+</body></html>
