@@ -3,189 +3,183 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@800&amp;family=DM+Sans:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>CORTHEX Admin Login</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "background": "#151312",
-                        "primary": "#ffba46",
-                        "on-tertiary": "#003353",
-                        "tertiary-fixed-dim": "#96ccff",
-                        "on-tertiary-container": "#003251",
-                        "outline": "#9e8e7b",
-                        "secondary-fixed-dim": "#e7c089",
-                        "on-tertiary-fixed-variant": "#004a76",
-                        "on-secondary": "#432c02",
-                        "error": "#ffb4ab",
-                        "on-primary-fixed-variant": "#614000",
-                        "on-background": "#e8e1df",
-                        "surface-container": "#221f1e",
-                        "error-container": "#93000a",
-                        "tertiary": "#96ccff",
-                        "on-primary-fixed": "#281800",
-                        "surface-dim": "#151312",
-                        "on-error": "#690005",
-                        "on-secondary-container": "#d5af79",
-                        "inverse-on-surface": "#33302e",
-                        "inverse-surface": "#e8e1df",
-                        "secondary-container": "#5d4216",
-                        "surface-container-lowest": "#100e0d",
-                        "primary-container": "#ca8a04",
-                        "on-primary": "#442c00",
-                        "surface-tint": "#ffba46",
-                        "on-primary-container": "#422a00",
-                        "surface-container-high": "#2c2928",
-                        "outline-variant": "#514535",
-                        "secondary-fixed": "#ffddb0",
-                        "surface-bright": "#3c3837",
-                        "surface-container-highest": "#373433",
-                        "on-surface": "#e8e1df",
-                        "tertiary-container": "#3f9de4",
-                        "secondary": "#e7c089",
-                        "primary-fixed": "#ffddb0",
-                        "tertiary-fixed": "#cee5ff",
-                        "on-tertiary-fixed": "#001d32",
-                        "surface": "#151312",
-                        "primary-fixed-dim": "#ffba46",
-                        "on-secondary-fixed-variant": "#5d4216",
-                        "on-surface-variant": "#d5c4ae",
-                        "on-secondary-fixed": "#281800",
-                        "surface-variant": "#373433",
-                        "surface-container-low": "#1d1b1a",
-                        "inverse-primary": "#805600",
-                        "on-error-container": "#ffdad6"
-                    },
-                    fontFamily: {
-                        "headline": ["Manrope"],
-                        "body": ["Inter"],
-                        "label": ["Inter"],
-                        "brand": ["DM Sans"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                },
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface": "#120d08",
+                "on-primary": "#553b0f",
+                "on-error": "#450900",
+                "on-tertiary-container": "#5f331b",
+                "outline": "#807464",
+                "secondary-container": "#493920",
+                "secondary-dim": "#ceb594",
+                "inverse-surface": "#fff8f3",
+                "surface-container-highest": "#2d2418",
+                "primary": "#e7c088",
+                "on-secondary-container": "#d5bb9a",
+                "surface-container-high": "#261e14",
+                "on-secondary": "#4e3d24",
+                "on-background": "#f3e3d0",
+                "surface-variant": "#2d2418",
+                "surface-container-low": "#18120b",
+                "surface-dim": "#120d08",
+                "tertiary-container": "#f7b594",
+                "tertiary": "#ffc5a9",
+                "on-surface": "#f3e3d0",
+                "primary-container": "#694d20",
+                "on-secondary-fixed-variant": "#6c583d",
+                "on-surface-variant": "#b7a997",
+                "on-primary-fixed": "#4e3509",
+                "secondary-fixed-dim": "#ebd0ae",
+                "primary-fixed": "#fcd49a",
+                "on-tertiary-fixed": "#461f09",
+                "secondary-fixed": "#f9debc",
+                "surface-bright": "#342b1e",
+                "on-tertiary": "#6a3c23",
+                "error": "#f97758",
+                "secondary": "#dcc3a1",
+                "on-secondary-fixed": "#4d3c24",
+                "surface-container-lowest": "#000000",
+                "error-container": "#85230a",
+                "background": "#0C0A09",
+                "on-primary-container": "#ffdeb2",
+                "tertiary-fixed-dim": "#e8a788",
+                "on-primary-fixed-variant": "#6d5123",
+                "tertiary-dim": "#e8a788",
+                "surface-tint": "#e7c088",
+                "on-tertiary-fixed-variant": "#693b23",
+                "primary-fixed-dim": "#edc68d",
+                "on-error-container": "#ff9b82",
+                "surface-container": "#1f190f",
+                "inverse-primary": "#775a2b",
+                "outline-variant": "#514638",
+                "primary-dim": "#d9b37c",
+                "error-dim": "#c44f34",
+                "tertiary-fixed": "#f7b594",
+                "inverse-on-surface": "#5b544c"
+              },
+              fontFamily: {
+                "headline": ["Public Sans"],
+                "body": ["Public Sans"],
+                "label": ["Inter"],
+                "dmsans": ["DM Sans"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
             },
+          },
         }
     </script>
 <style>
+        body {
+            background-color: #0C0A09;
+            font-family: 'DM Sans', sans-serif;
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .vault-gradient {
-            background: linear-gradient(135deg, #ffba46 0%, #ca8a04 100%);
+        .hexagon-shape {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
         }
-        .milled-surface {
-            background-color: #100e0d;
-            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.5);
+        .glass-panel {
+            background: rgba(31, 25, 15, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(128, 116, 100, 0.2);
         }
-        .ghost-focus:focus-within {
-            background-color: #2c2928;
-            outline: 1px solid rgba(158, 142, 123, 0.2);
+        .command-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(128, 116, 100, 0.4);
+            transition: all 0.2s ease;
         }
-        .pulse-accent {
-            height: 2px;
-            width: 0;
-            transition: width 0.4s ease-in-out;
-            background-color: #ffba46;
-        }
-        .ghost-focus:focus-within .pulse-accent {
-            width: 100%;
+        .command-input:focus {
+            border-color: #e7c088;
+            box-shadow: 0 0 0 1px #e7c088;
+            outline: none;
         }
     </style>
 </head>
-<body class="bg-[#0C0A09] text-on-surface font-body min-h-screen flex items-center justify-center relative overflow-hidden">
-<!-- Background Watermark Decoration -->
-<div class="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none">
-<h1 class="text-[25vw] font-brand font-bold tracking-tighter">CORTHEX</h1>
+<body class="min-h-screen flex flex-col text-on-surface">
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="relative w-full max-w-md">
+<!-- Decorative Tech Background Elements -->
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-tertiary/5 rounded-full blur-3xl"></div>
+<!-- Login Card -->
+<div class="glass-panel p-8 md:p-10 rounded-xl relative overflow-hidden">
+<!-- Top Accent Line -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+<div class="flex flex-col items-center mb-10">
+<!-- Hexagon Logo -->
+<div class="w-16 h-16 bg-primary flex items-center justify-center hexagon-shape mb-4 shadow-[0_0_20px_rgba(231,192,136,0.3)]">
+<span class="material-symbols-outlined text-on-primary text-3xl font-bold" style="font-variation-settings: 'FILL' 1;">
+                            security
+                        </span>
 </div>
-<!-- Login Container -->
-<main class="relative z-10 w-full max-w-md px-6">
-<div class="bg-surface-container-low p-10 rounded-xl flex flex-col items-center">
-<!-- Logo & Identity -->
-<header class="mb-12 text-center">
-<div class="flex items-center justify-center mb-4">
-<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">security</span>
+<h1 class="text-2xl font-bold tracking-tighter text-on-background font-headline">CORTHEX ADMIN</h1>
+<p class="text-on-surface-variant text-sm mt-1 font-label tracking-widest uppercase">Central Command Access</p>
 </div>
-<h1 class="text-3xl font-brand font-bold tracking-tight text-primary">CORTHEX ADMIN</h1>
-<p class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em] mt-2">Sovereign Authority Terminal</p>
-</header>
-<!-- Authentication Form -->
-<form class="w-full space-y-8">
-<!-- Email Input Group -->
-<div class="space-y-2 group">
-<label class="block font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1" for="email">
-                        Credential Identifier
-                    </label>
-<div class="milled-surface rounded-lg overflow-hidden ghost-focus transition-all duration-400">
-<div class="flex items-center px-4 py-3">
-<span class="material-symbols-outlined text-outline-variant text-xl mr-3">alternate_email</span>
-<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-surface-bright font-brand tracking-tight text-sm" id="email" name="email" placeholder="ADMIN@CORTHEX.SECURE" required="" type="email"/>
-</div>
-<div class="pulse-accent"></div>
-</div>
-</div>
-<!-- Password Input Group -->
-<div class="space-y-2 group">
-<div class="flex justify-between items-center ml-1">
-<label class="block font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant" for="password">
-                            Security Key
-                        </label>
-<a class="text-[9px] font-bold uppercase tracking-widest text-outline hover:text-primary transition-colors" href="#">Recover Access</a>
-</div>
-<div class="milled-surface rounded-lg overflow-hidden ghost-focus transition-all duration-400">
-<div class="flex items-center px-4 py-3">
-<span class="material-symbols-outlined text-outline-variant text-xl mr-3">lock</span>
-<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-surface-bright font-brand tracking-tight text-sm" id="password" name="password" placeholder="••••••••••••" required="" type="password"/>
-</div>
-<div class="pulse-accent"></div>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block text-xs font-semibold uppercase tracking-widest text-primary font-label">Administrative Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">
+                                alternate_email
+                            </span>
+<input class="command-input w-full pl-11 pr-4 py-3 rounded-lg text-on-surface placeholder:text-stone-600 font-dmsans" placeholder="admin@corthex.io" type="email"/>
 </div>
 </div>
-<!-- Submit Action -->
-<button class="vault-gradient w-full py-4 rounded-lg flex items-center justify-center group active:scale-95 transition-all duration-400 ease-in-out" type="submit">
-<span class="text-on-primary-container font-brand font-bold text-sm tracking-widest uppercase mr-2">Login</span>
-<span class="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">arrow_forward</span>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block text-xs font-semibold uppercase tracking-widest text-primary font-label">Security Protocol</label>
+<a class="text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-tighter" href="#">Forgot Code?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">
+                                lock_open
+                            </span>
+<input class="command-input w-full pl-11 pr-4 py-3 rounded-lg text-on-surface placeholder:text-stone-600 font-dmsans" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center space-x-2 py-2">
+<input class="w-4 h-4 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-surface" id="persist" type="checkbox"/>
+<label class="text-xs text-on-surface-variant font-label" for="persist">Maintain Secure Session</label>
+</div>
+<button class="w-full bg-primary hover:bg-primary-dim text-on-primary font-bold py-4 rounded-lg shadow-lg shadow-primary/10 transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-sm" type="submit">
+                        Initialize Session
+                        <span class="material-symbols-outlined text-lg">
+                            login
+                        </span>
 </button>
 </form>
-<!-- Metadata Footer -->
-<footer class="mt-12 pt-8 border-t border-surface-container-highest w-full text-center">
-<div class="flex justify-center space-x-6 mb-4">
-<div class="flex items-center text-[10px] text-on-surface-variant uppercase tracking-tighter">
-<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
-                        Nodes Online
-                    </div>
-<div class="flex items-center text-[10px] text-on-surface-variant uppercase tracking-tighter">
-<span class="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>
-                        Vault Encrypted
-                    </div>
+<!-- Status Indicators -->
+<div class="mt-8 flex justify-between items-center border-t border-outline-variant/30 pt-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest">Mainframe Online</span>
 </div>
-<p class="text-[9px] text-surface-bright font-label leading-relaxed">
-                    UNAUTHORIZED ACCESS PROHIBITED BY PROTOCOL 84-C.<br/>
-                    IP LOGGING AND THERMAL TRACING ACTIVE.
-                </p>
-</footer>
+<span class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest">v4.2.0-secure</span>
 </div>
-<!-- Decorative Security Lines -->
-<div class="absolute -top-10 -left-10 w-24 h-24 border-t-2 border-l-2 border-primary/20 pointer-events-none"></div>
-<div class="absolute -bottom-10 -right-10 w-24 h-24 border-b-2 border-r-2 border-primary/20 pointer-events-none"></div>
+</div>
+<!-- System Messages Overlay -->
+<div class="mt-6 text-center">
+<p class="text-[10px] text-stone-600 font-label tracking-[0.2em] uppercase">Authorized Personnel Only. Unauthorized access is monitored and logged.</p>
+</div>
+</div>
 </main>
-<!-- Bottom Status Bar -->
-<div class="fixed bottom-0 left-0 w-full px-10 py-4 flex justify-between items-center bg-surface-container-lowest/50 backdrop-blur-md">
-<div class="text-[10px] font-label text-on-surface-variant tracking-[0.3em] uppercase">
-            System Hash: f7a2..90bc
-        </div>
-<div class="text-[10px] font-label text-on-surface-variant tracking-[0.3em] uppercase">
-            v4.2.0-Production
-        </div>
+<!-- Footer from Shared Components -->
+<footer class="fixed bottom-0 w-full z-50 flex justify-center items-center gap-6 py-6 bg-transparent">
+<span class="text-stone-500 dark:text-stone-400 font-['Public_Sans'] text-xs tracking-wide">© 2024 CORTHEX. All rights reserved.</span>
+<div class="flex gap-4">
+<a class="text-stone-500 dark:text-stone-400 font-['Public_Sans'] text-xs tracking-wide hover:text-stone-200 dark:hover:text-stone-50 transition-colors cursor-pointer active:opacity-70" href="#">Privacy Policy</a>
+<a class="text-stone-500 dark:text-stone-400 font-['Public_Sans'] text-xs tracking-wide hover:text-stone-200 dark:hover:text-stone-50 transition-colors cursor-pointer active:opacity-70" href="#">Terms of Service</a>
+<a class="text-stone-500 dark:text-stone-400 font-['Public_Sans'] text-xs tracking-wide hover:text-stone-200 dark:hover:text-stone-50 transition-colors cursor-pointer active:opacity-70" href="#">Help Center</a>
 </div>
+</footer>
 </body></html>

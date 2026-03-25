@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;700;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed-variant": "#6d5123",
+                        "on-secondary-fixed-variant": "#6c583d",
+                        "on-error": "#450900",
+                        "surface-container-low": "#18120b",
+                        "surface-bright": "#342b1e",
+                        "surface-container-high": "#261e14",
+                        "on-secondary": "#4e3d24",
+                        "secondary-dim": "#ceb594",
+                        "on-surface-variant": "#b7a997",
+                        "on-tertiary-fixed": "#461f09",
+                        "primary-fixed-dim": "#edc68d",
+                        "surface-variant": "#2d2418",
+                        "surface-container-lowest": "#000000",
+                        "tertiary-container": "#f7b594",
+                        "tertiary-fixed-dim": "#e8a788",
+                        "on-secondary-container": "#d5bb9a",
+                        "background": "#0C0A09",
+                        "surface-container-highest": "#2d2418",
+                        "on-error-container": "#ff9b82",
+                        "error-container": "#85230a",
+                        "tertiary-fixed": "#f7b594",
+                        "on-primary-fixed": "#4e3509",
+                        "surface-tint": "#e7c088",
+                        "on-secondary-fixed": "#4d3c24",
+                        "primary-fixed": "#fcd49a",
+                        "primary-dim": "#d9b37c",
+                        "inverse-surface": "#fff8f3",
+                        "secondary-fixed": "#f9debc",
+                        "secondary-container": "#493920",
+                        "primary-container": "#694d20",
+                        "error": "#f97758",
+                        "secondary-fixed-dim": "#ebd0ae",
+                        "on-surface": "#f3e3d0",
+                        "surface-container": "#1f190f",
+                        "error-dim": "#c44f34",
+                        "outline": "#807464",
+                        "on-background": "#f3e3d0",
+                        "on-tertiary-container": "#5f331b",
+                        "on-primary": "#553b0f",
+                        "on-tertiary-fixed-variant": "#693b23",
+                        "secondary": "#dcc3a1",
+                        "inverse-primary": "#775a2b",
+                        "inverse-on-surface": "#5b544c",
+                        "on-primary-container": "#ffdeb2",
+                        "tertiary-dim": "#e8a788",
+                        "tertiary": "#ffc5a9",
+                        "outline-variant": "#514638",
+                        "primary": "#CA8A04",
+                        "surface-dim": "#120d08",
+                        "surface": "#120d08",
+                        "on-tertiary": "#6a3c23"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .workflow-grid-cols {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr 1fr 80px;
+        }
+    </style>
+</head>
+<body class="bg-[#0C0A09] text-on-surface font-body selection:bg-primary/30 min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-50 bg-stone-950 border-r border-stone-800 w-64 shadow-2xl">
+<div class="p-6 border-b border-stone-800 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary/20 border border-primary/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-stone-100 font-headline">CORTHEX</h1>
+<p class="font-public-sans uppercase tracking-widest text-[10px] text-stone-500">Industrial OS</p>
+</div>
+</div>
+<nav class="flex-1 py-4">
+<div class="flex items-center gap-3 bg-stone-900 text-amber-500 border-r-2 border-amber-500 px-4 py-3 transition-transform translate-x-1">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-public-sans uppercase tracking-widest text-xs">Workflows</span>
+</div>
+<div class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:bg-stone-900/50 hover:text-stone-200 transition-colors">
+<span class="material-symbols-outlined">play_circle</span>
+<span class="font-public-sans uppercase tracking-widest text-xs">Executions</span>
+</div>
+<div class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:bg-stone-900/50 hover:text-stone-200 transition-colors">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-public-sans uppercase tracking-widest text-xs">Nodes</span>
+</div>
+</nav>
+<div class="px-4 py-6 border-t border-stone-800 space-y-2">
+<div class="flex items-center gap-3 text-stone-500 px-4 py-2 hover:bg-stone-900/50 hover:text-stone-200 transition-colors">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+<span class="font-public-sans uppercase tracking-widest text-[10px]">Documentation</span>
+</div>
+<div class="flex items-center gap-3 text-stone-500 px-4 py-2 hover:bg-stone-900/50 hover:text-stone-200 transition-colors">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span class="font-public-sans uppercase tracking-widest text-[10px]">Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-8 h-16 bg-stone-950/80 backdrop-blur-md border-b border-stone-800">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-lg">search</span>
+<input class="bg-stone-900/50 border-stone-800 rounded-none focus:ring-primary focus:border-primary text-sm pl-10 pr-4 py-1.5 w-64 text-stone-300" placeholder="Filter active workflows..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<span class="text-[10px] font-mono uppercase tracking-widest text-stone-400">System Nominal</span>
+</div>
+<div class="flex gap-4 border-l border-stone-800 pl-6">
+<span class="material-symbols-outlined text-stone-400 hover:text-primary cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined text-stone-400 hover:text-primary cursor-pointer transition-colors">settings</span>
+<div class="w-8 h-8 rounded-none border border-stone-700 overflow-hidden bg-stone-800">
+<img alt="User profile avatar" class="w-full h-full object-cover grayscale opacity-80" data-alt="close-up portrait of professional engineer in dark studio lighting looking at the camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYLGGCnwWEgUeHVLRGYz0Ss9g3UKz5pJCvGAhDD4U-IfxAw57TQaqDxqUd9d3yZnrlIwtcskGmHsIYUEdLY-8ZhZl57mrTvnOnKQcO463jF5VZ1JvAogpfVSF_t0vhtJAApPGtI88A_3PI9D14Am3Nt5cTQUuyUTIr2Rl7iesz90WQBCCgGQH-lNEybBGsO9EdnD8p-jtQ0q2qpWTNd_fxv8gHDyK8TzFjKmz003XrxlcekZ4ugUwX9kqV8tIvzH1PXilR3Q5akOk"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-8 flex gap-8">
+<!-- Left: Workflow Inventory -->
+<div class="flex-1 space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-3xl font-black font-headline tracking-tighter text-stone-100">WORKFLOWS</h2>
+<p class="text-xs font-mono text-stone-500 uppercase tracking-widest mt-1">Found 12 automated sequences</p>
+</div>
+<button class="bg-primary text-black font-black px-6 py-2 flex items-center gap-2 hover:bg-primary-fixed transition-colors text-xs tracking-tighter uppercase">
+<span class="material-symbols-outlined text-lg">add</span>
+                        New Workflow
+                    </button>
+</div>
+<!-- Table Header -->
+<div class="workflow-grid-cols px-6 py-3 bg-stone-900/30 border border-stone-800 text-[10px] font-mono text-stone-500 uppercase tracking-[0.2em]">
+<div>Identification / Trigger</div>
+<div>Status</div>
+<div>Last Execution</div>
+<div>Health</div>
+<div class="text-right">Action</div>
+</div>
+<!-- Workflow List -->
+<div class="space-y-px">
+<!-- Workflow Item 1 -->
+<div class="workflow-grid-cols items-center px-6 py-5 bg-stone-900/20 border border-stone-800/50 hover:bg-stone-900/40 transition-colors group">
+<div class="flex flex-col gap-1">
+<span class="text-stone-100 font-bold tracking-tight">ERP_SYNC_AUTOMATION_V4</span>
+<span class="text-[10px] font-mono text-stone-500 flex items-center gap-1 uppercase">
+<span class="material-symbols-outlined text-xs">schedule</span> Every 15m
+                            </span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<button class="relative w-8 h-4 bg-primary rounded-full transition-colors flex items-center px-0.5">
+<div class="w-3 h-3 bg-black rounded-full translate-x-4"></div>
+</button>
+<span class="text-[10px] font-mono text-primary uppercase">Active</span>
+</div>
+</div>
+<div class="font-mono text-xs text-stone-400 tracking-tighter">
+                            2023-11-24 <span class="text-stone-600">|</span> 14:32:01.442
+                        </div>
+<div>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 overflow-hidden">
+<div class="w-[98%] h-full bg-primary shadow-[0_0_8px_#CA8A04]"></div>
+</div>
+<span class="font-mono text-[10px] text-stone-300">98%</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="p-1.5 border border-stone-800 text-stone-500 hover:text-stone-100 hover:border-stone-600">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+<!-- Workflow Item 2 -->
+<div class="workflow-grid-cols items-center px-6 py-5 bg-stone-900/20 border border-stone-800/50 hover:bg-stone-900/40 transition-colors group">
+<div class="flex flex-col gap-1">
+<span class="text-stone-100 font-bold tracking-tight">LOGISTICS_ROUTING_AI</span>
+<span class="text-[10px] font-mono text-stone-500 flex items-center gap-1 uppercase">
+<span class="material-symbols-outlined text-xs">webhook</span> Webhook
+                            </span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<button class="relative w-8 h-4 bg-stone-800 rounded-full transition-colors flex items-center px-0.5">
+<div class="w-3 h-3 bg-stone-600 rounded-full"></div>
+</button>
+<span class="text-[10px] font-mono text-stone-600 uppercase">Standby</span>
+</div>
+</div>
+<div class="font-mono text-xs text-stone-500 tracking-tighter italic">
+                            Waiting for trigger...
+                        </div>
+<div>
+<div class="flex items-center gap-2 opacity-50">
+<div class="flex-1 h-1 bg-stone-800 overflow-hidden">
+<div class="w-[100%] h-full bg-stone-600"></div>
+</div>
+<span class="font-mono text-[10px] text-stone-500">N/A</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="p-1.5 border border-stone-800 text-stone-500 hover:text-stone-100 hover:border-stone-600">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+<!-- Workflow Item 3 -->
+<div class="workflow-grid-cols items-center px-6 py-5 bg-stone-900/20 border border-stone-800/50 hover:bg-stone-900/40 transition-colors group">
+<div class="flex flex-col gap-1">
+<span class="text-stone-100 font-bold tracking-tight">NODE_METRIC_COLLECTOR</span>
+<span class="text-[10px] font-mono text-stone-500 flex items-center gap-1 uppercase">
+<span class="material-symbols-outlined text-xs">schedule</span> Every 1m
+                            </span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<button class="relative w-8 h-4 bg-primary rounded-full transition-colors flex items-center px-0.5">
+<div class="w-3 h-3 bg-black rounded-full translate-x-4"></div>
+</button>
+<span class="text-[10px] font-mono text-primary uppercase">Active</span>
+</div>
+</div>
+<div class="font-mono text-xs text-stone-400 tracking-tighter">
+                            2023-11-24 <span class="text-stone-600">|</span> 14:46:58.211
+                        </div>
+<div>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 overflow-hidden">
+<div class="w-[74%] h-full bg-error shadow-[0_0_8px_#f97758]"></div>
+</div>
+<span class="font-mono text-[10px] text-error">74%</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="p-1.5 border border-stone-800 text-stone-500 hover:text-stone-100 hover:border-stone-600">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bento Style Stats Grid -->
+<div class="grid grid-cols-3 gap-4 pt-4">
+<div class="bg-stone-900/40 border border-stone-800 p-6 flex flex-col justify-between aspect-video">
+<span class="text-[10px] font-mono text-stone-500 uppercase tracking-widest">Total Throughput</span>
+<div>
+<div class="text-4xl font-black text-stone-200">2.4M</div>
+<div class="text-[10px] font-mono text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +14.2% THIS WEEK
+                            </div>
+</div>
+</div>
+<div class="bg-stone-900/40 border border-stone-800 p-6 flex flex-col justify-between aspect-video">
+<span class="text-[10px] font-mono text-stone-500 uppercase tracking-widest">Active Instances</span>
+<div>
+<div class="text-4xl font-black text-stone-200">882</div>
+<div class="text-[10px] font-mono text-stone-600 mt-1 uppercase">Parallel Processing Ops</div>
+</div>
+</div>
+<div class="bg-primary/5 border border-primary/20 p-6 flex flex-col justify-between aspect-video">
+<span class="text-[10px] font-mono text-primary uppercase tracking-widest">System Health</span>
+<div>
+<div class="text-4xl font-black text-primary">99.9%</div>
+<div class="text-[10px] font-mono text-stone-500 mt-1 uppercase tracking-tighter">Uptime Cluster 01-ALPHA</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Live Execution Logs Panel -->
+<aside class="w-96 flex flex-col bg-stone-950 border border-stone-800 overflow-hidden">
+<div class="p-4 border-b border-stone-800 flex items-center justify-between bg-stone-900/50">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-primary animate-pulse rounded-full"></div>
+<h3 class="font-mono text-[11px] font-bold text-stone-100 uppercase tracking-widest">Live Execution Stream</h3>
+</div>
+<span class="material-symbols-outlined text-stone-500 text-sm cursor-pointer hover:text-stone-300">close_fullscreen</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[11px] selection:bg-primary/20">
+<!-- Log Item -->
+<div class="space-y-1">
+<div class="flex justify-between text-stone-600">
+<span>14:47:01.002</span>
+<span class="text-primary">[SUCCESS]</span>
+</div>
+<p class="text-stone-400 break-all border-l border-stone-800 pl-3 py-1">
+                            NODE_METRIC_COLLECTOR: Push sequence complete to master.db.latency: 14ms
+                        </p>
+</div>
+<!-- Log Item -->
+<div class="space-y-1">
+<div class="flex justify-between text-stone-600">
+<span>14:46:59.882</span>
+<span class="text-stone-400">[TRIGGER]</span>
+</div>
+<p class="text-stone-500 break-all border-l border-stone-800 pl-3 py-1">
+                            Inbound Webhook: ERP_SYNC_AUTOMATION_V4 payload received (4.2KB)
+                        </p>
+</div>
+<!-- Log Item -->
+<div class="space-y-1">
+<div class="flex justify-between text-stone-600">
+<span>14:46:58.115</span>
+<span class="text-error">[ERROR]</span>
+</div>
+<p class="text-error-dim/80 break-all border-l border-error/30 pl-3 py-1 bg-error/5">
+                            CRITICAL: API Connection timeout on Node #44 (External Auth Gateway). Retrying in 500ms...
+                        </p>
+</div>
+<!-- Log Item -->
+<div class="space-y-1">
+<div class="flex justify-between text-stone-600">
+<span>14:46:55.001</span>
+<span class="text-primary">[SUCCESS]</span>
+</div>
+<p class="text-stone-400 break-all border-l border-stone-800 pl-3 py-1">
+                            LOGISTICS_ROUTING_AI: Path optimization calculated for Cluster 9 (Drone-A1).
+                        </p>
+</div>
+<!-- Log Item -->
+<div class="space-y-1">
+<div class="flex justify-between text-stone-600">
+<span>14:46:52.410</span>
+<span class="text-stone-400">[INFO]</span>
+</div>
+<p class="text-stone-500 break-all border-l border-stone-800 pl-3 py-1">
+                            System Check: All 12/12 workflow runners active on Node_Srv_B1.
+                        </p>
+</div>
+<div class="space-y-1 opacity-60">
+<div class="flex justify-between text-stone-600">
+<span>14:46:50.002</span>
+<span class="text-primary">[SUCCESS]</span>
+</div>
+<p class="text-stone-400 break-all border-l border-stone-800 pl-3 py-1">
+                            Database cleanup routine finalized. 1,042 stale logs purged.
+                        </p>
+</div>
+</div>
+<div class="p-4 border-t border-stone-800 bg-stone-900/30 flex items-center gap-3">
+<span class="material-symbols-outlined text-stone-600 text-sm">terminal</span>
+<input class="bg-transparent border-none p-0 text-[10px] font-mono text-stone-400 focus:ring-0 placeholder:text-stone-700 w-full" placeholder="Send command to kernel..." type="text"/>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

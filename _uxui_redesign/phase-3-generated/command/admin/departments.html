@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Admin Departments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #e8e1df;
+            font-family: 'Public Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .industrial-grid {
+            background-image: radial-gradient(#2c2928 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#221f1e",
+                        "inverse-primary": "#805600",
+                        "on-surface": "#e8e1df",
+                        "outline-variant": "#514535",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#151312",
+                        "tertiary-container": "#3f9de4",
+                        "tertiary": "#96ccff",
+                        "tertiary-fixed": "#cee5ff",
+                        "inverse-on-surface": "#33302e",
+                        "on-surface-variant": "#d5c4ae",
+                        "on-primary-fixed": "#281800",
+                        "primary-container": "#ca8a04",
+                        "on-secondary-fixed-variant": "#5d4216",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "surface-variant": "#373433",
+                        "on-primary-fixed-variant": "#614000",
+                        "surface-tint": "#ffba46",
+                        "surface-container-low": "#1d1b1a",
+                        "on-tertiary-fixed-variant": "#004a76",
+                        "primary-fixed-dim": "#ffba46",
+                        "on-secondary-fixed": "#281800",
+                        "inverse-surface": "#e8e1df",
+                        "on-background": "#e8e1df",
+                        "surface-container-lowest": "#100e0d",
+                        "surface-container-highest": "#373433",
+                        "primary": "#ffba46",
+                        "on-secondary-container": "#d5af79",
+                        "error-container": "#93000a",
+                        "background": "#151312",
+                        "surface-container-high": "#2c2928",
+                        "on-secondary": "#432c02",
+                        "on-primary-container": "#422a00",
+                        "on-primary": "#442c00",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#ffddb0",
+                        "on-tertiary-container": "#003251",
+                        "secondary-fixed-dim": "#e7c089",
+                        "primary-fixed": "#ffddb0",
+                        "on-tertiary-fixed": "#001d32",
+                        "surface": "#151312",
+                        "secondary-container": "#5d4216",
+                        "on-tertiary": "#003353",
+                        "error": "#ffb4ab",
+                        "secondary": "#e7c089",
+                        "surface-bright": "#3c3837",
+                        "outline": "#9e8e7b"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-[#0C0A09] min-h-screen">
+<!-- TopNavBar (Shared Component Implemented) -->
+<nav class="fixed top-0 z-50 flex justify-between items-center w-full px-6 py-3 bg-[#151312] shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_8px_rgba(202,138,4,0.1)]">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-[#CA8A04] uppercase">CORTHEX</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="font-['Public_Sans'] font-heavy tracking-tighter uppercase text-[#e8e1df] opacity-70 hover:text-[#FFBA46] transition-colors duration-200" href="#">Systems</a>
+<a class="font-['Public_Sans'] font-heavy tracking-tighter uppercase text-[#e8e1df] opacity-70 hover:text-[#FFBA46] transition-colors duration-200" href="#">Assets</a>
+<a class="font-['Public_Sans'] font-heavy tracking-tighter uppercase text-[#e8e1df] opacity-70 hover:text-[#FFBA46] transition-colors duration-200" href="#">Logs</a>
+<a class="font-['Public_Sans'] font-heavy tracking-tighter uppercase text-[#e8e1df] opacity-70 hover:text-[#FFBA46] transition-colors duration-200" href="#">Telemetry</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#e8e1df] opacity-70 cursor-pointer hover:text-[#FFBA46]">notifications</span>
+<span class="material-symbols-outlined text-[#e8e1df] opacity-70 cursor-pointer hover:text-[#FFBA46]">settings</span>
+<div class="h-8 w-8 bg-[#2c2928] overflow-hidden">
+<img alt="Admin Profile" data-alt="close-up portrait of a professional man in a tech environment with dramatic lighting and dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArjDrGOZe7cSHj6Z-H4emf6vqnjQM9j2k2ZjoLkazzS_nE7H9ljw5MOgeUochCOTIcUXTsJGr8BwWIOT3mRKbFluh5CFQmVnl_AEqGuXbGohK-SgRLThQhnV7Dsr0UOmOMgjDF08blGOTbT7VAOQZ-v784jtij1BwZ_y2TGJnm-G06-aQJ_LW9SLvVM1zLKQg7mmwfCGR7xYx-zL5R3ruSCfpKIltBhs1veQxt9ITBTww8LOmoxkzeYZ9_PXq11VjCSuQVDn-X3Z0"/>
+</div>
+</div>
+</nav>
+<div class="h-[1px] w-full bg-[#2c2928] fixed top-[60px] z-50"></div>
+<!-- SideNavBar (Shared Component Implemented) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#100e0d] border-r border-[#2c2928]/20 pt-20 flex flex-col z-40">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-1.5 h-6 bg-[#CA8A04]"></div>
+<div>
+<h2 class="font-black text-[#e8e1df] tracking-tight text-lg leading-tight">COMMAND</h2>
+<p class="font-['JetBrains_Mono'] text-[10px] tracking-[0.2em] text-[#CA8A04] opacity-80 uppercase">v4.2.0-ALPHA</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase text-[#e8e1df] opacity-60 hover:opacity-100 hover:bg-[#151312] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase bg-[#2c2928] text-[#FFBA46] border-l-4 border-[#CA8A04] font-bold" href="#">
+<span class="material-symbols-outlined text-lg">domain</span> Departments
+            </a>
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase text-[#e8e1df] opacity-60 hover:opacity-100 hover:bg-[#151312] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-lg" data-weight="fill">groups</span> Personnel
+            </a>
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase text-[#e8e1df] opacity-60 hover:opacity-100 hover:bg-[#151312] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-lg">developer_board</span> Infrastructure
+            </a>
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase text-[#e8e1df] opacity-60 hover:opacity-100 hover:bg-[#151312] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-lg">verified_user</span> Security
+            </a>
+<a class="flex items-center gap-4 px-6 py-3 font-['JetBrains_Mono'] text-xs tracking-widest uppercase text-[#e8e1df] opacity-60 hover:opacity-100 hover:bg-[#151312] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-lg">query_stats</span> Analytics
+            </a>
+</nav>
+<div class="p-6 border-t border-[#2c2928]/20">
+<button class="w-full bg-[#CA8A04] text-[#151312] font-black text-xs py-3 tracking-widest uppercase hover:bg-[#FFBA46] transition-colors active:scale-[0.98]">
+                CREATE NEW
+            </button>
+</div>
+<div class="pb-6">
+<a class="flex items-center gap-4 px-6 py-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.2em] uppercase text-[#e8e1df] opacity-50 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined text-sm">help_center</span> Support
+            </a>
+<a class="flex items-center gap-4 px-6 py-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.2em] uppercase text-[#e8e1df] opacity-50 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined text-sm">terminal</span> Terminal
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-24 px-10 pb-12 industrial-grid min-h-screen">
+<!-- Page Header -->
+<header class="flex justify-between items-end mb-12 relative">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 bg-[#CA8A04] shadow-[0_0_8px_#CA8A04]"></span>
+<span class="font-['JetBrains_Mono'] text-xs tracking-[0.3em] text-[#CA8A04] uppercase">Registry / Sector_04</span>
+</div>
+<h1 class="text-6xl font-black tracking-tighter uppercase text-[#e8e1df] leading-none">Departments</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-[#outline] opacity-60 mb-1">Total Sectors</p>
+<p class="font-['JetBrains_Mono'] text-2xl font-bold text-[#e8e1df]">12<span class="text-[#CA8A04]">.00</span></p>
+</div>
+<button class="bg-[#CA8A04] hover:bg-[#FFBA46] text-[#100e0d] px-8 py-4 font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 active:scale-95 shadow-[8px_8px_0px_rgba(202,138,4,0.2)]">
+<span class="material-symbols-outlined font-bold">add</span>
+                    Create Department
+                </button>
+</div>
+</header>
+<!-- Department Table Module -->
+<section class="bg-[#100e0d] border border-white/5 shadow-2xl overflow-hidden backdrop-blur-md">
+<!-- Table Controls -->
+<div class="bg-[#151312] px-6 py-4 border-b border-[#2c2928] flex justify-between items-center">
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#outline] text-sm">search</span>
+<input class="bg-[#100e0d] border-b border-[#outline-variant] focus:border-[#CA8A04] text-[#e8e1df] font-['JetBrains_Mono'] text-[10px] pl-10 pr-4 py-2 w-64 outline-none transition-all placeholder:opacity-30" placeholder="FILTER SYSTEMS..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4 text-[#outline]">
+<span class="material-symbols-outlined cursor-pointer hover:text-[#CA8A04] transition-colors">filter_list</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-[#CA8A04] transition-colors">download</span>
+<div class="h-4 w-[1px] bg-[#2c2928]"></div>
+<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest">Active nodes: 148</span>
+</div>
+</div>
+<!-- The Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#151312] border-b border-[#2c2928]">
+<th class="px-8 py-6">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.2em] text-[#outline] uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">folder_open</span>
+                                    Department Name
+                                </span>
+</th>
+<th class="px-8 py-6">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.2em] text-[#outline] uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">corporate_fare</span>
+                                    Company
+                                </span>
+</th>
+<th class="px-8 py-6">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.2em] text-[#outline] uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">groups</span>
+                                    Agent Count
+                                </span>
+</th>
+<th class="px-8 py-6">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.2em] text-[#outline] uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">shield_person</span>
+                                    Head Agent
+                                </span>
+</th>
+<th class="px-8 py-6 text-right">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold tracking-[0.2em] text-[#outline] uppercase">Status</span>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#2c2928]/30">
+<!-- Row 1 -->
+<tr class="hover:bg-[#151312] transition-colors group">
+<td class="px-8 py-6">
+<div class="flex flex-col">
+<span class="text-[#e8e1df] font-bold tracking-tight uppercase group-hover:text-[#CA8A04] transition-colors">Neural Network Core</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#outline] opacity-50">UID: DEP-092-ALPHA</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-[#2c2928] flex items-center justify-center">
+<span class="material-symbols-outlined text-xs text-[#CA8A04]">architecture</span>
+</div>
+<span class="text-sm font-medium">CORTHEX INDUSTRIES</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<span class="font-['JetBrains_Mono'] text-lg font-bold text-[#e8e1df]">142</span>
+<div class="flex-1 h-1 bg-[#2c2928] w-24 relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-[#CA8A04] w-3/4"></div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="Head Agent" class="w-8 h-8 opacity-80" data-alt="professional portrait of an executive woman with futuristic lighting and dark grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2AUqkJnguexgevotvwnUozdQr5DxqhBrMQ8L51FlDPxRt2p9iVmmcT6UeoafxjRmTzLW70KaXF4n0ki8LdFGot7xGID99qpqrVKtPv2xP2-JdrrxpEy_IoLJD9B7WXKfCYS4G9By8hsrRTlqMV8VOTzglb_e-WNfr0jE-yxDMieKh1QMHxmDBEHicDeDaInCu9tYGv25dAH4S2pUThA1MLyHyBLgSB-Z0eHT2qo6teu-CBuksI5je_gmWZr0sQ5FYC6ljq1M5ZOU"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-[#e8e1df]">SARA VANCE</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#CA8A04]">LVL 09 CLEARANCE</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="inline-flex items-center gap-2 bg-[#2c2928] px-3 py-1 border-l-2 border-[#CA8A04]">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold text-[#CA8A04] uppercase">Operational</span>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#151312] transition-colors group">
+<td class="px-8 py-6">
+<div class="flex flex-col">
+<span class="text-[#e8e1df] font-bold tracking-tight uppercase group-hover:text-[#CA8A04] transition-colors">Biometric Security</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#outline] opacity-50">UID: DEP-412-BETA</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-[#2c2928] flex items-center justify-center">
+<span class="material-symbols-outlined text-xs text-[#CA8A04]">security</span>
+</div>
+<span class="text-sm font-medium">SHIELD DEFENSE</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<span class="font-['JetBrains_Mono'] text-lg font-bold text-[#e8e1df]">84</span>
+<div class="flex-1 h-1 bg-[#2c2928] w-24 relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-[#CA8A04] w-1/2"></div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="Head Agent" class="w-8 h-8 opacity-80" data-alt="sharp portrait of a technical specialist in a dark uniform with dramatic teal highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGpCrcq7OfwXAygNe9S8ovMTNtdhFHPF_AdjP1aghdsXT7DoWo5PjUc6hlacg4zXAOF-8Ffs6Guyd_Lu36YxTCGOB5nLgtEjcs8hOVmRw21oUFtQMHxlNpu_Cp2ISTyPGDDBIQviVKNDze4ZUH3c7UJe50Ar5jgMKjuqk03mwwEhzruzjwbWCD1gUnx6FLVemvJ5sFHNEZoeRl61OeFFqyy3r9O4daO0WdyXPMZRpgiALSZMtQJFF6SEeNXZOU6ErlGGBhTZeGRrY"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-[#e8e1df]">MARCUS CHEN</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#CA8A04]">LVL 08 CLEARANCE</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="inline-flex items-center gap-2 bg-[#2c2928] px-3 py-1 border-l-2 border-[#CA8A04]">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold text-[#CA8A04] uppercase">Operational</span>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#151312] transition-colors group">
+<td class="px-8 py-6">
+<div class="flex flex-col">
+<span class="text-[#e8e1df] font-bold tracking-tight uppercase group-hover:text-[#CA8A04] transition-colors">Quantum Logistics</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#outline] opacity-50">UID: DEP-881-OMEGA</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-[#2c2928] flex items-center justify-center">
+<span class="material-symbols-outlined text-xs text-[#CA8A04]">hub</span>
+</div>
+<span class="text-sm font-medium">NEXUS GLOBAL</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<span class="font-['JetBrains_Mono'] text-lg font-bold text-[#e8e1df]">216</span>
+<div class="flex-1 h-1 bg-[#2c2928] w-24 relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-[#CA8A04] w-full"></div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="Head Agent" class="w-8 h-8 opacity-80" data-alt="professional portrait of a senior logistics manager in a modern industrial setting with amber lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHCDYcUMkVQz8OSrwuirjb2T9kyTAd0sAFBu42PECqjEYbw8VA6xvpvgqgsHhpiPdQm36yxkRcRjmgu_AXoh9OBqik6B0H_AebTxNTOl0D_obRSWsSSkMugdWuNq9pj4ztwExjxtPunyjrWt-1Gg5v3TDSNSZKepWFwAygAsH0C4FxKqGd33iyvmfzoliJdDrT7MPCV-HP0FED2ST1NduKKRYNlYwdB3RAnGdrsCrcuRmY-GoZHOTiwYe1XiTERuznBipDdV_FWRw"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-[#e8e1df]">ELARA KANE</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#CA8A04]">LVL 10 CLEARANCE</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="inline-flex items-center gap-2 bg-[#93000a] px-3 py-1 border-l-2 border-[#ffb4ab]">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold text-[#ffdad6] uppercase">Maintenance</span>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#151312] transition-colors group">
+<td class="px-8 py-6">
+<div class="flex flex-col">
+<span class="text-[#e8e1df] font-bold tracking-tight uppercase group-hover:text-[#CA8A04] transition-colors">Satellite Uplink</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#outline] opacity-50">UID: DEP-003-SIGMA</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-[#2c2928] flex items-center justify-center">
+<span class="material-symbols-outlined text-xs text-[#CA8A04]">satellite_alt</span>
+</div>
+<span class="text-sm font-medium">CORTHEX INDUSTRIES</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<span class="font-['JetBrains_Mono'] text-lg font-bold text-[#e8e1df]">12</span>
+<div class="flex-1 h-1 bg-[#2c2928] w-24 relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-[#CA8A04] w-[10%]"></div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<img alt="Head Agent" class="w-8 h-8 opacity-80" data-alt="side profile of a technical operations director in a dark studio with blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuDHsK4gEu5EqDuUk7fqQiKwAdmS8FvGnGtgkzvOVpiO_dJoVUxzgtbvkdx0cvfup-f5GSt01Ad1fUe_YBzMBkgs_HkoovbS1-luxRpxjxK4UbkrTorr-NmWQl8itjZ7PPtox2d7x7KVoPEvFUQP8r2TX6UY2_75j_2IE92SgvqyBSbLjXrx_ZGabQ183pJ-zMBiia-o1k6pcFzhBz5auIq5OIcP32YrSxy8-eJk1RC64vwMU8CV5PcdSVXBdlYssHAtLARq7v6hE"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-[#e8e1df]">VICTOR REED</span>
+<span class="font-['JetBrains_Mono'] text-[9px] text-[#CA8A04]">LVL 07 CLEARANCE</span>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="inline-flex items-center gap-2 bg-[#2c2928] px-3 py-1 border-l-2 border-[#CA8A04]">
+<span class="font-['JetBrains_Mono'] text-[10px] font-bold text-[#CA8A04] uppercase">Operational</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer Pagination -->
+<div class="bg-[#151312] px-8 py-6 flex justify-between items-center border-t border-[#2c2928]">
+<div class="font-['JetBrains_Mono'] text-[10px] text-[#outline] opacity-60 uppercase">
+                    Showing 1-4 of 12 Registered Departments
+                </div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-[#2c2928] text-[#e8e1df] hover:bg-[#CA8A04] hover:text-[#100e0d] transition-all">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-[#CA8A04] text-[#100e0d] font-bold text-[10px] font-['JetBrains_Mono']">
+                        01
+                    </button>
+<button class="w-8 h-8 flex items-center justify-center border border-[#2c2928] text-[#e8e1df] hover:bg-[#CA8A04] hover:text-[#100e0d] transition-all font-bold text-[10px] font-['JetBrains_Mono']">
+                        02
+                    </button>
+<button class="w-8 h-8 flex items-center justify-center border border-[#2c2928] text-[#e8e1df] hover:bg-[#CA8A04] hover:text-[#100e0d] transition-all font-bold text-[10px] font-['JetBrains_Mono']">
+                        03
+                    </button>
+<button class="w-8 h-8 flex items-center justify-center border border-[#2c2928] text-[#e8e1df] hover:bg-[#CA8A04] hover:text-[#100e0d] transition-all">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Technical Metadata Overlay -->
+<div class="mt-12 grid grid-cols-4 gap-6">
+<div class="bg-[#100e0d] p-6 border-l-2 border-[#CA8A04]">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-[#outline] opacity-50 mb-2">Network Load</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-black text-[#e8e1df]">42%</span>
+<span class="material-symbols-outlined text-[#CA8A04] opacity-40">query_stats</span>
+</div>
+</div>
+<div class="bg-[#100e0d] p-6 border-l-2 border-[#CA8A04]">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-[#outline] opacity-50 mb-2">Secure Zones</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-black text-[#e8e1df]">08</span>
+<span class="material-symbols-outlined text-[#CA8A04] opacity-40">verified_user</span>
+</div>
+</div>
+<div class="bg-[#100e0d] p-6 border-l-2 border-[#CA8A04]">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-[#outline] opacity-50 mb-2">Encryption Key</p>
+<div class="flex items-end justify-between">
+<span class="font-['JetBrains_Mono'] text-sm font-bold text-[#e8e1df] truncate">X-992-001-K</span>
+<span class="material-symbols-outlined text-[#CA8A04] opacity-40">key</span>
+</div>
+</div>
+<div class="bg-[#100e0d] p-6 border-l-2 border-[#error]">
+<p class="font-['JetBrains_Mono'] text-[10px] uppercase text-[#outline] opacity-50 mb-2">System Alerts</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-black text-[#error]">03</span>
+<span class="material-symbols-outlined text-[#error] opacity-40">warning</span>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Suppression Logic: Not rendering FAB on Details/Admin screens as per guidelines -->
+</body></html>

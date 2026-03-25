@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Performance Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#261e14",
+                        "outline-variant": "#514638",
+                        "primary-container": "#694d20",
+                        "surface-container-highest": "#2d2418",
+                        "secondary-fixed": "#f9debc",
+                        "on-tertiary-fixed": "#461f09",
+                        "tertiary-fixed": "#f7b594",
+                        "primary-fixed-dim": "#edc68d",
+                        "surface": "#120d08",
+                        "surface-container-low": "#18120b",
+                        "inverse-primary": "#775a2b",
+                        "on-surface-variant": "#b7a997",
+                        "surface-variant": "#2d2418",
+                        "on-secondary-fixed": "#4d3c24",
+                        "tertiary-fixed-dim": "#e8a788",
+                        "primary-dim": "#d9b37c",
+                        "outline": "#807464",
+                        "on-tertiary-container": "#5f331b",
+                        "error-dim": "#c44f34",
+                        "on-tertiary-fixed-variant": "#693b23",
+                        "tertiary": "#ffc5a9",
+                        "on-background": "#f3e3d0",
+                        "inverse-on-surface": "#5b544c",
+                        "surface-container-lowest": "#000000",
+                        "on-error": "#450900",
+                        "surface-dim": "#120d08",
+                        "on-primary-fixed": "#4e3509",
+                        "on-primary-container": "#ffdeb2",
+                        "surface-tint": "#e7c088",
+                        "on-primary": "#553b0f",
+                        "secondary-dim": "#ceb594",
+                        "surface-bright": "#342b1e",
+                        "tertiary-container": "#f7b594",
+                        "on-surface": "#f3e3d0",
+                        "tertiary-dim": "#e8a788",
+                        "secondary": "#dcc3a1",
+                        "primary-fixed": "#fcd49a",
+                        "on-secondary-fixed-variant": "#6c583d",
+                        "on-error-container": "#ff9b82",
+                        "primary": "#e7c088",
+                        "background": "#120d08",
+                        "on-tertiary": "#6a3c23",
+                        "on-secondary": "#4e3d24",
+                        "error": "#f97758",
+                        "secondary-fixed-dim": "#ebd0ae",
+                        "error-container": "#85230a",
+                        "surface-container": "#1f190f",
+                        "on-primary-fixed-variant": "#6d5123",
+                        "inverse-surface": "#fff8f3",
+                        "secondary-container": "#493920",
+                        "on-secondary-container": "#d5bb9a"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-grid {
+            background-image: linear-gradient(to right, #2d2418 1px, transparent 1px), linear-gradient(to bottom, #2d2418 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-stone-950/80 backdrop-blur-md border-b border-stone-800">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-[#927241]">CORTHEX</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-stone-400 hover:text-stone-200 transition-colors font-label text-sm uppercase tracking-widest" href="#">System</a>
+<a class="text-[#927241] border-b-2 border-[#927241] pb-1 font-label text-sm uppercase tracking-widest font-bold" href="#">Performance</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors font-label text-sm uppercase tracking-widest" href="#">Network</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-stone-500 text-sm">search</span>
+<input class="bg-stone-900 border-stone-800 text-stone-300 text-xs py-1.5 pl-9 pr-4 rounded-full focus:ring-primary focus:border-primary w-48 transition-all" placeholder="QUERY SYSTEM..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-stone-500 hover:text-primary cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined text-stone-500 hover:text-primary cursor-pointer transition-colors">settings</span>
+<div class="w-8 h-8 rounded-full border border-stone-800 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man with sharp features and a focused expression in a dimly lit high-tech environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPJwGQYdDxxRjQx1nFHDuJwkHe-Js6ZcUfVj8blvp3U1hePyqcJRJMBAVdxlvQmngZ5I_eh0rvksK21PfWPT2UoYMKdSNRC4hgBa4nF5negvJwlc3Cga58zQmHStVklrdA46nBIiUB4m5mSb1k063mH-0El7jFFAaBLa72zcnbmfnSfcKKtMl75yqa7dkuGFjbZDeO6t6PfxmKqLMHjM09SbtIM8b5aczDI7CAGW3oFLgWYV9Ok7VfRCObdOz-tpSsRkHkCCdyRRM"/>
+</div>
+</div>
+</header>
+<!-- Sidebar Anchor -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-stone-950 border-r border-stone-800 flex flex-col py-4 pt-20 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<div>
+<h2 class="text-[#927241] font-bold text-sm tracking-tight uppercase">Performance</h2>
+<p class="text-stone-500 text-[10px] uppercase tracking-tighter">Analytics Suite</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-stone-500 hover:bg-stone-900/80 hover:text-stone-300 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="font-label uppercase tracking-widest text-xs">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 bg-stone-900 text-[#927241] border-r-4 border-[#927241] transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="font-label uppercase tracking-widest text-xs font-bold">Analytics</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-500 hover:bg-stone-900/80 hover:text-stone-300 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+<span class="font-label uppercase tracking-widest text-xs">Agents</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-500 hover:bg-stone-900/80 hover:text-stone-300 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-xl">list_alt</span>
+<span class="font-label uppercase tracking-widest text-xs">Logs</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-500 hover:bg-stone-900/80 hover:text-stone-300 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-xl">shield</span>
+<span class="font-label uppercase tracking-widest text-xs">Security</span>
+</a>
+</nav>
+<div class="px-6 py-4">
+<div class="bg-surface-container rounded-lg p-4 border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] text-stone-500 uppercase font-bold">API STATUS</span>
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+</div>
+<div class="h-1.5 w-full bg-stone-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+<p class="text-[9px] text-stone-500 mt-2 uppercase">99.98% Uptime</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-20 p-6 min-h-screen">
+<!-- Controls Header -->
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+<div>
+<h1 class="text-3xl font-black text-on-background tracking-tighter uppercase mb-1">System Throughput</h1>
+<p class="text-stone-500 text-sm tracking-wide">Real-time performance metrics for decentralized agent nodes.</p>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<!-- Period Selector -->
+<div class="inline-flex p-1 bg-surface-container rounded-lg border border-outline-variant">
+<button class="px-4 py-1.5 text-xs font-bold rounded-md bg-primary text-on-primary shadow-sm transition-all uppercase tracking-wider">Today</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md text-stone-500 hover:text-on-background transition-all uppercase tracking-wider">Week</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md text-stone-500 hover:text-on-background transition-all uppercase tracking-wider">Month</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md text-stone-500 hover:text-on-background transition-all uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                        Custom
+                    </button>
+</div>
+<!-- Comparison Toggle -->
+<div class="flex items-center bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant gap-3">
+<span class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Comparison</span>
+<div class="flex bg-stone-900 p-0.5 rounded shadow-inner">
+<button class="px-3 py-0.5 text-[10px] font-bold text-primary rounded bg-surface-container-high shadow uppercase">YoY</button>
+<button class="px-3 py-0.5 text-[10px] font-bold text-stone-600 uppercase">MoM</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Metric Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+<!-- Latency (Line Chart Placeholder) -->
+<div class="lg:col-span-2 bg-surface-container rounded-xl border border-outline-variant p-6 flex flex-col relative overflow-hidden group">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Response Time</span>
+<h3 class="text-4xl font-black mt-1">42<span class="text-lg font-normal text-stone-500 ml-1">ms</span></h3>
+</div>
+<div class="flex items-center text-emerald-500 gap-1 bg-emerald-500/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+<span class="text-xs font-bold">-12.4%</span>
+</div>
+</div>
+<div class="h-32 chart-grid relative flex items-end gap-1.5">
+<!-- Simulated Latency Sparkline -->
+<div class="flex-1 bg-primary/20 hover:bg-primary transition-all rounded-t-sm h-[40%]" title="08:00"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary transition-all rounded-t-sm h-[60%]" title="10:00"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary transition-all rounded-t-sm h-[45%]" title="12:00"></div>
+<div class="flex-1 bg-primary/30 hover:bg-primary transition-all rounded-t-sm h-[85%]" title="14:00"></div>
+<div class="flex-1 bg-primary/40 hover:bg-primary transition-all rounded-t-sm h-[30%]" title="16:00"></div>
+<div class="flex-1 bg-primary/30 hover:bg-primary transition-all rounded-t-sm h-[55%]" title="18:00"></div>
+<div class="flex-1 bg-primary hover:bg-primary transition-all rounded-t-sm h-[25%]" title="20:00"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary transition-all rounded-t-sm h-[42%]" title="22:00"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="text-[9px] text-stone-600">08:00</span>
+<span class="text-[9px] text-stone-600">16:00</span>
+<span class="text-[9px] text-stone-600">00:00</span>
+</div>
+</div>
+<!-- Stability Gauge -->
+<div class="bg-surface-container rounded-xl border border-outline-variant p-6 flex flex-col justify-between items-center text-center">
+<span class="text-[10px] font-black text-primary uppercase tracking-[0.2em] self-start">Error Rate</span>
+<div class="relative w-32 h-32 flex items-center justify-center mt-2">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-stone-800" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-error" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="362.5" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-black">0.52<span class="text-sm font-normal">%</span></span>
+<span class="text-[9px] text-stone-500 uppercase tracking-tighter">Stability Nominal</span>
+</div>
+</div>
+<div class="w-full mt-4 flex items-center justify-center gap-2 text-stone-500 text-xs italic">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                    Within SLA Threshold
+                </div>
+</div>
+<!-- Request Volume -->
+<div class="bg-surface-container rounded-xl border border-outline-variant p-6 flex flex-col group overflow-hidden">
+<span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Throughput</span>
+<h3 class="text-4xl font-black mt-1">1.2<span class="text-lg font-normal text-stone-500 ml-1">M/s</span></h3>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between text-[10px] uppercase font-bold text-stone-400">
+<span>Cluster Alpha</span>
+<span>82%</span>
+</div>
+<div class="h-1 bg-stone-800 rounded-full">
+<div class="h-full bg-primary-dim w-[82%]"></div>
+</div>
+<div class="flex items-center justify-between text-[10px] uppercase font-bold text-stone-400">
+<span>Cluster Omega</span>
+<span>45%</span>
+</div>
+<div class="h-1 bg-stone-800 rounded-full">
+<div class="h-full bg-stone-600 w-[45%]"></div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-stone-800/50 flex justify-between items-center">
+<span class="text-[9px] text-stone-500 uppercase">Live Node Count: 12</span>
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">sensors</span>
+</div>
+</div>
+</div>
+<!-- Throughput Detailed Chart -->
+<div class="bg-surface-container rounded-xl border border-outline-variant p-6 mb-6">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h4 class="text-sm font-black uppercase tracking-widest text-on-background flex items-center gap-2">
+                        Node Request Distribution
+                        <span class="material-symbols-outlined text-stone-500 text-sm">info</span>
+</h4>
+</div>
+<div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-tighter text-stone-500">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Primary
+                    </div>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-stone-700"></span> Overflow
+                    </div>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-4 h-48 items-end chart-grid p-2">
+<!-- Bar Chart Bars -->
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[15%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[45%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N01</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[10%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[65%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N02</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[25%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[40%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N03</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[5%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[85%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N04</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[20%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[50%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N05</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[12%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[70%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N06</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[30%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[35%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N07</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[8%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[90%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N08</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[15%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[45%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N09</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[22%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[55%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N10</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[18%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[62%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N11</span>
+</div>
+<div class="col-span-1 space-y-1 group cursor-pointer h-full flex flex-col justify-end">
+<div class="bg-stone-700 w-full h-[10%] rounded-t-sm group-hover:bg-stone-600 transition-all"></div>
+<div class="bg-primary w-full h-[78%] group-hover:opacity-80 transition-all"></div>
+<span class="text-[8px] text-center text-stone-500 block mt-2">N12</span>
+</div>
+</div>
+</div>
+<!-- Agent Efficiency Table -->
+<div class="bg-surface-container rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-6 py-4 bg-stone-900 border-b border-stone-800 flex justify-between items-center">
+<h4 class="text-sm font-black uppercase tracking-widest text-on-background">Agent Efficiency Scores</h4>
+<button class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                    EXPORT DATA <span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-stone-950/50">
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-stone-500">Agent ID</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-stone-500">Task Volume</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-stone-500">Completion Rate</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-stone-500">Accuracy</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-stone-500">Efficiency Score</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-800">
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-[10px] font-black text-primary">A-42</div>
+<span class="text-xs font-bold font-label uppercase">Agent-Xenon-01</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">12,402</td>
+<td class="px-6 py-4 text-xs">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 rounded-full max-w-[60px]">
+<div class="h-full bg-emerald-500 w-[99%]"></div>
+</div>
+<span class="text-emerald-500 font-bold">99.2%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">98.5%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary/10 border border-primary/20 rounded text-primary text-[10px] font-black">9.8 / 10</span>
+</td>
+</tr>
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-[10px] font-black text-stone-400">A-12</div>
+<span class="text-xs font-bold font-label uppercase">Agent-Argon-09</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">8,115</td>
+<td class="px-6 py-4 text-xs">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 rounded-full max-w-[60px]">
+<div class="h-full bg-emerald-500 w-[94%]"></div>
+</div>
+<span class="text-stone-300 font-bold">94.8%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">99.1%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-stone-800/50 border border-stone-700 rounded text-stone-300 text-[10px] font-black">8.4 / 10</span>
+</td>
+</tr>
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-[10px] font-black text-stone-400">A-88</div>
+<span class="text-xs font-bold font-label uppercase">Agent-Neon-04</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">10,980</td>
+<td class="px-6 py-4 text-xs">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 rounded-full max-w-[60px]">
+<div class="h-full bg-emerald-500 w-[97%]"></div>
+</div>
+<span class="text-stone-300 font-bold">97.1%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">96.2%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-stone-800/50 border border-stone-700 rounded text-stone-300 text-[10px] font-black">8.9 / 10</span>
+</td>
+</tr>
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-error-container/20 flex items-center justify-center text-[10px] font-black text-error">A-03</div>
+<span class="text-xs font-bold font-label uppercase">Agent-Krypton-11</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">5,400</td>
+<td class="px-6 py-4 text-xs">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-stone-800 rounded-full max-w-[60px]">
+<div class="h-full bg-error w-[72%]"></div>
+</div>
+<span class="text-error font-bold">72.4%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs font-medium text-stone-300">88.0%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-error-container/10 border border-error-container/20 rounded text-error text-[10px] font-black">5.2 / 10</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-stone-800 bg-stone-950/20 flex items-center justify-between">
+<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Displaying 4 of 128 active agents</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded border border-stone-800 flex items-center justify-center hover:bg-stone-900 transition-colors">
+<span class="material-symbols-outlined text-stone-500 text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded border border-stone-800 flex items-center justify-center hover:bg-stone-900 transition-colors">
+<span class="material-symbols-outlined text-stone-500 text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full h-16 bg-stone-950/95 backdrop-blur-md border-t border-stone-800 flex justify-around items-center z-50">
+<button class="flex flex-col items-center text-stone-500">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[9px] uppercase mt-1">Dash</span>
+</button>
+<button class="flex flex-col items-center text-[#927241]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="text-[9px] uppercase mt-1">Analytics</span>
+</button>
+<button class="flex flex-col items-center text-stone-500">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[9px] uppercase mt-1">Agents</span>
+</button>
+<button class="flex flex-col items-center text-stone-500">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[9px] uppercase mt-1">Config</span>
+</button>
+</nav>
+</body></html>

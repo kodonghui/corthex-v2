@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX ADMIN - MCP Access</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#fcd49a",
+              "surface-dim": "#120d08",
+              "surface-container-highest": "#2d2418",
+              "on-primary-container": "#ffdeb2",
+              "on-error-container": "#ff9b82",
+              "on-secondary": "#4e3d24",
+              "inverse-primary": "#775a2b",
+              "secondary-dim": "#ceb594",
+              "surface": "#120d08",
+              "on-secondary-container": "#d5bb9a",
+              "on-surface-variant": "#b7a997",
+              "inverse-surface": "#fff8f3",
+              "secondary-fixed-dim": "#ebd0ae",
+              "secondary-container": "#493920",
+              "on-error": "#450900",
+              "tertiary-container": "#f7b594",
+              "surface-container": "#1f190f",
+              "on-primary-fixed-variant": "#6d5123",
+              "primary": "#e7c088",
+              "on-surface": "#f3e3d0",
+              "outline-variant": "#514638",
+              "on-background": "#f3e3d0",
+              "error-container": "#85230a",
+              "on-primary": "#553b0f",
+              "tertiary-dim": "#e8a788",
+              "secondary-fixed": "#f9debc",
+              "surface-container-lowest": "#000000",
+              "on-tertiary-container": "#5f331b",
+              "tertiary": "#ffc5a9",
+              "primary-container": "#694d20",
+              "primary-fixed-dim": "#edc68d",
+              "on-tertiary": "#6a3c23",
+              "tertiary-fixed-dim": "#e8a788",
+              "inverse-on-surface": "#5b544c",
+              "secondary": "#dcc3a1",
+              "on-tertiary-fixed": "#461f09",
+              "surface-container-high": "#261e14",
+              "surface-variant": "#2d2418",
+              "on-secondary-fixed-variant": "#6c583d",
+              "tertiary-fixed": "#f7b594",
+              "primary-dim": "#d9b37c",
+              "on-primary-fixed": "#4e3509",
+              "error": "#f97758",
+              "surface-bright": "#342b1e",
+              "on-tertiary-fixed-variant": "#693b23",
+              "surface-tint": "#e7c088",
+              "surface-container-low": "#18120b",
+              "outline": "#807464",
+              "on-secondary-fixed": "#4d3c24",
+              "error-dim": "#c44f34",
+              "background": "#0C0A09"
+            },
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #f3e3d0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary/30">
+<!-- TopNavBar Execution -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-stone-950/90 backdrop-blur-md border-b border-stone-800 shadow-2xl font-publicSans tracking-tight">
+<div class="text-xl font-black tracking-tighter text-[#927241]">CORTHEX ADMIN</div>
+<nav class="hidden md:flex items-center gap-8 h-full">
+<a class="text-stone-500 hover:text-stone-300 transition-colors active:scale-95 duration-100 h-full flex items-center" href="#">Dashboard</a>
+<a class="text-stone-500 hover:text-stone-300 transition-colors active:scale-95 duration-100 h-full flex items-center" href="#">MCP Servers</a>
+<a class="text-[#927241] border-b-2 border-[#927241] pb-1 transition-colors active:scale-95 duration-100 h-full flex items-center pt-1" href="#">Access Control</a>
+<a class="text-stone-500 hover:text-stone-300 transition-colors active:scale-95 duration-100 h-full flex items-center" href="#">Logs</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-stone-400 hover:bg-stone-900/50 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-stone-400 hover:bg-stone-900/50 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest border border-outline-variant overflow-hidden">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional male administrator in a dimly lit high-tech environment with warm amber backlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9cqbg60wppJO_Z23hVz8yaVtAt2E27F388wQM63k9AdZwbvYxXmqz0CWakfuHLAkQE8c5cmZt4g3Qw3tHDU7LX92CG_UWhdeo22uCf6yj4Lj6nPl1WMnZvvdrcLk1jz27sQZraywvMtszgfpJUrPE0gFxRwKBCXqanJKVFu8LyMbhB3AQK09bO28TNlqV-s4fiaxQcyd_7loFJTN6N69QiQNflifdGWXP6HHS0vf9jfWmV1rk4qGd8GJENvQUUjA7_wtavVXXL0g"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar Execution -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 flex flex-col pt-4 bg-stone-950 border-r border-stone-800 font-publicSans antialiased hidden md:flex">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-[#927241]/20 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[#927241]" data-icon="terminal">terminal</span>
+</div>
+<div>
+<div class="text-[#927241] font-bold text-sm leading-tight">MCP Access</div>
+<div class="text-stone-500 text-[10px] uppercase tracking-widest">Industrial Control</div>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<a class="text-stone-500 flex items-center px-4 py-3 gap-3 hover:text-stone-300 hover:bg-stone-900 transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="text-stone-500 flex items-center px-4 py-3 gap-3 hover:text-stone-300 hover:bg-stone-900 transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="dns">dns</span>
+<span class="text-sm font-medium">MCP Servers</span>
+</a>
+<a class="bg-[#927241]/10 text-[#927241] border-r-4 border-[#927241] flex items-center px-4 py-3 gap-3 active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="text-sm font-medium">Access Control</span>
+</a>
+<a class="text-stone-500 flex items-center px-4 py-3 gap-3 hover:text-stone-300 hover:bg-stone-900 transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="text-sm font-medium">Logs</span>
+</a>
+</div>
+<div class="p-4 border-t border-stone-800">
+<button class="w-full py-3 px-4 bg-error-container/20 text-error hover:bg-error-container/30 border border-error/30 rounded font-bold text-xs uppercase tracking-tighter transition-all">
+                Emergency Shutdown
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:pl-64 pt-16 min-h-screen">
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="text-4xl font-black tracking-tighter text-on-surface mb-2">ACCESS CONTROL</h1>
+<p class="text-stone-500 max-w-lg font-medium">Manage and audit active neural-link permissions across the distributed Model Context Protocol network.</p>
+</div>
+<button class="bg-[#CA8A04] hover:bg-[#A16E03] text-stone-950 font-bold px-8 py-3 rounded-sm flex items-center gap-3 transition-transform active:scale-95 shadow-lg shadow-[#CA8A04]/20">
+<span class="material-symbols-outlined text-lg" data-icon="add_moderator" style="font-variation-settings: 'FILL' 1;">add_moderator</span>
+                    GRANT ACCESS
+                </button>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="bg-surface-container border border-stone-800 p-6 flex flex-col justify-between">
+<span class="text-stone-500 text-xs font-bold tracking-widest uppercase">Active Agents</span>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="text-3xl font-mono text-primary">124</span>
+<span class="text-emerald-500 text-xs font-mono">+4.2%</span>
+</div>
+</div>
+<div class="bg-surface-container border border-stone-800 p-6 flex flex-col justify-between">
+<span class="text-stone-500 text-xs font-bold tracking-widest uppercase">MCP Nodes</span>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="text-3xl font-mono text-primary">12</span>
+<span class="text-stone-600 text-xs font-mono">STABLE</span>
+</div>
+</div>
+<div class="col-span-1 md:col-span-2 bg-surface-container-high border border-stone-800 p-6 flex items-center justify-between relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-stone-500 text-xs font-bold tracking-widest uppercase">Security Level</span>
+<div class="mt-4 text-3xl font-mono text-[#CA8A04]">CLASS-IV</div>
+</div>
+<div class="opacity-20 transform translate-x-8 translate-y-4">
+<span class="material-symbols-outlined text-8xl" data-icon="security">security</span>
+</div>
+</div>
+</div>
+<!-- Access Control Table -->
+<div class="bg-surface-container-low border border-stone-800 overflow-hidden shadow-2xl">
+<div class="p-4 border-b border-stone-800 bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm" data-icon="search">search</span>
+<input class="bg-surface-container-highest border-stone-800 text-xs font-mono pl-10 pr-4 py-2 w-64 focus:ring-1 focus:ring-primary focus:border-primary outline-none text-stone-300 placeholder-stone-600" placeholder="FILTER BY AGENT OR SERVER..." type="text"/>
+</div>
+<button class="text-stone-500 hover:text-stone-300 p-2 transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-stone-500 text-xs font-mono">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        LIVE ACCESS LOGS
+                    </div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-stone-900/50">
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest border-b border-stone-800">Agent Entity</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest border-b border-stone-800">MCP Server Hub</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest border-b border-stone-800">Allowed Toolsets</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest border-b border-stone-800">Granted Date</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest border-b border-stone-800 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-800/50">
+<!-- Row 1 -->
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm overflow-hidden border border-stone-700 bg-stone-800">
+<img alt="Agent Alpha" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Digital avatar of a sleek futuristic AI entity with glowing blue circuits on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQdzuZ1Sex1HOeUljculZZGSMoL5FIFTae0crcV2wXsd-cHZ8CuJ9BEQl32NCNnfrzXv2uLmHLj0yEklAm7PV5pkOYU07p_iPHw1Hz2josyv6m7Y7POR1Wg-Sm0HBtqHiAwUPwD__wQEyZBtXBKCYxNUI5hx4Ni_XelALes_dZkskMQI_6NFxCoAzbC0_fXO4fmiXUlF70QR5xmqMNx6ExZcGCLzaWKtmQiDwcYuScdHY-4tOq8vGznpg8xEOKA-vldaePSQdR6Dk"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">AGENT_ALPHA_09</div>
+<div class="text-[10px] font-mono text-stone-600">ID: #AX-4412-K</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<span class="font-mono text-xs text-stone-300">HUB-CENTRAL-01</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Read_System</span>
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Execute_L1</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.05.12 14:32</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="delete_forever">delete_forever</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm overflow-hidden border border-stone-700 bg-stone-800">
+<img alt="Agent Delta" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Modern geometric portrait of an artificial intelligence construct in monochrome gold and black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB4jcP6fpM9ZC5lBhXawQzo1Dh9W484X3zJUQFErTZF8BXsBfd3yP6EHGM6MvHvCqoCo2HhyNoNfBqlvdAaw2VRnOydJMeZwe2I6pb9LvxpLxn2Fk7P3c8WMNpUwP-Z2UNtMIEVIX-L2-D_XaqoB5rIxmXzvrjL1Jz_Zlh3-xx6mXd2EH_8rLgecK5YyFt3e17zoRhL99B73kqRR45uLtluOmIDOAoVrRVsJXWThpZqu_zT0d8IccsBEfIeke0nHSW-oRCW7TY5fQ"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">AGENT_DELTA_V2</div>
+<div class="text-[10px] font-mono text-stone-600">ID: #DX-9908-M</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+<span class="font-mono text-xs text-stone-300">EDGE-NODE-NORTH</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Data_Siphon</span>
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Write_Cache</span>
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Audit_Log</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.05.14 09:15</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="delete_forever">delete_forever</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-stone-900/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm overflow-hidden border border-stone-700 bg-stone-800">
+<img alt="Agent Sigma" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Conceptual visualization of a high-performance compute agent with amber glowing optic arrays" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7gVcb-ui92P7i9yefVB-Qx0DXjTQP8q9rD2tlcelxN-JOJ_AAA_RJbA74k4vJ5yeEZSylhVakcLDuDxAil952D-uxyK9bYcor5z9K5t-TqKdWoqXTyEAReAApo9c5p203d6rHvvuhdcr4g8jhd1biGfbhXzI1OyZ1BMhBULle2H76jlJ-tLV8dY-VdVpd9G97j4fIeQp2KGLMOUDMi6FD_y5F-pnGMc8YFcsOz3BpIzcsiXqFoqgZu0lbddEaOzQR5TP0R0fGmQU"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface">AGENT_SIGMA_CORE</div>
+<div class="text-[10px] font-mono text-stone-600">ID: #SX-0012-A</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<span class="font-mono text-xs text-stone-300">HUB-CORE-ROOT</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-[#927241]/20 border border-[#927241]/40 text-[10px] font-mono text-[#927241] uppercase">Root_Access</span>
+<span class="px-2 py-0.5 bg-stone-900 border border-stone-700 text-[10px] font-mono text-primary uppercase">Kernel_Mod</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.05.15 22:48</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="delete_forever">delete_forever</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination/Footer -->
+<div class="p-4 border-t border-stone-800 bg-stone-950 flex items-center justify-between">
+<span class="text-[10px] font-mono text-stone-600">DISPLAYING 3 OF 124 ENTITIES</span>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center border border-stone-800 text-stone-600 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center border border-primary text-primary text-xs font-mono">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-stone-800 text-stone-600 hover:text-primary transition-colors text-xs font-mono">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-stone-800 text-stone-600 hover:text-primary transition-colors text-xs font-mono">3</button>
+<button class="w-8 h-8 flex items-center justify-center border border-stone-800 text-stone-600 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Danger Zone / Audit Section -->
+<div class="mt-12 p-8 border border-stone-800/50 bg-stone-950/50 relative overflow-hidden group">
+<div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#927241]/5 to-transparent"></div>
+<div class="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-2">SYSTEM SECURITY AUDIT</h3>
+<p class="text-stone-500 text-sm max-w-xl">Every access grant is logged and immutable on the CORTHEX blockchain ledger. Unauthorized privilege escalation will trigger immediate protocol containment.</p>
+</div>
+<button class="px-6 py-3 border border-stone-700 text-stone-400 hover:border-primary hover:text-primary transition-all flex items-center gap-3 font-mono text-xs tracking-widest uppercase">
+<span class="material-symbols-outlined text-sm" data-icon="terminal">terminal</span>
+                        Run Full Audit Trace
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-stone-950 border-t border-stone-800 h-16 flex items-center justify-around z-50">
+<a class="flex flex-col items-center gap-1 text-stone-500" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] uppercase font-bold">Dash</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-stone-500" href="#">
+<span class="material-symbols-outlined" data-icon="dns">dns</span>
+<span class="text-[10px] uppercase font-bold">Servers</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#927241]" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span class="text-[10px] uppercase font-bold">Access</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-stone-500" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="text-[10px] uppercase font-bold">Logs</span>
+</a>
+</nav>
+</body></html>

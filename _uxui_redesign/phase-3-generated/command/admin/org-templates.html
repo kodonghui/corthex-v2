@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Space+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#e8e1df",
+                        "surface-tint": "#ffba46",
+                        "background": "#151312",
+                        "on-secondary-fixed-variant": "#5d4216",
+                        "surface-container-low": "#1d1b1a",
+                        "inverse-primary": "#805600",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "surface-container-lowest": "#100e0d",
+                        "primary-container": "#ca8a04",
+                        "on-tertiary-container": "#003251",
+                        "surface-bright": "#3c3837",
+                        "on-secondary": "#432c02",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2c2928",
+                        "surface-container": "#221f1e",
+                        "primary-fixed-dim": "#ffba46",
+                        "on-background": "#e8e1df",
+                        "outline": "#9e8e7b",
+                        "on-primary-container": "#422a00",
+                        "surface-dim": "#151312",
+                        "surface-container-highest": "#373433",
+                        "on-tertiary-fixed-variant": "#004a76",
+                        "on-primary-fixed-variant": "#614000",
+                        "primary": "#ffba46",
+                        "tertiary-fixed": "#cee5ff",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#003353",
+                        "primary-fixed": "#ffddb0",
+                        "tertiary-container": "#3f9de4",
+                        "secondary-fixed-dim": "#e7c089",
+                        "secondary-fixed": "#ffddb0",
+                        "on-secondary-fixed": "#281800",
+                        "on-surface-variant": "#d5c4ae",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#33302e",
+                        "error": "#ffb4ab",
+                        "secondary": "#e7c089",
+                        "outline-variant": "#514535",
+                        "on-secondary-container": "#d5af79",
+                        "on-primary": "#442c00",
+                        "tertiary": "#96ccff",
+                        "on-tertiary-fixed": "#001d32",
+                        "inverse-surface": "#e8e1df",
+                        "surface": "#151312",
+                        "surface-variant": "#373433",
+                        "secondary-container": "#5d4216",
+                        "on-primary-fixed": "#281800"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0c0a09;
+            color: #e8e1df;
+        }
+        .machined-depth {
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Predicted Anchor) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#100e0d] dark:bg-[#100e0d] border-r border-[#2c2928] w-64 shadow-[20px_0_40px_rgba(0,0,0,0.4)]">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-xl" style="font-variation-settings: 'FILL' 1;">memory</span>
+</div>
+<div>
+<h1 class="font-headline font-black text-primary leading-none tracking-tighter text-lg">CORTHEX</h1>
+<p class="font-mono text-[10px] tracking-widest text-on-surface opacity-50">INDUSTRIAL COMMAND</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 mt-6">
+<div class="text-[#e8e1df] opacity-50 px-4 py-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-xl">dashboard</span> Dashboard
+            </div>
+<div class="bg-[#2c2928] text-yellow-600 border-l-4 border-yellow-600 px-4 py-3 font-mono text-sm uppercase tracking-widest flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">layers</span> Org Templates
+            </div>
+<div class="text-[#e8e1df] opacity-50 px-4 py-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-xl">account_tree</span> Department Logic
+            </div>
+<div class="text-[#e8e1df] opacity-50 px-4 py-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-xl">memory</span> Agent Registry
+            </div>
+<div class="text-[#e8e1df] opacity-50 px-4 py-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-xl">factory</span> Industry Presets
+            </div>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container font-headline font-heavy uppercase tracking-tighter py-3 text-sm transition-transform active:scale-95">
+                APPLY TO COMPANY
+            </button>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar (Predicted Anchor) -->
+<header class="sticky top-0 z-30 bg-[#151312] flex justify-between items-center w-full px-8 h-16">
+<div class="flex items-center gap-8">
+<h2 class="font-headline font-black tracking-tighter text-[#e8e1df] text-xl uppercase">Templates</h2>
+<div class="hidden md:flex gap-6">
+<span class="text-on-surface opacity-70 font-headline uppercase tracking-tight text-sm hover:text-primary transition-colors cursor-pointer">Organizations</span>
+<span class="text-on-surface opacity-70 font-headline uppercase tracking-tight text-sm hover:text-primary transition-colors cursor-pointer">Analytics</span>
+<span class="text-on-surface opacity-70 font-headline uppercase tracking-tight text-sm hover:text-primary transition-colors cursor-pointer">Settings</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-on-surface opacity-70 cursor-pointer hover:text-primary">notifications</span>
+<span class="material-symbols-outlined text-on-surface opacity-70 cursor-pointer hover:text-primary">help_outline</span>
+<div class="w-8 h-8 bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a technical administrator in a dark studio setting with low key lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKH_5EUZs2_zWM09k8BfI5168LYXMP0Bk6N7V4TqiOG85sI7c7fX5WuIT3vOJx1idaegxLmZuGOa8_MtLW4xCkFwiCxaH6Upa8jps7zaa0ITAEMfOJZxDbPn_Hky77gMs3kXCKSpt4smlFvHnw7KtY0fDpB7-_5ZqJSpawiP6di0tRo-wDwMdPU_wnUs4YpTVsM6s6cvy4QAmY6JHAlnCn9FkW59Fc2G4OHmhC3c1rzH5oiKqRMfRIMMhFQ1V7qc5wBl_JgLCEbzw"/>
+</div>
+</div>
+</header>
+<div class="bg-[#2c2928] h-[1px] w-full"></div>
+<!-- Content Canvas -->
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Page Header / Breadcrumbs -->
+<div class="mb-12 flex justify-between items-end">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 bg-primary shadow-[0_0_8px_rgba(202,138,4,0.6)]"></div>
+<span class="font-mono text-[10px] tracking-[0.2em] uppercase text-primary">System / Templates / Registry</span>
+</div>
+<h1 class="font-headline font-black text-5xl tracking-tighter uppercase text-on-surface">Organization Templates</h1>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 bg-surface-container-high border-b-2 border-outline-variant hover:border-primary transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                    </button>
+<button class="px-6 py-2 bg-surface-container-high border-b-2 border-outline-variant hover:border-primary transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">sort</span> Sort
+                    </button>
+</div>
+</div>
+<!-- Templates Grid -->
+<div class="grid grid-cols-1 gap-px bg-[#2c2928]">
+<!-- Row Header (Machined Style) -->
+<div class="grid grid-cols-12 bg-[#100e0d] px-6 py-3 border-b border-[#2c2928]">
+<div class="col-span-4 font-mono text-[10px] uppercase tracking-widest text-on-surface opacity-40">Template Identification</div>
+<div class="col-span-2 font-mono text-[10px] uppercase tracking-widest text-on-surface opacity-40 text-center">Industry Sector</div>
+<div class="col-span-2 font-mono text-[10px] uppercase tracking-widest text-on-surface opacity-40 text-center">Dept. Count</div>
+<div class="col-span-2 font-mono text-[10px] uppercase tracking-widest text-on-surface opacity-40 text-center">Agent Registry</div>
+<div class="col-span-2 font-mono text-[10px] uppercase tracking-widest text-on-surface opacity-40 text-right">Operations</div>
+</div>
+<!-- Template Row 01 -->
+<div class="grid grid-cols-12 bg-[#151312] hover:bg-[#1d1b1a] px-6 py-8 transition-colors group">
+<div class="col-span-4 flex items-center gap-6">
+<div class="w-16 h-16 bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" data-alt="Macro view of precision industrial gears and machinery parts with deep shadows and golden highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPjgg2YjmdQWZ8r3joj79CrB2SFkDsVCpKoaSAowXrx_RvJfrnS7okZZQ63F14j7o1v1q3RC-zBNIks0mhDyfA4EYz6gvPlCMPpfEoN1BwtbJcrnAdrseyYCQlCfbZLFkGAoKsV2bAgoWPNjaZ83ZMfXWxpYMMPRL2TbRAI2RSjgLZ7PgXXwS-b9tFQ1M9tUoBRJLysXZkDE_H3gu-xubyBnxw-4LTexBUiT8DvDy_50MfIBTMgL8MLaPTN0wJioRiE6K6E8JXP2A"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-xl tracking-tight text-on-surface mb-1">Precision Manufacturing v.4</h3>
+<p class="font-mono text-xs text-on-surface opacity-40">UUID: 8829-MANF-COR-01</p>
+</div>
+</div>
+<div class="col-span-2 flex items-center justify-center">
+<span class="px-3 py-1 bg-surface-container border border-outline-variant font-mono text-[11px] uppercase tracking-widest text-on-surface">Heavy Industry</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">12</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Core Depts</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">48</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Active Nodes</span>
+</div>
+<div class="col-span-2 flex items-center justify-end gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-colors group/icon">
+<span class="material-symbols-outlined text-on-surface opacity-50 group-hover/icon:text-primary transition-colors">visibility</span>
+</button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 font-headline font-heavy text-xs uppercase tracking-tighter hover:bg-primary transition-all active:scale-95">
+                            APPLY TO COMPANY
+                        </button>
+</div>
+</div>
+<!-- Template Row 02 -->
+<div class="grid grid-cols-12 bg-[#151312] hover:bg-[#1d1b1a] px-6 py-8 transition-colors group">
+<div class="col-span-4 flex items-center gap-6">
+<div class="w-16 h-16 bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" data-alt="Digital representation of high-speed data flow and fiber optic patterns with neon blue and amber light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Rto4SOzbRLpK2kgZS6DusECSjt7MkhmT7g2euZx1WnfCFGg4zcQDNgvducwJHTE8vQe-7WarctM8UqiFdkis7No2n0xnKZQnMrLgMz9Fjm98kz4nz39ed1HzA--YYKH-cKdQ5p6pzcO9Kipt0R64wYJw8OR7s1DfZNbKO93fmprOxwh0CMh4Jasp0KDWc1sqoOYlJ13DQXvjSmCzhhUF5EKE1ea5TBnfW-Eg66PsGZY8GaIgkBzE4VjIhcGB0JfQ58CI4Z6O5rI"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-xl tracking-tight text-on-surface mb-1">Logistics &amp; Supply Chain</h3>
+<p class="font-mono text-xs text-on-surface opacity-40">UUID: 4410-LOGI-COR-03</p>
+</div>
+</div>
+<div class="col-span-2 flex items-center justify-center">
+<span class="px-3 py-1 bg-surface-container border border-outline-variant font-mono text-[11px] uppercase tracking-widest text-on-surface">Distribution</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">08</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Core Depts</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">32</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Active Nodes</span>
+</div>
+<div class="col-span-2 flex items-center justify-end gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-colors group/icon">
+<span class="material-symbols-outlined text-on-surface opacity-50 group-hover/icon:text-primary transition-colors">visibility</span>
+</button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 font-headline font-heavy text-xs uppercase tracking-tighter hover:bg-primary transition-all active:scale-95">
+                            APPLY TO COMPANY
+                        </button>
+</div>
+</div>
+<!-- Template Row 03 -->
+<div class="grid grid-cols-12 bg-[#151312] hover:bg-[#1d1b1a] px-6 py-8 transition-colors group">
+<div class="col-span-4 flex items-center gap-6">
+<div class="w-16 h-16 bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" data-alt="A clean high-tech server room with glowing blue status lights and architectural server racks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDegeOL245Fyl04HOmsg64yzZaydc_SvwYBQDJ6B1EjGT2UT6647zYpnPWdmp1DuCa4kjqQBN1mBCRKzULHOaCHrPKongxrIY-lu8ocyZe7j5mzuS4dM_iFZXncQi_62pegj-qyC40iIb641C4tgSNB0dG2eLM7TA_jbsVrmZLgQNLvC48dLK6OYoifJCz7vl43mI-drpDndfBILinnjDZW0-VEs3YnnF1kN1u-_dkxKSnZXmpku2ngg3xx02klXl5kt94e9-xQ48o"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-xl tracking-tight text-on-surface mb-1">SaaS Infrastructure Ops</h3>
+<p class="font-mono text-xs text-on-surface opacity-40">UUID: 9921-TECH-COR-05</p>
+</div>
+</div>
+<div class="col-span-2 flex items-center justify-center">
+<span class="px-3 py-1 bg-surface-container border border-outline-variant font-mono text-[11px] uppercase tracking-widest text-on-surface">Technology</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">15</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Core Depts</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">124</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Active Nodes</span>
+</div>
+<div class="col-span-2 flex items-center justify-end gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-colors group/icon">
+<span class="material-symbols-outlined text-on-surface opacity-50 group-hover/icon:text-primary transition-colors">visibility</span>
+</button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 font-headline font-heavy text-xs uppercase tracking-tighter hover:bg-primary transition-all active:scale-95">
+                            APPLY TO COMPANY
+                        </button>
+</div>
+</div>
+<!-- Template Row 04 -->
+<div class="grid grid-cols-12 bg-[#151312] hover:bg-[#1d1b1a] px-6 py-8 transition-colors group">
+<div class="col-span-4 flex items-center gap-6">
+<div class="w-16 h-16 bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" data-alt="Close up of chemical laboratory glassware with bioluminescent liquid and sophisticated scientific equipment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHzJvYvD7qiQH9EHfx3On3D4O9zJLVqaYNKmhCuZMopg-mOjHkcbpqqBVIfFC9RU8zajayLVFkgzH5VZrkdqnyfGPYyVYTPL0ZynJ6AUjqzU28IRaIpS4NCU0Ie5qOJx7cByKKJ2C4LyDrMSgXrZXoThzZocuCi9AXlzhuX1UiDjDeZvusaZ2re-0iRDRLK03phJF8btoKpFDlIquHzjpN7Oc5M-cBVpSJW4WXFpwFsQU0-HdmoNC1LHI8vcbrXFjIGvs8YX8dvOM"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-xl tracking-tight text-on-surface mb-1">Biotech R&amp;D Framework</h3>
+<p class="font-mono text-xs text-on-surface opacity-40">UUID: 2125-PHAR-COR-02</p>
+</div>
+</div>
+<div class="col-span-2 flex items-center justify-center">
+<span class="px-3 py-1 bg-surface-container border border-outline-variant font-mono text-[11px] uppercase tracking-widest text-on-surface">Life Sciences</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">06</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Core Depts</span>
+</div>
+<div class="col-span-2 flex flex-col items-center justify-center">
+<span class="font-mono text-2xl font-bold text-on-surface">24</span>
+<span class="font-mono text-[9px] uppercase tracking-tighter opacity-40">Active Nodes</span>
+</div>
+<div class="col-span-2 flex items-center justify-end gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-colors group/icon">
+<span class="material-symbols-outlined text-on-surface opacity-50 group-hover/icon:text-primary transition-colors">visibility</span>
+</button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 font-headline font-heavy text-xs uppercase tracking-tighter hover:bg-primary transition-all active:scale-95">
+                            APPLY TO COMPANY
+                        </button>
+</div>
+</div>
+</div>
+<!-- Footer Telemetry -->
+<div class="mt-12 flex justify-between items-center bg-[#100e0d] p-6 border border-[#2c2928] machined-depth">
+<div class="flex gap-12">
+<div class="flex flex-col">
+<span class="font-mono text-[9px] uppercase tracking-widest text-primary mb-1">Global Template Latency</span>
+<span class="font-mono text-lg font-bold text-on-surface">0.024ms</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono text-[9px] uppercase tracking-widest text-primary mb-1">Registry Uptime</span>
+<span class="font-mono text-lg font-bold text-on-surface">99.998%</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono text-[9px] uppercase tracking-widest text-primary mb-1">Encrypted Sessions</span>
+<span class="font-mono text-lg font-bold text-on-surface">4,129</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-mono text-[10px] uppercase tracking-[0.3em] text-on-surface opacity-30">CORTHEX.ADMIN.SECURE_LAYER_01</span>
+<div class="w-12 h-[2px] bg-primary animate-pulse"></div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

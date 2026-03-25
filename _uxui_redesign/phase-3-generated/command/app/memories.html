@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        'c-bg': '#0C0A09',
+                        'c-surface': '#1C1917',
+                        'c-elevated': '#292524',
+                        'c-border': '#44403C',
+                        'c-border-strong': '#57534E',
+                        'c-accent': '#CA8A04',
+                        'c-accent-hover': '#D97706',
+                        'c-accent-muted': 'rgba(202, 138, 4, 0.1)',
+                        'c-text-primary': '#FAFAF9',
+                        'c-text-secondary': '#A8A29E',
+                        'c-text-disabled': '#57534E',
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0C0A09; }
+        ::-webkit-scrollbar-thumb { background: #44403C; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #57534E; }
+    </style>
+</head>
+<body class="bg-c-bg text-c-text-primary font-body selection:bg-c-accent/30">
+<!-- Sidebar (Shared Component Mockup) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] hidden lg:flex flex-col bg-[#0C0A09] border-r border-[#1C1917] z-40">
+<div class="flex flex-col h-screen py-4 overflow-y-auto">
+<div class="px-6 mb-8">
+<div class="text-[#FAFAF9] font-bold text-xl tracking-tight">CORTHEX</div>
+<div class="font-mono text-[10px] text-[#A8A29E] uppercase tracking-widest mt-1">MANAGEMENT PLATFORM</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<div class="text-[10px] font-bold uppercase tracking-widest text-[#A8A29E] px-3 mb-2 mt-4">Command</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#A8A29E] hover:text-[#FAFAF9] hover:bg-[#CA8A0419] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">dashboard</span>
+<span class="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#A8A29E] hover:text-[#FAFAF9] hover:bg-[#CA8A0419] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">hub</span>
+<span class="text-xs font-bold uppercase tracking-widest">NEXUS</span>
+</a>
+<div class="text-[10px] font-bold uppercase tracking-widest text-[#A8A29E] px-3 mb-2 mt-6">Organization</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#A8A29E] hover:text-[#FAFAF9] hover:bg-[#CA8A0419] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">robot</span>
+<span class="text-xs font-bold uppercase tracking-widest">Agents</span>
+</a>
+<!-- Active Memory Tab -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#CA8A0419] text-[#FAFAF9] border-l-2 border-[#CA8A04] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">psychology</span>
+<span class="text-xs font-bold uppercase tracking-widest">Memories</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#A8A29E] hover:text-[#FAFAF9] hover:bg-[#CA8A0419] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="text-xs font-bold uppercase tracking-widest">Reports</span>
+</a>
+</nav>
+<div class="px-3 mt-auto pt-6 border-t border-[#1C1917]">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#A8A29E] hover:text-[#FAFAF9] transition-all" href="#">
+<span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+<span class="text-xs font-bold uppercase tracking-widest">Admin</span>
+</a>
+<div class="flex items-center gap-3 px-3 py-4 mt-2">
+<div class="w-8 h-8 rounded bg-c-accent flex items-center justify-center text-c-bg font-bold text-xs">JD</div>
+<div class="flex-1">
+<div class="text-[11px] font-bold text-white leading-none">John Doe</div>
+<div class="text-[10px] text-c-text-secondary mt-1">Lead Architect</div>
+</div>
+<span class="material-symbols-outlined text-c-text-secondary text-sm cursor-pointer hover:text-red-500">logout</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 lg:left-[280px] z-30 bg-[#1C1917]/90 backdrop-blur-md border-b border-[#44403C] h-14 flex items-center justify-between px-6">
+<div class="flex items-center gap-2">
+<span class="text-c-text-secondary text-sm">CORTHEX</span>
+<span class="text-c-border-strong text-sm font-mono">&gt;</span>
+<span class="text-c-text-primary text-sm font-bold">Memories</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<input class="bg-c-elevated border border-c-border text-xs rounded px-3 py-1.5 w-64 focus:ring-1 focus:ring-c-accent focus:border-c-accent outline-none placeholder-c-text-disabled" placeholder="Search... Ctrl+K" type="text"/>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined text-c-text-secondary cursor-pointer hover:text-c-text-primary">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-success rounded-full border border-c-bg"></span>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-c-border">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional male headshot with neutral background, soft corporate lighting, sharp focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAtNMwsJKoRTppZevwPj3ebPaB-hkwe_hOIHfKC8xFtwS0VXrPuT-WggcXy8meoBaNTGdpWZ-zyWDd081-PIMCRMwEimYfbdFOAEjR49GD6XAJr2PJQWBim23rpgsuSI_SpfdOdjUTJpIyKw3hyu8-bz2YBmTjDm9zp491JemTvUaa3lMytjvGpLEySfOpVeDKuwuxD55sU4fZMrybweAD6XmtPlmMguKe4smbn8WjPLcIr5rv5Zj0tTUu71XO3vW5CKmrHOE--lo"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 pb-10 px-6 lg:ml-[280px] min-h-screen">
+<div class="max-w-6xl mx-auto">
+<!-- Page Header -->
+<div class="mb-8">
+<h1 class="text-3xl font-bold font-headline mb-2">Agent Memories</h1>
+<p class="text-c-text-secondary text-sm">Browse and analyze high-dimensional vector embeddings of agent cognitive history.</p>
+</div>
+<!-- Filters & Search Toolbar -->
+<div class="bg-c-surface border border-c-border rounded-lg p-4 mb-6 space-y-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-c-text-disabled text-lg">search</span>
+<input class="w-full bg-c-bg border border-c-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-c-text-primary placeholder-c-text-disabled focus:ring-1 focus:ring-c-accent focus:border-c-accent transition-all" placeholder="Filter memories by keyword, hash, or semantic context..." type="text"/>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+<button class="bg-c-accent text-c-bg px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest whitespace-nowrap">All Sources</button>
+<button class="bg-c-elevated border border-c-border text-c-text-secondary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:border-c-accent/50 transition-all whitespace-nowrap">ARES</button>
+<button class="bg-c-elevated border border-c-border text-c-text-secondary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:border-c-accent/50 transition-all whitespace-nowrap">ATHENA</button>
+<button class="bg-c-elevated border border-c-border text-c-text-secondary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:border-c-accent/50 transition-all whitespace-nowrap">HERMES</button>
+<button class="bg-c-elevated border border-c-border text-c-text-secondary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:border-c-accent/50 transition-all whitespace-nowrap">TITAN</button>
+</div>
+</div>
+<div class="flex flex-wrap gap-4 pt-4 border-t border-c-border/50">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-c-text-disabled uppercase tracking-widest">Type:</span>
+<select class="bg-c-bg border border-c-border text-xs text-c-text-secondary rounded-md px-2 py-1 outline-none focus:border-c-accent">
+<option>All Types</option>
+<option>Episodic</option>
+<option>Semantic</option>
+<option>Associative</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-c-text-disabled uppercase tracking-widest">Score Min:</span>
+<input class="accent-c-accent w-24" type="range"/>
+</div>
+</div>
+</div>
+<!-- Memory List Area -->
+<div class="space-y-3">
+<!-- Memory Entry Item -->
+<div class="group bg-c-surface border border-c-border hover:border-c-accent/50 rounded-lg p-5 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden">
+<!-- Similarity Sidebar (Indicator) -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-c-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<!-- Agent Info & Score -->
+<div class="flex flex-row md:flex-col gap-4 items-start md:w-32 flex-shrink-0">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-c-accent shadow-lg shadow-c-accent/10 object-cover" data-alt="futuristic AI robot head with glowing gold ocular sensors, dark metallic finish, professional tech studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQtbNOmgt-mFI-3mFIeQalKqwItuSnwf3CijFL9XafiyxxwFNrlP695YfsegtLzX4-LzrRiAwrPIDGUgA1J0X8al-8orXlyDF8n6ZGO4b2WEznBd4B0Xurfc8rTJ5O4iQQrZxPW-U1q4An-HyWYFLtZUjcPTbJPPx-KkuvR4cFWAb1CW7XsTJdxjXr4aZUFpaC6-SnOmV-kmQrnINaecxRKm-SgzFyypF17fpm1z_WZaslKtJtXFutXbDbuhvGW7e9ZFcc7Tak-P0"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-c-surface"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-c-text-primary">ARES-04</span>
+<div class="mt-2 flex flex-col gap-1">
+<span class="font-mono text-[10px] text-c-accent">SIMILARITY</span>
+<span class="font-mono text-lg font-bold text-c-text-primary">0.982</span>
+<div class="w-full bg-c-border h-1 rounded-full overflow-hidden">
+<div class="bg-c-accent h-full w-[98%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Section -->
+<div class="flex-1 space-y-3">
+<div class="flex items-center justify-between gap-4">
+<div class="flex flex-wrap items-center gap-2">
+<span class="bg-c-accent-muted border border-c-accent text-c-accent text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded">Episodic</span>
+<span class="text-c-text-secondary text-xs font-medium">Ref #MEM-88291-XA</span>
+</div>
+<span class="font-mono text-[11px] text-c-text-disabled">2023-11-24 14:22:01.034</span>
+</div>
+<p class="text-c-text-primary text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                            Observed anomalous latency spike in regional data nodes. Cross-referenced with historical cluster behavior (Event ID 772). Correlation suggested pre-emptive load balancing across tier-2 gateway agents. Execution resulted in 14% efficiency gain for the sub-network.
+                        </p>
+<div class="flex items-center gap-4 pt-2">
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Relate</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Trace</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-red-400 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Prune</span>
+</div>
+</div>
+</div>
+<!-- Hash/Metadata side -->
+<div class="hidden xl:flex flex-col items-end justify-between w-24 flex-shrink-0 text-right">
+<span class="font-mono text-[10px] text-c-text-disabled uppercase">SHA-256</span>
+<span class="font-mono text-[9px] text-c-text-disabled break-all leading-tight opacity-50">8f2a9...1d9e</span>
+<div class="bg-c-elevated px-2 py-1 rounded border border-c-border">
+<span class="text-[10px] font-bold text-c-text-secondary">ACTIVE</span>
+</div>
+</div>
+</div>
+<!-- Memory Entry Item 2 -->
+<div class="group bg-c-surface border border-c-border hover:border-c-accent/50 rounded-lg p-5 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-c-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex flex-row md:flex-col gap-4 items-start md:w-32 flex-shrink-0">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-c-accent shadow-lg shadow-c-accent/10 object-cover" data-alt="sleek white minimalist robot head profile, glowing blue internal lights, soft futuristic lighting, clean high-tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZaBfVfJYySaxSxJ7Zgm-_f2ohNL2OneXOSNEnZaA-Ld2Y475PrRD0cvHv0fsZHMjt29ACZYP7YEPBoqTe5aKx_75TehEAjs-n9jT5HPYyhr4Ks_UsZa1UkQw15NX7Xjf7C8DSJjni5dMOejOMpc2eiiNzF18om1floe1_kwxA4BTU9j5uy7OPROhOMsUynPxss9zgIkyOIeJkLpWpv5UQvMdAQslqvTtHqStSs9gbDUB03j5fTV9VsNsJuy338fUUSTGcna5xlEY"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-amber-500 rounded-full border-2 border-c-surface"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-c-text-primary">ATHENA-X</span>
+<div class="mt-2 flex flex-col gap-1">
+<span class="font-mono text-[10px] text-c-accent">SIMILARITY</span>
+<span class="font-mono text-lg font-bold text-c-text-primary">0.841</span>
+<div class="w-full bg-c-border h-1 rounded-full overflow-hidden">
+<div class="bg-c-accent h-full w-[84%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center justify-between gap-4">
+<div class="flex flex-wrap items-center gap-2">
+<span class="bg-c-accent-muted border border-c-accent text-c-accent text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded">Semantic</span>
+<span class="text-c-text-secondary text-xs font-medium">Ref #MEM-88289-XB</span>
+</div>
+<span class="font-mono text-[11px] text-c-text-disabled">2023-11-24 13:58:44.212</span>
+</div>
+<p class="text-c-text-primary text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                            Extracted core linguistic patterns from the 2024 Strategic Roadmap. Identified recurrent emphasis on 'Autonomous Governance'. Compiled multi-layered semantic tree representing high-level executive priorities for downstream agent alignment.
+                        </p>
+<div class="flex items-center gap-4 pt-2">
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Relate</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Trace</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-red-400 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Prune</span>
+</div>
+</div>
+</div>
+<div class="hidden xl:flex flex-col items-end justify-between w-24 flex-shrink-0 text-right">
+<span class="font-mono text-[10px] text-c-text-disabled uppercase">SHA-256</span>
+<span class="font-mono text-[9px] text-c-text-disabled break-all leading-tight opacity-50">1c9e3...b7a2</span>
+<div class="bg-c-elevated px-2 py-1 rounded border border-c-border">
+<span class="text-[10px] font-bold text-c-text-secondary">INDEXED</span>
+</div>
+</div>
+</div>
+<!-- Memory Entry Item 3 -->
+<div class="group bg-c-surface border border-c-border hover:border-c-accent/50 rounded-lg p-5 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-c-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex flex-row md:flex-col gap-4 items-start md:w-32 flex-shrink-0">
+<div class="relative">
+<img class="w-12 h-12 rounded-full border-2 border-c-accent shadow-lg shadow-c-accent/10 object-cover" data-alt="abstract mechanical orb with glowing circuitry, dark space background, depth of field, warm amber lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYcB_7Kg4joAfWY6ynnaIiIJHdan5U-tgcMo3eZAAMuKkQUtrB7h94PwWNlJMwQy9zHo8Bp8Th3GQWMZTyjp4ze8l1aHC5S5Lcc48IJZYz9e4hGo2ussfuGpjaLp37iBkFQYWTJkt4OhOOb7TjclV8hwhTccxvyVIrv_wAndvt1C5v-6tLt0gWt4V6U9znaIg88yTkoe7AmMjzzFK-ZXVAKB5f4jpfJyTPgAqzc2Rlgz8E4KEbV2srBuoo4eztLPoZBAY7w8cRtIM"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-c-surface"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-c-text-primary">HERMES-V3</span>
+<div class="mt-2 flex flex-col gap-1">
+<span class="font-mono text-[10px] text-c-accent">SIMILARITY</span>
+<span class="font-mono text-lg font-bold text-c-text-primary">0.915</span>
+<div class="w-full bg-c-border h-1 rounded-full overflow-hidden">
+<div class="bg-c-accent h-full w-[91%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center justify-between gap-4">
+<div class="flex flex-wrap items-center gap-2">
+<span class="bg-c-accent-muted border border-c-accent text-c-accent text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded">Associative</span>
+<span class="text-c-text-secondary text-xs font-medium">Ref #MEM-88285-XC</span>
+</div>
+<span class="font-mono text-[11px] text-c-text-disabled">2023-11-24 12:10:05.119</span>
+</div>
+<p class="text-c-text-primary text-sm leading-relaxed line-clamp-2 md:line-clamp-3">
+                            Linked user prompt regarding 'Scalability' with the proprietary 'Nexus Protocol' whitepaper. Memory vector anchored to both concepts to improve future retrieval speed for systems architecture queries. Associative link strength verified at 94th percentile.
+                        </p>
+<div class="flex items-center gap-4 pt-2">
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Relate</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-c-accent cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Trace</span>
+</div>
+<div class="flex items-center gap-1.5 text-c-text-secondary hover:text-red-400 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Prune</span>
+</div>
+</div>
+</div>
+<div class="hidden xl:flex flex-col items-end justify-between w-24 flex-shrink-0 text-right">
+<span class="font-mono text-[10px] text-c-text-disabled uppercase">SHA-256</span>
+<span class="font-mono text-[9px] text-c-text-disabled break-all leading-tight opacity-50">f4e1d...9921</span>
+<div class="bg-c-elevated px-2 py-1 rounded border border-c-border">
+<span class="text-[10px] font-bold text-c-text-secondary">ACTIVE</span>
+</div>
+</div>
+</div>
+<!-- More Button -->
+<div class="flex justify-center pt-8">
+<button class="bg-c-elevated border border-c-border hover:border-c-accent text-c-text-primary px-8 py-3 rounded-lg text-sm font-bold uppercase tracking-widest transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">expand_more</span>
+                        Load More Engrams
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Stats HUD -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50 pointer-events-none">
+<div class="bg-c-surface/80 backdrop-blur-md border border-c-accent/30 rounded-lg p-3 w-48 shadow-2xl pointer-events-auto">
+<div class="text-[10px] font-bold text-c-text-disabled uppercase tracking-widest mb-2 flex items-center justify-between">
+                Global Recall Rate
+                <span class="w-1.5 h-1.5 bg-success rounded-full animate-pulse"></span>
+</div>
+<div class="font-mono text-2xl font-bold text-c-text-primary">99.98<span class="text-xs text-c-accent">%</span></div>
+<div class="w-full bg-c-bg h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-success h-full w-[99.9%]"></div>
+</div>
+</div>
+<div class="bg-c-surface/80 backdrop-blur-md border border-c-border rounded-lg p-3 w-48 shadow-2xl pointer-events-auto">
+<div class="text-[10px] font-bold text-c-text-disabled uppercase tracking-widest mb-1">Vector Density</div>
+<div class="font-mono text-lg font-bold text-c-text-primary">4.2M Engrams</div>
+</div>
+</div>
+</body></html>

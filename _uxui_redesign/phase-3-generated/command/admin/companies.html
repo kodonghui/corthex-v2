@@ -3,321 +3,442 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>CORTHEX Admin - Companies Management</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Space+Grotesk:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#CA8A04",
-                        background: "#0C0A09",
-                        surface: "#1C1917",
-                        border: "#292524",
-                        muted: "#A8A29E"
-                    },
-                    fontFamily: {
-                        "headline": ["DM Sans", "sans-serif"],
-                        "body": ["DM Sans", "sans-serif"],
-                        "label": ["DM Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error-container": "#93000a",
+              "secondary-fixed-dim": "#e7c089",
+              "on-tertiary-container": "#003251",
+              "on-surface-variant": "#d5c4ae",
+              "background": "#151312",
+              "tertiary-fixed": "#cee5ff",
+              "on-primary-fixed-variant": "#614000",
+              "inverse-primary": "#805600",
+              "surface-container-lowest": "#100e0d",
+              "inverse-on-surface": "#33302e",
+              "on-tertiary-fixed-variant": "#004a76",
+              "surface-container": "#221f1e",
+              "on-error-container": "#ffdad6",
+              "on-primary": "#442c00",
+              "primary-fixed": "#ffddb0",
+              "primary-container": "#ca8a04",
+              "primary": "#ffba46",
+              "surface-container-highest": "#373433",
+              "on-error": "#690005",
+              "surface": "#151312",
+              "secondary-fixed": "#ffddb0",
+              "on-primary-container": "#422a00",
+              "on-tertiary-fixed": "#001d32",
+              "tertiary-fixed-dim": "#96ccff",
+              "secondary": "#e7c089",
+              "surface-dim": "#151312",
+              "on-secondary-container": "#d5af79",
+              "inverse-surface": "#e8e1df",
+              "surface-container-low": "#1d1b1a",
+              "outline-variant": "#514535",
+              "on-primary-fixed": "#281800",
+              "tertiary": "#96ccff",
+              "surface-variant": "#373433",
+              "surface-bright": "#3c3837",
+              "surface-tint": "#ffba46",
+              "surface-container-high": "#2c2928",
+              "on-secondary-fixed-variant": "#5d4216",
+              "error": "#ffb4ab",
+              "tertiary-container": "#3f9de4",
+              "primary-fixed-dim": "#ffba46",
+              "on-surface": "#e8e1df",
+              "outline": "#9e8e7b",
+              "on-secondary-fixed": "#281800",
+              "on-background": "#e8e1df",
+              "on-tertiary": "#003353",
+              "secondary-container": "#5d4216",
+              "on-secondary": "#432c02"
             },
-        }
+            fontFamily: {
+              "headline": ["Public Sans"],
+              "body": ["Public Sans"],
+              "label": ["Space Grotesk"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
     </script>
 <style>
-        body {
-            background-color: #0C0A09;
-            color: #F5F5F4;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #0c0a09;
+        color: #e8e1df;
+      }
+      .kinetic-monolith-gradient {
+        background: linear-gradient(135deg, #ffba46 0%, #ca8a04 100%);
+      }
     </style>
 </head>
-<body class="antialiased selection:bg-primary selection:text-black">
-<!-- Top Navigation Bar (Shared Component Logic) -->
-<nav class="flex justify-between items-center px-6 h-16 w-full sticky top-0 z-50 bg-[#0C0A09] border-b border-[#292524] font-['DM_Sans'] tracking-tight">
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="bg-[#151312] dark:bg-[#151312] docked full-width top-0 rounded-none bg-[#2c2928] flat no-border tonal-depth flex justify-between items-center w-full px-6 h-16 fixed z-50">
 <div class="flex items-center gap-8">
-<span class="text-xl font-black text-yellow-600 tracking-tighter">CORTHEX</span>
-<div class="hidden md:flex items-center gap-6 text-sm">
-<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Dashboard</a>
-<a class="text-yellow-600 font-bold border-b-2 border-yellow-600 py-5" href="#">Companies</a>
-<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Users</a>
-<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Agents</a>
-<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Analytics</a>
+<span class="text-2xl font-black tracking-tighter text-[#ffba46] dark:text-[#ffba46] font-['Public_Sans'] uppercase">CORTHEX</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#e8e1df]/60 font-mono text-xs tracking-widest hover:bg-[#2c2928] transition-colors duration-150 px-3 py-2" href="#">DASHBOARD</a>
+<a class="text-[#e8e1df]/60 font-mono text-xs tracking-widest hover:bg-[#2c2928] transition-colors duration-150 px-3 py-2" href="#">SYSTEM_LOGS</a>
+<a class="text-[#e8e1df]/60 font-mono text-xs tracking-widest hover:bg-[#2c2928] transition-colors duration-150 px-3 py-2" href="#">TELEMETRY</a>
 </div>
 </div>
 <div class="flex items-center gap-4">
-<div class="relative hidden lg:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#A8A29E] text-lg">search</span>
-<input class="bg-[#1C1917] border border-[#292524] rounded px-10 py-1.5 text-sm focus:ring-1 focus:ring-yellow-600 focus:border-yellow-600 outline-none w-64" placeholder="Search companies..." type="text"/>
-</div>
-<button class="bg-yellow-600 hover:bg-yellow-500 text-black text-xs font-bold px-4 py-2 rounded transition-colors uppercase tracking-wider">
-                Create company
-            </button>
-<div class="flex items-center gap-2 ml-2 border-l border-[#292524] pl-4">
-<span class="material-symbols-outlined text-[#A8A29E] cursor-pointer hover:text-yellow-500 transition-colors">notifications</span>
-<span class="material-symbols-outlined text-[#A8A29E] cursor-pointer hover:text-yellow-500 transition-colors">settings</span>
-<img alt="Admin Profile" class="w-8 h-8 rounded-full border border-[#292524] ml-2" data-alt="professional portrait of a tech executive in a dark modern office setting with cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW8_2D1ABzIR8b1w_9-IWaFIsHuUdWeBoCyls3EtZj6VUSX5O391kSrbt-p--oJw3q3ZMICc_vWiGC-rqng1IblJMu7hXOFSJf4ZYD9IKpv4WQBiSSpsZZ8nm0G3ryAqZvRyBAOes9mp14JOMFFnqxidCHdHtVxvrphoSd1AckXYCmJy8KOfna0qIU1YDyQV_cky9mtlLvvzLE3tx2yf9YoV8OFaHizrnbxNMa6z4Mbf0wU1tuG7AFRYPmPyZ3G-JLvJ3zUGl3DsBv"/>
+<button class="text-yellow-600 dark:text-[#ffba46] material-symbols-outlined hover:bg-[#2c2928] p-2 transition-colors">notifications</button>
+<button class="text-yellow-600 dark:text-[#ffba46] material-symbols-outlined hover:bg-[#2c2928] p-2 transition-colors">settings</button>
+<div class="h-8 w-8 bg-surface-container-highest border border-outline-variant flex items-center justify-center">
+<img alt="Admin Controller" class="w-full h-full object-cover" data-alt="High-contrast profile avatar silhouette with industrial technical HUD overlays and amber lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6bHaqnTaX2Bb7bYUnLzwU3sppMemC30pLXlIPryRFaYYfdn_oe1SgohHHnrIR0VMn95k4E5PILzghKGPWPiqVOIGQu9YAkQwGMozS5AoKjEwpdFU0iaiVwmguEBudIn8fC3dWFn-r7vzFCPIYcUhQ9AoOmzQlfT3WBrHr-3HAwYUnLN15jUj3n6VNsNvZbUq-CdXKXN35FduS2YWUbAjp61gQPLLLz6xk9-ODffJ9ytqbJ-4ujwxGlpHOTpTnYd5zjDo7Px7Dd2Q"/>
 </div>
 </div>
 </nav>
-<main class="max-w-7xl mx-auto px-6 py-8">
-<!-- Header & Stats -->
-<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<!-- SideNavBar -->
+<aside class="bg-[#100e0d] dark:bg-[#100e0d] fixed left-0 top-0 h-screen flex flex-col border-r border-[#2c2928] w-64 pt-16 z-40 shadow-[20px_0_40px_rgba(0,0,0,0.4)]">
+<div class="p-6 border-b border-[#2c2928] mb-4">
+<h2 class="font-black text-xl text-[#e8e1df] font-['JetBrains_Mono'] tracking-tighter">CORTHEX_OS</h2>
+<p class="font-['JetBrains_Mono'] text-[10px] tracking-widest uppercase text-[#ffba46]/60">ROOT_ACCESS_LEVEL_0</p>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<a class="bg-[#2c2928] text-[#ffba46] border-l-4 border-[#ffba46] py-4 px-6 flex items-center gap-4 font-['JetBrains_Mono'] text-xs tracking-widest uppercase cursor-pointer active:bg-black" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">business</span>
+                COMPANIES
+            </a>
+<a class="text-[#e8e1df]/40 py-4 px-6 flex items-center gap-4 font-['JetBrains_Mono'] text-xs tracking-widest uppercase hover:text-[#e8e1df] hover:bg-[#151312] transition-all cursor-pointer active:bg-black" href="#">
+<span class="material-symbols-outlined">engineering</span>
+                OPERATORS
+            </a>
+<a class="text-[#e8e1df]/40 py-4 px-6 flex items-center gap-4 font-['JetBrains_Mono'] text-xs tracking-widest uppercase hover:text-[#e8e1df] hover:bg-[#151312] transition-all cursor-pointer active:bg-black" href="#">
+<span class="material-symbols-outlined">hub</span>
+                INFRASTRUCTURE
+            </a>
+<a class="text-[#e8e1df]/40 py-4 px-6 flex items-center gap-4 font-['JetBrains_Mono'] text-xs tracking-widest uppercase hover:text-[#e8e1df] hover:bg-[#151312] transition-all cursor-pointer active:bg-black" href="#">
+<span class="material-symbols-outlined">terminal</span>
+                TERMINAL
+            </a>
+<a class="text-[#e8e1df]/40 py-4 px-6 flex items-center gap-4 font-['JetBrains_Mono'] text-xs tracking-widest uppercase hover:text-[#e8e1df] hover:bg-[#151312] transition-all cursor-pointer active:bg-black" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                ARCHIVE
+            </a>
+</nav>
+<div class="p-6 border-t border-[#2c2928] bg-[#151312]">
+<button class="w-full kinetic-monolith-gradient text-on-primary font-bold py-3 text-xs tracking-[0.2em] mb-6">PROVISION_NEW</button>
+<div class="space-y-2">
+<a class="text-[#e8e1df]/40 flex items-center gap-3 text-[10px] tracking-widest uppercase hover:text-[#ffba46]" href="#">
+<span class="material-symbols-outlined text-sm">settings_input_component</span>
+                    DIAGNOSTICS
+                </a>
+<a class="text-[#e8e1df]/40 flex items-center gap-3 text-[10px] tracking-widest uppercase hover:text-error" href="#">
+<span class="material-symbols-outlined text-sm">logout</span>
+                    LOGOUT
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 p-8 min-h-screen bg-[#0C0A09]">
+<div class="max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
 <div>
-<h1 class="text-3xl font-black tracking-tight text-white mb-2">Company Directory</h1>
-<p class="text-[#A8A29E] text-sm">Manage and monitor active organization instances across the CORTHEX network.</p>
+<div class="flex items-center gap-3 mb-2">
+<div class="w-2 h-2 bg-primary shadow-[0_0_8px_rgba(255,186,70,0.6)]"></div>
+<span class="font-mono text-xs tracking-[0.3em] text-primary">ADMIN_OVERRIDE</span>
 </div>
-<div class="flex gap-4">
-<div class="bg-[#1C1917] border border-[#292524] p-4 rounded min-w-[140px]">
-<p class="text-[10px] uppercase tracking-widest text-[#A8A29E] mb-1">Total Active</p>
-<p class="text-2xl font-bold text-yellow-600">1,284</p>
+<h1 class="text-5xl font-black font-headline tracking-tighter uppercase leading-none">Companies Management</h1>
+<p class="font-mono text-sm text-on-surface-variant mt-2 max-w-xl">Global entity provisioner. Manage high-level infrastructure permissions and node allocation across the mesh network.</p>
 </div>
-<div class="bg-[#1C1917] border border-[#292524] p-4 rounded min-w-[140px]">
-<p class="text-[10px] uppercase tracking-widest text-[#A8A29E] mb-1">New this month</p>
-<p class="text-2xl font-bold text-yellow-600">+42</p>
-</div>
-</div>
+<button class="kinetic-monolith-gradient text-on-primary font-black py-4 px-8 text-sm tracking-[0.15em] uppercase active:scale-95 transition-transform flex items-center gap-3">
+<span class="material-symbols-outlined">add_box</span>
+                    Create Company
+                </button>
 </header>
-<!-- Main Content: Bento Grid of Companies -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Filters & Stats (The "Subtractive" Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-1 mb-8">
+<div class="bg-surface-container-low p-6 flex flex-col justify-between h-32">
+<span class="font-mono text-[10px] tracking-widest text-on-surface-variant uppercase">Total_Entities</span>
+<span class="text-4xl font-black font-headline tracking-tighter">1,284</span>
+</div>
+<div class="bg-surface-container-low p-6 flex flex-col justify-between h-32">
+<span class="font-mono text-[10px] tracking-widest text-on-surface-variant uppercase">Active_Throughput</span>
+<div class="flex items-end gap-2">
+<span class="text-4xl font-black font-headline tracking-tighter text-tertiary">98.2</span>
+<span class="font-mono text-xs mb-1">%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 flex flex-col justify-between h-32">
+<span class="font-mono text-[10px] tracking-widest text-on-surface-variant uppercase">Sync_Status</span>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-primary animate-pulse"></div>
+<span class="text-xl font-black font-headline tracking-tight text-primary">STABLE</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 flex items-center justify-center h-32 border-l border-[#2c2928]">
+<div class="relative w-full">
+<input class="w-full bg-transparent border-none border-b border-outline-variant focus:ring-0 focus:border-primary font-mono text-xs tracking-widest placeholder:text-on-surface-variant/30" placeholder="FILTER_SEARCH..." type="text"/>
+<span class="material-symbols-outlined absolute right-0 top-0 text-on-surface-variant/50">search</span>
+</div>
+</div>
+</div>
+<!-- Company Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 <!-- Company Card 1 -->
-<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="absolute top-0 right-0 w-32 h-32 bg-yellow-600/5 blur-[80px] pointer-events-none"></div>
-<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-lowest group relative hover:bg-surface-container transition-colors duration-300">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-outline-variant/20 group-hover:bg-primary transition-colors"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-black font-headline tracking-tight uppercase mb-1">AETHER_CORE_INDUSTRIES</h3>
+<div class="flex items-center gap-4">
+<span class="bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border border-primary/20">ENTERPRISE</span>
+<span class="font-mono text-[10px] text-on-surface-variant/40">ID: AC-8821-X</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
 <div class="flex items-center gap-3">
-<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
 </div>
 <div>
-<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Nebula Systems</h3>
-<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Users</p>
+<p class="text-lg font-black font-headline leading-none">42,019</p>
 </div>
 </div>
-<button class="text-[#A8A29E] hover:text-white">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">smart_toy</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
-<span class="text-white font-medium">842</span>
-</div>
-</div>
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
-<span class="text-white font-medium">12</span>
+<div>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Agents</p>
+<p class="text-lg font-black font-headline leading-none">1,502</p>
 </div>
 </div>
 </div>
-<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
-<span class="text-xs text-[#A8A29E]">Created Oct 12, 2023</span>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Provisioned_On</span>
+<span class="font-mono text-xs text-on-surface-variant">2024.08.12_14:22</span>
 </div>
-<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+<button class="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold hover:underline">ACCESS_ROOT</button>
+</div>
 </div>
 </div>
 <!-- Company Card 2 -->
-<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-lowest group relative hover:bg-surface-container transition-colors duration-300">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-outline-variant/20 group-hover:bg-primary transition-colors"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-black font-headline tracking-tight uppercase mb-1">NEURAL_STORM_LABS</h3>
+<div class="flex items-center gap-4">
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border border-tertiary/20">GROWTH</span>
+<span class="font-mono text-[10px] text-on-surface-variant/40">ID: NS-0092-B</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
 <div class="flex items-center gap-3">
-<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">database</span>
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
 </div>
 <div>
-<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Quantum Logic</h3>
-<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-[#A8A29E] border border-white/10 uppercase">Professional</span>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Users</p>
+<p class="text-lg font-black font-headline leading-none">8,442</p>
 </div>
 </div>
-<button class="text-[#A8A29E] hover:text-white">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">smart_toy</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
-<span class="text-white font-medium">156</span>
-</div>
-</div>
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
-<span class="text-white font-medium">4</span>
+<div>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Agents</p>
+<p class="text-lg font-black font-headline leading-none">248</p>
 </div>
 </div>
 </div>
-<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
-<span class="text-xs text-[#A8A29E]">Created Nov 05, 2023</span>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Provisioned_On</span>
+<span class="font-mono text-xs text-on-surface-variant">2023.11.05_09:15</span>
 </div>
-<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+<button class="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold hover:underline">ACCESS_ROOT</button>
+</div>
 </div>
 </div>
 <!-- Company Card 3 -->
-<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-lowest group relative hover:bg-surface-container transition-colors duration-300">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-outline-variant/20 group-hover:bg-primary transition-colors"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-black font-headline tracking-tight uppercase mb-1">VOID_SIGNAL_TECH</h3>
+<div class="flex items-center gap-4">
+<span class="bg-on-surface-variant/10 text-on-surface-variant px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border border-outline-variant">CORE</span>
+<span class="font-mono text-[10px] text-on-surface-variant/40">ID: VS-1111-Z</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
 <div class="flex items-center gap-3">
-<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">shield</span>
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
 </div>
 <div>
-<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Aegis Security</h3>
-<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Users</p>
+<p class="text-lg font-black font-headline leading-none">120</p>
 </div>
 </div>
-<button class="text-[#A8A29E] hover:text-white">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">smart_toy</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
-<span class="text-white font-medium">2,410</span>
-</div>
-</div>
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
-<span class="text-white font-medium">38</span>
+<div>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Agents</p>
+<p class="text-lg font-black font-headline leading-none">12</p>
 </div>
 </div>
 </div>
-<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
-<span class="text-xs text-[#A8A29E]">Created Jan 18, 2024</span>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Provisioned_On</span>
+<span class="font-mono text-xs text-on-surface-variant">2024.12.01_22:01</span>
 </div>
-<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+<button class="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold hover:underline">ACCESS_ROOT</button>
+</div>
 </div>
 </div>
 <!-- Company Card 4 -->
-<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-lowest group relative hover:bg-surface-container transition-colors duration-300">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-outline-variant/20 group-hover:bg-primary transition-colors"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-black font-headline tracking-tight uppercase mb-1">HEX_GRID_MINING</h3>
+<div class="flex items-center gap-4">
+<span class="bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border border-primary/20">ENTERPRISE</span>
+<span class="font-mono text-[10px] text-on-surface-variant/40">ID: HG-7762-L</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
 <div class="flex items-center gap-3">
-<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">language</span>
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
 </div>
 <div>
-<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Global Node</h3>
-<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-[#A8A29E] border border-white/10 uppercase">Free</span>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Users</p>
+<p class="text-lg font-black font-headline leading-none">104,221</p>
 </div>
 </div>
-<button class="text-[#A8A29E] hover:text-white">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">smart_toy</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
-<span class="text-white font-medium">12</span>
-</div>
-</div>
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
-<span class="text-white font-medium">1</span>
+<div>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Agents</p>
+<p class="text-lg font-black font-headline leading-none">4,990</p>
 </div>
 </div>
 </div>
-<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
-<span class="text-xs text-[#A8A29E]">Created Feb 02, 2024</span>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Provisioned_On</span>
+<span class="font-mono text-xs text-on-surface-variant">2022.05.20_11:11</span>
 </div>
-<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+<button class="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold hover:underline">ACCESS_ROOT</button>
+</div>
 </div>
 </div>
 <!-- Company Card 5 -->
-<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-lowest group relative hover:bg-surface-container transition-colors duration-300">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-outline-variant/20 group-hover:bg-primary transition-colors"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-black font-headline tracking-tight uppercase mb-1">ORBITAL_REACH_LOGS</h3>
+<div class="flex items-center gap-4">
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border border-tertiary/20">GROWTH</span>
+<span class="font-mono text-[10px] text-on-surface-variant/40">ID: OR-4402-K</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary">more_vert</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-8">
 <div class="flex items-center gap-3">
-<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
 </div>
 <div>
-<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Synth Logic</h3>
-<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Users</p>
+<p class="text-lg font-black font-headline leading-none">2,110</p>
 </div>
 </div>
-<button class="text-[#A8A29E] hover:text-white">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">smart_toy</span>
 </div>
-<div class="grid grid-cols-2 gap-4 mb-6">
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div>
+<p class="text-[10px] font-mono tracking-widest text-on-surface-variant/60 uppercase leading-none mb-1">Agents</p>
+<p class="text-lg font-black font-headline leading-none">62</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-6 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Provisioned_On</span>
+<span class="font-mono text-xs text-on-surface-variant">2024.01.14_18:50</span>
+</div>
+<button class="text-[10px] font-mono tracking-[0.2em] text-primary uppercase font-bold hover:underline">ACCESS_ROOT</button>
+</div>
+</div>
+</div>
+<!-- Empty "Provision New" Slate -->
+<div class="border-2 border-dashed border-outline-variant/20 group hover:border-primary/50 transition-all cursor-pointer flex flex-col items-center justify-center p-8 text-center min-h-[340px]">
+<div class="w-16 h-16 bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary mb-6 transition-colors">
+<span class="material-symbols-outlined text-4xl">add</span>
+</div>
+<h3 class="font-headline font-black tracking-widest uppercase mb-2">Initialize Node</h3>
+<p class="font-mono text-[10px] text-on-surface-variant/40 uppercase tracking-[0.1em]">Awaiting infrastructure allocation command...</p>
+</div>
+</div>
+<!-- Footer Data Stream -->
+<footer class="mt-16 pt-8 border-t border-[#2c2928] flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">System_Load</span>
 <div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
-<span class="text-white font-medium">520</span>
+<div class="w-24 h-1 bg-surface-container-highest">
+<div class="w-[34%] h-full bg-tertiary"></div>
+</div>
+<span class="font-mono text-[10px] text-tertiary">34.12%</span>
 </div>
 </div>
-<div class="space-y-1">
-<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
-<span class="text-white font-medium">18</span>
+<div class="flex flex-col">
+<span class="text-[9px] font-mono text-on-surface-variant/40 uppercase">Network_Latency</span>
+<span class="font-mono text-[10px] text-primary">12ms_RRT</span>
 </div>
 </div>
-</div>
-<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
-<span class="text-xs text-[#A8A29E]">Created Mar 10, 2024</span>
-</div>
-<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</div>
-</div>
-<!-- Empty State / Add New Placeholder -->
-<div class="border-2 border-dashed border-[#292524] rounded-lg p-6 flex flex-col items-center justify-center text-center group hover:border-yellow-600/50 transition-all cursor-pointer">
-<div class="w-12 h-12 rounded-full border border-[#292524] flex items-center justify-center mb-4 group-hover:bg-yellow-600/10 transition-colors">
-<span class="material-symbols-outlined text-[#A8A29E] group-hover:text-yellow-600">add</span>
-</div>
-<h3 class="font-bold text-white group-hover:text-yellow-600 transition-colors">Provision New Instance</h3>
-<p class="text-xs text-[#A8A29E] mt-1">Configure workspace parameters</p>
-</div>
-</div>
-<!-- Pagination / Footer Actions -->
-<footer class="mt-12 flex items-center justify-between py-6 border-t border-[#292524]">
-<p class="text-xs text-[#A8A29E]">Showing <span class="text-white font-bold">5</span> of <span class="text-white font-bold">1,284</span> companies</p>
-<div class="flex gap-2">
-<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5 disabled:opacity-50" disabled="">
-<span class="material-symbols-outlined text-sm">chevron_left</span>
-</button>
-<button class="w-8 h-8 rounded bg-yellow-600 text-black font-bold text-xs">1</button>
-<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">2</button>
-<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">3</button>
-<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">
-<span class="material-symbols-outlined text-sm">chevron_right</span>
-</button>
-</div>
+<div class="font-mono text-[10px] text-on-surface-variant/30 uppercase tracking-[0.2em]">
+                    SECURE_TERMINAL // SESSION_ID_9921-X-ALPHA
+                </div>
 </footer>
+</div>
 </main>
 </body></html>

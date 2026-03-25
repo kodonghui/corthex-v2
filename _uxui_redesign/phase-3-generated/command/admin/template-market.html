@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Space+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#d5af79",
+                        "secondary": "#e7c089",
+                        "surface-container-high": "#2c2928",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "primary": "#ffba46",
+                        "secondary-container": "#5d4216",
+                        "on-error": "#690005",
+                        "on-background": "#e8e1df",
+                        "on-primary-fixed-variant": "#614000",
+                        "background": "#151312",
+                        "tertiary": "#96ccff",
+                        "surface-container-highest": "#373433",
+                        "surface-bright": "#3c3837",
+                        "on-primary-fixed": "#281800",
+                        "outline": "#9e8e7b",
+                        "surface": "#151312",
+                        "on-surface-variant": "#d5c4ae",
+                        "on-secondary-fixed-variant": "#5d4216",
+                        "inverse-surface": "#e8e1df",
+                        "on-tertiary-fixed": "#001d32",
+                        "primary-container": "#ca8a04",
+                        "on-tertiary-container": "#003251",
+                        "inverse-on-surface": "#33302e",
+                        "on-secondary": "#432c02",
+                        "surface-dim": "#151312",
+                        "on-primary-container": "#422a00",
+                        "on-primary": "#442c00",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed-dim": "#ffba46",
+                        "on-surface": "#e8e1df",
+                        "surface-container-lowest": "#100e0d",
+                        "primary-fixed": "#ffddb0",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#cee5ff",
+                        "secondary-fixed": "#ffddb0",
+                        "surface-container": "#221f1e",
+                        "surface-container-low": "#1d1b1a",
+                        "inverse-primary": "#805600",
+                        "secondary-fixed-dim": "#e7c089",
+                        "surface-tint": "#ffba46",
+                        "outline-variant": "#514535",
+                        "on-tertiary-fixed-variant": "#004a76",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#281800",
+                        "tertiary-container": "#3f9de4",
+                        "surface-variant": "#373433",
+                        "on-tertiary": "#003353"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0C0A09; /* Overriding with user's specific requested dark background */
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 left-0 w-full z-50 bg-[#151312] shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="text-2xl font-black tracking-tighter text-[#CA8A04] uppercase font-headline">
+                CORTHEX
+            </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#FFBA46] border-b-2 border-[#CA8A04] pb-1 font-headline font-black tracking-tighter uppercase transition-colors duration-200" href="#">Marketplace</a>
+<a class="text-[#e8e1df] opacity-70 font-headline font-black tracking-tighter uppercase hover:text-[#FFBA46] transition-colors duration-200" href="#">Library</a>
+<a class="text-[#e8e1df] opacity-70 font-headline font-black tracking-tighter uppercase hover:text-[#FFBA46] transition-colors duration-200" href="#">Assets</a>
+<a class="text-[#e8e1df] opacity-70 font-headline font-black tracking-tighter uppercase hover:text-[#FFBA46] transition-colors duration-200" href="#">Analytics</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">search</span>
+<input class="bg-surface-container-low border-none focus:ring-1 focus:ring-primary text-xs font-mono py-2 pl-10 pr-4 w-64 placeholder:opacity-30" placeholder="SYSTEM_SEARCH" type="text"/>
+</div>
+<div class="flex items-center gap-4 text-[#e8e1df] opacity-70">
+<span class="material-symbols-outlined hover:text-[#FFBA46] cursor-pointer transition-transform active:scale-95">notifications</span>
+<span class="material-symbols-outlined hover:text-[#FFBA46] cursor-pointer transition-transform active:scale-95">settings</span>
+<div class="w-8 h-8 bg-surface-container-high overflow-hidden">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="Portrait of a professional male engineer in low-key dramatic lighting, industrial tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv5LvNfn_rsvK2B8EhCBXBIkEk_jFyhD5BPm6hwX47UsUwzsQh4m38NgKlRZb3xdhwbEcQYtQly-nGJI9cruDOJBWuDpNcBNdflCJyYYd2VOcWX-fJiJ4j8Ozhzn1dXNn1_CIgp_Zsd40h9ll0ZvT9hfdg12ftbzwjL2ZUoNweHYBQq8nBJNwpawid0yUoDPPkJPvIgVU7gJUR4g-IWHy9Nd3jHdu-Kcuft-vxYSoJ58mH1ol48PPGUCGRrDmCehNHQxykR2pS-DA"/>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#2c2928] h-[1px] w-full self-end"></div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#100e0d] flex flex-col border-r border-[#2c2928] pt-24 z-40 hidden md:flex">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-2 h-2 bg-primary animate-pulse"></div>
+<div>
+<div class="text-[#CA8A04] text-lg font-bold font-headline">CORTHEX</div>
+<div class="text-[#e8e1df] opacity-40 text-[10px] font-mono tracking-widest uppercase">Industrial OS</div>
+</div>
+</div>
+<nav class="flex-1">
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="bg-[#2c2928] text-[#FFBA46] border-l-4 border-[#CA8A04] px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">layers</span> Templates
+            </a>
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">extension</span> Components
+            </a>
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">description</span> Documentation
+            </a>
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">help</span> Support
+            </a>
+</nav>
+<div class="border-t border-[#2c2928] mt-auto">
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+<a class="text-[#e8e1df] opacity-60 px-6 py-4 flex items-center gap-3 font-mono text-sm uppercase tracking-widest hover:bg-[#151312] hover:opacity-100 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-24 min-h-screen px-8 pb-12">
+<!-- Header Section -->
+<section class="mb-12 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="h-[1px] w-8 bg-primary-container"></span>
+<span class="text-xs font-mono text-primary tracking-widest uppercase">Central Repository</span>
+</div>
+<h1 class="text-5xl font-black font-headline tracking-tighter uppercase text-on-surface">Template Market</h1>
+<p class="text-outline text-sm max-w-xl font-body">Deploy production-ready industrial logic modules. All templates are verified for high-concurrency environments and IEC 61131-3 compliance.</p>
+</div>
+<div class="bg-surface-container-lowest p-1 flex items-center border border-outline-variant/10 shadow-sm">
+<button class="bg-surface-container-high text-primary px-6 py-3 font-mono text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span> Submit Template
+                </button>
+</div>
+</section>
+<!-- Filter Bar -->
+<div class="bg-surface-container-low mb-8 sticky top-[80px] z-30 p-4 border-l-4 border-primary shadow-lg flex flex-col md:flex-row items-center gap-6">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">filter_list</span>
+<input class="w-full bg-transparent border-none border-b border-outline-variant/30 focus:border-primary focus:ring-0 text-sm font-mono text-on-surface py-2 pl-10 placeholder:text-outline-variant/50" placeholder="FILTER_BY_KEYWORD..." type="text"/>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1 w-full no-scrollbar">
+<span class="text-[10px] font-mono text-outline uppercase tracking-widest mr-2 whitespace-nowrap">Categories:</span>
+<button class="px-4 py-1.5 bg-primary text-on-primary text-[10px] font-mono uppercase whitespace-nowrap">All_Systems</button>
+<button class="px-4 py-1.5 bg-surface-container-high text-on-surface opacity-70 hover:opacity-100 text-[10px] font-mono uppercase whitespace-nowrap transition-colors">Automation</button>
+<button class="px-4 py-1.5 bg-surface-container-high text-on-surface opacity-70 hover:opacity-100 text-[10px] font-mono uppercase whitespace-nowrap transition-colors">Analytics</button>
+<button class="px-4 py-1.5 bg-surface-container-high text-on-surface opacity-70 hover:opacity-100 text-[10px] font-mono uppercase whitespace-nowrap transition-colors">Security</button>
+<button class="px-4 py-1.5 bg-surface-container-high text-on-surface opacity-70 hover:opacity-100 text-[10px] font-mono uppercase whitespace-nowrap transition-colors">Ops</button>
+<button class="px-4 py-1.5 bg-surface-container-high text-on-surface opacity-70 hover:opacity-100 text-[10px] font-mono uppercase whitespace-nowrap transition-colors">Telemetry</button>
+</div>
+</div>
+<!-- Marketplace Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="High-tech industrial control panel interface with glowing orange and amber data visualizations on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEUyM46u3nmG96VMiKAuFALBaOgcYmAFKTRKaEqntgQmFwqj3XKieJpzOoOWO5ROpWD_VtC79cdY1ENWtsMVIyZG8XbFzMluY5nGhY_pM658HMqiqqdupTw5JFIGtpVoLxnKxRT8Q6B0VllJxCndBjKbvw31N4lsv1HTSqBg_h2xbQ4_mC6YHdKPhchIjTRYAdrZ6fuqwQa32vAtu6JZguR-dOMfmv_eN2XsUX0kRJi5pXiFwPcg_pkLFao0FjNZT-yLuK4nKJsG4"/>
+<div class="absolute top-4 right-4 bg-[#100e0d]/80 backdrop-blur-md px-3 py-1 text-[10px] font-mono text-primary border border-primary/20">
+                        VERIFIED_CORE
+                    </div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">OmniLink PLC Bridge</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.9</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Multi-protocol bridging layer for Siemens S7 and Allen-Bradley systems. Real-time data sync with &lt; 10ms latency.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">12,402</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Abstract data analytics dashboard showing complex line graphs and metrics in electric blue and gold" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcg7O5oGqm5ebR2LtZtxLs0P3NYIPC6rkAPavKIxwimj0U5Go2ooCb7jw1xjOBUXVTViWIU3njLmLiokr8mniqacgXxe07o-zXWEn4ZU7mZZMlRJYALeFHXqB8lHhCAB6RlkJ8DKcKTJe5j1Q1sGwtKt1IEeQZw1RKFRqLjcarwofnQXKiAaCquy1G-A65_3aT-cE2auI1LHckQCNWSkEPsIQXBrJ27Pj7qd7Fgex0MQErzl3TxFnoc_oIlaKjQKEKP8QZwynT6WE"/>
+<div class="absolute top-4 right-4 bg-[#100e0d]/80 backdrop-blur-md px-3 py-1 text-[10px] font-mono text-tertiary border border-tertiary/20">
+                        ANALYTICS_EXT
+                    </div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">Predictive Fault-X</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.7</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Neural network modeling for industrial vibration sensors. Identifies bearing failure 72 hours before critical state.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">8,911</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Dark computer server room with rows of machines and glowing amber LED status lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsFN4Fi3go5CwPDW8W8HJ2wCyXd0SbhBCLG_KMO2bko_mdiA3L2S8PB_3_pBrV0UOwnEPe4B4XIDFdQHuPx9S85NDXSlgDHhvT-G52e0cx_qiU8F4nRsNiAcC4Ct667V-KoGIbTg-6TAYEfbXJeGNpKjsAG448KeYHeLH1VZyVe_kR2ZVsxP_ohd3Ps5DAQyFuY-x1YqE0DUvkR-40-81zjMa8FDYVU-47rdxkozN5HmV6OlTRLqxhOBZZ3ZFg8QGVe1ouz4SlHEM"/>
+<div class="absolute top-4 right-4 bg-[#100e0d]/80 backdrop-blur-md px-3 py-1 text-[10px] font-mono text-error border border-error/20">
+                        SECURITY_HSM
+                    </div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">Sentinel Firewall</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">5.0</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Air-gapped architecture isolation for critical infrastructure. Intrusion detection with automated packet-kill.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">4,205</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Close-up of industrial robotic arm working in a precision manufacturing facility with sharp amber lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKhwgtCQ9_pxVTLqaa2Me7RySNbgEdiLzorQa8bYG35Q_sNQMKFbaf4gjO5CU1zZIv1-E0xBS3QqPLJYZTvEEyzNh2_56Aj-bKBIM-USAyYuVG_-bFOCkvRh1KuCdTYsFE1g0Cih-1UM3lp4DE8UKx2kQJFYMwvZgw6cX8z9V55eH-c-FT-mdzL83VVQ9Qs0u6_ESvleupav9wXGurH-WEF2Zu_WcDoWPu3kW8KAMUasuHFjnXMjDLiNxJeatTJNWKyrkL6522yg0"/>
+<div class="absolute top-4 right-4 bg-[#100e0d]/80 backdrop-blur-md px-3 py-1 text-[10px] font-mono text-primary border border-primary/20">
+                        OPS_RUNTIME
+                    </div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">MotionSync Pro</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.8</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Precision motion control for 6-axis robotic arms. Optimized for CNC integration and additive manufacturing.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">1,550</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Global satellite network visualization with glowing orange lines connecting points on earth in space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsCDQy4BSKgdSkSvQ4nvFDZHz0CMQTlLxWAUAz5a2nZ-We9I6hC_J-fEKuPJawGZrRbFz-Hkt4b-dMgaiwqVwAhbs5TmznjToRaOfXcw3dgLGGUUAVg9RU9BfDgMtQ-CS_JBPEk-yGiaZyVtywssq1B8neUiWWRYn5iLd13PFaEyLv2EwhsbBA_MJKgiLTM6pGRAuAEDa6_inM0mVAYoUzD-neqH92nqQROu3lgm-pRWXiuAEcKLG4WXIv8E6rAprInlGZox5jY-M"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">EdgePulse Connect</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.6</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Unified edge-to-cloud telemetry sync. Native support for MQTT, CoAP, and custom industrial headers.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">22,109</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Macro photo of a computer chip with amber glow emanating from the gold circuits" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMsmNewOrg2qhj968PfCfqjfzg1X5QzFclcXO0ime5PVu19vLetZ0k2PttMSNmgJ226XrnnhuQjtI98uXiWIOmyvjryTFvRrs3X10swMqmqJFfydiCO10jtG_tp0v-OKefYImd-u5mMyC2tl8mhm2TPYedx336WKqV-E3AcpGU_Q7F8Jk-gxAncn0vP59QjZ2DWswamYkKIn7EwTBtfKynFG5JKyzkck80OtsGAAuAtF8Hn_HXyeunmCbS9PWT83JIgtKmP1KUfdU"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">Core-OS MicroKernel</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.9</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Ultra-lightweight operating substrate for resource-constrained IoT nodes. Sub-1MB footprint.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">31,040</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 7 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Close-up of high-speed industrial machinery with motion blur and sharp gold highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQt4BDMt5Q2rqXRUQzjSpFwtwr06Qq_XBC8hBbo8rBJzk6Vh3hQ1GcjuuQJ3JnbXGF4bO-bGdmch-Gy4hKkd-OaEpvWdYdXS9ZzRY04HUDou9qMW52ABKWIK8BVgfcMCQ8oFleHf2sEZxdTZq_znwEYRUTdZzcruF_dQVHAzlf1DkPhAhhnYPZWIj6Hu3JMhm81cec3PkqwzoQ9ZE77aPhws_vEn9sP4qi1vgr4gQvvVd2NiQ6Qu49GUZHmXG_CyxEE9RhCFI-pY4"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">Logic-Sync 2.0</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.4</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">Real-time state synchronization for distributed PLC clusters. Ensures deterministic execution across nodes.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">7,112</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+<!-- Card 8 -->
+<div class="group bg-surface-container-lowest border border-transparent hover:border-primary-container/30 transition-all duration-300 flex flex-col">
+<div class="relative aspect-video overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100" data-alt="Modern high-density data visualization charts on a dark industrial screen with amber and blue highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfCUTeAVgQvNDtUgjcdUtGo1XOcmQ5J9690qxy2Qfbdhcp6jRVK0EIkmrHEOurpePbiT9O3wM9yAXIzplxlHOTNe4im9gOupnoWxSG_TCa7PNGwx1uu3g1SElyoNyGKTA6hwLpnKDlNPsBsGUS5kw8cTiexB_aEULH5d0ewQKvAA9Zixo8qUtKNFPk66ETLJY9bZ-QWrObu__HsewENa6prHbUUEbHgP7fhrqIE9XQT0KTXClmEKrv2E4ePsiLDkw8ghuus1HwXos"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold font-headline leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">HyperViz SCADA</h3>
+<div class="flex items-center gap-1 text-primary">
+<span class="text-xs font-mono font-bold">4.9</span>
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-xs text-outline mb-6 font-body leading-relaxed">High-performance HMI template engine. Vector-based components with dynamic data binding support.</p>
+<div class="mt-auto flex items-center justify-between border-t border-outline-variant/10 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Installs</span>
+<span class="text-sm font-mono text-on-surface">19,443</span>
+</div>
+<button class="bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface px-4 py-2 text-[10px] font-mono uppercase transition-colors">Deploy_Node</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer / Load More -->
+<div class="mt-16 flex flex-col items-center gap-4">
+<div class="h-[1px] w-full bg-surface-container-high"></div>
+<button class="group flex flex-col items-center gap-2 py-4">
+<span class="text-[10px] font-mono text-outline uppercase tracking-widest group-hover:text-primary transition-colors">Expand_Database</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-y-1 transition-transform">keyboard_double_arrow_down</span>
+</button>
+<div class="text-[10px] font-mono text-outline-variant/40 mt-8">
+                CORTHEX INDUSTRIAL MARKETPLACE v2.4.0-STABLE | END_OF_FEED
+            </div>
+</div>
+</main>
+<!-- Floating System Status (Bespoke Command Component) -->
+<div class="fixed bottom-6 right-6 z-50 bg-surface-container shadow-2xl border border-outline-variant/20 p-4 hidden lg:flex items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 bg-primary"></div>
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">System_State</span>
+<span class="text-xs font-mono font-bold text-primary">OPTIMAL</span>
+</div>
+</div>
+<div class="w-[1px] h-8 bg-outline-variant/20"></div>
+<div class="flex flex-col">
+<span class="text-[10px] font-mono text-outline-variant uppercase">Throughput</span>
+<span class="text-xs font-mono text-on-surface">142.4 GB/s</span>
+</div>
+<div class="w-[1px] h-8 bg-outline-variant/20"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-sm">terminal</span>
+<span class="text-[10px] font-mono text-on-surface uppercase tracking-tight">Active_Sessions: 14</span>
+</div>
+</div>
+</body></html>

@@ -3,9 +3,8 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CORTHEX Command | AI Nexus</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -14,16 +13,31 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: "#CA8A04",
-                        background: "#0C0A09",
-                        surface: "#1C1917",
-                        border: "#292524",
-                        accent: "#EAB308"
+                        corthex: {
+                            bg: "#0C0A09",
+                            surface: "#1C1917",
+                            elevated: "#292524",
+                            border: "#44403C",
+                            "border-strong": "#57534E",
+                            accent: "#CA8A04",
+                            "accent-hover": "#D97706",
+                            "accent-deep": "#A16207",
+                            "accent-muted": "rgba(202, 138, 4, 0.1)",
+                            "text-primary": "#FAFAF9",
+                            "text-secondary": "#A8A29E",
+                            "text-disabled": "#57534E",
+                            "text-on-accent": "#0C0A09",
+                            success: "#22C55E",
+                            warning: "#EAB308",
+                            error: "#EF4444",
+                            info: "#3B82F6"
+                        }
                     },
                     fontFamily: {
                         "headline": ["DM Sans", "sans-serif"],
                         "body": ["DM Sans", "sans-serif"],
-                        "label": ["DM Sans", "sans-serif"]
+                        "label": ["DM Sans", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
                     },
                     borderRadius: {
                         "DEFAULT": "0.25rem",
@@ -36,246 +50,240 @@
         }
     </script>
 <style>
-        body {
-            background-color: #0C0A09;
-            color: #D6D3D1;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0C0A09;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #292524;
-            border-radius: 10px;
-        }
+        body { font-family: 'DM Sans', sans-serif; background-color: #0C0A09; color: #FAFAF9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #44403C; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #57534E; }
     </style>
 </head>
-<body class="antialiased overflow-hidden h-screen flex flex-col">
-<!-- Top Navigation Bar (Shared Component) -->
-<header class="bg-[#0C0A09] dark:bg-[#0C0A09] border-b border-[#292524] flex justify-between items-center w-full px-6 h-16 sticky top-0 z-50 font-['DM_Sans'] antialiased tracking-tight">
-<div class="flex items-center gap-8">
-<div class="text-xl font-black tracking-tighter text-yellow-600 dark:text-yellow-600">CORTHEX</div>
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-stone-400 dark:text-stone-500 hover:text-yellow-500 transition-colors" href="#">Dashboard</a>
-<a class="text-stone-400 dark:text-stone-500 hover:text-yellow-500 transition-colors" href="#">Agents</a>
-<a class="text-yellow-600 dark:text-yellow-600 border-b-2 border-yellow-600 pb-1" href="#">Nexus</a>
-<a class="text-stone-400 dark:text-stone-500 hover:text-yellow-500 transition-colors" href="#">Vault</a>
-</nav>
+<body class="antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Main Canvas Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-corthex-bg relative">
+<!-- Top Bar: Agent Selector -->
+<header class="h-16 flex items-center justify-between px-6 border-b border-corthex-border bg-corthex-surface/90 backdrop-blur-md z-10">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Active Session</span>
+<div class="relative group cursor-pointer flex items-center gap-2">
+<span class="text-corthex-text-primary font-bold text-sm">ARCHON-VII Strategic Intelligence</span>
+<span class="material-symbols-outlined text-corthex-text-secondary text-sm">expand_more</span>
+<!-- Dropdown Mock -->
+<div class="absolute top-full left-0 mt-2 w-64 bg-corthex-surface border border-corthex-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2 z-50">
+<div class="px-3 py-2 text-[10px] text-corthex-text-disabled uppercase font-bold tracking-tighter">Switch Agent</div>
+<div class="p-2 hover:bg-corthex-elevated rounded flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-corthex-accent flex items-center justify-center font-bold text-corthex-text-on-accent text-xs">AV</div>
+<div class="text-xs font-medium text-corthex-text-primary">ARCHON-VII</div>
+</div>
+<div class="p-2 hover:bg-corthex-elevated rounded flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-corthex-info flex items-center justify-center font-bold text-white text-xs">NL</div>
+<div class="text-xs font-medium text-corthex-text-primary">NEXUS-LOGOS</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="flex items-center gap-4">
-<div class="hidden sm:flex items-center bg-[#1C1917] border border-[#292524] px-3 py-1.5 rounded">
-<span class="material-symbols-outlined text-stone-500 text-sm mr-2">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-sm text-stone-300 w-48" placeholder="Search Nexus..." type="text"/>
+<div class="flex items-center gap-1.5 px-3 py-1 bg-corthex-success/10 rounded-full">
+<div class="w-1.5 h-1.5 rounded-full bg-corthex-success animate-pulse"></div>
+<span class="text-[10px] font-bold text-corthex-success tracking-widest">LIVE</span>
 </div>
-<button class="text-stone-400 hover:text-yellow-500 transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="text-stone-400 hover:text-yellow-500 transition-colors">
-<span class="material-symbols-outlined">settings</span>
-</button>
-<div class="w-8 h-8 rounded-full overflow-hidden border border-[#292524]">
-<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man with neutral expression, studio lighting, cinematic dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1A6HwU_2-FOwVThMViT85ehuA3J2F3diQ0fj2cYE6KzUc80xWMeqSJKbxAR803_AiUlAKN57NtNOizTwAdRkyyVjlMCxO5jQls1xjwIQCZXGKNETCGHuo-O-4y5U0lQsaIgDR_nTCmfEN_2pK29K9CYlk5DXjx50zMIgK5tHudNPVQmZQDCXKAfOm31DYG4rJsDVEa213P0RW8URAtij84MzrzBVOxNjia_Py0KbxvUpHp7k8VMvnbZnlK9EgGJQVVmY9kJL2lgr0"/>
-</div>
+<button class="material-symbols-outlined text-corthex-text-secondary hover:text-corthex-text-primary transition-colors">more_vert</button>
 </div>
 </header>
-<main class="flex-1 flex overflow-hidden">
-<!-- Main Chat Canvas -->
-<section class="flex-1 flex flex-col relative bg-[#0C0A09]">
-<!-- Agent Selector Header -->
-<div class="px-6 py-4 border-b border-[#292524] bg-[#0C0A09]/80 backdrop-blur-md flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="relative">
-<div class="w-10 h-10 rounded-lg bg-yellow-600/10 border border-yellow-600/30 flex items-center justify-center">
-<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<!-- Chat Messages Scroll Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="text-[10px] font-mono font-bold text-corthex-text-disabled uppercase tracking-[0.2em] px-3 py-1 bg-corthex-elevated/50 rounded-full border border-corthex-border/30">Cycle: 2024-05-18</span>
 </div>
-<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#0C0A09] rounded-full"></div>
-</div>
-<div>
-<div class="flex items-center gap-2">
-<span class="text-stone-100 font-bold tracking-tight">AURA-09</span>
-<span class="material-symbols-outlined text-stone-500 text-lg cursor-pointer">expand_more</span>
-</div>
-<p class="text-[10px] text-stone-500 uppercase tracking-widest font-medium">Neural Processing Active</p>
-</div>
-</div>
-<div class="flex gap-2">
-<button class="p-2 text-stone-400 hover:text-stone-200 transition-colors">
-<span class="material-symbols-outlined">videocam</span>
-</button>
-<button class="p-2 text-stone-400 hover:text-stone-200 transition-colors">
-<span class="material-symbols-outlined">call</span>
-</button>
-</div>
-</div>
-<!-- Messages List -->
-<div class="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar">
 <!-- Agent Message -->
-<div class="flex items-start gap-4 max-w-3xl">
-<div class="w-8 h-8 rounded bg-yellow-600/20 border border-yellow-600/40 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-yellow-600 text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<div class="flex flex-col items-start max-w-[80%] gap-2">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-8 h-8 rounded bg-corthex-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-corthex-text-on-accent text-lg" data-weight="fill">smart_toy</span>
 </div>
-<div class="space-y-2">
-<div class="p-4 bg-stone-900/50 border border-yellow-600/10 rounded-xl rounded-tl-none text-stone-300 leading-relaxed shadow-sm">
-                            Greetings. Neural pathways initialized. I have synthesized the latest market volatility data for your portfolio. Would you like to view the visual mapping or the executive summary?
-                        </div>
-<span class="text-[10px] text-stone-600 font-medium ml-1">09:41 AM</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">ARCHON-VII</span>
 </div>
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-xl rounded-tl-none shadow-sm">
+<p class="text-corthex-text-primary text-sm leading-relaxed">
+                            System diagnostics complete. All neural pathways are synchronized. I have analyzed the Q3 projection data you requested. Preliminary findings suggest a <span class="text-corthex-accent font-mono">14.2%</span> efficiency delta in the APAC region.
+                        </p>
+</div>
+<span class="font-mono text-[10px] text-corthex-text-disabled ml-11">09:14:22 UTC</span>
 </div>
 <!-- User Message -->
-<div class="flex items-start gap-4 max-w-3xl ml-auto flex-row-reverse">
-<div class="w-8 h-8 rounded bg-stone-800 border border-stone-700 flex items-center justify-center shrink-0 overflow-hidden">
-<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man with neutral expression, studio lighting, cinematic dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQgjWqiHVNVAHdpPE87uyRrC-x6ocQGS-ZKeUsDE9Hs7fs3F8I0fahmOeJjodzpb_Fyh7rKcJFmsdOECLFX_H3fVX-XGdkVns3DDMKLNJ7Fi8WzeMdupa6zPygIN_hZCmaId3-fosOaZqijkdrsxrSJBDy6ocdW8l-OsJOXp57g4S5_fhB1NXtNnm2lCp4-oe13BgUpcUPLDLltr8I0MM1kA3NAKRHi2JzJwm-RGMPxtN-z2GVpJHmxZQ3DJKOM-_Bk4pT4W0HtT1z"/>
+<div class="flex flex-col items-end max-w-[80%] gap-2 ml-auto">
+<div class="flex items-center gap-3 mb-1 flex-row-reverse">
+<div class="w-8 h-8 rounded bg-corthex-elevated border border-corthex-border flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a professional male executive with sharp features and neutral expression against a dark textured background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM4wxUCrxRyVYmiqz4k1vwkyYOGQDkHcLMuTw81Z3VF68LOcgZts1YgG0VQRkNoA9TM0mXnUQgVbYE7JHrvbP1CR96gbj50gfkF7CtUtRATkAdHoJ4g4Cc7PuPtH8EtXUpArYC6I71ZxE7cKorw27WTCMCCRw6xDT1JezH_ZU5N6J5f7SioompGAt2rIw8hLagrufxVSOD5gaJYmuM7X_ARIrJPK9dxc6n_SqDH5PjNT71Qf2CRpavN3ZoWR2DzMr8U9MJrDXVdn8"/>
 </div>
-<div class="space-y-2 flex flex-col items-end">
-<div class="p-4 bg-stone-800 border border-stone-700 rounded-xl rounded-tr-none text-stone-200 leading-relaxed shadow-sm">
-                            Let's start with the visual mapping. Highlight any anomalies in the tech sector specifically.
-                        </div>
-<span class="text-[10px] text-stone-600 font-medium mr-1">09:42 AM</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Administrator</span>
 </div>
+<div class="bg-corthex-elevated border border-corthex-border-strong p-4 rounded-xl rounded-tr-none shadow-sm">
+<p class="text-corthex-text-primary text-sm leading-relaxed">
+                            Confirming receipt. Can you correlate that delta with the recent logistics shift in the Singapore hub? I need a visualization of the bottlenecks.
+                        </p>
 </div>
-<!-- Agent Message with Data Visualization Component -->
-<div class="flex items-start gap-4 max-w-3xl">
-<div class="w-8 h-8 rounded bg-yellow-600/20 border border-yellow-600/40 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-yellow-600 text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-mono text-[10px] text-corthex-text-disabled mr-11">09:15:04 UTC</span>
 </div>
-<div class="space-y-3 flex-1">
-<div class="p-4 bg-stone-900/50 border border-yellow-600/10 rounded-xl rounded-tl-none text-stone-300 leading-relaxed">
-                            Generating sector map. Detecting three primary anomalies in semiconductor supply chains.
-                        </div>
-<div class="w-full aspect-video bg-[#1C1917] border border-[#292524] rounded-lg relative overflow-hidden group">
-<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(202,138,4,0.05),transparent_70%)]"></div>
-<!-- Mock Data Visualization -->
-<div class="absolute inset-0 flex items-center justify-center">
-<div class="w-4/5 h-2/3 border-b border-l border-stone-800 relative">
-<div class="absolute bottom-0 left-1/4 w-8 h-[60%] bg-yellow-600/20 border-t-2 border-yellow-600"></div>
-<div class="absolute bottom-0 left-2/4 w-8 h-[85%] bg-yellow-600/40 border-t-2 border-yellow-500"></div>
-<div class="absolute bottom-0 left-3/4 w-8 h-[45%] bg-yellow-600/20 border-t-2 border-yellow-600"></div>
-<div class="absolute -top-4 left-0 text-[10px] text-stone-600 uppercase tracking-tighter">Throughput %</div>
+<!-- Agent Message with Data Card -->
+<div class="flex flex-col items-start max-w-[85%] gap-2">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-8 h-8 rounded bg-corthex-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-corthex-text-on-accent text-lg" data-weight="fill">smart_toy</span>
 </div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">ARCHON-VII</span>
 </div>
-<div class="absolute top-3 right-3 flex gap-1">
-<div class="px-2 py-0.5 bg-yellow-600/10 border border-yellow-600/30 rounded text-[9px] text-yellow-500 font-bold uppercase">LIVE</div>
-</div>
-</div>
-<span class="text-[10px] text-stone-600 font-medium ml-1">09:43 AM</span>
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-xl rounded-tl-none shadow-sm w-full">
+<p class="text-corthex-text-primary text-sm leading-relaxed mb-4">
+                            Correlation confirmed. The bottleneck is localized at Hub-SGP-12. See the visualization below for the real-time throughput analysis.
+                        </p>
+<!-- Inline Data Visualization (Bento Style) -->
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div class="p-4 bg-corthex-bg border border-corthex-border rounded-lg">
+<span class="text-[10px] font-mono text-corthex-text-disabled uppercase">Throughput</span>
+<div class="text-xl font-mono font-bold text-corthex-accent">842 req/s</div>
+<div class="w-full bg-corthex-border h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-corthex-accent h-full w-[85%]"></div>
 </div>
 </div>
+<div class="p-4 bg-corthex-bg border border-corthex-border rounded-lg">
+<span class="text-[10px] font-mono text-corthex-text-disabled uppercase">Latency</span>
+<div class="text-xl font-mono font-bold text-corthex-error">240ms</div>
+<div class="w-full bg-corthex-border h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-corthex-error h-full w-[70%]"></div>
 </div>
-<!-- Input Area -->
-<div class="p-6 border-t border-[#292524] bg-[#0C0A09]">
-<div class="max-w-4xl mx-auto relative">
-<div class="bg-[#1C1917] border border-[#292524] rounded-xl flex items-end p-2 transition-all focus-within:border-yellow-600/50 focus-within:ring-1 focus-within:ring-yellow-600/20">
-<button class="p-2 text-stone-500 hover:text-stone-300 transition-colors">
-<span class="material-symbols-outlined">add_circle</span>
+</div>
+</div>
+</div>
+<span class="font-mono text-[10px] text-corthex-text-disabled ml-11">09:15:38 UTC</span>
+</div>
+</div>
+<!-- Message Input Bar -->
+<footer class="p-6 bg-corthex-bg border-t border-corthex-border">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center gap-3 bg-corthex-elevated border border-corthex-border p-2 rounded-xl focus-within:border-corthex-accent transition-all">
+<button class="p-2 text-corthex-text-secondary hover:text-corthex-text-primary hover:bg-corthex-surface rounded-lg transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">attach_file</span>
 </button>
-<textarea class="w-full bg-transparent border-none focus:ring-0 text-stone-200 placeholder-stone-600 resize-none py-2 px-2 custom-scrollbar max-h-32" placeholder="Type a command or ask AURA-09..." rows="1"></textarea>
-<button class="p-2 text-stone-500 hover:text-stone-300 transition-colors">
-<span class="material-symbols-outlined">mic</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-corthex-text-primary placeholder:text-corthex-text-disabled text-sm py-2 px-1" placeholder="Command input... (Shift + Enter for new line)" type="text"/>
+<button class="p-2 text-corthex-text-secondary hover:text-corthex-text-primary hover:bg-corthex-surface rounded-lg transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">mic</span>
 </button>
-<button class="ml-1 bg-yellow-600 hover:bg-yellow-500 text-[#0C0A09] p-2 rounded-lg transition-all flex items-center justify-center shadow-[0_0_15px_rgba(202,138,4,0.2)]">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+<button class="flex items-center gap-2 bg-corthex-accent hover:bg-corthex-accent-hover active:scale-95 text-corthex-text-on-accent px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest transition-all">
+<span>Send</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill">send</span>
 </button>
 </div>
-<div class="mt-2 flex gap-4 px-2">
-<button class="text-[10px] text-stone-500 hover:text-stone-300 transition-colors flex items-center gap-1 uppercase tracking-widest font-bold">
-<span class="w-1.5 h-1.5 rounded-full bg-stone-700"></span> /analyze-market
-                        </button>
-<button class="text-[10px] text-stone-500 hover:text-stone-300 transition-colors flex items-center gap-1 uppercase tracking-widest font-bold">
-<span class="w-1.5 h-1.5 rounded-full bg-stone-700"></span> /summarize-vault
-                        </button>
+<div class="mt-2 flex items-center justify-center gap-4">
+<span class="text-[10px] text-corthex-text-disabled font-mono">ENCRYPTED END-TO-END</span>
+<div class="h-1 w-1 rounded-full bg-corthex-border"></div>
+<span class="text-[10px] text-corthex-text-disabled font-mono">TOKEN USAGE: 1,420</span>
 </div>
 </div>
-</div>
-</section>
+</footer>
+</main>
 <!-- Right Sidebar: Agent Info -->
-<aside class="hidden xl:flex flex-col w-80 bg-[#0C0A09] border-l border-[#292524] overflow-y-auto">
-<div class="p-6 space-y-8">
-<!-- Profile Section -->
-<div class="text-center space-y-4">
-<div class="relative inline-block mx-auto">
-<div class="w-24 h-24 rounded-2xl bg-[#1C1917] border border-yellow-600/20 flex items-center justify-center overflow-hidden relative group">
-<div class="absolute inset-0 bg-gradient-to-tr from-yellow-600/10 to-transparent"></div>
-<span class="material-symbols-outlined text-4xl text-yellow-600" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<aside class="w-[320px] bg-corthex-surface border-l border-corthex-border flex flex-col hidden xl:flex">
+<!-- Agent Identity Section -->
+<div class="p-6 border-b border-corthex-border flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-corthex-accent to-corthex-accent-deep p-0.5">
+<div class="w-full h-full rounded-2xl bg-corthex-surface flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-5xl text-corthex-accent" data-weight="fill">smart_toy</span>
 </div>
-<div class="absolute -bottom-2 right-1/2 translate-x-1/2 bg-yellow-600 text-[#0C0A09] text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter border-2 border-[#0C0A09]">LEVEL 09</div>
 </div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-corthex-surface border-4 border-corthex-surface flex items-center justify-center">
+<div class="w-full h-full rounded-full bg-corthex-success"></div>
+</div>
+</div>
+<h2 class="text-xl font-bold text-corthex-text-primary tracking-tight">ARCHON-VII</h2>
+<p class="text-xs font-mono text-corthex-text-secondary mt-1">S-TIER ANALYTIC UNIT</p>
+</div>
+<!-- Stats/Capabilities Grid -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+<!-- Capabilities Section -->
 <div>
-<h2 class="text-xl font-bold text-stone-100 tracking-tight">AURA-09</h2>
-<div class="flex items-center justify-center gap-2 mt-1">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-<span class="text-xs text-stone-500 font-medium uppercase tracking-wider">System Operational</span>
-</div>
-</div>
-</div>
-<!-- Stats Grid -->
-<div class="grid grid-cols-2 gap-3">
-<div class="p-3 bg-[#1C1917] border border-[#292524] rounded-lg">
-<p class="text-[10px] text-stone-500 uppercase font-bold tracking-widest">Uptime</p>
-<p class="text-stone-200 font-mono text-sm">99.98%</p>
-</div>
-<div class="p-3 bg-[#1C1917] border border-[#292524] rounded-lg">
-<p class="text-[10px] text-stone-500 uppercase font-bold tracking-widest">Latency</p>
-<p class="text-stone-200 font-mono text-sm">12ms</p>
-</div>
-</div>
-<!-- Capabilities -->
+<h3 class="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-4">Core Capabilities</h3>
 <div class="space-y-3">
-<h3 class="text-[10px] text-stone-500 uppercase font-bold tracking-[0.2em]">Neural Capabilities</h3>
+<div class="p-3 bg-corthex-elevated border border-corthex-border rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-corthex-accent text-lg">query_stats</span>
+<div class="flex-1">
+<div class="text-xs font-bold text-corthex-text-primary">Predictive Modeling</div>
+<div class="text-[10px] text-corthex-text-secondary">High-fidelity future projections</div>
+</div>
+</div>
+<div class="p-3 bg-corthex-elevated border border-corthex-border rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-corthex-accent text-lg">account_tree</span>
+<div class="flex-1">
+<div class="text-xs font-bold text-corthex-text-primary">Supply Chain Logic</div>
+<div class="text-[10px] text-corthex-text-secondary">Logistical optimization expert</div>
+</div>
+</div>
+<div class="p-3 bg-corthex-elevated border border-corthex-border rounded-lg flex items-center gap-3 opacity-50">
+<span class="material-symbols-outlined text-corthex-text-disabled text-lg">translate</span>
+<div class="flex-1">
+<div class="text-xs font-bold text-corthex-text-disabled">Linguistic Synthesis</div>
+<div class="text-[10px] text-corthex-text-disabled">Secondary module offline</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Parameters Section -->
+<div>
+<h3 class="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-4">Unit Parameters</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-xs">
+<span class="text-corthex-text-secondary">Logic Engine</span>
+<span class="text-corthex-text-primary font-mono">STABLE (98.2%)</span>
+</div>
+<div class="w-full bg-corthex-border h-1 rounded-full overflow-hidden">
+<div class="bg-corthex-accent h-full w-[98%]"></div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-corthex-text-secondary">Recall Accuracy</span>
+<span class="text-corthex-text-primary font-mono">PERFECT</span>
+</div>
+<div class="w-full bg-corthex-border h-1 rounded-full overflow-hidden">
+<div class="bg-corthex-success h-full w-full"></div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-corthex-text-secondary">Response Latency</span>
+<span class="text-corthex-text-primary font-mono">140ms</span>
+</div>
+</div>
+</div>
+<!-- Shared Files (Example Content Pattern) -->
+<div>
+<h3 class="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-4">Relevant Files</h3>
 <div class="space-y-2">
-<div class="flex items-center gap-3 p-3 bg-[#1C1917]/40 border border-[#292524] rounded-lg group hover:border-yellow-600/30 transition-colors cursor-default">
-<span class="material-symbols-outlined text-yellow-600/70 text-lg">hub</span>
-<span class="text-sm text-stone-300 font-medium">Data Synthesis</span>
+<div class="flex items-center justify-between p-2 hover:bg-corthex-elevated rounded transition-colors group cursor-pointer border border-transparent hover:border-corthex-border">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-corthex-text-secondary text-base">description</span>
+<span class="text-xs text-corthex-text-primary truncate max-w-[140px]">q3_forecast.xls</span>
 </div>
-<div class="flex items-center gap-3 p-3 bg-[#1C1917]/40 border border-[#292524] rounded-lg group hover:border-yellow-600/30 transition-colors cursor-default">
-<span class="material-symbols-outlined text-yellow-600/70 text-lg">schema</span>
-<span class="text-sm text-stone-300 font-medium">Neural Mapping</span>
+<span class="text-[10px] font-mono text-corthex-text-disabled opacity-0 group-hover:opacity-100 transition-opacity">1.2MB</span>
 </div>
-<div class="flex items-center gap-3 p-3 bg-[#1C1917]/40 border border-[#292524] rounded-lg group hover:border-yellow-600/30 transition-colors cursor-default">
-<span class="material-symbols-outlined text-yellow-600/70 text-lg">query_stats</span>
-<span class="text-sm text-stone-300 font-medium">Predictive Analytics</span>
+<div class="flex items-center justify-between p-2 hover:bg-corthex-elevated rounded transition-colors group cursor-pointer border border-transparent hover:border-corthex-border">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-corthex-text-secondary text-base">analytics</span>
+<span class="text-xs text-corthex-text-primary truncate max-w-[140px]">bottleneck_analysis.json</span>
 </div>
-</div>
-</div>
-<!-- Recent Files / Activity -->
-<div class="space-y-3">
-<h3 class="text-[10px] text-stone-500 uppercase font-bold tracking-[0.2em]">Shared Workspace</h3>
-<div class="space-y-2">
-<div class="flex items-center gap-3 group cursor-pointer">
-<div class="w-8 h-8 rounded bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-500 group-hover:text-yellow-600 transition-colors">
-<span class="material-symbols-outlined text-sm">description</span>
-</div>
-<div class="flex-1 min-w-0">
-<p class="text-xs text-stone-300 font-medium truncate">market_volatility_q4.pdf</p>
-<p class="text-[10px] text-stone-600 uppercase">2.4 MB • Just now</p>
-</div>
-</div>
-<div class="flex items-center gap-3 group cursor-pointer">
-<div class="w-8 h-8 rounded bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-500 group-hover:text-yellow-600 transition-colors">
-<span class="material-symbols-outlined text-sm">image</span>
-</div>
-<div class="flex-1 min-w-0">
-<p class="text-xs text-stone-300 font-medium truncate">neural_map_overlay.png</p>
-<p class="text-[10px] text-stone-600 uppercase">1.1 MB • 2m ago</p>
+<span class="text-[10px] font-mono text-corthex-text-disabled opacity-0 group-hover:opacity-100 transition-opacity">45KB</span>
 </div>
 </div>
 </div>
 </div>
-<!-- Footer CTA -->
-<button class="w-full py-3 bg-[#1C1917] border border-[#292524] text-stone-400 text-xs font-bold uppercase tracking-widest hover:text-yellow-600 hover:border-yellow-600/30 transition-all rounded-lg flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-sm">terminal</span>
-                    Configure Agent
-                </button>
+<!-- Sidebar Footer -->
+<div class="p-4 border-t border-corthex-border bg-corthex-bg/50">
+<button class="w-full flex items-center justify-center gap-2 text-corthex-text-secondary hover:text-corthex-text-primary transition-colors py-2 text-xs font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined text-base">history</span>
+<span>Session Logs</span>
+</button>
 </div>
 </aside>
-</main>
-<!-- SideNavBar (Shared Component - Mobile/Hidden state reference) -->
-<div class="hidden lg:flex flex-col w-64 h-screen bg-[#0C0A09] dark:bg-[#0C0A09] border-r border-[#292524] fixed left-0 top-0 z-40 font-['DM_Sans'] text-sm pointer-events-none opacity-0">
-<!-- Structural reference only -->
 </div>
 </body></html>

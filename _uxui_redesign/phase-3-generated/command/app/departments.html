@@ -3,304 +3,391 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>CORTHEX | Departments Management</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        stone: {
-                            950: "#0C0A09",
-                            900: "#1C1917",
-                            800: "#292524",
-                        },
-                        yellow: {
-                            600: "#CA8A04",
-                            500: "#EAB308",
-                        }
-                    },
-                    fontFamily: {
-                        "headline": ["DM Sans", "sans-serif"],
-                        "body": ["DM Sans", "sans-serif"],
-                        "label": ["DM Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            corthex: {
+              bg: "#0C0A09",
+              surface: "#1C1917",
+              elevated: "#292524",
+              border: "#44403C",
+              "border-strong": "#57534E",
+              accent: "#CA8A04",
+              "accent-hover": "#D97706",
+              "accent-muted": "#CA8A0419",
+              primary: "#FAFAF9",
+              secondary: "#A8A29E"
+            }
+          },
+          fontFamily: {
+            "headline": ["DM Sans", "sans-serif"],
+            "body": ["DM Sans", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        },
+      },
+    }
+  </script>
 <style>
-        body {
-            background-color: #0C0A09;
-            color: #E7E5E4;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .cyber-grid {
-            background-image: radial-gradient(circle at 2px 2px, #292524 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-        .glass-card {
-            background: rgba(28, 25, 23, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid #292524;
-        }
-        .glow-accent {
-            box-shadow: 0 0 15px rgba(202, 138, 4, 0.15);
-        }
-    </style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
 </head>
-<body class="antialiased selection:bg-yellow-600/30">
-<!-- Top Navigation Bar -->
-<nav class="flex justify-between items-center px-6 h-16 w-full bg-[#0C0A09] docked full-width top-0 border-b border-stone-800 font-sans antialiased text-sm tracking-tight z-50 sticky">
-<div class="flex items-center gap-8">
-<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX</span>
-<div class="hidden md:flex items-center gap-6">
-<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Dashboard</a>
-<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1 transition-colors duration-200" href="#">Departments</a>
-<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Agents</a>
-<a class="text-stone-400 hover:text-yellow-500 hover:bg-stone-900/50 transition-colors duration-200" href="#">Logs</a>
+<body class="bg-corthex-bg text-corthex-primary font-body antialiased selection:bg-corthex-accent selection:text-corthex-bg">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-[280px] z-50 bg-[#0C0A09] border-r border-[#1C1917] flex flex-col h-full py-6 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-corthex-accent flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-corthex-bg font-bold" style="font-variation-settings: 'FILL' 1;">hexagon</span>
 </div>
+<div>
+<h1 class="text-[#FAFAF9] font-bold text-lg leading-none">CORTHEX</h1>
+<p class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#A8A29E] mt-1">MANAGEMENT PLATFORM</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="px-4 mb-2">
+<p class="text-[10px] uppercase tracking-widest font-bold text-[#A8A29E] px-4">COMMAND</p>
+</div>
+<a class="text-[#A8A29E] flex items-center px-4 py-3 hover:bg-[#CA8A0419] hover:text-[#FAFAF9] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Dashboard</span>
+</a>
+<a class="text-[#A8A29E] flex items-center px-4 py-3 hover:bg-[#CA8A0419] hover:text-[#FAFAF9] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">terminal</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Hub</span>
+</a>
+<a class="text-[#A8A29E] flex items-center px-4 py-3 hover:bg-[#CA8A0419] hover:text-[#FAFAF9] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">hub</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Nexus</span>
+</a>
+<div class="px-4 mt-6 mb-2">
+<p class="text-[10px] uppercase tracking-widest font-bold text-[#A8A29E] px-4">ORGANIZATION</p>
+</div>
+<a class="text-[#A8A29E] flex items-center px-4 py-3 hover:bg-[#CA8A0419] hover:text-[#FAFAF9] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">smart_toy</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Agents</span>
+</a>
+<!-- Active State Logic: Departments is the active page -->
+<a class="bg-[#CA8A0419] text-[#FAFAF9] border-l-2 border-[#CA8A04] flex items-center px-4 py-3 transition-all duration-200 translate-x-1" href="#">
+<span class="material-symbols-outlined mr-3 text-corthex-accent" style="font-variation-settings: 'FILL' 1;">corporate_fare</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Departments</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<button class="w-full bg-white/10 text-[#A8A29E] text-[10px] uppercase tracking-widest font-bold py-3 rounded hover:bg-white/15 transition-colors mb-4">
+        Switch to Admin
+      </button>
+<div class="flex items-center gap-3 px-4 py-3">
+<div class="w-10 h-10 rounded bg-corthex-accent flex items-center justify-center font-bold text-corthex-bg">JD</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-bold text-white truncate">John Doe</p>
+<p class="text-[10px] text-[#A8A29E] font-mono">OPERATOR</p>
+</div>
+<button class="text-[#A8A29E] hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full h-14 z-40 bg-[#1C1917]/90 backdrop-blur-md border-b border-[#44403C] md:pl-[280px]">
+<div class="flex justify-between items-center px-6 h-full w-full">
+<div class="flex items-center gap-2">
+<span class="text-corthex-secondary text-sm font-medium">CORTHEX</span>
+<span class="text-corthex-border">/</span>
+<span class="text-corthex-primary text-sm font-bold">Departments</span>
 </div>
 <div class="flex items-center gap-4">
 <div class="relative hidden sm:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-lg">search</span>
-<input class="bg-stone-900 border-stone-800 text-stone-300 pl-10 pr-4 py-1.5 rounded text-xs focus:ring-yellow-600 focus:border-yellow-600 w-64" placeholder="Search Command..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-corthex-secondary text-sm">search</span>
+<input class="bg-corthex-elevated border border-corthex-border rounded-lg pl-9 pr-4 py-1.5 text-xs text-corthex-primary placeholder-corthex-secondary focus:outline-none focus:border-corthex-accent w-64 transition-colors" placeholder="Search Commands... Ctrl+K" type="text"/>
 </div>
-<button class="bg-yellow-600 text-stone-950 px-4 py-1.5 rounded font-bold text-xs uppercase tracking-wider hover:bg-yellow-500 transition-colors flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">add</span>
-                Create Department
-            </button>
-<div class="flex items-center gap-3 ml-2 border-l border-stone-800 pl-4">
-<span class="material-symbols-outlined text-stone-400 hover:text-yellow-600 cursor-pointer">notifications</span>
-<span class="material-symbols-outlined text-stone-400 hover:text-yellow-600 cursor-pointer">settings</span>
-<img alt="User profile" class="w-8 h-8 rounded border border-stone-700 object-cover" data-alt="close-up portrait of a professional man with sharp features and cinematic lighting against a dark industrial background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChD0mSL-AlqzgXpTY3LNOQv8MfKqeprtDUZBP9qV1oYbdn3tS6kLDVSimIe5qTvcEgaBm6mlRQCj5qIAo0PHI2_TSFDfrc1IMKfmQ-Ki-yrjezFEWkJ_P_Yg4-JpD2s_ydYI3OfqI2Vm7EHpfiHxbemNaYo5QHP9pX-hxi8tifCSwKKN6uva0sSRMF0ro7vXWN4wUS6PyvVuF9FR1eLE8wINHc_0f0gLzGcSfW-A5Sr-_uSnWZ-yw2iVTy0cvHBa9Vh26R_fpIC-f_"/>
+<button class="text-corthex-secondary hover:text-corthex-primary relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-corthex-accent rounded-full border-2 border-corthex-surface"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-corthex-elevated border border-corthex-border overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="portrait of a professional man in a dark tech environment, sharp focus, cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3TqpcviCGJcn5ej2XHQfEMF-kMg2LYO3mUuifuMQnSZtw7wOT7N0lwpYcS3UZZrUZsYsoLPFmQx3jwDeVj4aFZ4uN3nkc3H_scGN2QrKLUFxtAu6kOALHwEuj8X8iq8jtH9wAmpdiZtxesR3iFOnN0cKk0JN8ZJIBuMYwPBnHCnry9DRjcRPcY0NiLo6tW2X86BHlx8KT8AbHDMsjteBeg7uX3ddU9NNg3snXYARW5Uy35caSkq_k68BvvzZxe1Pb3WH9meqkEYo"/>
 </div>
 </div>
-</nav>
-<!-- Main Content Canvas -->
-<main class="min-h-screen p-6 md:p-10 cyber-grid relative pb-24">
-<!-- Header Section -->
-<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-<div>
-<div class="flex items-center gap-3 mb-2">
-<span class="h-[1px] w-8 bg-yellow-600"></span>
-<span class="text-yellow-600 uppercase tracking-[0.3em] text-[10px] font-bold">Organizational Overview</span>
-</div>
-<h1 class="text-4xl font-black tracking-tight text-white flex items-baseline gap-4">
-                    Departments <span class="text-stone-600 text-2xl font-light">(08)</span>
-</h1>
-</div>
-<div class="flex items-center gap-4 bg-stone-900/50 p-1.5 rounded border border-stone-800">
-<button class="px-4 py-2 bg-stone-800 text-white rounded text-xs font-bold transition-all shadow-inner">Grid View</button>
-<button class="px-4 py-2 text-stone-500 hover:text-stone-300 rounded text-xs font-bold transition-all">List View</button>
 </div>
 </header>
-<!-- Department Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-<!-- Card: Marketing -->
-<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
-<div class="absolute top-0 right-0 w-16 h-16 bg-yellow-600/5 blur-3xl rounded-full -mr-8 -mt-8"></div>
+<!-- Main Content Canvas -->
+<main class="md:ml-[280px] pt-14 min-h-screen">
+<div class="p-6 lg:p-10 max-w-[1440px] mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<p class="text-[10px] uppercase tracking-widest font-bold text-corthex-secondary mb-1">Organization Oversight</p>
+<h2 class="text-4xl font-bold font-headline tracking-tight">12 Departments</h2>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-corthex-secondary text-lg group-focus-within:text-corthex-accent transition-colors">search</span>
+<input class="bg-corthex-surface border border-corthex-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-corthex-primary placeholder-corthex-secondary focus:outline-none focus:border-corthex-accent w-full md:w-72 transition-all" placeholder="Search Departments..." type="text"/>
+</div>
+<button class="flex items-center gap-2 bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg px-5 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95">
+<span class="material-symbols-outlined text-xl">add</span>
+            Create Department
+          </button>
+</div>
+</div>
+<!-- Department Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Intelligence Department -->
+<div class="bg-corthex-surface border border-corthex-border rounded-xl p-6 hover:border-corthex-accent/50 transition-all duration-300 group">
 <div class="flex justify-between items-start mb-6">
-<div class="p-2 bg-yellow-600/10 rounded border border-yellow-600/20">
-<span class="material-symbols-outlined text-yellow-600" data-icon="campaign">campaign</span>
+<div class="w-12 h-12 bg-corthex-accent-muted rounded-lg flex items-center justify-center text-corthex-accent">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">security</span>
 </div>
-<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-MRK-01</span>
+<span class="bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Operational</span>
 </div>
-<h3 class="text-xl font-bold text-white mb-1">Marketing</h3>
-<p class="text-stone-500 text-xs mb-6 font-medium">Growth and Brand Positioning</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
-<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<h3 class="text-xl font-bold mb-1 group-hover:text-corthex-accent transition-colors">Intelligence</h3>
+<p class="text-corthex-secondary text-sm mb-6 line-clamp-2">Data mining, signal analysis, and strategic threat assessment across all sectors.</p>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Members</p>
+<p class="text-xl font-mono font-bold">24 <span class="text-xs font-normal text-corthex-secondary">Agents</span></p>
+</div>
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Active Jobs</p>
+<p class="text-xl font-mono font-bold text-corthex-accent">8</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-corthex-secondary font-medium">Head of Department</span>
 <div class="flex items-center gap-2">
-<span class="text-xs font-bold text-stone-200">Sarah Chen</span>
-<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="professional female avatar with soft studio lighting and dark minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh9_GbKdJsgLFg_NxCRd9foWdvOHekMDf2yyNye5eGmqpluIE010FEf0JycHw15wle-4mnVHZluxaPzlA2l5Bh50fzbPb0-97CuN5mtn5WOnvDm9aL0YuWc-7K7gRK_JddlTKLAQGcd4KfjMZlfm_R6DKT3pmIvjk_mSKWnb31TM5DEW09KSDbpJEWDOcZu-J_-DOFljNUBOYQMn3h3F4VvUfMJrVpRSkL-tvyMpSkmsLqciPhYwmP8bk-CKZs4HHPCYW26Ggw5quQ"/>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex flex-col">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
-<span class="text-sm font-bold text-stone-200">12 Agents</span>
-</div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
-<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
-<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
-                                4 Active
-                            </span>
-</div>
+<span class="text-corthex-primary font-bold">S. Vance</span>
+<img class="w-6 h-6 rounded-full border border-corthex-border" data-alt="professional portrait of head of department, sleek dark background, serious expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-BQ0XIFtC1TtVvkhDVq3WtptqPv55yUhCLWG6Qy4RK6qQOOk3CcDx_ycRqikxCR__T-ixc5CVWqn9R1pCLUNIL1VMtj1V6c2UCls3fzec_QHapf50X22Gx_HTcrepYXK6-QMHJp85TkIU8w1QCIYnk3ooE8jWqGYGj13dnvEvnkgDi7fQY68OTHXuAKbTq_7MU4Azkmb7BHSl9-H--dXd0iJkAvOSDZLEcbM1KnvoCf1slSyiMddDdgs6MERZfWn944D6m4wZsEs"/>
 </div>
 </div>
 <div class="space-y-2">
 <div class="flex justify-between items-end">
-<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
-<span class="text-xs font-mono text-yellow-600">74%</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary">Budget Utilization</span>
+<span class="text-xs font-mono font-bold text-corthex-primary">72%</span>
 </div>
-<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
-<div class="h-full bg-yellow-600 glow-accent" style="width: 74%"></div>
+<div class="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+<div class="h-full bg-corthex-accent rounded-full" style="width: 72%;"></div>
 </div>
 </div>
 </div>
-<!-- Card: Security -->
-<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+</div>
+<!-- Logistics Department -->
+<div class="bg-corthex-surface border border-corthex-border rounded-xl p-6 hover:border-corthex-accent/50 transition-all duration-300 group">
 <div class="flex justify-between items-start mb-6">
-<div class="p-2 bg-stone-800 rounded border border-stone-700">
-<span class="material-symbols-outlined text-stone-300" data-icon="shield">shield</span>
+<div class="w-12 h-12 bg-corthex-accent-muted rounded-lg flex items-center justify-center text-corthex-accent">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
 </div>
-<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-SEC-04</span>
+<span class="bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Operational</span>
 </div>
-<h3 class="text-xl font-bold text-white mb-1">Security</h3>
-<p class="text-stone-500 text-xs mb-6 font-medium">Protocol and Cyber-Defense</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
-<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<h3 class="text-xl font-bold mb-1 group-hover:text-corthex-accent transition-colors">Logistics</h3>
+<p class="text-corthex-secondary text-sm mb-6 line-clamp-2">Global resource deployment, supply chain fortification, and hardware maintenance.</p>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Members</p>
+<p class="text-xl font-mono font-bold">18 <span class="text-xs font-normal text-corthex-secondary">Agents</span></p>
+</div>
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Active Jobs</p>
+<p class="text-xl font-mono font-bold text-corthex-accent">14</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-corthex-secondary font-medium">Head of Department</span>
 <div class="flex items-center gap-2">
-<span class="text-xs font-bold text-stone-200">Marcus Thorne</span>
-<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="stern male professional avatar with dramatic lighting and dark suit background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1N0puBVKlR66qxsVYObb2MLdFqNWuV7bGC7cOZ1OrjFN4YjgEtqFKjHtB_NGMr0_xabV2T5mU1jIUKNFsg2ZfjITdSBvc44WBDksMYktjZ-YMgUJ1UhtMqHglBwtARz3vbTKE5RPsR-Itu3FkLqCtxj0W0DyW4aH1iYQ8vKDCYrO2fWqDYPkEOb4zOIgPyMGaGoTK11v7dnlz3YHbzdYwj6tCUhBqNV0UkDylAz5_A04qezrUoNUpeSwQQl69DGDv9w-ru4ZyTYfW"/>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex flex-col">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
-<span class="text-sm font-bold text-stone-200">8 Agents</span>
-</div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
-<span class="text-xs font-bold text-stone-400 flex items-center gap-1">
-<span class="w-1.5 h-1.5 bg-stone-600 rounded-full"></span>
-                                0 Active
-                            </span>
-</div>
+<span class="text-corthex-primary font-bold">M. Chen</span>
+<img class="w-6 h-6 rounded-full border border-corthex-border" data-alt="close up headshot of male professional in tactical corporate attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFz37LM1QiCBKUUQGOCTbPrSi3qX00wVc7QdkPYIGuLDUgwRZthQYqoVsBgCwWFsOWmtopfZDk959YFfWGgY1RfpCXIX9biRJtyY24vx8sMSqffcpI7JF5mDsZkfztlNuIULBXKNmkAJ8sTpNNgO-rRK4ZKdPCM8ezc2NXkeS7o7sZ3jN6SK0Cg8UM-ozUw1CuDGyLmJzkM_h4-BPHnmMdb76NbV96jn_YAAccARxYQVKZ7bb2qBXZhXFIGPwmVd5qWw5y1S6jXis"/>
 </div>
 </div>
 <div class="space-y-2">
 <div class="flex justify-between items-end">
-<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
-<span class="text-xs font-mono text-stone-400">12%</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary">Budget Utilization</span>
+<span class="text-xs font-mono font-bold text-corthex-primary">45%</span>
 </div>
-<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
-<div class="h-full bg-yellow-600" style="width: 12%"></div>
+<div class="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+<div class="h-full bg-corthex-accent rounded-full" style="width: 45%;"></div>
 </div>
 </div>
 </div>
-<!-- Card: Logistics -->
-<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden border-yellow-600/20">
+</div>
+<!-- Defense Department -->
+<div class="bg-corthex-surface border border-corthex-border rounded-xl p-6 hover:border-corthex-accent/50 transition-all duration-300 group">
 <div class="flex justify-between items-start mb-6">
-<div class="p-2 bg-yellow-600/10 rounded border border-yellow-600/20">
-<span class="material-symbols-outlined text-yellow-600" data-icon="inventory_2">inventory_2</span>
+<div class="w-12 h-12 bg-corthex-accent-muted rounded-lg flex items-center justify-center text-corthex-accent">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">shield</span>
 </div>
-<span class="text-[10px] font-mono text-yellow-600/70 tracking-tighter">ID: DEPT-LOG-02</span>
+<span class="bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Alert</span>
 </div>
-<h3 class="text-xl font-bold text-white mb-1">Logistics</h3>
-<p class="text-stone-500 text-xs mb-6 font-medium">Supply Chain &amp; Resource Allocation</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
-<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<h3 class="text-xl font-bold mb-1 group-hover:text-corthex-accent transition-colors">Defense</h3>
+<p class="text-corthex-secondary text-sm mb-6 line-clamp-2">Perimeter security, kinetic response teams, and asset protection protocols.</p>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Members</p>
+<p class="text-xl font-mono font-bold">42 <span class="text-xs font-normal text-corthex-secondary">Agents</span></p>
+</div>
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Active Jobs</p>
+<p class="text-xl font-mono font-bold text-corthex-accent">6</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-corthex-secondary font-medium">Head of Department</span>
 <div class="flex items-center gap-2">
-<span class="text-xs font-bold text-stone-200">Elena Vance</span>
-<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="focused female avatar with corporate tech background and neutral color palette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl6aXvstUpgssBZkaeN0a4tp1Hmeo8bs5QPfKhaCy2ziDo1APU7bg1SKV-vQfmwp8iVnVLvZ1fQ7ShUr-uI1xidHX3OtJvpPIJ2f1-edSwE68UrUyM7ic2lwhxO8J3Fwu9E_gwTvIf1D-fRb3YcrIkiUPgvT8FlMCGt0ka71oSjVNvDLIQb6CQaq39_oat-hqEwgKBiFYmVdbImPmpo1gt9IeQLy7VFyGU8uN5XRdMczFvLmtRRDaJX5Q34GJdxn-iMb7jj6z_n-28"/>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex flex-col">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
-<span class="text-sm font-bold text-stone-200">15 Agents</span>
-</div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
-<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
-<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
-                                9 Active
-                            </span>
-</div>
+<span class="text-corthex-primary font-bold">K. Richter</span>
+<img class="w-6 h-6 rounded-full border border-corthex-border" data-alt="professional woman in corporate attire, focused look, neutral dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBasg_K0dGOmzzw36jjztm7C9rX4hVSzz9sM9XTVOdQGZrv0iObsFVkdHqSyNNNofPCM82GPQUTtTI1KIMYC3lWGrWfGBEw8-2YuxHKkw2x6p7yp0tiEh_Rvphn-Rzbj3sHZCI63mjYKEkwnjSqZMFq2f2TvuabJhQ7Q67QBFrxB5gz73szrDkijIDCyHuXu8LXKYcjVg98UaAjXter1YzkoyC4SFqnr7ecdzpS6UvINr2_Sn7bLWSVwVPddwBKZ06YkrGSaFpAmxE"/>
 </div>
 </div>
 <div class="space-y-2">
 <div class="flex justify-between items-end">
-<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
-<span class="text-xs font-mono text-yellow-600 font-bold">92%</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary">Budget Utilization</span>
+<span class="text-xs font-mono font-bold text-corthex-primary">91%</span>
 </div>
-<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
-<div class="h-full bg-yellow-600 shadow-[0_0_8px_rgba(202,138,4,0.5)]" style="width: 92%"></div>
+<div class="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+<div class="h-full bg-corthex-accent rounded-full" style="width: 91%;"></div>
 </div>
 </div>
 </div>
-<!-- Card: Research -->
-<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+</div>
+<!-- Research & Development -->
+<div class="bg-corthex-surface border border-corthex-border rounded-xl p-6 hover:border-corthex-accent/50 transition-all duration-300 group">
 <div class="flex justify-between items-start mb-6">
-<div class="p-2 bg-stone-800 rounded border border-stone-700">
-<span class="material-symbols-outlined text-stone-300" data-icon="science">science</span>
+<div class="w-12 h-12 bg-corthex-accent-muted rounded-lg flex items-center justify-center text-corthex-accent">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">science</span>
 </div>
-<span class="text-[10px] font-mono text-stone-500 tracking-tighter">ID: DEPT-RSD-08</span>
+<span class="bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Operational</span>
 </div>
-<h3 class="text-xl font-bold text-white mb-1">Research</h3>
-<p class="text-stone-500 text-xs mb-6 font-medium">Core AI Development &amp; Logic</p>
-<div class="space-y-4 mb-8">
-<div class="flex items-center justify-between py-2 border-b border-stone-800/50">
-<span class="text-stone-500 text-[10px] uppercase tracking-wider font-bold">Head Agent</span>
+<h3 class="text-xl font-bold mb-1 group-hover:text-corthex-accent transition-colors">R &amp; D</h3>
+<p class="text-corthex-secondary text-sm mb-6 line-clamp-2">Experimental AI models, hardware prototyping, and advanced cryptology.</p>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Members</p>
+<p class="text-xl font-mono font-bold">12 <span class="text-xs font-normal text-corthex-secondary">Agents</span></p>
+</div>
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Active Jobs</p>
+<p class="text-xl font-mono font-bold text-corthex-accent">22</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-corthex-secondary font-medium">Head of Department</span>
 <div class="flex items-center gap-2">
-<span class="text-xs font-bold text-stone-200">Dr. Aris Thorne</span>
-<img class="w-5 h-5 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="distinguished older male professional avatar with glasses and scholarly aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5DbyRtAqG0DwWuVlwv7YMu43BiTWcdACDtUurVU36-JFtxapSvvU4SCzpzPxfEi8PIm5qPc8eXalARMNhU4xpzdRQZ8sgR_sO36mHKLTHh5ajdDNHmu81dGhX0eR6_HiZjdaMKhEvO-NmdckFzPJiOJg52H6N8RoLc6xWgtpGfpfdnd2srHYdqMLXx1Kvq6Jykpy5IhlVnvaKINdZwsEy3OETfalaRRmSRf8fj1N2MbxrKPYw7B0ggxk5H6_NYzYpLprfSu9cqo9m"/>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex flex-col">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Team</span>
-<span class="text-sm font-bold text-stone-200">24 Agents</span>
-</div>
-<div class="flex flex-col items-end">
-<span class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Status</span>
-<span class="text-xs font-bold text-yellow-600 flex items-center gap-1">
-<span class="w-1.5 h-1.5 bg-yellow-600 rounded-full animate-pulse"></span>
-                                18 Active
-                            </span>
-</div>
+<span class="text-corthex-primary font-bold">Dr. Aris</span>
+<img class="w-6 h-6 rounded-full border border-corthex-border" data-alt="male research lead in dark clinical environment, intellectual look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0yFhpanVSbhHBSIFrX2_XMKIL-kJ1_f2BN5B4yUn-RpEN7kg9hJWsmZvrp8pKQd-BguohG3PXJa63i6kG6ptvUairMTN1rwzIdwEJITt-TqmtEqFiKU7S5U-GTTNHqZbYDXP9MfJ-R5IqxuhaANr0T5cSScqZZn9ajtYpP5-8yeR1irOlNS3Ym5oDO3cjfqKQsH406-w_3kAkkb4PWMuQjxbsRvfi36QzC6mwlxwPJcw9G7c1KYNpxmDFI3ITQGRmaaCjQp7Ke7c"/>
 </div>
 </div>
 <div class="space-y-2">
 <div class="flex justify-between items-end">
-<span class="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Budget Utilization</span>
-<span class="text-xs font-mono text-stone-400">45%</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary">Budget Utilization</span>
+<span class="text-xs font-mono font-bold text-corthex-primary">38%</span>
 </div>
-<div class="h-1 w-full bg-stone-800 rounded-full overflow-hidden">
-<div class="h-full bg-yellow-600" style="width: 45%"></div>
+<div class="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+<div class="h-full bg-corthex-accent rounded-full" style="width: 38%;"></div>
 </div>
 </div>
 </div>
-<!-- Additional Cards Placeholder -->
-<div class="glass-card p-5 group hover:border-yellow-600/50 transition-all duration-300 flex flex-col items-center justify-center border-dashed border-stone-800">
-<div class="w-12 h-12 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-stone-600 group-hover:text-yellow-600">add</span>
 </div>
-<span class="text-stone-500 text-xs font-bold uppercase tracking-widest">New Unit</span>
+<!-- Cyber Ops -->
+<div class="bg-corthex-surface border border-corthex-border rounded-xl p-6 hover:border-corthex-accent/50 transition-all duration-300 group">
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 bg-corthex-accent-muted rounded-lg flex items-center justify-center text-corthex-accent">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<span class="bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Critical</span>
+</div>
+<h3 class="text-xl font-bold mb-1 group-hover:text-corthex-accent transition-colors">Cyber Ops</h3>
+<p class="text-corthex-secondary text-sm mb-6 line-clamp-2">Network penetration testing, firewall management, and digital forensic tracking.</p>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Members</p>
+<p class="text-xl font-mono font-bold">31 <span class="text-xs font-normal text-corthex-secondary">Agents</span></p>
+</div>
+<div class="bg-corthex-elevated p-3 rounded-lg border border-corthex-border/50">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Active Jobs</p>
+<p class="text-xl font-mono font-bold text-corthex-accent">31</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-corthex-secondary font-medium">Head of Department</span>
+<div class="flex items-center gap-2">
+<span class="text-corthex-primary font-bold">Zero-One</span>
+<div class="w-6 h-6 rounded-full bg-corthex-accent flex items-center justify-center font-bold text-[10px] text-corthex-bg">ZO</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary">Budget Utilization</span>
+<span class="text-xs font-mono font-bold text-corthex-primary">88%</span>
+</div>
+<div class="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+<div class="h-full bg-corthex-accent rounded-full" style="width: 88%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Department Placeholder -->
+<button class="bg-corthex-bg border-2 border-dashed border-corthex-border rounded-xl p-6 flex flex-col items-center justify-center text-corthex-secondary hover:border-corthex-accent hover:text-corthex-accent transition-all group">
+<div class="w-12 h-12 rounded-full border border-corthex-border flex items-center justify-center mb-4 group-hover:border-corthex-accent group-hover:bg-corthex-accent-muted transition-all">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<p class="text-sm font-bold uppercase tracking-widest">Register New Department</p>
+<p class="text-xs mt-1 opacity-60">Authorize new organizational unit</p>
+</button>
+</div>
+<!-- Quick Stats Footer -->
+<div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Global Personnel</p>
+<p class="text-2xl font-mono font-bold text-corthex-primary">342 <span class="text-xs font-normal text-corthex-secondary">Units</span></p>
+</div>
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Network Stability</p>
+<p class="text-2xl font-mono font-bold text-green-500">99.9%</p>
+</div>
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Allocated Credits</p>
+<p class="text-2xl font-mono font-bold text-corthex-primary">12.4M</p>
+</div>
+<div class="bg-corthex-surface border border-corthex-border p-4 rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-corthex-secondary mb-1">Threat Level</p>
+<p class="text-2xl font-mono font-bold text-amber-500">LOW</p>
+</div>
 </div>
 </div>
 </main>
-<!-- Bottom Navigation (Mobile Only) -->
-<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-[#0C0A09]/95 backdrop-blur-md z-50 border-t border-stone-800 shadow-2xl">
-<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
-<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Dashboard</span>
+<!-- Mobile Bottom Nav (Suppressed for Desktop) -->
+<div class="md:hidden fixed bottom-0 w-full h-16 bg-corthex-surface border-t border-corthex-border flex items-center justify-around px-4 z-40">
+<button class="text-corthex-accent flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">corporate_fare</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Depts</span>
+</button>
+<button class="text-corthex-secondary flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Agents</span>
+</button>
+<button class="text-corthex-secondary flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Nexus</span>
+</button>
+<button class="text-corthex-secondary flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter">Ops</span>
+</button>
 </div>
-<div class="flex flex-col items-center justify-center text-yellow-600 bg-yellow-600/10 rounded-xl py-1 px-3 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-lg" data-icon="account_tree">account_tree</span>
-<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Departments</span>
-</div>
-<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-lg" data-icon="smart_toy">smart_toy</span>
-<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Agents</span>
-</div>
-<div class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-300 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
-<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Logs</span>
-</div>
-</nav>
 </body></html>

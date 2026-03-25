@@ -3,9 +3,9 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CORTHEX | Reports Command</title>
+<title>CORTHEX | Reports Management</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -14,329 +14,466 @@
             theme: {
                 extend: {
                     colors: {
-                        stone: {
-                            800: "#292524",
-                            900: "#1C1917",
-                            950: "#0C0A09",
-                        },
-                        yellow: {
-                            600: "#CA8A04",
-                            500: "#EAB308",
-                        }
+                        "on-tertiary-fixed-variant": "#693b23",
+                        "on-tertiary-container": "#5f331b",
+                        "on-secondary-container": "#d5bb9a",
+                        "on-primary-fixed-variant": "#6d5123",
+                        "secondary-fixed-dim": "#ebd0ae",
+                        "inverse-primary": "#775a2b",
+                        "inverse-surface": "#fff8f3",
+                        "surface-variant": "#2d2418",
+                        "on-tertiary": "#6a3c23",
+                        "on-primary-fixed": "#4e3509",
+                        "background": "#0C0A09",
+                        "on-surface-variant": "#b7a997",
+                        "secondary-dim": "#ceb594",
+                        "on-background": "#f3e3d0",
+                        "surface-container-high": "#261e14",
+                        "error": "#f97758",
+                        "surface-container": "#1f190f",
+                        "primary-fixed-dim": "#edc68d",
+                        "on-primary-container": "#ffdeb2",
+                        "surface-container-highest": "#2d2418",
+                        "outline-variant": "#514638",
+                        "on-secondary-fixed-variant": "#6c583d",
+                        "secondary": "#dcc3a1",
+                        "tertiary-dim": "#e8a788",
+                        "on-error": "#450900",
+                        "on-error-container": "#ff9b82",
+                        "on-primary": "#553b0f",
+                        "tertiary": "#ffc5a9",
+                        "primary": "#CA8A04",
+                        "tertiary-fixed": "#f7b594",
+                        "inverse-on-surface": "#5b544c",
+                        "surface-tint": "#e7c088",
+                        "secondary-container": "#493920",
+                        "on-surface": "#f3e3d0",
+                        "on-secondary": "#4e3d24",
+                        "error-dim": "#c44f34",
+                        "tertiary-container": "#f7b594",
+                        "on-tertiary-fixed": "#461f09",
+                        "primary-fixed": "#fcd49a",
+                        "surface-bright": "#342b1e",
+                        "primary-container": "#694d20",
+                        "error-container": "#85230a",
+                        "outline": "#807464",
+                        "tertiary-fixed-dim": "#e8a788",
+                        "surface-container-low": "#18120b",
+                        "surface-dim": "#120d08",
+                        "secondary-fixed": "#f9debc",
+                        "on-secondary-fixed": "#4d3c24",
+                        "surface": "#120d08"
                     },
                     fontFamily: {
-                        "headline": ["DM Sans", "sans-serif"],
-                        "body": ["DM Sans", "sans-serif"],
-                        "label": ["DM Sans", "sans-serif"]
+                        "headline": ["Public Sans"],
+                        "body": ["Public Sans"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
                     },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
                 },
             },
         }
     </script>
 <style>
-        body {
-            background-color: #0C0A09;
-            color: #E7E5E4;
-            font-family: 'DM Sans', sans-serif;
-        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
         }
-        /* Custom scrollbar for cyberpunk feel */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0C0A09;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #292524;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #CA8A04;
-        }
+        body { font-family: 'Public Sans', sans-serif; }
     </style>
 </head>
-<body class="antialiased selection:bg-yellow-600/30">
-<!-- TopNavBar Implementation from JSON -->
-<nav class="bg-[#0C0A09] text-stone-400 font-sans antialiased tracking-tight docked full-width top-0 border-b border-stone-800 flex justify-between items-center px-6 h-16 w-full sticky z-50">
-<div class="flex items-center gap-8">
-<span class="text-xl font-black tracking-tighter text-yellow-600">CORTHEX</span>
-<div class="hidden md:flex items-center gap-6">
-<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Dashboard</a>
-<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1 hover:text-yellow-500 transition-colors" href="#">Reports</a>
-<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Systems</a>
-<a class="text-stone-400 hover:text-yellow-500 transition-colors" href="#">Archives</a>
+<body class="bg-background text-on-background antialiased overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 bg-stone-950 text-amber-700 font-['Public_Sans'] text-sm border-r border-stone-800 w-64 z-50">
+<div class="flex flex-col mb-8 px-2">
+<span class="text-lg font-black text-amber-600 tracking-tight">CORTHEX</span>
+<span class="text-[10px] uppercase tracking-widest text-stone-500 font-bold">Management Portal</span>
 </div>
-</div>
-<div class="flex items-center gap-4">
-<div class="relative hidden sm:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
-<input class="bg-stone-900 border-stone-800 text-xs rounded pl-9 pr-4 py-1.5 focus:ring-1 focus:ring-yellow-600 focus:border-yellow-600 w-48 transition-all" placeholder="Search logs..." type="text"/>
-</div>
-<button class="material-symbols-outlined hover:text-yellow-500 transition-colors">notifications</button>
-<button class="material-symbols-outlined hover:text-yellow-500 transition-colors">settings</button>
-<div class="h-8 w-8 rounded bg-stone-800 border border-stone-700 overflow-hidden">
-<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a serious man with sharp features and cinematic overhead lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSrO-yJnU0MDjlsT9DDUGb7QzlFkjpubwB0a-3M8-1VjzI1p33mcFmIm6mMau1bhr6muSI8p1PoRj5EpM2HysSlKW6fxmGBCmckFO6GvIaxNMp5AEzRWDksfAieXdtT201ritRxwDxcYn9Mvw5k40gSDzG4bpI86_32GULCMJ95fAI9jNna_EDs1kA4weJtN7bROrJbRDo0h4zY_JWbcsxd54YoQIzNCZEsLO4X90-QEIeIqHcy8masNFZWi_gT_ukVXQnLBKkyK5y"/>
-</div>
-</div>
-</nav>
-<main class="flex h-[calc(100vh-64px)] overflow-hidden">
-<!-- SideNavBar Implementation from JSON -->
-<aside class="hidden lg:flex flex-col w-64 h-full pt-4 pb-8 bg-[#0C0A09] text-sm font-medium tracking-tight docked h-screen left-0 border-r border-stone-800">
-<div class="px-6 mb-8">
-<div class="flex items-center gap-3 mb-1">
-<div class="w-2 h-2 rounded-full bg-yellow-600 animate-pulse"></div>
-<span class="text-lg font-bold text-yellow-600">REPORTS_CMD</span>
-</div>
-<span class="text-[10px] text-stone-600 uppercase tracking-widest">v4.0.2-alpha</span>
-</div>
-<nav class="flex-1 space-y-1 px-3">
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">dashboard</span>
-<span>Overview</span>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 hover:bg-stone-900/50 transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2 bg-stone-900 text-yellow-600 border-l-4 border-yellow-600 transition-all translate-x-1" href="#">
-<span class="material-symbols-outlined text-lg">monitoring</span>
+<a class="flex items-center gap-3 bg-stone-900 text-amber-500 font-semibold px-4 py-3 rounded-lg active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 hover:bg-stone-900/50 transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span>Audits</span>
+</a>
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 hover:bg-stone-900/50 transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
 <span>Analytics</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">ios_share</span>
-<span>Exports</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">event_repeat</span>
-<span>Scheduled</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">shield</span>
-<span>Security</span>
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 hover:bg-stone-900/50 transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Archive</span>
 </a>
 </nav>
-<div class="px-3 pt-4 mt-4 border-t border-stone-800 space-y-1">
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">help_outline</span>
-<span>Help</span>
+<div class="mt-auto pt-4 space-y-1">
+<button class="w-full flex items-center justify-center gap-2 bg-amber-700/10 text-amber-600 border border-amber-700/30 font-bold py-2 px-4 rounded-lg mb-4 hover:bg-amber-700/20 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Report
+            </button>
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:bg-stone-900/50 hover:text-stone-200 transition-all rounded" href="#">
-<span class="material-symbols-outlined text-lg">logout</span>
+<a class="flex items-center gap-3 text-stone-500 px-4 py-3 hover:text-stone-300 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
 <span>Logout</span>
 </a>
 </div>
 </aside>
 <!-- Main Content Area -->
-<section class="flex-1 flex flex-col min-w-0 bg-[#0C0A09]">
-<!-- Filters & Header -->
-<header class="p-6 border-b border-stone-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<main class="ml-64 flex flex-col h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center px-6 h-16 w-full bg-stone-900 text-amber-700 font-['Public_Sans'] antialiased border-b border-stone-800 shrink-0">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-amber-600">CORTHEX</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-stone-400 hover:bg-stone-800 hover:text-stone-200 transition-colors px-3 py-1 rounded" href="#">Overview</a>
+<a class="text-amber-500 font-bold border-b-2 border-amber-500 px-3 py-1" href="#">Reports</a>
+<a class="text-stone-400 hover:bg-stone-800 hover:text-stone-200 transition-colors px-3 py-1 rounded" href="#">Intelligence</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-lg">search</span>
+<input class="bg-stone-950 border-stone-800 text-stone-300 text-sm pl-10 pr-4 py-1.5 rounded-full w-64 focus:ring-amber-500 focus:border-amber-500" placeholder="Search archives..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-stone-400 hover:bg-stone-800 hover:text-stone-200 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-stone-400 hover:bg-stone-800 hover:text-stone-200 rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-stone-700 ml-2">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional male analyst in high-tech environment with soft blue computer light reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_4ckjsO0BaHT2wmbfXWwIBqKIySiTfUnQOYGqSv7JyN07tWHOPe6VHXOg29yqyGbNGY_osH-vOqgI0PRlgcaHlJIvcVc870a1lmhjiNFjQ4pktrQoQlVUtCBvSVvTWOHqhS3XB7Viva-Bb3WaAtMaMM_-PVhdMUQvPgtHdPsjbr71ca1BFXr5s0Vf0DbOfHYnB5b9p5Rmi3ZGjulObI047PYZk6FG26OQ5D_n6_uTnWdojtOKlybmXGLh5y6Nk91CZi1RGuspkRA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dynamic Content -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Filters -->
+<aside class="w-72 bg-stone-950/40 border-r border-stone-800 p-6 overflow-y-auto shrink-0">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xs font-black tracking-widest text-stone-500 uppercase">Filters</h2>
+<button class="text-[10px] text-amber-600 hover:text-amber-500 font-bold uppercase tracking-tighter">Reset All</button>
+</div>
+<div class="space-y-8">
+<section>
+<label class="block text-xs font-bold text-stone-400 uppercase mb-3">Report Type</label>
+<div class="space-y-2">
+<label class="flex items-center gap-3 group cursor-pointer">
+<input checked="" class="rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-500 focus:ring-offset-stone-950" type="checkbox"/>
+<span class="text-sm text-stone-300 group-hover:text-amber-500 transition-colors">System Audits</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<input class="rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-500 focus:ring-offset-stone-950" type="checkbox"/>
+<span class="text-sm text-stone-300 group-hover:text-amber-500 transition-colors">Forensic Analysis</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<input checked="" class="rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-500 focus:ring-offset-stone-950" type="checkbox"/>
+<span class="text-sm text-stone-300 group-hover:text-amber-500 transition-colors">Compliance Drift</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<input class="rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-500 focus:ring-offset-stone-950" type="checkbox"/>
+<span class="text-sm text-stone-300 group-hover:text-amber-500 transition-colors">Entity Tracking</span>
+</label>
+</div>
+</section>
+<section>
+<label class="block text-xs font-bold text-stone-400 uppercase mb-3">Date Range</label>
+<div class="space-y-3">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-stone-600 font-mono uppercase">Start</span>
+<input class="w-full bg-stone-900/50 border-stone-800 text-stone-400 font-mono text-xs pl-12 pr-4 py-2 rounded focus:border-amber-700 focus:ring-0 transition-colors" type="text" value="2023-10-01"/>
+</div>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-stone-600 font-mono uppercase">End</span>
+<input class="w-full bg-stone-900/50 border-stone-800 text-stone-400 font-mono text-xs pl-12 pr-4 py-2 rounded focus:border-amber-700 focus:ring-0 transition-colors" type="text" value="2024-03-24"/>
+</div>
+</div>
+</section>
+<section>
+<label class="block text-xs font-bold text-stone-400 uppercase mb-3">Security Level</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-2 py-1 bg-stone-900 border border-stone-800 text-[10px] text-stone-400 hover:border-amber-700 transition-all rounded">L1</button>
+<button class="px-2 py-1 bg-stone-900 border border-amber-900 text-[10px] text-amber-500 rounded">L2</button>
+<button class="px-2 py-1 bg-stone-900 border border-stone-800 text-[10px] text-stone-400 hover:border-amber-700 transition-all rounded">L3</button>
+<button class="px-2 py-1 bg-amber-900/20 border border-amber-600 text-[10px] text-amber-600 rounded">OMEGA</button>
+</div>
+</section>
+<section class="pt-6 border-t border-stone-800/50">
+<div class="bg-amber-900/5 border border-amber-900/20 rounded p-4">
+<h4 class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">analytics</span>
+                                Usage Statistics
+                            </h4>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px]">
+<span class="text-stone-500">Active Nodes</span>
+<span class="text-amber-500 font-mono">14,282</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-stone-500">Storage utilized</span>
+<span class="text-amber-500 font-mono">82.4%</span>
+</div>
+<div class="w-full bg-stone-900 h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-amber-600 h-full w-[82.4%]"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</aside>
+<!-- Center Table Area -->
+<section class="flex-1 flex flex-col bg-background p-6 overflow-hidden">
+<div class="flex items-center justify-between mb-6">
 <div>
-<h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                        System Reports
-                        <span class="text-[10px] bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 px-1.5 py-0.5 rounded uppercase tracking-tighter">Live HUD</span>
+<h1 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                            Active Audit Records
+                            <span class="bg-amber-600/10 text-amber-500 text-[10px] px-2 py-0.5 rounded border border-amber-600/30 font-mono tracking-tighter">V4.82-ALPHA</span>
 </h1>
-<p class="text-stone-500 text-sm mt-1">Manage and audit cross-platform intelligence data.</p>
+<p class="text-sm text-stone-500 mt-1">Found 1,284 encrypted reports matching current parameters</p>
 </div>
-<div class="flex items-center gap-3">
-<div class="flex items-center bg-stone-900 border border-stone-800 rounded p-1">
-<button class="px-3 py-1.5 text-xs font-medium bg-stone-800 text-white rounded">All</button>
-<button class="px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-300 transition-colors">Performance</button>
-<button class="px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-300 transition-colors">Security</button>
-</div>
-<button class="bg-[#CA8A04] hover:bg-yellow-500 text-stone-950 font-bold px-4 py-2 rounded flex items-center gap-2 text-sm transition-all active:scale-95">
-<span class="material-symbols-outlined text-sm">add_chart</span>
+<button class="bg-primary hover:bg-amber-600 text-on-primary font-bold px-6 py-2.5 rounded shadow-lg shadow-amber-900/20 flex items-center gap-2 transition-all active:scale-95">
+<span class="material-symbols-outlined text-xl">bolt</span>
                         Generate Report
                     </button>
 </div>
-</header>
-<!-- Content Grid -->
-<div class="flex-1 flex overflow-hidden">
-<!-- Table View -->
-<div class="flex-1 overflow-auto p-6">
-<div class="border border-stone-800 rounded-lg overflow-hidden bg-stone-900/30">
+<div class="flex-1 overflow-auto border border-stone-800 rounded-lg bg-stone-950/20">
 <table class="w-full text-left border-collapse">
-<thead>
-<tr class="border-b border-stone-800 bg-stone-900/50">
-<th class="px-4 py-3 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Title</th>
-<th class="px-4 py-3 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Type</th>
-<th class="px-4 py-3 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Created by Agent</th>
-<th class="px-4 py-3 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Date</th>
-<th class="px-4 py-3 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Status</th>
-<th class="px-4 py-3"></th>
+<thead class="sticky top-0 bg-stone-900/80 backdrop-blur-md z-10">
+<tr class="text-[10px] font-black text-stone-500 uppercase tracking-widest border-b border-stone-800">
+<th class="px-6 py-4">Title</th>
+<th class="px-6 py-4">Type</th>
+<th class="px-6 py-4">Created By</th>
+<th class="px-6 py-4">Date</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4"></th>
 </tr>
 </thead>
 <tbody class="divide-y divide-stone-800/50">
-<tr class="hover:bg-yellow-600/[0.03] transition-colors group cursor-pointer">
-<td class="px-4 py-4">
+<!-- Row 1 -->
+<tr class="hover:bg-stone-900/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4">
 <div class="flex flex-col">
-<span class="text-sm font-semibold text-stone-200">Q3 Infrastructure Audit</span>
-<span class="text-[10px] text-stone-600 font-mono">ID: RPT-992-ALPHA</span>
+<span class="text-stone-200 font-bold group-hover:text-amber-500 transition-colors">Quantum Leakage Audit - HK Region</span>
+<span class="text-[10px] text-stone-600 font-mono">CTX-AUD-82210-HK</span>
 </div>
 </td>
-<td class="px-4 py-4">
-<span class="text-xs px-2 py-0.5 rounded border border-stone-700 bg-stone-800 text-stone-400">Security</span>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold bg-stone-900 border border-stone-800 text-stone-400 px-2 py-0.5 rounded uppercase">Security</span>
 </td>
-<td class="px-4 py-4 text-sm text-stone-400 font-mono">AURA-09</td>
-<td class="px-4 py-4 text-xs text-stone-500">Oct 24, 2023</td>
-<td class="px-4 py-4">
-<span class="flex items-center gap-1.5 text-xs text-emerald-500">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Agent Avatar" class="w-6 h-6 rounded-full border border-stone-700" data-alt="Close up avatar of a serious woman in dark clothing with sharp lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwvTtnj_on37iK6YbAw_-nlzHwldWfOvVhCQp3iHo-IxIdEo272goI54t2exoDeBh7o-f89DxK9UFDX0AO-bJZ4N2Gf-iTwXS3iGE7GBbsO1bo3AmQ3q44ECxgwKNZRQad8d6uukSvx8sXOcBF5GO2YgfqQJCRsHIAP8njlzn6KG2IbNM4zz0LO9MGOIw1ouLPL-B70VCJQij2fq-i8SDidenYAkmTpi8-fc6dvvDeo3xHXhQj-2XsbVLgs7lgPt7xD-9d2i64Q6U"/>
+<span class="text-sm text-stone-400">Agent Vesper</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.03.22 14:12</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            Ready
-                                        </span>
-</td>
-<td class="px-4 py-4 text-right">
-<button class="material-symbols-outlined text-stone-600 group-hover:text-yellow-600 transition-colors">more_vert</button>
-</td>
-</tr>
-<tr class="bg-yellow-600/[0.02] border-l-2 border-l-yellow-600">
-<td class="px-4 py-4">
-<div class="flex flex-col">
-<span class="text-sm font-semibold text-stone-200">Neural Net Latency Scan</span>
-<span class="text-[10px] text-stone-600 font-mono">ID: RPT-104-BETA</span>
+<span class="text-[10px] font-bold text-emerald-500 uppercase">Verified</span>
 </div>
 </td>
-<td class="px-4 py-4">
-<span class="text-xs px-2 py-0.5 rounded border border-yellow-600/30 bg-yellow-600/10 text-yellow-500">Performance</span>
-</td>
-<td class="px-4 py-4 text-sm text-stone-400 font-mono">FLUX-X</td>
-<td class="px-4 py-4 text-xs text-stone-500">Oct 26, 2023</td>
-<td class="px-4 py-4">
-<span class="flex items-center gap-1.5 text-xs text-yellow-600 italic">
-<span class="w-1.5 h-1.5 rounded-full bg-yellow-600 animate-pulse"></span>
-                                            Generating
-                                        </span>
-</td>
-<td class="px-4 py-4 text-right">
-<button class="material-symbols-outlined text-yellow-600">open_in_new</button>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-amber-500 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
 </td>
 </tr>
-<tr class="hover:bg-yellow-600/[0.03] transition-colors group cursor-pointer">
-<td class="px-4 py-4">
+<!-- Row 2 -->
+<tr class="hover:bg-stone-900/40 transition-colors group cursor-pointer bg-amber-900/5">
+<td class="px-6 py-4">
 <div class="flex flex-col">
-<span class="text-sm font-semibold text-stone-200">Token Burn Analysis</span>
-<span class="text-[10px] text-stone-600 font-mono">ID: RPT-881-GAMMA</span>
+<span class="text-amber-500 font-bold">Unidentified Node Access Detection</span>
+<span class="text-[10px] text-stone-600 font-mono">CTX-INT-00192-UA</span>
 </div>
 </td>
-<td class="px-4 py-4">
-<span class="text-xs px-2 py-0.5 rounded border border-stone-700 bg-stone-800 text-stone-400">Cost</span>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold bg-amber-900/20 border border-amber-700/30 text-amber-500 px-2 py-0.5 rounded uppercase">Forensic</span>
 </td>
-<td class="px-4 py-4 text-sm text-stone-400 font-mono">AURA-09</td>
-<td class="px-4 py-4 text-xs text-stone-500">Oct 21, 2023</td>
-<td class="px-4 py-4">
-<span class="flex items-center gap-1.5 text-xs text-stone-600">
-<span class="w-1.5 h-1.5 rounded-full bg-stone-700"></span>
-                                            Archived
-                                        </span>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Agent Avatar" class="w-6 h-6 rounded-full border border-stone-700" data-alt="Cyberpunk male avatar portrait with digital elements on face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV2GcWIaugSrRWzw0kD8wDQxs7xgfDu8vkCWsrm3wst07GrWbegVfRFjQtoWPPAVIQBZvPDv-IYluwTwNAfsKKgpxpgd47LtGC3S-fbamwrk7z3T5o1yfvPtC6iQdLEcXdX_H4cvfGXcjli3wXfA31kc_FfdKGC0hjS93XMmW7Yjpn_AWYaP7Gv2YmGAoeG6-7IV6kK8o8ntyHtGyO1EW52DX5lep2wed_bAltu-a_gtmgxr8eIstwmY60MtugQtze_TeXjZx2NI4"/>
+<span class="text-sm text-stone-400">System.AI</span>
+</div>
 </td>
-<td class="px-4 py-4 text-right">
-<button class="material-symbols-outlined text-stone-600 group-hover:text-yellow-600 transition-colors">more_vert</button>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.03.22 18:44</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+<span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Processing</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-amber-500 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
 </td>
 </tr>
-<tr class="hover:bg-yellow-600/[0.03] transition-colors group cursor-pointer">
-<td class="px-4 py-4">
+<!-- Row 3 -->
+<tr class="hover:bg-stone-900/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4">
 <div class="flex flex-col">
-<span class="text-sm font-semibold text-stone-200">Sentinel Shield Logs</span>
-<span class="text-[10px] text-stone-600 font-mono">ID: RPT-112-DELTA</span>
+<span class="text-stone-200 font-bold group-hover:text-amber-500 transition-colors">Quarterly Compliance Drift Report</span>
+<span class="text-[10px] text-stone-600 font-mono">CTX-CMP-99201-GL</span>
 </div>
 </td>
-<td class="px-4 py-4">
-<span class="text-xs px-2 py-0.5 rounded border border-stone-700 bg-stone-800 text-stone-400">Security</span>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold bg-stone-900 border border-stone-800 text-stone-400 px-2 py-0.5 rounded uppercase">Compliance</span>
 </td>
-<td class="px-4 py-4 text-sm text-stone-400 font-mono">CORE-V</td>
-<td class="px-4 py-4 text-xs text-stone-500">Oct 19, 2023</td>
-<td class="px-4 py-4">
-<span class="flex items-center gap-1.5 text-xs text-emerald-500">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Agent Avatar" class="w-6 h-6 rounded-full border border-stone-700" data-alt="Avatar of a sophisticated female professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfdz97oPF9yUtjrMoHrwHNcAXrJh4AH1ozLstThAfssULsS0hQR35dw2NoJpiFhNO4xX-QwkzAOvpZmzKfHrAqbtIu27LiZQKB3drra2jeDFwr9fmrLkCQQdcR-X55F0sFlzfpDXNc8yTpuNU_2Rl6egShqd7F6w9qqy9R6t-hylnAo7lRINRFkeZoTEn6vjXyWo5STJ4sfWBPEl8eW9Bb4Jo3EbZ9wwqoJl9B9foliHepI0FlmI-JryN175LEUQeNRfzGNAQe_aY"/>
+<span class="text-sm text-stone-400">Agent Oracle</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.03.21 09:12</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            Ready
-                                        </span>
+<span class="text-[10px] font-bold text-emerald-500 uppercase">Verified</span>
+</div>
 </td>
-<td class="px-4 py-4 text-right">
-<button class="material-symbols-outlined text-stone-600 group-hover:text-yellow-600 transition-colors">more_vert</button>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-amber-500 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-stone-900/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-stone-200 font-bold group-hover:text-amber-500 transition-colors">Entity Movement: Sector 7</span>
+<span class="text-[10px] text-stone-600 font-mono">CTX-TRK-77112-S7</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-bold bg-stone-900 border border-stone-800 text-stone-400 px-2 py-0.5 rounded uppercase">Entity</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Agent Avatar" class="w-6 h-6 rounded-full border border-stone-700" data-alt="Avatar of a sharp male field operative" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD81fToe-nsktsxgcIz1oCAYdP9He-NKMfYpe-3iAzD3qVgDjRr3lPLGUfQMdc_WBET5fT4W7RVUET1Bkpvc-xEDpZbeMYnmH-ZtkiR18-QDFiP4wGr0eax3uN2YVplrKR8VQItAjT2uRRBE_1MajJaOdDMwlDu9Ccu7Ud8QURqqDC9aFtMA6jCCMVQYrp79sqwJBjbqjGjrlmZCsD2X02gp6hRoqLAu6P5Eytkr0x5CKSJvXiJz_EA_AOqbVIRgvD4wDKwQiICISs"/>
+<span class="text-sm text-stone-400">Agent Ghost</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-mono text-xs text-stone-500">2024.03.20 23:59</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+<span class="text-[10px] font-bold text-rose-500 uppercase">Flagged</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-stone-600 hover:text-amber-500 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
 </td>
 </tr>
 </tbody>
 </table>
 </div>
+<!-- Pagination -->
+<div class="flex items-center justify-between mt-4">
+<div class="text-[10px] text-stone-500 font-mono">Showing 1-15 of 1,284 entries</div>
+<div class="flex items-center gap-2">
+<button class="p-1 border border-stone-800 text-stone-500 hover:text-amber-500 disabled:opacity-30 rounded" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="px-2 py-1 bg-stone-900 text-amber-500 text-xs font-bold rounded">1</button>
+<button class="px-2 py-1 text-stone-500 text-xs hover:text-white rounded">2</button>
+<button class="px-2 py-1 text-stone-500 text-xs hover:text-white rounded">3</button>
+<button class="p-1 border border-stone-800 text-stone-500 hover:text-amber-500 rounded">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
 </div>
-<!-- Preview Panel (Slide-over / Sidebar) -->
-<aside class="w-80 border-l border-stone-800 bg-stone-900/40 p-6 flex flex-col gap-6 overflow-y-auto">
+</div>
+</section>
+<!-- Right Preview Panel -->
+<aside class="w-80 bg-stone-950/60 border-l border-stone-800 flex flex-col overflow-y-auto shrink-0">
+<div class="p-6 border-b border-stone-800">
+<h3 class="text-xs font-black tracking-widest text-stone-500 uppercase mb-4">Report Preview</h3>
+<div class="aspect-video bg-stone-900 rounded-lg overflow-hidden border border-stone-800 relative mb-4">
+<img alt="Data visualization" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all" data-alt="abstract dark data visualization with complex amber and gold line charts and glowing numeric data points on black background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDW9YK6RxWb0lgvK6nyNu6PBIAfFUaD1ASiuLHpP9oCgP0-PbVbRK1LTw71IBoFvfPyo045s_ydlNUQjbDJEwdZ_mjwjfnz3wAaW5rw-_JYO3EuNXUiF5Ffn3j8PSvPkvl3JYBGhon8g3_N--BnwklMrrqr-haGqtqYU4iBlSvSRisdIfCObAlAE25bAh2Z0wNKKzJ7okCvEsb3OoOnloKkJ4A2nBXuIv1dUQ3aeDlwaAQWu8Z9byRWm-2_BRNjqigOJFmmh2CH4c"/>
+<div class="absolute inset-0 bg-gradient-to-t from-stone-950 to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex flex-col">
+<span class="text-[10px] font-mono text-amber-500">ENCRYPTION ACTIVE</span>
+<span class="text-[8px] font-mono text-stone-500 tracking-tighter">NODE: HK_SEC_01</span>
+</div>
+</div>
+<h4 class="text-lg font-bold text-white leading-tight">Quantum Leakage Audit - HK Region</h4>
+<p class="text-xs text-stone-400 mt-2 leading-relaxed">Intelligence gathering on potential quantum-level data bleed in the Hong Kong sovereign sector. Anomalies detected in primary cooling systems.</p>
+</div>
+<div class="p-6 space-y-6">
 <div>
-<div class="flex items-center justify-between mb-4">
-<h3 class="text-xs font-bold text-stone-500 uppercase tracking-widest">Report Preview</h3>
-<button class="material-symbols-outlined text-stone-600 hover:text-white transition-colors">close</button>
-</div>
-<div class="relative w-full aspect-video rounded border border-stone-800 bg-stone-950 overflow-hidden mb-4 group">
-<div class="absolute inset-0 bg-gradient-to-t from-stone-950 to-transparent z-10 opacity-60"></div>
-<img alt="Report visual summary" class="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="close-up of digital glowing green and yellow line charts on a dark computer monitor with shallow depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN7Vz1f-Tuk8t2SGUAwDD8EdMZbePE4IthjTEdosaswKtJRa5rvFTMmU8kZbYWk_N7dIgKhUJbXWUWiFg_K5ini2N-_WRTAoiQv81vBcQJtANbszAuMmySECn5cBy6F--t3Js4KuEhsOv2SR8ia24LHFlfArlCUe40ZnEQnVCPi_x5Azki090viLvpRuOh1QOvTe4e4RWSBi9Cs5fUzP23l_f_M2LBX5XmATmtgoYJZ-OJF3q885WHLRlpredszuRDLTXMQKDKIhrf"/>
-<div class="absolute bottom-3 left-3 z-20">
-<span class="text-[10px] font-mono text-yellow-600 bg-stone-950/80 px-2 py-1 border border-yellow-600/30 rounded">SCANNING_ACTIVE</span>
+<span class="text-[10px] font-black text-stone-500 uppercase tracking-widest block mb-2">Hash Signature</span>
+<div class="bg-stone-900 p-2 rounded border border-stone-800">
+<code class="text-[10px] font-mono text-amber-600 break-all leading-tight">
+                                0x4F2A9B1C2D3E4F5G6H7I8J9K0L1M2N3P4Q5R6S7T8U9V0W1X2Y3Z
+                            </code>
 </div>
 </div>
-<h2 class="text-lg font-bold text-white leading-tight">Neural Net Latency Scan</h2>
-<div class="flex items-center gap-2 mt-2">
-<span class="text-[10px] font-mono text-stone-500">AGENT_ID: FLUX-X</span>
-<span class="text-stone-700">•</span>
-<span class="text-[10px] font-mono text-stone-500">PRIORITY: P1</span>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<span class="text-[10px] font-black text-stone-500 uppercase tracking-widest block mb-1">Enc. Level</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-amber-500">lock</span>
+<span class="text-sm font-bold text-stone-200">AES-2048</span>
 </div>
 </div>
-<div class="space-y-4">
-<div class="bg-stone-900/60 border border-stone-800 p-3 rounded">
-<h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Metrics Summary</h4>
-<div class="grid grid-cols-2 gap-3">
-<div class="flex flex-col">
-<span class="text-2xl font-black text-yellow-600 tracking-tighter">42ms</span>
-<span class="text-[10px] text-stone-500 uppercase">Avg Latency</span>
-</div>
-<div class="flex flex-col">
-<span class="text-2xl font-black text-white tracking-tighter">99.8%</span>
-<span class="text-[10px] text-stone-500 uppercase">Stability</span>
+<div>
+<span class="text-[10px] font-black text-stone-500 uppercase tracking-widest block mb-1">File Size</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-stone-500">description</span>
+<span class="text-sm font-bold text-stone-200">14.2 MB</span>
 </div>
 </div>
 </div>
-<div class="space-y-2">
-<h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Key Insights</h4>
-<ul class="text-xs text-stone-400 space-y-3">
-<li class="flex gap-2">
-<span class="text-yellow-600 shrink-0">01</span>
-<span>Bottleneck detected in Asia-East node routing protocols.</span>
-</li>
-<li class="flex gap-2">
-<span class="text-yellow-600 shrink-0">02</span>
-<span>Predictive maintenance required for A-09 GPU clusters.</span>
-</li>
-<li class="flex gap-2">
-<span class="text-yellow-600 shrink-0">03</span>
-<span>Efficiency increased by 14% since last patch cycle.</span>
-</li>
-</ul>
+<div class="pt-6 border-t border-stone-800/50">
+<span class="text-[10px] font-black text-stone-500 uppercase tracking-widest block mb-3">Security Summary</span>
+<div class="space-y-3">
+<div class="flex items-start gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5"></div>
+<p class="text-[11px] text-stone-400">Validated against master ledger on block 4,112,021</p>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5"></div>
+<p class="text-[11px] text-stone-400">Contains L2 restricted intelligence assets</p>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-stone-700 mt-1.5"></div>
+<p class="text-[11px] text-stone-600 italic">Auto-archive scheduled for 2025.10.01</p>
 </div>
 </div>
-<div class="mt-auto pt-6 border-t border-stone-800 grid grid-cols-2 gap-3">
-<button class="text-xs font-bold border border-stone-700 text-stone-300 hover:bg-stone-800 py-2 rounded transition-colors">Download PDF</button>
-<button class="text-xs font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 hover:bg-yellow-600/20 py-2 rounded transition-colors">Share Report</button>
+</div>
+<div class="pt-6">
+<button class="w-full bg-stone-900 border border-stone-800 text-stone-300 font-bold py-3 rounded hover:bg-stone-800 hover:text-white transition-all flex items-center justify-center gap-2 mb-2">
+<span class="material-symbols-outlined text-lg">download</span>
+                            Download PDF
+                        </button>
+<button class="w-full bg-transparent border border-stone-800 text-stone-500 py-3 rounded hover:border-rose-900 hover:text-rose-500 transition-all text-[11px] font-black uppercase tracking-widest">
+                            Shred Record
+                        </button>
+</div>
 </div>
 </aside>
 </div>
-</section>
 </main>
-<!-- Contextual Toast Notification (UI Flavour) -->
-<div class="fixed bottom-6 right-6 z-[100] bg-stone-900 border border-yellow-600/50 p-4 rounded-lg shadow-2xl flex items-center gap-4 max-w-sm">
-<div class="w-10 h-10 rounded bg-yellow-600/10 flex items-center justify-center text-yellow-600 shrink-0">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">generating_tokens</span>
-</div>
-<div class="flex-1">
-<p class="text-sm font-bold text-white">Generating Report...</p>
-<p class="text-[11px] text-stone-500">Neural Net Latency Scan is 84% complete.</p>
-<div class="w-full h-1 bg-stone-800 rounded-full mt-2 overflow-hidden">
-<div class="h-full bg-yellow-600 w-[84%]"></div>
-</div>
-</div>
-</div>
 </body></html>
