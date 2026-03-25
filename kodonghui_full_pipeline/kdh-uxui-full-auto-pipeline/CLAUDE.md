@@ -1,7 +1,7 @@
-# CLAUDE.md -- kdh-uxui-full-auto-pipeline v6.0 (ProMax)
+# CLAUDE.md -- kdh-uxui-full-auto-pipeline v6.1 (ProMax)
 
 ## What This Pipeline Does
-Redesigns ALL frontend packages (app, admin, landing) using promax design-system DB + Playwright visual research + Stitch 2 MCP generation. Multi-theme support.
+Redesigns ALL frontend packages (app, admin, landing) using promax design-system DB + Playwright visual research + Stitch 2 MCP generation + **react:components skill for HTML→React conversion**. Multi-theme support.
 
 ## Key Differences from v5.1 (Libre)
 - **promax** replaces LibreUIUX as design decision engine
@@ -10,6 +10,17 @@ Redesigns ALL frontend packages (app, admin, landing) using promax design-system
 - **Multi-theme** via CSS custom properties (not single theme)
 - **ALL packages** covered (app + admin + landing)
 - **ZERO hardcoded colors** anywhere in pipeline or output
+- **react:components** skill converts Stitch HTML → modular React components (AST-validated)
+
+## Stitch → React Conversion (Phase 3.5)
+After Stitch MCP generates HTML screens (Phase 3), the `react:components` skill converts them to production-ready React/JSX:
+1. Stitch MCP `generate_screen_from_text` → HTML + PNG
+2. `react:components` skill reads HTML + PNG → modular React components
+3. Components placed in `phase-3-generated/{theme}/{package}/components/`
+4. Phase 4 uses these React components to rebuild page render output
+
+Skill location: `~/.claude/skills/react-components/SKILL.md`
+Install: `npx skills add google-labs-code/stitch-skills --skill react:components --global --yes`
 
 ## Folder Structure
 

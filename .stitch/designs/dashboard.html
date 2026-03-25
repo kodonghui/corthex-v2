@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Command Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CA8A04",
+                        surface: "#1C1917",
+                        border: "#292524",
+                        background: "#0C0A09"
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #0C0A09;
+            color: #E7E5E4;
+            font-family: 'DM Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-yellow-600/30">
+<!-- TopNavBar Implementation from JSON -->
+<nav class="fixed top-0 w-full border-b border-stone-800 flex justify-between items-center px-6 h-16 w-full z-50 bg-[#0C0A09] font-['DM_Sans'] antialiased tracking-tight shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black tracking-tighter text-yellow-600 uppercase">CORTHEX</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-yellow-600 border-b-2 border-yellow-600 pb-1" href="#">Dashboard</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Agents</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Jobs</a>
+<a class="text-stone-400 hover:text-stone-200 transition-colors" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-stone-900 border border-stone-800 rounded px-3 py-1.5">
+<span class="material-symbols-outlined text-stone-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-stone-300 w-48" placeholder="Search system..." type="text"/>
+</div>
+<button class="text-stone-400 hover:bg-stone-900/50 p-2 rounded transition-transform active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-stone-400 hover:bg-stone-900/50 p-2 rounded transition-transform active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded bg-stone-800 border border-stone-700 overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional man in a dark environment with subtle golden rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQcfpWKkS-rnf90dy0PTXH17YfQ6ub_0aZki3Ay37cpdoxn1eLzneFo6b1y13jX75KghPi6TfLu8TT5VJA29zW9ZakYNRbp1w4kNnpfz6css-q6RHzIUbIjGw2d1lKs-pOvp7OhhlDjN3SuGmG0L_77CyNo84i3N81Fmf6Lsh5JWMIK6NM2XGiE7zqE7rwu6GwZKoCIyRZi2kyLPn5USNY8PEr4flB2tSlZOXYfxFebnvy1mp-LbjdC_Bar5GpN5MVQNnJ_QKCr5T0"/>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-24 px-6 max-w-7xl mx-auto">
+<!-- Welcome Header -->
+<header class="mb-10">
+<div class="flex flex-col gap-1">
+<span class="text-yellow-600 font-bold tracking-[0.2em] text-xs uppercase">System Authorization Confirmed</span>
+<h1 class="text-4xl font-bold tracking-tight text-stone-100">Welcome back, Director</h1>
+</div>
+</header>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<!-- Card 1 -->
+<div class="bg-[#1C1917] border border-[#292524] p-5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-yellow-600/5 blur-3xl -mr-12 -mt-12 group-hover:bg-yellow-600/10 transition-colors"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-yellow-600">smart_toy</span>
+<span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">ONLINE</span>
+</div>
+<div class="text-3xl font-bold text-stone-100 mb-1">24</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-stone-500">Active Agents</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-[#1C1917] border border-[#292524] p-5 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-yellow-600">lan</span>
+<span class="text-[10px] font-bold text-stone-500 bg-stone-500/10 px-2 py-0.5 rounded">SECTORS</span>
+</div>
+<div class="text-3xl font-bold text-stone-100 mb-1">08</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-stone-500">Departments</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-[#1C1917] border border-[#292524] p-5 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-yellow-600">pending_actions</span>
+<span class="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">+12% WK</span>
+</div>
+<div class="text-3xl font-bold text-stone-100 mb-1">142</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-stone-500">Pending Jobs</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-[#1C1917] border border-[#292524] p-5 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-yellow-600">payments</span>
+<span class="text-[10px] font-bold text-stone-500 bg-stone-500/10 px-2 py-0.5 rounded">MTD</span>
+</div>
+<div class="text-3xl font-bold text-stone-100 mb-1">$12,450</div>
+<div class="text-[10px] font-bold uppercase tracking-widest text-stone-500">Total Costs</div>
+</div>
+</div>
+<!-- Dashboard Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Active Units Panel (2/3 width on large) -->
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center justify-between mb-2">
+<h2 class="text-sm font-bold tracking-widest uppercase text-stone-400 flex items-center gap-2">
+<span class="w-2 h-2 bg-yellow-600 rounded-full animate-pulse"></span>
+                        Active Units
+                    </h2>
+<button class="text-[10px] font-bold text-yellow-600 hover:text-yellow-500 transition-colors uppercase tracking-wider">Expand Fleet</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Agent Card -->
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex gap-4 items-center group cursor-pointer hover:border-yellow-600/50 transition-colors">
+<div class="w-12 h-12 bg-stone-900 border border-stone-800 rounded overflow-hidden">
+<img alt="Agent Aura" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="futuristic sleek white robotic head with glowing blue optics in a dark laboratory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMm-ZOPmHKFpHE2RUVQ-7qu01E96kybphlf--VfC9lUToEWZCJYqr5VKVk79ePV-2aFZlInfMp1rbGmZvRfvuAz4ePRAQc0mPG9OnSVfuw-BsosYvgE34P-1_-r3eT5lifEubGj7XenbrP_dn0zqISXiUXOVyD_OziRDn-bfEsNPCTrHPHa9ovJsUi5tKpJXm83dYjnwjpLLkpbhGud1gZbU3rjGnPczZyjO1vO31glqN5IwfmOC4STu-vWM47TYgV4IoV4ZhCxel8"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-bold text-stone-100 text-sm">AURA-09</span>
+<span class="text-[9px] text-emerald-500 font-black">98% SYNC</span>
+</div>
+<div class="w-full bg-stone-900 h-1 rounded-full overflow-hidden">
+<div class="bg-yellow-600 h-full w-[98%]"></div>
+</div>
+<div class="mt-2 text-[10px] text-stone-500 font-medium">Processing Data Stream: Delta-7</div>
+</div>
+</div>
+<!-- Agent Card -->
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex gap-4 items-center group cursor-pointer hover:border-yellow-600/50 transition-colors">
+<div class="w-12 h-12 bg-stone-900 border border-stone-800 rounded overflow-hidden">
+<img alt="Agent Flux" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="intricate close-up of internal electronic circuitry with glowing orange components and fiber optic cables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEgy9vyRtu3ILRhak1s0nJRmq_ELi3FoLXd70ihL11KilbguaVMnm_pGtu35Ve8vkcb5p4s-XD37ZIDtqfQLhgxyT1NdwgCYSa6YlSaivhOQIOoactTrQWAc25_WTHLHdO_a6aTvrnWt3XP7V-VPiviE7u8TC9zGKYlwnzzxolrzv20pZHmUqxKtg8iTpSKtbbnm6ApgB47Ju6gpbzBWtTsyC677VAn4r9SNq-kNl9eBy0QaRgffYiB0_IuANivRHsSs5vW8NqKYMd"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-bold text-stone-100 text-sm">FLUX-X</span>
+<span class="text-[9px] text-emerald-500 font-black">42% SYNC</span>
+</div>
+<div class="w-full bg-stone-900 h-1 rounded-full overflow-hidden">
+<div class="bg-yellow-600 h-full w-[42%]"></div>
+</div>
+<div class="mt-2 text-[10px] text-stone-500 font-medium">Analyzing Cost Metrics</div>
+</div>
+</div>
+<!-- Agent Card -->
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex gap-4 items-center group cursor-pointer hover:border-yellow-600/50 transition-colors">
+<div class="w-12 h-12 bg-stone-900 border border-stone-800 rounded overflow-hidden">
+<img alt="Agent Nexus" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="minimalist white humanoid robot arm interacting with a holographic interface on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCFecKoMVwsW05TQa_MLNvz3o6SKcev22VPcfg8tEs7pZenhry7bSQEtEcDnjQOs332YyH5ickEZT1G4Jj_Fzvnhwnl4HMacE-4uTQQr6rJBl_oYlOwcWQiyQ4zNcM-T7olqp6eRGVUfl8WlNHiJVVtQpqFsgKT5aSkBVw_kGaKgXPMtnqAHzR_Yeifj2cm5_Ox1-g4rJJrYLMhkd_rBH4KkwG3QIoay-OQGTSHd-8qcFckMjjMDFyohRZGUs3Q3_MbA7kqxdg71Rw"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-bold text-stone-100 text-sm">NEXUS-PRIME</span>
+<span class="text-[9px] text-yellow-500 font-black">IDLE</span>
+</div>
+<div class="w-full bg-stone-900 h-1 rounded-full overflow-hidden">
+<div class="bg-stone-700 h-full w-0"></div>
+</div>
+<div class="mt-2 text-[10px] text-stone-500 font-medium">Standby Mode - Authorization Pending</div>
+</div>
+</div>
+<!-- Agent Card -->
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex gap-4 items-center group cursor-pointer hover:border-yellow-600/50 transition-colors">
+<div class="w-12 h-12 bg-stone-900 border border-stone-800 rounded overflow-hidden">
+<img alt="Agent Core" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="glowing abstract digital grid representing core system processes with neon green and black depth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDZ3ufpAWCRUOLkX344QDqpcUZ3uF3qeY206zrhocqSmf38hz4QF_v6r0PI_ca9VjdOqiIY9sCU2QHYaqRCmhjgTuF2fZXrP9lOIdd5MC8oBo-AvzdPXnty-w7l3g6A18V4gYlvGjgRjEMc1HmJ9UZzsqZXHlNsrwfiRjT312VtPhQUWbar5zpA6wQimbHG0RjvuyJOlrDZGK0uSqPAi1IeOf7G8llhFQ_rUsKlDZDs84iOKB0jmInmxbW6_WR5naFs1ssgEo8_eLc"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-bold text-stone-100 text-sm">CORE-01</span>
+<span class="text-[9px] text-emerald-500 font-black">77% SYNC</span>
+</div>
+<div class="w-full bg-stone-900 h-1 rounded-full overflow-hidden">
+<div class="bg-yellow-600 h-full w-[77%]"></div>
+</div>
+<div class="mt-2 text-[10px] text-stone-500 font-medium">Firewall Maintenance in Progress</div>
+</div>
+</div>
+</div>
+<!-- Featured Visualization Area -->
+<div class="bg-[#1C1917] border border-[#292524] p-6 h-64 relative overflow-hidden">
+<div class="flex justify-between items-center mb-4 relative z-10">
+<h3 class="text-xs font-bold uppercase tracking-widest text-stone-400">System Load Distribution</h3>
+<div class="flex gap-2">
+<span class="w-2 h-2 rounded-full bg-yellow-600"></span>
+<span class="w-2 h-2 rounded-full bg-stone-700"></span>
+<span class="w-2 h-2 rounded-full bg-stone-700"></span>
+</div>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-40 opacity-20 flex items-end px-6 gap-1">
+<div class="w-full bg-yellow-600 h-[40%]"></div>
+<div class="w-full bg-yellow-600 h-[65%]"></div>
+<div class="w-full bg-yellow-600 h-[50%]"></div>
+<div class="w-full bg-yellow-600 h-[85%]"></div>
+<div class="w-full bg-yellow-600 h-[95%]"></div>
+<div class="w-full bg-yellow-600 h-[45%]"></div>
+<div class="w-full bg-yellow-600 h-[30%]"></div>
+<div class="w-full bg-yellow-600 h-[70%]"></div>
+<div class="w-full bg-yellow-600 h-[60%]"></div>
+<div class="w-full bg-yellow-600 h-[80%]"></div>
+<div class="w-full bg-yellow-600 h-[55%]"></div>
+<div class="w-full bg-yellow-600 h-[90%]"></div>
+</div>
+<div class="relative z-10 grid grid-cols-3 gap-10 mt-10">
+<div>
+<div class="text-[10px] text-stone-500 uppercase tracking-tighter mb-1">Compute Power</div>
+<div class="text-2xl font-bold text-stone-100">8.2 PFLOPS</div>
+</div>
+<div>
+<div class="text-[10px] text-stone-500 uppercase tracking-tighter mb-1">Neural Latency</div>
+<div class="text-2xl font-bold text-stone-100">1.4 MS</div>
+</div>
+<div>
+<div class="text-[10px] text-stone-500 uppercase tracking-tighter mb-1">Grid Stability</div>
+<div class="text-2xl font-bold text-stone-100">99.9%</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Event Stream (1/3 width) -->
+<div class="bg-[#1C1917] border border-[#292524] flex flex-col">
+<div class="p-4 border-b border-[#292524] flex items-center justify-between">
+<h2 class="text-xs font-bold tracking-widest uppercase text-stone-100">Live Event Stream</h2>
+<span class="text-[10px] font-bold text-stone-500 bg-stone-800 px-2 py-1 rounded tracking-tighter">0.02s LAG</span>
+</div>
+<div class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-stone-700">
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-yellow-600 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-stone-500 uppercase mb-1">12:44:02 · AGENT_AURA</div>
+<p class="text-xs text-stone-300 leading-relaxed">Optimization protocol complete. Sector 7 efficiency increased by 4.2%.</p>
+</div>
+</div>
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-stone-700 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-stone-500 uppercase mb-1">12:43:15 · SYSTEM</div>
+<p class="text-xs text-stone-300 leading-relaxed">New job initiated: [ID-8449] - Batch processing social sentiment analysis.</p>
+</div>
+</div>
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-yellow-600 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-stone-500 uppercase mb-1">12:41:59 · AGENT_FLUX</div>
+<p class="text-xs text-stone-300 leading-relaxed">Budget threshold warning: Department Marketing (03) reached 85% of daily allocation.</p>
+</div>
+</div>
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-stone-700 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-stone-500 uppercase mb-1">12:40:00 · SYSTEM</div>
+<p class="text-xs text-stone-300 leading-relaxed">Automated backup sequence for Core Database Delta finalized. Integrity 100%.</p>
+</div>
+</div>
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-red-900 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-red-500 uppercase mb-1">12:38:12 · SECURITY</div>
+<p class="text-xs text-stone-300 leading-relaxed">Unauthorized access attempt blocked from IP: 192.168.1.104. Threat level: Low.</p>
+</div>
+</div>
+<!-- Stream Item -->
+<div class="flex gap-3">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-stone-700 mt-1.5"></div>
+<div class="w-px h-full bg-stone-800 my-1"></div>
+</div>
+<div>
+<div class="text-[10px] font-bold text-stone-500 uppercase mb-1">12:35:44 · AGENT_CORE</div>
+<p class="text-xs text-stone-300 leading-relaxed">Patch 2.4.1 deployed across all sub-nodes. Re-syncing grid...</p>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-[#292524] bg-stone-900/30">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-yellow-600 animate-pulse"></div>
+<span class="text-[10px] font-black text-stone-500 tracking-[0.3em] uppercase">Feed Connected</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Implementation from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-[#0C0A09]/95 backdrop-blur-md border-t border-stone-800 shadow-2xl tap-highlight-transparent md:hidden">
+<div class="flex flex-col items-center justify-center text-yellow-500 bg-yellow-500/10 rounded-xl p-2">
+<span class="material-symbols-outlined mb-1">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Command</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-500 p-2 hover:text-yellow-400">
+<span class="material-symbols-outlined mb-1">smart_toy</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Agents</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-500 p-2 hover:text-yellow-400">
+<span class="material-symbols-outlined mb-1">hub</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Network</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-500 p-2 hover:text-yellow-400">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Costs</span>
+</div>
+</nav>
+<!-- Contextual FAB - Suppression Logic: Only on Home/Dash -->
+<button class="fixed right-6 bottom-24 md:bottom-6 w-14 h-14 bg-yellow-600 text-black rounded-full shadow-lg flex items-center justify-center hover:bg-yellow-500 active:scale-95 transition-all z-40 group">
+<span class="material-symbols-outlined font-black">add</span>
+<span class="absolute right-16 bg-stone-900 text-stone-100 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border border-stone-800 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Deploy New Agent</span>
+</button>
+</body></html>
