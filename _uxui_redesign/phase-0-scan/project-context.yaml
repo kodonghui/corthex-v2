@@ -1,0 +1,417 @@
+## CORTHEX v3 "OpenClaw" — Project Context (Auto-Scanned)
+## Generated: 2026-03-25
+
+project:
+  name: "CORTHEX"
+  description: "AI Virtual Office Management Platform"
+  framework: react
+  language: typescript
+  bundler: vite
+  runtime: bun
+  monorepo: turborepo
+  version: "3.0 (OpenClaw)"
+
+packages:
+  app:
+    name: "@corthex/app"
+    path: "packages/app"
+    port: 5174
+    description: "CEO app — user-facing pages"
+    router: react-router-dom v7 (BrowserRouter)
+    state: zustand + @tanstack/react-query
+    icons: lucide-react 0.577.0
+    ui_lib: "@corthex/ui + @radix-ui/react-dialog + @subframe/core (legacy)"
+    charts: lightweight-charts
+    flow: "@xyflow/react"
+    dnd: "@dnd-kit/core + sortable"
+    editor: codemirror
+    markdown: react-markdown
+    toast: sonner
+
+  admin:
+    name: "@corthex/admin"
+    path: "packages/admin"
+    port: 5173
+    description: "Admin console — management pages"
+    router: react-router-dom v7 (BrowserRouter, basename=/admin)
+    state: zustand + @tanstack/react-query
+    icons: lucide-react 0.577.0
+    flow: "@xyflow/react + elkjs"
+    export: html-to-image
+
+  landing:
+    name: "@corthex/landing"
+    path: "packages/landing"
+    description: "Landing page — marketing/signup"
+    router: none (single page)
+    css: tailwindcss v4
+
+  shared:
+    name: "@corthex/shared"
+    path: "packages/shared"
+    description: "Shared types"
+
+  ui:
+    name: "@corthex/ui"
+    path: "packages/ui"
+    description: "Shared UI components"
+
+  server:
+    name: "@corthex/server"
+    path: "packages/server"
+    description: "Backend (Hono + Bun)"
+
+paths:
+  root: "."
+  # App package
+  app_entry: "packages/app/src/main.tsx"
+  app_router: "packages/app/src/App.tsx"
+  app_layout: "packages/app/src/components/layout.tsx"
+  app_sidebar: "packages/app/src/components/sidebar.tsx"
+  app_index_html: "packages/app/index.html"
+  app_css: "packages/app/src/index.css"
+  app_themes_css: "packages/app/src/styles/themes.css"
+  app_theme_store: "packages/app/src/stores/theme-store.ts"
+  app_theme_selector: "packages/app/src/components/settings/theme-selector.tsx"
+  app_ui_theme_css: "packages/app/src/ui/theme.css"
+  app_pages_dir: "packages/app/src/pages/"
+
+  # Admin package
+  admin_entry: "packages/admin/src/main.tsx"
+  admin_router: "packages/admin/src/App.tsx"
+  admin_layout: "packages/admin/src/components/layout.tsx"
+  admin_sidebar: "packages/admin/src/components/sidebar.tsx"
+  admin_index_html: "packages/admin/index.html"
+  admin_css: "packages/admin/src/index.css"
+  admin_pages_dir: "packages/admin/src/pages/"
+
+  # Landing package
+  landing_entry: "packages/landing/src/main.tsx"
+  landing_app: "packages/landing/src/App.tsx"
+  landing_index_html: "packages/landing/index.html"
+  landing_css: "packages/landing/src/index.css"
+
+  # Config
+  tsconfig: "packages/app/tsconfig.json"
+
+type_check_cmd: "cd packages/app && npx tsc --noEmit && cd ../admin && npx tsc --noEmit"
+
+css_framework:
+  name: "tailwindcss"
+  version: "4"
+  config_method: "@theme block in index.css (Tailwind v4 CSS-first config)"
+  no_tailwind_config_file: true  # Tailwind v4 uses CSS @theme, not tailwind.config.ts
+
+current_theme_system:
+  method: "CSS custom properties via @theme + data-theme attribute"
+  store: "zustand (theme-store.ts) with localStorage persistence"
+  default_theme: "sovereign (natural-organic)"
+  existing_themes:
+    - "sovereign (Natural Organic — olive/cream light)"
+    - "imperial (Imperial Red + Obsidian dark)"
+    - "tactical (Military Green dark)"
+    - "mystic (Deep Indigo dark)"
+    - "stealth (Near-black minimal)"
+  problem: "layout.tsx and sidebar.tsx use HARDCODED hex values instead of CSS variables"
+
+hardcoded_colors_inventory:
+  app_layout:
+    - "bg-[#faf8f5]"
+    - "text-[#1a1a1a]"
+    - "border-[#e5e1d3]"
+    - "bg-[#f5f0e8]"
+    - "text-[#6b705c]"
+    - "text-[#a3a08e]"
+    - "border-[#d4cfc4]"
+    - "bg-[#606C38]"
+    - "focus:border-[#606C38]"
+    - "focus:ring-[#606C38]"
+  app_sidebar:
+    - "bg-[#283618]"
+    - "border-[#3a4d28]"
+    - "bg-[#606C38]/30"
+    - "text-[#c5d8a4]"
+    - "text-[#a3c48a]"
+    - "bg-[#e5e1d3]/20"
+    - "bg-[#606C38]"
+  admin_layout:
+    - "bg-[#faf8f5]"
+    - "style={{ backgroundColor: '#5a7247' }}"
+  note: "ALL must be replaced with CSS variable references (var(--color-corthex-*))"
+
+pages:
+  app:
+    # GROUP 1: Hub
+    - route: "/login"
+      component: "packages/app/src/pages/login.tsx"
+      export: "LoginPage"
+      auth: false
+      layout: false
+    - route: "/onboarding"
+      component: "packages/app/src/pages/onboarding.tsx"
+      export: "OnboardingPage"
+      auth: true
+      layout: false
+    - route: "/hub"
+      component: "packages/app/src/pages/hub.tsx"
+      export: "HubPage"
+      default: true  # / redirects here
+    - route: "/dashboard"
+      component: "packages/app/src/pages/dashboard.tsx"
+      export: "DashboardPage"
+
+    # GROUP 2: Workspace
+    - route: "/chat"
+      component: "packages/app/src/pages/chat.tsx"
+      export: "ChatPage"
+    - route: "/organization"
+      component: "packages/app/src/pages/organization.tsx"
+      export: "OrganizationPage"
+    - route: "/agents"
+      component: "packages/app/src/pages/agents.tsx"
+      export: "AgentsPage"
+    - route: "/departments"
+      component: "packages/app/src/pages/departments.tsx"
+      export: "DepartmentsPage"
+    - route: "/tiers"
+      component: "packages/app/src/pages/tiers.tsx"
+      export: "TiersPage"
+    - route: "/nexus"
+      component: "packages/app/src/pages/nexus.tsx"
+      export: "NexusPage"
+    - route: "/agora"
+      component: "packages/app/src/pages/agora.tsx"
+      export: "AgoraPage"
+    - route: "/memories"
+      component: "packages/app/src/pages/memories.tsx"
+      export: "MemoriesPage"
+    - route: "/messenger"
+      component: "packages/app/src/pages/messenger.tsx"
+      export: "MessengerPage"
+
+    # GROUP 3: Library
+    - route: "/knowledge"
+      component: "packages/app/src/pages/knowledge.tsx"
+      export: "KnowledgePage"
+    - route: "/files"
+      component: "packages/app/src/pages/files.tsx"
+      export: "FilesPage"
+    - route: "/classified"
+      component: "packages/app/src/pages/classified.tsx"
+      export: "ClassifiedPage"
+    - route: "/reports"
+      component: "packages/app/src/pages/reports.tsx"
+      export: "ReportsPage"
+
+    # GROUP 4: ARGOS (Jobs/Workflows)
+    - route: "/jobs"
+      component: "packages/app/src/pages/jobs.tsx"
+      export: "JobsPage"
+    - route: "/n8n-workflows"
+      component: "packages/app/src/pages/n8n-workflows.tsx"
+      export: "N8nWorkflowsPage"
+    - route: "/marketing-pipeline"
+      component: "packages/app/src/pages/marketing-pipeline.tsx"
+      export: "MarketingPipelinePage"
+    - route: "/marketing-approval"
+      component: "packages/app/src/pages/marketing-approval.tsx"
+      export: "MarketingApprovalPage"
+
+    # GROUP 5: Activity/System
+    - route: "/activity-log"
+      component: "packages/app/src/pages/activity-log.tsx"
+      export: "ActivityLogPage"
+    - route: "/ops-log"
+      component: "packages/app/src/pages/ops-log.tsx"
+      export: "OpsLogPage"
+    - route: "/notifications"
+      component: "packages/app/src/pages/notifications.tsx"
+      export: "NotificationsPage"
+    - route: "/costs"
+      component: "packages/app/src/pages/costs.tsx"
+      export: "CostsPage"
+    - route: "/performance"
+      component: "packages/app/src/pages/performance.tsx"
+      export: "PerformancePage"
+    - route: "/sns"
+      component: "packages/app/src/pages/sns.tsx"
+      export: "SnsPage"
+    - route: "/trading"
+      component: "packages/app/src/pages/trading.tsx"
+      export: "TradingPage"
+
+    # GROUP 6: Settings
+    - route: "/settings"
+      component: "packages/app/src/pages/settings.tsx"
+      export: "SettingsPage"
+
+    # Redirects (not separate pages)
+    redirects:
+      - from: "/" to: "/hub"
+      - from: "/command-center" to: "/hub"
+      - from: "/org" to: "/organization"
+      - from: "/cron" to: "/jobs"
+      - from: "/argos" to: "/jobs"
+      - from: "/workflows" to: "/n8n-workflows"
+      - from: "/home" to: "/hub"
+
+  admin:
+    - route: "/admin/login"
+      component: "packages/admin/src/pages/login.tsx"
+      export: "LoginPage"
+      auth: false
+      layout: false
+    - route: "/admin/"
+      component: "packages/admin/src/pages/dashboard.tsx"
+      export: "DashboardPage"
+      default: true
+    - route: "/admin/users"
+      component: "packages/admin/src/pages/users.tsx"
+      export: "UsersPage"
+    - route: "/admin/employees"
+      component: "packages/admin/src/pages/employees.tsx"
+      export: "EmployeesPage"
+    - route: "/admin/departments"
+      component: "packages/admin/src/pages/departments.tsx"
+      export: "DepartmentsPage"
+    - route: "/admin/agents"
+      component: "packages/admin/src/pages/agents.tsx"
+      export: "AgentsPage"
+    - route: "/admin/credentials"
+      component: "packages/admin/src/pages/credentials.tsx"
+      export: "CredentialsPage"
+    - route: "/admin/companies"
+      component: "packages/admin/src/pages/companies.tsx"
+      export: "CompaniesPage"
+    - route: "/admin/tools"
+      component: "packages/admin/src/pages/tools.tsx"
+      export: "ToolsPage"
+    - route: "/admin/costs"
+      component: "packages/admin/src/pages/costs.tsx"
+      export: "CostsPage"
+    - route: "/admin/report-lines"
+      component: "packages/admin/src/pages/report-lines.tsx"
+      export: "ReportLinesPage"
+    - route: "/admin/soul-templates"
+      component: "packages/admin/src/pages/soul-templates.tsx"
+      export: "SoulTemplatesPage"
+    - route: "/admin/monitoring"
+      component: "packages/admin/src/pages/monitoring.tsx"
+      export: "MonitoringPage"
+    - route: "/admin/sketchvibe"
+      component: "packages/admin/src/pages/sketchvibe.tsx"
+      export: "default"
+    - route: "/admin/nexus"
+      component: "packages/admin/src/pages/nexus.tsx"
+      export: "NexusPage"
+    - route: "/admin/org-templates"
+      component: "packages/admin/src/pages/org-templates.tsx"
+      export: "OrgTemplatesPage"
+    - route: "/admin/template-market"
+      component: "packages/admin/src/pages/template-market.tsx"
+      export: "TemplateMarketPage"
+    - route: "/admin/agent-marketplace"
+      component: "packages/admin/src/pages/agent-marketplace.tsx"
+      export: "AgentMarketplacePage"
+    - route: "/admin/api-keys"
+      component: "packages/admin/src/pages/api-keys.tsx"
+      export: "ApiKeysPage"
+    - route: "/admin/agent-reports"
+      component: "packages/admin/src/pages/agent-reports.tsx"
+      export: "AgentReportsPage"
+    - route: "/admin/mcp-servers"
+      component: "packages/admin/src/pages/mcp-servers.tsx"
+      export: "McpServersPage"
+    - route: "/admin/mcp-access"
+      component: "packages/admin/src/pages/mcp-access.tsx"
+      export: "McpAccessPage"
+    - route: "/admin/mcp-credentials"
+      component: "packages/admin/src/pages/mcp-credentials.tsx"
+      export: "McpCredentialsPage"
+    - route: "/admin/n8n-editor"
+      component: "packages/admin/src/pages/n8n-editor.tsx"
+      export: "N8nEditorPage"
+    - route: "/admin/marketing-settings"
+      component: "packages/admin/src/pages/marketing-settings.tsx"
+      export: "MarketingSettingsPage"
+    - route: "/admin/memory-management"
+      component: "packages/admin/src/pages/memory-management.tsx"
+      export: "MemoryManagementPage"
+    - route: "/admin/settings"
+      component: "packages/admin/src/pages/settings.tsx"
+      export: "SettingsPage"
+    - route: "/admin/onboarding"
+      component: "packages/admin/src/pages/onboarding.tsx"
+      export: "OnboardingWizardPage"
+
+    redirects:
+      - from: "/admin/workflows" to: "/admin/n8n-editor"
+
+  landing:
+    - route: "/"
+      component: "packages/landing/src/App.tsx"
+      sections:
+        - "packages/landing/src/components/hero.tsx"
+        - "packages/landing/src/components/features.tsx"
+        - "packages/landing/src/components/pricing.tsx"
+        - "packages/landing/src/components/cta.tsx"
+        - "packages/landing/src/components/footer.tsx"
+
+page_counts:
+  app: 30  # excluding redirects and /reports/:id (same component)
+  admin: 28
+  landing: 1
+  total: 59
+
+current_tokens:
+  fonts:
+    heading: "Inter"
+    body: "Inter"
+    mono: "JetBrains Mono"
+    serif: "Noto Serif KR"
+  colors:
+    accent: "#606C38 (olive)"
+    accent_deep: "#283618 (dark olive)"
+    bg: "#faf8f5 (cream)"
+    surface: "#ffffff"
+    elevated: "#f5f0e8"
+    border: "#e5e1d3"
+    text_primary: "#1a1a1a"
+    text_secondary: "#6b705c"
+  color_mode: "light (default sovereign/natural-organic theme)"
+  dark_mode: "available via theme switching (imperial/tactical/mystic/stealth)"
+
+app_shell:
+  app:
+    layout_file: "packages/app/src/components/layout.tsx"
+    sidebar_file: "packages/app/src/components/sidebar.tsx"
+    font_cdn: "Inter + JetBrains Mono + Noto Serif KR (Google Fonts)"
+    sidebar_width: "280px (collapsed: 64px)"
+    topbar_height: "56px"
+    features:
+      - "Collapsible sidebar with localStorage persistence"
+      - "Mobile responsive (overlay sidebar on <lg)"
+      - "Breadcrumbs in desktop topbar"
+      - "Search bar (Ctrl+K placeholder)"
+      - "Notification badge (live polling)"
+      - "SwitchToAdmin button"
+      - "Build number display"
+  admin:
+    layout_file: "packages/admin/src/components/layout.tsx"
+    sidebar_file: "packages/admin/src/components/sidebar.tsx"
+    font_cdn: "Inter + JetBrains Mono + Noto Serif KR (Google Fonts)"
+    features:
+      - "Company selector"
+      - "Onboarding redirect"
+      - "Error boundary per page"
+
+themes_to_generate:
+  - name: "command"
+    keywords: "AI command center dark premium cyberpunk"
+    target: "Power users, tech-savvy, dark mode lovers"
+  - name: "studio"
+    keywords: "AI virtual office collaboration modern clean"
+    target: "Creative teams, daily users, light and friendly"
+  - name: "corporate"
+    keywords: "AI enterprise SaaS dashboard professional trust"
+    target: "Enterprise, formal, executive presentations"
