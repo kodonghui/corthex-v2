@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | Costs Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-tertiary-fixed": "#360f00",
+                "inverse-surface": "#2d3133",
+                "primary-fixed-dim": "#b4c5ff",
+                "surface": "#f7f9fb",
+                "on-primary-fixed-variant": "#003ea8",
+                "surface-container-high": "#e6e8ea",
+                "surface-container-lowest": "#ffffff",
+                "secondary-container": "#acbfff",
+                "on-primary-container": "#eeefff",
+                "on-secondary-container": "#394c84",
+                "primary": "#004ac6",
+                "surface-dim": "#d8dadc",
+                "tertiary-container": "#bc4800",
+                "on-error-container": "#93000a",
+                "on-tertiary-fixed-variant": "#7d2d00",
+                "on-secondary-fixed-variant": "#31447b",
+                "secondary-fixed-dim": "#b4c5ff",
+                "on-surface": "#191c1e",
+                "surface-bright": "#f7f9fb",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed": "#ffdbcd",
+                "on-background": "#191c1e",
+                "inverse-on-surface": "#eff1f3",
+                "on-secondary-fixed": "#00174b",
+                "surface-variant": "#e0e3e5",
+                "on-primary-fixed": "#00174b",
+                "on-tertiary-container": "#ffede6",
+                "tertiary-fixed-dim": "#ffb596",
+                "background": "#f7f9fb",
+                "on-primary": "#ffffff",
+                "outline": "#737686",
+                "inverse-primary": "#b4c5ff",
+                "surface-tint": "#0053db",
+                "on-surface-variant": "#434655",
+                "error": "#ba1a1a",
+                "error-container": "#ffdad6",
+                "outline-variant": "#c3c6d7",
+                "secondary-fixed": "#dbe1ff",
+                "surface-container-highest": "#e0e3e5",
+                "primary-container": "#2563eb",
+                "on-tertiary": "#ffffff",
+                "secondary": "#495c95",
+                "tertiary": "#943700",
+                "on-error": "#ffffff",
+                "surface-container": "#eceef0",
+                "primary-fixed": "#dbe1ff",
+                "surface-container-low": "#f2f4f6"
+              },
+              fontFamily: {
+                "headline": ["Lexend"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-lexend { font-family: 'Lexend', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Sidebar Component (Authority: JSON) -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-slate-100 dark:bg-slate-900 flex flex-col py-6 space-y-2 font-lexend text-sm">
+<div class="px-6 mb-8">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dns</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-blue-600 leading-none">CORTHEX</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Enterprise</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active Tab: Costs -->
+<a class="flex items-center px-4 py-3 mx-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all scale-95 active:scale-100" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-4 py-3 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm rounded-lg mx-2 transition-all scale-95 active:scale-100" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="payments">payments</span>
+                Costs
+            </a>
+<a class="flex items-center px-4 py-3 mx-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all scale-95 active:scale-100" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="assessment">assessment</span>
+                Reports
+            </a>
+<a class="flex items-center px-4 py-3 mx-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all scale-95 active:scale-100" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dns">dns</span>
+                Systems
+            </a>
+</nav>
+<div class="px-4 mt-auto space-y-1">
+<button class="w-full bg-primary text-white py-2.5 rounded-lg font-medium mb-6 flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/20 active:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>New Report</span>
+</button>
+<a class="flex items-center px-4 py-2 mx-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 transition-all text-xs" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center px-4 py-2 mx-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 transition-all text-xs" href="#">
+<span class="material-symbols-outlined mr-3 text-lg" data-icon="person">person</span>
+                Account
+            </a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen p-8">
+<!-- Top Navigation Area -->
+<header class="flex justify-between items-center mb-10">
+<div>
+<h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Costs Analysis</h2>
+<p class="text-on-surface-variant font-body mt-1">Real-time expenditure monitoring and optimization.</p>
+</div>
+<div class="flex items-center bg-surface-container-low p-1 rounded-xl">
+<button class="px-4 py-2 text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">Today</button>
+<button class="px-4 py-2 text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">Week</button>
+<button class="px-4 py-2 text-xs font-semibold bg-surface-container-lowest text-primary shadow-sm rounded-lg transition-all">Month</button>
+<button class="px-4 py-2 text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">Q3</button>
+<button class="px-4 py-2 text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">YTD</button>
+</div>
+</header>
+<!-- Summary Section: Metric Blades -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<!-- Total Cost Blade -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between group transition-all hover:bg-white border border-transparent hover:border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined p-2 bg-primary/5 text-primary rounded-lg" data-icon="payments">payments</span>
+<span class="text-xs font-bold text-emerald-600 flex items-center bg-emerald-50 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-xs mr-0.5">trending_up</span> 12.4%
+                    </span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Total Cost</p>
+<h3 class="text-2xl font-headline font-bold text-on-surface">$12,450.22</h3>
+</div>
+<div class="w-0.5 h-12 bg-primary rounded-full"></div>
+</div>
+</div>
+<!-- API Calls Blade -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between group transition-all hover:bg-white border border-transparent hover:border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined p-2 bg-primary/5 text-primary rounded-lg" data-icon="api">api</span>
+<span class="text-xs font-bold text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">Stable</span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">API Calls</p>
+<h3 class="text-2xl font-headline font-bold text-on-surface">1.2M</h3>
+</div>
+<div class="w-0.5 h-12 bg-primary-container rounded-full"></div>
+</div>
+</div>
+<!-- Token Usage Blade -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between group transition-all hover:bg-white border border-transparent hover:border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined p-2 bg-error/5 text-error rounded-lg" data-icon="memory">memory</span>
+<span class="text-xs font-bold text-error bg-error-container/20 px-2 py-1 rounded-full">Critical</span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Token Usage</p>
+<h3 class="text-2xl font-headline font-bold text-on-surface">850M</h3>
+</div>
+<div class="w-0.5 h-12 bg-error rounded-full"></div>
+</div>
+</div>
+<!-- Avg Cost Blade -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between group transition-all hover:bg-white border border-transparent hover:border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined p-2 bg-primary/5 text-primary rounded-lg" data-icon="calculate">calculate</span>
+<span class="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">Optimized</span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant mb-1">Avg Cost/Call</p>
+<h3 class="text-2xl font-headline font-bold text-on-surface">$0.01</h3>
+</div>
+<div class="w-0.5 h-12 bg-primary rounded-full opacity-30"></div>
+</div>
+</div>
+</section>
+<!-- Charts Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+<!-- Line Chart Area -->
+<div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl relative overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-lg font-headline font-bold text-on-surface">Computational Expenditure</h3>
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-on-surface-variant">Last 30 Days</span>
+</div>
+</div>
+<!-- Abstract Chart Visualization -->
+<div class="h-64 flex items-end justify-between space-x-2">
+<div class="w-full h-[40%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[55%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[48%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[60%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[75%] bg-primary/20 rounded-t-sm border-t-2 border-primary"></div>
+<div class="w-full h-[65%] bg-primary/20 rounded-t-sm border-t-2 border-primary"></div>
+<div class="w-full h-[85%] bg-primary/20 rounded-t-sm border-t-2 border-primary"></div>
+<div class="w-full h-[95%] bg-primary rounded-t-sm"></div>
+<div class="w-full h-[70%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[50%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[45%] bg-surface-container-low rounded-t-sm"></div>
+<div class="w-full h-[60%] bg-surface-container-low rounded-t-sm"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] uppercase font-bold text-on-surface-variant/50 tracking-widest">
+<span>Oct 01</span>
+<span>Oct 15</span>
+<span>Oct 31</span>
+</div>
+</div>
+<!-- Department & Alert Column -->
+<div class="space-y-6">
+<!-- Breakdown Chart -->
+<div class="bg-surface-container-lowest p-6 rounded-xl">
+<h3 class="text-sm font-headline font-bold text-on-surface mb-6">Department Breakdown</h3>
+<div class="space-y-4">
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span class="text-on-surface-variant">Logistics</span>
+<span class="text-on-surface">$4.2k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span class="text-on-surface-variant">Marketing</span>
+<span class="text-on-surface">$3.1k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[60%]"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span class="text-on-surface-variant">Security</span>
+<span class="text-on-surface">$2.8k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[45%]"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-semibold mb-1 text-error">
+<span>Research</span>
+<span>$1.9k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-error w-[90%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Efficiency Alert -->
+<div class="bg-gradient-to-br from-tertiary-container/10 to-tertiary-fixed/30 p-6 rounded-xl border border-tertiary/20">
+<div class="flex items-start space-x-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h4 class="text-sm font-bold text-tertiary uppercase tracking-tight">Efficiency Alert</h4>
+<p class="text-xs text-on-tertiary-fixed-variant mt-2 leading-relaxed">
+                                The <strong>Research cluster</strong> has exceeded its allocated budget by 18%. Immediate review of token intensive processes is recommended.
+                            </p>
+<button class="mt-4 text-xs font-bold text-tertiary underline underline-offset-4 hover:opacity-80 transition-opacity">
+                                View Cluster Logs
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Consumers Table -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<div class="p-6 border-b border-surface-container">
+<h3 class="text-lg font-headline font-bold text-on-surface">Top Cost Consumers</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[11px] uppercase tracking-widest text-on-surface-variant font-bold bg-surface-container-low">
+<th class="px-8 py-4">Agent Name</th>
+<th class="px-6 py-4">Department</th>
+<th class="px-6 py-4">Tokens</th>
+<th class="px-6 py-4">Cost</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-8 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+</div>
+<span class="font-bold text-sm">Sentinel-Alpha</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded">Security</span>
+</td>
+<td class="px-6 py-5 text-sm font-body">145.2M</td>
+<td class="px-6 py-5 text-sm font-bold">$2,140.00</td>
+<td class="px-6 py-5">
+<div class="flex items-center text-xs font-bold text-emerald-600">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-2"></span> Active
+                                </div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">auto_graph</span>
+</div>
+<span class="font-bold text-sm">Growth-Engine</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded">Marketing</span>
+</td>
+<td class="px-6 py-5 text-sm font-body">98.4M</td>
+<td class="px-6 py-5 text-sm font-bold">$1,450.50</td>
+<td class="px-6 py-5">
+<div class="flex items-center text-xs font-bold text-emerald-600">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-2"></span> Active
+                                </div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-error/5 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-sm">science</span>
+</div>
+<span class="font-bold text-sm">Bio-Model-X</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded text-error">Research</span>
+</td>
+<td class="px-6 py-5 text-sm font-body">210.1M</td>
+<td class="px-6 py-5 text-sm font-bold text-error">$3,105.00</td>
+<td class="px-6 py-5">
+<div class="flex items-center text-xs font-bold text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant mr-2"></span> Paused
+                                </div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">inventory</span>
+</div>
+<span class="font-bold text-sm">Stock-Sync-V2</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded">Logistics</span>
+</td>
+<td class="px-6 py-5 text-sm font-body">42.2M</td>
+<td class="px-6 py-5 text-sm font-bold">$620.15</td>
+<td class="px-6 py-5">
+<div class="flex items-center text-xs font-bold text-emerald-600">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-2"></span> Active
+                                </div>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-between items-center px-8">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Showing top 4 consumers</p>
+<button class="text-xs font-bold text-primary flex items-center hover:opacity-80 transition-all">
+                    View Full Cost List <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>
