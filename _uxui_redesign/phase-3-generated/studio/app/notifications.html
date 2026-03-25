@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#6cd3f7",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#ebfdfe",
+                        "inverse-primary": "#6cd3f7",
+                        "on-error-container": "#93000a",
+                        "primary": "#00647c",
+                        "tertiary-fixed-dim": "#e8b3ff",
+                        "on-tertiary-container": "#fffbff",
+                        "on-surface": "#0e1e1f",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#9261aa",
+                        "on-background": "#0e1e1f",
+                        "inverse-on-surface": "#e2f4f5",
+                        "surface-dim": "#ccddde",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#d4e6e7",
+                        "on-primary-fixed": "#001f28",
+                        "inverse-surface": "#233334",
+                        "surface-container-high": "#daeced",
+                        "on-primary-fixed-variant": "#004e61",
+                        "tertiary": "#78498f",
+                        "on-tertiary-fixed": "#310049",
+                        "on-secondary-fixed-variant": "#284b58",
+                        "surface-container": "#dff1f2",
+                        "surface-container-low": "#e5f7f8",
+                        "outline-variant": "#bdc8ce",
+                        "on-tertiary-fixed-variant": "#613378",
+                        "on-secondary-container": "#466977",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#f6d9ff",
+                        "background": "#ebfdfe",
+                        "on-primary-container": "#fafdff",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#006780",
+                        "primary-container": "#007f9d",
+                        "outline": "#6e797e",
+                        "primary-fixed": "#b7eaff",
+                        "on-surface-variant": "#3e484d",
+                        "secondary-fixed": "#c3e8f8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#001f28",
+                        "secondary": "#406370",
+                        "surface-container-highest": "#d4e6e7",
+                        "secondary-container": "#c3e8f8",
+                        "surface": "#ebfdfe",
+                        "secondary-fixed-dim": "#a8ccdb"
+                    },
+                    fontFamily: {
+                        "headline": ["Work Sans"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(212, 230, 231, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .tonal-shift-bg {
+            background-color: #ebfdfe;
+        }
+        body {
+            background-color: #ebfdfe;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface antialiased">
+<header class="fixed top-0 w-full z-50 bg-cyan-50/70 dark:bg-slate-950/70 backdrop-blur-xl shadow-sm shadow-cyan-200/10 flex justify-between items-center px-6 py-3 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-cyan-900 dark:text-cyan-50">CORTHEX Studio</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-cyan-600/60 dark:text-slate-400 font-work-sans text-sm tracking-tight hover:bg-white/50 transition-colors px-3 py-1 rounded-lg" href="#">Workspace</a>
+<a class="text-cyan-600/60 dark:text-slate-400 font-work-sans text-sm tracking-tight hover:bg-white/50 transition-colors px-3 py-1 rounded-lg" href="#">Projects</a>
+<a class="text-cyan-600/60 dark:text-slate-400 font-work-sans text-sm tracking-tight hover:bg-white/50 transition-colors px-3 py-1 rounded-lg" href="#">Library</a>
+<a class="text-cyan-700 dark:text-cyan-300 font-semibold font-work-sans text-sm tracking-tight px-3 py-1 rounded-lg" href="#">Notifications</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<button class="p-2 rounded-full hover:bg-white/50 transition-colors text-cyan-900">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+<button class="p-2 rounded-full hover:bg-white/50 transition-colors text-cyan-900">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional designer with creative office background in soft focus and blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRzk0WjmlcQJvve_97EXMVz3YV_is1u2zZcqYu3vSuWuUMoWiocM9CYOoVnnAhbgBuGVqefmVh24bS2H3YxLqhPKJE_MSMZOdTBJdtBE2Ugd3895soTrMKCcjhs_70Ac1LO35zQyxexQ522YYskZsR2Bg4bzl7hhSwEpeGL9mM_FRe3X5vHjZNXEbwgcTpU45EIZ99BSVgXBwKYFjFpAL38nl_Z8GyIdeIK7QzJjvnpoNK1hg-ldtqLnPaET6Sc4-u_X6FAW19gGei"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen pt-16">
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-64 py-8 gap-y-6 bg-cyan-50 dark:bg-slate-950 fixed left-0">
+<div class="px-6 flex flex-col gap-1 mb-4">
+<h2 class="text-lg font-black text-cyan-900 dark:text-cyan-50 tracking-tighter">CORTEX</h2>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium text-cyan-600">Design Studio</span>
+</div>
+<nav class="flex flex-col gap-y-1">
+<div class="group flex items-center gap-3 py-2 text-cyan-600 dark:text-slate-500 pl-4 hover:text-cyan-800 transition-transform hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" data-icon="grid_view">grid_view</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Workspace</span>
+</div>
+<div class="group flex items-center gap-3 py-2 text-cyan-600 dark:text-slate-500 pl-4 hover:text-cyan-800 transition-transform hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_open">folder_open</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Projects</span>
+</div>
+<div class="group flex items-center gap-3 py-2 text-cyan-600 dark:text-slate-500 pl-4 hover:text-cyan-800 transition-transform hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" data-icon="subscriptions">subscriptions</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Library</span>
+</div>
+<div class="group flex items-center gap-3 py-2 text-cyan-900 dark:text-white border-r-2 border-cyan-700 dark:border-cyan-400 pl-4">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Notifications</span>
+</div>
+</nav>
+<div class="mt-auto px-6 pb-6 flex flex-col gap-y-4">
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-medium text-xs uppercase tracking-widest shadow-lg shadow-cyan-900/20">
+                    New Project
+                </button>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 text-cyan-600 hover:text-cyan-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="help_outline">help_outline</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Help</span>
+</div>
+<div class="flex items-center gap-3 text-cyan-600 hover:text-cyan-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="archive">archive</span>
+<span class="font-work-sans text-xs uppercase tracking-widest font-medium">Archive</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 md:ml-64 p-8 lg:p-12">
+<div class="max-w-5xl mx-auto">
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-[3.5rem] font-black leading-none tracking-tight text-on-surface mb-4">Activity</h1>
+<p class="text-on-surface-variant max-w-md">Stay updated with the latest workspace movements, peer feedback, and system status.</p>
+</div>
+<div class="flex bg-surface-container-low p-1.5 rounded-xl">
+<button class="px-6 py-2 bg-surface-container-lowest text-primary font-semibold rounded-lg shadow-sm">All</button>
+<button class="px-6 py-2 text-on-surface-variant hover:text-primary transition-colors font-medium">Mentions</button>
+<button class="px-6 py-2 text-on-surface-variant hover:text-primary transition-colors font-medium">System</button>
+<button class="px-6 py-2 text-on-surface-variant hover:text-primary transition-colors font-medium">Alerts</button>
+</div>
+</header>
+<div class="space-y-4">
+<div class="group relative flex items-start gap-6 p-6 bg-surface-container-low rounded-xl hover:bg-surface-container transition-colors duration-300">
+<div class="flex-shrink-0 relative">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-secondary-container">
+<img alt="Team member" class="w-full h-full object-cover" data-alt="Modern professional headshot of a team member in a minimalist architectural studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH9O8DkmebZfIT-0ueYSqeQq37WtPrGiyjrnY1Oeoa8tP8K6ySAA537nVNsUQ7URRbAGcVyvwU5x1NnH9BmC5JFFeSdEGc-n6Y5bFhfX-cfmZ7UeexIRz6ulqW7yp-pbifDOgRJ8D6WL07tbTChJmHav93XzoP0brB92ny5FmMx6CmPgLFZKX1GmApxu2hWzn3pQ41Anui5BhUa7jfs6OcHHiTsDXjjJiT4o2WkaWFhAQjk9IyFBkxiGndkoK_JouB5ZR109md9MS0"/>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-tertiary border-2 border-surface-container-low flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">#Project-Alpha</span>
+<span class="text-label-sm text-on-surface-variant text-[0.6875rem]">2m ago</span>
+</div>
+<h3 class="font-semibold text-lg text-on-surface leading-tight mb-1">Sarah Chen mentioned you in <span class="text-primary font-bold">Design Handoff</span></h3>
+<p class="text-on-surface-variant text-sm italic">"Love the atmospheric clarity here, but can we double check the contrast on the tertiary pulsar?"</p>
+</div>
+<div class="flex flex-col items-end justify-between self-stretch">
+<span class="text-tertiary font-bold text-[10px] uppercase tracking-widest px-2 py-1 bg-tertiary-fixed rounded">Mention</span>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary text-sm font-semibold">Mark as Read</button>
+</div>
+</div>
+<div class="group relative flex items-start gap-6 p-6 bg-surface-container-highest rounded-xl hover:bg-surface-container-high transition-colors duration-300">
+<div class="flex-shrink-0">
+<div class="h-12 w-12 rounded-lg bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined" data-icon="report">report</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container text-[10px] font-bold uppercase tracking-wider">System</span>
+<span class="text-label-sm text-on-surface-variant text-[0.6875rem]">45m ago</span>
+</div>
+<h3 class="font-semibold text-lg text-on-surface leading-tight mb-1">Deployment failed: Production Cluster 7</h3>
+<p class="text-on-surface-variant text-sm">Automated roll-back initiated successfully. Review the stack trace in analytics for details.</p>
+</div>
+<div class="flex flex-col items-end justify-between self-stretch">
+<span class="text-error font-bold text-[10px] uppercase tracking-widest px-2 py-1 bg-error-container rounded">Critical</span>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary text-sm font-semibold">View Logs</button>
+</div>
+</div>
+<div class="group relative flex items-start gap-6 p-6 bg-surface-container-low rounded-xl hover:bg-surface-container transition-colors duration-300">
+<div class="flex-shrink-0">
+<div class="h-12 w-12 rounded-lg bg-primary-fixed-dim flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Workflow</span>
+<span class="text-label-sm text-on-surface-variant text-[0.6875rem]">3h ago</span>
+</div>
+<h3 class="font-semibold text-lg text-on-surface leading-tight mb-1">Rendering Complete: Studio Flythrough</h3>
+<p class="text-on-surface-variant text-sm">The 4K sequence has been finalized and uploaded to the shared library assets folder.</p>
+</div>
+<div class="flex flex-col items-end justify-between self-stretch">
+<span class="text-primary font-bold text-[10px] uppercase tracking-widest px-2 py-1 bg-secondary-container rounded">Success</span>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary text-sm font-semibold">Open File</button>
+</div>
+</div>
+<div class="group relative flex items-start gap-6 p-6 bg-surface-dim opacity-70 rounded-xl hover:bg-surface-container transition-colors duration-300">
+<div class="flex-shrink-0">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-secondary-container">
+<img alt="Team member" class="w-full h-full object-cover grayscale" data-alt="Close up of a creative director in a high-key lighting photography studio with soft teal highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-HYCKgpLYO89aw-FTJVk_y_vqPwZkVVByNf1WzGLF4ivUJCKZkcKz9BEMZTPJE4hAhtCBzMRAPvLlFJmNVmuEKmE27Sm5pzykt_uACEveAGhjJTNBuyg8FD8yYAD1HL5OX110bjWvbXoxNr-OGGgosno82ju7ADwkKC-iUTwRPsx8spTEBI_71VqG6j9olWg-xz1muoauyftUIBWt_d3aaCbKEid6a6Kz_FMDO4k9P8cz2-OrMoQsh4QnzYHE3fwo_-3_qT8irYam"/>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">#Archive</span>
+<span class="text-label-sm text-on-surface-variant text-[0.6875rem]">1d ago</span>
+</div>
+<h3 class="font-semibold text-lg text-on-surface leading-tight mb-1">James Miller approved your request</h3>
+<p class="text-on-surface-variant text-sm">Budget reallocation for Q4 marketing assets has been signed off.</p>
+</div>
+<div class="flex flex-col items-end justify-between self-stretch">
+<span class="text-on-surface-variant font-bold text-[10px] uppercase tracking-widest px-2 py-1 bg-surface-container-high rounded">Archived</span>
+</div>
+</div>
+</div>
+<div class="mt-12 flex justify-center">
+<button class="px-8 py-3 bg-surface-container-lowest text-primary font-semibold rounded-full shadow-sm hover:shadow-md transition-all">
+                        Load More Activity
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<div class="md:hidden fixed bottom-0 w-full z-50 bg-cyan-50/70 backdrop-blur-xl border-t-0 shadow-[0_-4px_12px_rgba(0,100,124,0.05)] flex justify-around items-center py-3">
+<button class="flex flex-col items-center gap-1 text-cyan-600/60">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Workspace</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-cyan-600/60">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Projects</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-cyan-700 font-semibold">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Activity</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-cyan-600/60">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Team</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-cyan-600/60">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#ebfdfe",
+                        "inverse-on-surface": "#e2f4f5",
+                        "on-primary-fixed": "#001f28",
+                        "on-tertiary-fixed-variant": "#6a3b00",
+                        "primary-fixed-dim": "#6cd3f7",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#ccddde",
+                        "surface-container-highest": "#d4e6e7",
+                        "on-primary-fixed-variant": "#004e61",
+                        "surface-variant": "#d4e6e7",
+                        "inverse-primary": "#6cd3f7",
+                        "surface-tint": "#006780",
+                        "on-secondary-fixed": "#001f28",
+                        "surface": "#ebfdfe",
+                        "surface-container": "#dff1f2",
+                        "on-background": "#0e1e1f",
+                        "on-tertiary-container": "#fffbff",
+                        "outline-variant": "#bdc8ce",
+                        "primary-container": "#007f9d",
+                        "on-secondary-container": "#466977",
+                        "inverse-surface": "#233334",
+                        "primary": "#00647c",
+                        "secondary": "#406370",
+                        "on-tertiary-fixed": "#2d1600",
+                        "surface-container-low": "#e5f7f8",
+                        "surface-bright": "#ebfdfe",
+                        "error": "#ba1a1a",
+                        "outline": "#6e797e",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fafdff",
+                        "primary-fixed": "#b7eaff",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#3e484d",
+                        "secondary-fixed": "#c3e8f8",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#ffdcbf",
+                        "secondary-container": "#c3e8f8",
+                        "tertiary-fixed-dim": "#ffb873",
+                        "surface-container-high": "#daeced",
+                        "on-surface": "#0e1e1f",
+                        "on-secondary-fixed-variant": "#284b58",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#a86516",
+                        "tertiary": "#894e00",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a8ccdb"
+                    },
+                    fontFamily: {
+                        "headline": ["Work Sans"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Work Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(212, 230, 231, 0.6);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<!-- Top Navigation Anchor -->
+<nav class="sticky top-0 w-full z-50 bg-cyan-50/80 dark:bg-slate-900/80 backdrop-blur-md shadow-[0_20px_40px_rgba(8,145,178,0.08)] flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-cyan-900 dark:text-cyan-100">CORTHEX</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-cyan-700 dark:text-cyan-300 font-semibold border-b-2 border-cyan-600 px-1 py-1 text-sm tracking-tight transition-all duration-200">Trading</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-cyan-600 px-1 py-1 text-sm tracking-tight transition-all duration-200">Portfolio</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-cyan-600 px-1 py-1 text-sm tracking-tight transition-all duration-200">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-lg group transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm p-0 w-32 placeholder:text-on-surface-variant/60" placeholder="Search markets..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-slate-500 hover:bg-cyan-100/50 rounded-lg transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-slate-500 hover:bg-cyan-100/50 rounded-lg transition-colors"><span class="material-symbols-outlined">settings</span></button>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded font-medium text-sm hover:bg-primary-container transition-colors shadow-sm">Trade</button>
+</div>
+</nav>
+<!-- Side Navigation Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col border-r border-cyan-100/20 dark:border-slate-800/20 bg-cyan-50 dark:bg-slate-950 pt-20 pb-6 hidden md:flex">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">Precision Studio</p>
+<p class="text-xs text-on-surface-variant">Active Trader</p>
+</div>
+</div>
+<nav class="flex-1 px-2">
+<div class="group flex items-center px-4 py-3 mb-1 mx-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-cyan-100/30 dark:hover:bg-slate-800/30 hover:translate-x-1 transition-transform duration-200">
+<span class="material-symbols-outlined mr-3">grid_view</span>
+<span class="font-medium text-sm">Hub</span>
+</div>
+<div class="group flex items-center px-4 py-3 mb-1 mx-2 rounded-lg bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-300 border-l-4 border-cyan-600 shadow-sm hover:translate-x-1 transition-transform duration-200">
+<span class="material-symbols-outlined mr-3">show_chart</span>
+<span class="font-medium text-sm">Trading</span>
+</div>
+<div class="group flex items-center px-4 py-3 mb-1 mx-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-cyan-100/30 dark:hover:bg-slate-800/30 hover:translate-x-1 transition-transform duration-200">
+<span class="material-symbols-outlined mr-3">account_balance_wallet</span>
+<span class="font-medium text-sm">Portfolio</span>
+</div>
+<div class="group flex items-center px-4 py-3 mb-1 mx-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-cyan-100/30 dark:hover:bg-slate-800/30 hover:translate-x-1 transition-transform duration-200">
+<span class="material-symbols-outlined mr-3">query_stats</span>
+<span class="font-medium text-sm">Analytics</span>
+</div>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-secondary-container text-on-secondary-fixed-variant rounded-lg font-semibold text-sm hover:brightness-95 transition-all mb-6">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Order
+            </button>
+<div class="space-y-1">
+<div class="group flex items-center px-4 py-2 mx-2 rounded-lg text-slate-500 text-xs hover:bg-cyan-100/30 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm mr-3">headset_mic</span>
+                    Support
+                </div>
+<div class="group flex items-center px-4 py-2 mx-2 rounded-lg text-slate-500 text-xs hover:bg-red-50 hover:text-error transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm mr-3">logout</span>
+                    Sign Out
+                </div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen p-6 space-y-6">
+<!-- Header & Market Stats -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-2">
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h1 class="text-3xl font-extrabold tracking-tighter text-on-surface">BTC/USDT</h1>
+<span class="px-2 py-0.5 bg-surface-container-highest text-primary font-bold text-xs rounded">PERP</span>
+</div>
+<div class="flex items-center gap-4 text-sm">
+<span class="text-2xl font-mono font-medium text-on-surface">42,842.50</span>
+<span class="text-emerald-600 font-semibold">+2.45%</span>
+</div>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 w-full md:w-auto">
+<div class="flex flex-col bg-surface-container-low px-4 py-2 rounded min-w-[120px]">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">24h High</span>
+<span class="text-sm font-mono font-semibold">43,150.00</span>
+</div>
+<div class="flex flex-col bg-surface-container-low px-4 py-2 rounded min-w-[120px]">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">24h Low</span>
+<span class="text-sm font-mono font-semibold">41,200.00</span>
+</div>
+<div class="flex flex-col bg-surface-container-low px-4 py-2 rounded min-w-[120px]">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">24h Volume</span>
+<span class="text-sm font-mono font-semibold">1.2B USDT</span>
+</div>
+</div>
+</header>
+<!-- Main Layout Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Price Chart Area -->
+<section class="col-span-12 lg:col-span-9 space-y-4">
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_20px_40px_rgba(8,145,178,0.04)] h-[550px] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<div class="flex bg-surface-container rounded p-1">
+<button class="px-3 py-1 text-xs font-bold rounded bg-surface-container-lowest text-primary shadow-sm">1H</button>
+<button class="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">4H</button>
+<button class="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">1D</button>
+<button class="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">1W</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-1 text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">show_chart</span>
+                                Indicators
+                            </button>
+<button class="flex items-center gap-1 text-xs font-medium text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">settings</span>
+                                Tools
+                            </button>
+</div>
+</div>
+<div class="flex-1 relative overflow-hidden rounded-lg group">
+<img class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" data-alt="abstract financial trading candlestick chart on a light cyan clean interface with professional trading indicators and clean UI lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkWgUc-Rwi66Azuv14OlYsTUvq5X9jMJDCCH9KzUISgg4adpNt0YCmtaHWw8YPPTd7sEp6ziZDrZHu7i3hBuDPwpHBjVnfIDmhLuJDutAxDTyLZo1iASJDJZNEqXNxt58Fj2EaRIAqMxL4GiNWpLY4A6b2oR7GLkZYrZ2NP6piIqzgCYdSsr6ABDxTVrPfVNQSBHzsMcsBsACZ20buTd9_TzYhfNmzvPQhtr9yYWGZqgBdJ4evpvWz6UtH1WP8Zxho5gUwjpa12Btw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/40 to-transparent pointer-events-none"></div>
+<!-- Floating Data Tooltip (The Silent Reveal Mockup) -->
+<div class="absolute top-1/2 left-1/3 glass-panel p-3 rounded shadow-xl border border-white/40 hidden md:block">
+<div class="text-[10px] text-primary font-bold mb-1">DEC 14, 14:00</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-1">
+<span class="text-[10px] text-on-surface-variant">O: 42,120.5</span>
+<span class="text-[10px] text-on-surface-variant">H: 42,900.2</span>
+<span class="text-[10px] text-on-surface-variant">L: 41,850.0</span>
+<span class="text-[10px] text-on-surface-variant">C: 42,842.5</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Active Orders & Position History -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(8,145,178,0.04)] overflow-hidden">
+<div class="flex border-b border-outline-variant/15">
+<button class="px-6 py-4 text-xs font-bold text-primary border-b-2 border-primary">Active Positions (2)</button>
+<button class="px-6 py-4 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low transition-colors">Open Orders (4)</button>
+<button class="px-6 py-4 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low transition-colors">History</button>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead class="bg-surface-container-low/50">
+<tr>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Market</th>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Size</th>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Entry</th>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider">Mark Price</th>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider">PNL (ROE%)</th>
+<th class="px-6 py-3 font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-bright transition-colors group relative">
+<td class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></td>
+<td class="px-6 py-4 font-bold">BTC/USDT <span class="text-[10px] text-emerald-600 ml-1">LONG 10x</span></td>
+<td class="px-6 py-4 font-mono">0.45 BTC</td>
+<td class="px-6 py-4 font-mono">41,200.00</td>
+<td class="px-6 py-4 font-mono">42,842.50</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-emerald-600 font-bold">+739.12 USDT</span>
+<span class="text-[10px] text-emerald-600/80">+3.98%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline font-semibold">Close</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group relative">
+<td class="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></td>
+<td class="px-6 py-4 font-bold">ETH/USDT <span class="text-[10px] text-rose-600 ml-1">SHORT 5x</span></td>
+<td class="px-6 py-4 font-mono">12.5 ETH</td>
+<td class="px-6 py-4 font-mono">2,240.50</td>
+<td class="px-6 py-4 font-mono">2,185.20</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-emerald-600 font-bold">+691.25 USDT</span>
+<span class="text-[10px] text-emerald-600/80">+2.46%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline font-semibold">Close</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Right Sidebar: Trading Strategies Panel -->
+<section class="col-span-12 lg:col-span-3 space-y-6">
+<!-- Quick Order Entry (Contextual Addition) -->
+<div class="bg-surface-container-highest rounded-xl p-5 space-y-4">
+<h3 class="text-sm font-bold tracking-tight">Place Order</h3>
+<div class="flex gap-1 p-1 bg-surface-container rounded-lg">
+<button class="flex-1 py-1.5 text-xs font-bold rounded bg-emerald-500 text-white shadow-sm">Buy</button>
+<button class="flex-1 py-1.5 text-xs font-bold text-on-surface-variant hover:bg-rose-100 transition-colors">Sell</button>
+</div>
+<div class="space-y-3">
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Price (USDT)</label>
+<input class="w-full bg-surface-container-high border-none rounded p-2 text-sm font-mono focus:ring-1 focus:ring-primary-fixed" type="text" value="42,842.50"/>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Amount (BTC)</label>
+<input class="w-full bg-surface-container-high border-none rounded p-2 text-sm font-mono focus:ring-1 focus:ring-primary-fixed" placeholder="0.00" type="text"/>
+</div>
+<div class="flex justify-between text-[10px] font-medium text-on-surface-variant">
+<span>Balance: 12,450.00 USDT</span>
+<span class="text-primary cursor-pointer">Max</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary rounded font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20">Execute Market Buy</button>
+</div>
+</div>
+<!-- Trading Strategies Panel -->
+<div class="bg-surface-container-low rounded-xl p-5 space-y-4 border border-outline-variant/10">
+<div class="flex justify-between items-center">
+<h3 class="text-sm font-bold tracking-tight">Trading Bots</h3>
+<span class="material-symbols-outlined text-sm text-on-surface-variant cursor-pointer">info</span>
+</div>
+<div class="space-y-3">
+<!-- Strategy 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg flex flex-col gap-3 shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold">Grid Trend Master</p>
+<p class="text-[10px] text-on-surface-variant">Neutral • High Freq</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex justify-between items-center">
+<div class="text-[10px] font-mono"><span class="text-emerald-600">+12.4%</span> PNL</div>
+<div class="text-[10px] text-on-surface-variant">32 Orders/24h</div>
+</div>
+</div>
+<!-- Strategy 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg flex flex-col gap-3 shadow-sm opacity-70 grayscale-[0.5]">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold">ETH Whale Tracer</p>
+<p class="text-[10px] text-on-surface-variant">Bullish • Long Term</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex justify-between items-center">
+<div class="text-[10px] font-mono"><span class="text-on-surface-variant">--</span></div>
+<div class="text-[10px] text-on-surface-variant italic">Inactive</div>
+</div>
+</div>
+<!-- Strategy 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-lg flex flex-col gap-3 shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold">Mean Reversion AI</p>
+<p class="text-[10px] text-on-surface-variant">Scalp • BTC Focus</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex justify-between items-center">
+<div class="text-[10px] font-mono"><span class="text-rose-600">-0.2%</span> PNL</div>
+<div class="text-[10px] text-on-surface-variant">8 Orders/24h</div>
+</div>
+</div>
+</div>
+<button class="w-full py-2 border-2 border-dashed border-outline-variant/30 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+                        Deploy New Bot
+                    </button>
+</div>
+<!-- Market Sentiment Card -->
+<div class="bg-surface-container-highest/40 rounded-xl p-5">
+<h3 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-on-surface-variant mb-4">Sentiment Index</h3>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden flex mb-2">
+<div class="h-full bg-emerald-500 w-[65%]"></div>
+<div class="h-full bg-rose-500 w-[35%]"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-emerald-600">65% Greed</span>
+<span class="text-[10px] font-bold text-rose-600">35% Fear</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Floating Action Button Anchor (Suppressed based on rules for Details/Transaction focus) -->
+</body></html>
