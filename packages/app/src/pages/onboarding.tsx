@@ -37,10 +37,23 @@ export function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-corthex-bg">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-corthex-text-secondary">로딩 중...</p>
+      <div className="min-h-screen bg-corthex-bg flex items-center justify-center p-4">
+        {/* Background dot grid */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none opacity-10"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, #44403C 1px, transparent 0)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+        <div className="flex flex-col items-center gap-4 z-10">
+          <div className="w-10 h-10 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
+          <div className="text-center">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-corthex-accent mb-1">
+              Mission Initialization
+            </p>
+            <p className="text-sm text-corthex-text-secondary">시스템 상태 확인 중...</p>
+          </div>
         </div>
       </div>
     )
