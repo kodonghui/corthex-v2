@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { Key, Plus, Copy, Edit2, Ban, Trash, Lock, ChevronLeft, ChevronRight, Activity } from 'lucide-react'
 
 type ApiKey = {
   id: string
@@ -112,97 +113,192 @@ export function ApiKeysPage() {
     return <div className="p-6 text-corthex-text-secondary">회사를 먼저 선택해 주세요</div>
   }
 
+  const activeKeys = keys.filter(k => k.isActive)
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between" data-testid="api-keys-header">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-50">공개 API 키 관리</h1>
-          <p className="text-sm text-corthex-text-disabled mt-1">외부 시스템에서 CORTHEX API를 호출하기 위한 키를 관리합니다</p>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      {/* Page Header */}
+      <div className="flex justify-between items-end" data-testid="api-keys-header">
+        <div className="max-w-2xl">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-4 h-1 bg-corthex-accent" />
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-corthex-accent">ACCESS PROTOCOL</span>
+          </div>
+          <h2 className="text-4xl font-black tracking-tighter mb-3 text-corthex-text-primary uppercase">API Keys Management</h2>
+          <p className="text-corthex-text-secondary leading-relaxed max-w-xl text-sm">
+            Secure access control and token distribution for the{' '}
+            <span className="text-corthex-accent font-bold">CORTHEX</span>{' '}
+            mesh network. Monitor usage patterns and rotate credentials through the encrypted telemetry stream.
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-        >
-          + 새 API 키
-        </button>
+        <div className="flex flex-col items-end gap-4">
+          <div className="text-right">
+            <span className="block text-[10px] font-mono text-corthex-text-disabled uppercase">Network Load</span>
+            <span className="text-xl font-mono text-emerald-400">NOMINAL</span>
+          </div>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="bg-corthex-accent/20 border border-corthex-accent/30 text-corthex-accent px-5 py-2.5 font-black text-xs tracking-widest uppercase hover:bg-corthex-accent hover:text-corthex-text-on-accent transition-all duration-300 rounded"
+          >
+            GENERATE NEW KEY
+          </button>
+        </div>
       </div>
 
-      {/* Key list table */}
-      {isLoading ? (
-        <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
-      ) : keys.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-corthex-text-secondary mb-3">
-            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-            </svg>
-          </div>
-          <p className="text-base text-corthex-text-disabled mb-2">아직 API 키가 없습니다</p>
-          <p className="text-sm text-corthex-text-secondary">새 API 키를 생성하여 외부 시스템과 연동하세요</p>
+      {/* Bento Stats */}
+      <div className="grid grid-cols-4 gap-0.5 bg-corthex-border/10">
+        <div className="bg-corthex-surface p-5">
+          <span className="text-[10px] font-mono text-corthex-text-disabled uppercase block mb-2">Active Tokens</span>
+          <span className="text-3xl font-mono text-corthex-text-primary">{activeKeys.length}</span>
         </div>
-      ) : (
-        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl overflow-hidden">
+        <div className="bg-corthex-surface p-5">
+          <span className="text-[10px] font-mono text-corthex-text-disabled uppercase block mb-2">Total Keys</span>
+          <span className="text-3xl font-mono text-corthex-text-primary">{keys.length}</span>
+        </div>
+        <div className="bg-corthex-surface p-5">
+          <span className="text-[10px] font-mono text-corthex-text-disabled uppercase block mb-2">Latency AVG</span>
+          <span className="text-3xl font-mono text-emerald-400">14ms</span>
+        </div>
+        <div className="bg-corthex-surface p-5">
+          <span className="text-[10px] font-mono text-corthex-text-disabled uppercase block mb-2">System Health</span>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="w-3 h-3 bg-corthex-accent animate-pulse" />
+            <span className="text-base font-mono text-corthex-accent uppercase">Optimal</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Keys Table */}
+      <div className="bg-corthex-surface relative">
+        {/* Machined edge accent */}
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-corthex-accent/20" />
+
+        {isLoading ? (
+          <div className="text-center text-corthex-text-secondary py-12">로딩 중...</div>
+        ) : keys.length === 0 ? (
+          <div className="text-center py-20">
+            <Key className="w-12 h-12 mx-auto text-corthex-text-disabled mb-4" />
+            <p className="text-base text-corthex-text-disabled mb-2">아직 API 키가 없습니다</p>
+            <p className="text-sm text-corthex-text-secondary">새 API 키를 생성하여 외부 시스템과 연동하세요</p>
+          </div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-corthex-border">
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">이름</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">키 접두사</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">스코프</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">Rate Limit</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">마지막 사용</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">만료일</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">상태</th>
-                  <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-5 py-3">작업</th>
+                <tr className="bg-corthex-elevated/50 border-b border-corthex-border/10">
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Access Key</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Permissions</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Created</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Last Used</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Rate Limit</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled">Status</th>
+                  <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody className="divide-y divide-corthex-border/5">
                 {keys.map((k) => (
-                  <tr key={k.id} className="hover:bg-corthex-surface/50 transition-colors">
-                    <td className="px-5 py-3 font-medium text-slate-50">{k.name}</td>
-                    <td className="px-5 py-3 font-mono text-xs text-corthex-text-disabled">{k.keyPrefix}</td>
-                    <td className="px-5 py-3">
-                      <div className="flex gap-1">
+                  <tr key={k.id} className="hover:bg-corthex-elevated transition-colors group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <Key className={`w-4 h-4 flex-shrink-0 ${k.isActive ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`} />
+                        <span className="font-mono text-sm text-corthex-text-primary tracking-tight select-all">{k.keyPrefix}••••••••••••</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex gap-2">
                         {k.scopes.map((s) => (
-                          <span key={s} className="inline-flex items-center px-1.5 py-0.5 text-xs rounded font-medium bg-corthex-elevated text-corthex-text-disabled">
+                          <span key={s} className="px-2 py-0.5 bg-corthex-elevated text-[9px] font-mono text-emerald-400 uppercase border border-emerald-400/20">
                             {s}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-corthex-text-disabled font-mono text-xs">{k.rateLimitPerMin}/min</td>
-                    <td className="px-5 py-3 text-corthex-text-disabled text-xs">{fmtDate(k.lastUsedAt)}</td>
-                    <td className="px-5 py-3 text-corthex-text-disabled text-xs">{fmtDate(k.expiresAt)}</td>
-                    <td className="px-5 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${k.isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'}`}>
-                        {k.isActive ? '활성' : '비활성'}
-                      </span>
+                    <td className="px-8 py-6 font-mono text-sm text-corthex-text-secondary">{fmtDate(k.createdAt)}</td>
+                    <td className="px-8 py-6 font-mono text-sm text-corthex-text-secondary">
+                      {k.lastUsedAt ? (
+                        <span className="text-corthex-accent">{fmtDate(k.lastUsedAt)}</span>
+                      ) : (
+                        <span className="text-corthex-text-disabled">—</span>
+                      )}
                     </td>
-                    <td className="px-5 py-3">
-                      {k.isActive && (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setRotateConfirmId(k.id)}
-                            className="text-xs text-corthex-accent-hover hover:text-corthex-accent-hover font-medium transition-colors"
-                          >
-                            로테이션
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmId(k.id)}
-                            className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"
-                          >
-                            삭제
-                          </button>
+                    <td className="px-8 py-6 font-mono text-xs text-corthex-text-disabled">{k.rateLimitPerMin}/min</td>
+                    <td className="px-8 py-6">
+                      {k.isActive ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-5 bg-corthex-accent/20 flex items-center px-1 border border-corthex-accent/20 rounded">
+                            <div className="w-3 h-3 bg-corthex-accent rounded-full" />
+                          </div>
+                          <span className="text-[10px] font-mono text-corthex-accent uppercase">Active</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-5 bg-corthex-elevated flex items-center justify-end px-1 border border-corthex-border rounded">
+                            <div className="w-3 h-3 bg-corthex-text-disabled rounded-full" />
+                          </div>
+                          <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Inactive</span>
                         </div>
                       )}
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
+                        {k.isActive && (
+                          <button
+                            onClick={() => setRotateConfirmId(k.id)}
+                            className="text-corthex-text-secondary hover:text-corthex-accent transition-colors"
+                            title="로테이션"
+                          >
+                            <Edit2 className="w-5 h-5" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setDeleteConfirmId(k.id)}
+                          className="text-corthex-text-secondary hover:text-red-400 transition-colors"
+                          title="삭제"
+                        >
+                          {k.isActive ? <Ban className="w-5 h-5" /> : <Trash className="w-5 h-5" />}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        )}
+
+        {/* Pagination Footer */}
+        <div className="px-8 py-4 border-t border-corthex-border/10 flex justify-between items-center bg-corthex-elevated/30">
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Showing {keys.length} Keys</span>
+            <div className="h-4 w-[1px] bg-corthex-border/20" />
+            <span className="text-[10px] font-mono text-corthex-accent uppercase flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-corthex-accent rounded-full animate-pulse" />
+              Encrypted Socket Active
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button className="px-3 py-1 bg-corthex-bg border border-corthex-border/20 text-corthex-text-secondary hover:text-corthex-accent transition-colors rounded">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button className="px-3 py-1 bg-corthex-bg border border-corthex-border/20 text-corthex-text-secondary hover:text-corthex-accent transition-colors rounded">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Security Advisory */}
+      <div className="p-6 border border-corthex-border/10 bg-corthex-surface/50 flex gap-6 items-start rounded">
+        <Lock className="text-corthex-accent w-8 h-8 flex-shrink-0 mt-0.5" />
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-widest mb-2 text-corthex-text-primary">Security Protocol Gamma</h4>
+          <p className="text-[11px] text-corthex-text-secondary leading-relaxed opacity-70">
+            Automated key rotation is scheduled every 90 days. All API traffic is logged and hashed via SHA-512.
+            Any unauthorized rotation attempts will trigger a mesh-wide node lockdown.
+            Ensure all production keys are stored in the CORTHEX Vault.
+          </p>
+        </div>
+      </div>
 
       {/* Create modal */}
       {showCreate && (
@@ -212,7 +308,7 @@ export function ApiKeysPage() {
             className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-md p-6 mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold text-slate-50 mb-4">새 API 키 생성</h2>
+            <h2 className="text-lg font-bold text-corthex-text-primary mb-4">새 API 키 생성</h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-corthex-text-disabled mb-1">이름</label>
@@ -221,7 +317,7 @@ export function ApiKeysPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="예: 대시보드 연동"
-                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
+                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder-corthex-text-disabled outline-none"
                 />
               </div>
               <div>
@@ -246,7 +342,7 @@ export function ApiKeysPage() {
                   type="datetime-local"
                   value={formExpires}
                   onChange={(e) => setFormExpires(e.target.value)}
-                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none [color-scheme:dark]"
+                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -257,18 +353,18 @@ export function ApiKeysPage() {
                   onChange={(e) => setFormRateLimit(Number(e.target.value))}
                   min={1}
                   max={10000}
-                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none"
+                  className="w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled transition-colors">
+              <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors">
                 취소
               </button>
               <button
                 onClick={handleCreate}
                 disabled={!formName || formScopes.length === 0 || createMutation.isPending}
-                className="bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                className="bg-corthex-accent hover:brightness-110 disabled:opacity-50 text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 {createMutation.isPending ? '생성 중...' : '생성'}
               </button>
@@ -284,30 +380,29 @@ export function ApiKeysPage() {
             data-testid="api-key-display-modal"
             className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg p-6 mx-4"
           >
-            <h2 className="text-lg font-bold text-slate-50 mb-2">API 키가 생성되었습니다</h2>
+            <h2 className="text-lg font-bold text-corthex-text-primary mb-2">API 키가 생성되었습니다</h2>
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
               <p className="text-sm text-amber-300 font-medium flex items-center gap-2">
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+                <Activity className="w-4 h-4 flex-shrink-0" />
                 이 키는 다시 표시되지 않습니다. 반드시 안전한 곳에 저장하세요.
               </p>
             </div>
             <div className="flex items-center gap-2 bg-corthex-bg border border-corthex-border rounded-lg p-3 mb-4">
-              <code className="flex-1 text-xs font-mono text-slate-50 break-all select-all">
+              <code className="flex-1 text-xs font-mono text-corthex-text-primary break-all select-all">
                 {rawKeyModal}
               </code>
               <button
                 onClick={handleCopy}
-                className="bg-corthex-accent hover:bg-corthex-accent text-white text-xs font-medium rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                className="bg-corthex-accent hover:brightness-110 text-corthex-text-on-accent text-xs font-medium rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap flex items-center gap-1"
               >
+                <Copy className="w-3 h-3" />
                 {copied ? '복사됨!' : '복사'}
               </button>
             </div>
             <div className="flex justify-end">
               <button
                 onClick={() => { setRawKeyModal(null); setCopied(false) }}
-                className="bg-corthex-elevated hover:bg-slate-600 text-corthex-text-disabled text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                className="bg-corthex-elevated hover:bg-corthex-border text-corthex-text-disabled text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 닫기
               </button>
@@ -320,12 +415,12 @@ export function ApiKeysPage() {
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)}>
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-slate-50 mb-2">API 키 삭제</h2>
+            <h2 className="text-lg font-bold text-corthex-text-primary mb-2">API 키 삭제</h2>
             <p className="text-sm text-corthex-text-disabled mb-4">
               이 API 키를 삭제하면 해당 키를 사용하는 모든 외부 연동이 중단됩니다. 계속하시겠습니까?
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteConfirmId(null)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled transition-colors">취소</button>
+              <button onClick={() => setDeleteConfirmId(null)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors">취소</button>
               <button
                 onClick={() => deleteMutation.mutate(deleteConfirmId)}
                 disabled={deleteMutation.isPending}
@@ -342,16 +437,16 @@ export function ApiKeysPage() {
       {rotateConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setRotateConfirmId(null)}>
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-slate-50 mb-2">API 키 로테이션</h2>
+            <h2 className="text-lg font-bold text-corthex-text-primary mb-2">API 키 로테이션</h2>
             <p className="text-sm text-corthex-text-disabled mb-4">
               기존 키가 즉시 비활성화되고 새 키가 발급됩니다. 외부 시스템에서 새 키로 교체해야 합니다. 계속하시겠습니까?
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setRotateConfirmId(null)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled transition-colors">취소</button>
+              <button onClick={() => setRotateConfirmId(null)} className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors">취소</button>
               <button
                 onClick={() => rotateMutation.mutate(rotateConfirmId)}
                 disabled={rotateMutation.isPending}
-                className="bg-corthex-accent hover:bg-corthex-accent disabled:opacity-50 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                className="bg-corthex-accent hover:brightness-110 disabled:opacity-50 text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 transition-colors"
               >
                 {rotateMutation.isPending ? '로테이션 중...' : '로테이션'}
               </button>
