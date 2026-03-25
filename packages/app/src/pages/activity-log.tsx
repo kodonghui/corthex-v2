@@ -179,7 +179,7 @@ const SCORE_LABELS: Record<string, string> = {
 const SEVERITY_STYLES: Record<string, { bg: string; text: string }> = {
   critical: { bg: 'rgba(220,38,38,0.12)', text: '#dc2626' },
   major: { bg: 'rgba(180,83,9,0.12)', text: '#b45309' },
-  minor: { bg: 'rgba(117,110,90,0.15)', text: '#756e5a' },
+  minor: { bg: 'rgba(117,110,90,0.15)', text: 'var(--color-corthex-text-secondary)' },
 }
 
 const RESULT_STYLES: Record<string, { bg: string; text: string }> = {
@@ -242,7 +242,7 @@ function scoreColor(pct: number): string {
 // === Status Badge ===
 
 function StatusBadgeEl({ status }: { status: string }) {
-  const info = STATUS_BADGE[status] || { label: status, dotColor: '#756e5a', bgColor: 'rgba(117,110,90,0.1)', textColor: '#756e5a', borderColor: 'rgba(117,110,90,0.2)' }
+  const info = STATUS_BADGE[status] || { label: status, dotColor: 'var(--color-corthex-text-secondary)', bgColor: 'rgba(117,110,90,0.1)', textColor: 'var(--color-corthex-text-secondary)', borderColor: 'rgba(117,110,90,0.2)' }
   return (
     <span
       className="text-xs font-bold px-2 py-0.5 rounded uppercase tracking-tighter"
@@ -260,7 +260,7 @@ function phaseDotColor(phase: string): string {
   if (['failed', 'error'].includes(phase)) return '#dc2626'
   if (['working', 'start', 'running'].includes(phase)) return '#2563eb'
   if (phase === 'warning') return '#b45309'
-  return '#756e5a'
+  return 'var(--color-corthex-text-secondary)'
 }
 
 // === Main Page ===
@@ -364,11 +364,11 @@ export function ActivityLogPage() {
               <WsStatusIndicator />
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4" style={{ color: '#756e5a' }} />
+                  <Search className="h-4 w-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
                 </span>
                 <input
                   className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-corthex-accent w-64 transition-all"
-                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
+                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
                   placeholder="Search events..."
                   type="text"
                   value={searchInput}
@@ -382,7 +382,7 @@ export function ActivityLogPage() {
                   value={toolNameFilter}
                   onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
                   className="py-2 px-3 border rounded-lg text-sm w-40 transition-colors focus:ring-1 focus:ring-corthex-accent"
-                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
+                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
                   data-testid="tool-name-filter"
                 />
               )}
@@ -391,7 +391,7 @@ export function ActivityLogPage() {
                   value={conclusionFilter}
                   onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
                   className="py-2 px-3 border rounded-lg text-sm"
-                  style={{ backgroundColor: '#faf8f5', borderColor: '#908a78', color: '#1a1a1a' }}
+                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
                   data-testid="conclusion-filter"
                 >
                   <option value="">All</option>
@@ -401,26 +401,26 @@ export function ActivityLogPage() {
               )}
               <button
                 className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-corthex-elevated"
-                style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3', color: '#6b705c' }}
+                style={{ backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
                 Filters
               </button>
-              <button className="p-2 rounded-lg transition-colors hover:bg-corthex-accent-deep" style={{ backgroundColor: '#606C38', color: '#ffffff' }}>
+              <button className="p-2 rounded-lg transition-colors hover:bg-corthex-accent-deep" style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
             </div>
           </div>
           {/* Navigation Tabs */}
-          <div className="flex border-b mt-8 gap-8" style={{ borderColor: '#e5e1d3' }} data-purpose="content-tabs">
+          <div className="flex border-b mt-8 gap-8" style={{ borderColor: 'var(--color-corthex-border)' }} data-purpose="content-tabs">
             {TAB_ITEMS.map(item => (
               <button
                 key={item.value}
                 onClick={() => setTab(item.value)}
                 className="pb-3 text-sm transition-colors"
                 style={tab === item.value
-                  ? { fontWeight: 600, borderBottom: '2px solid #606C38', color: '#1a1a1a' }
-                  : { fontWeight: 500, color: '#6b705c', borderBottom: '2px solid transparent' }
+                  ? { fontWeight: 600, borderBottom: '2px solid #606C38', color: 'var(--color-corthex-text-primary)' }
+                  : { fontWeight: 500, color: 'var(--color-corthex-text-secondary)', borderBottom: '2px solid transparent' }
                 }
                 data-testid={`tab-${item.value}`}
               >
@@ -454,7 +454,7 @@ export function ActivityLogPage() {
           <div className="mx-8 mb-4 p-3 rounded-b-lg" style={{ backgroundColor: 'rgba(220,38,38,0.03)', border: '1px solid rgba(220,38,38,0.15)' }} data-testid="security-alerts-detail">
             <table className="w-full text-xs">
               <thead>
-                <tr style={{ color: '#6b705c', borderBottom: '1px solid rgba(220,38,38,0.15)' }}>
+                <tr style={{ color: 'var(--color-corthex-text-secondary)', borderBottom: '1px solid rgba(220,38,38,0.15)' }}>
                   <th className="text-left py-1 pr-2 font-medium">시간</th>
                   <th className="text-left py-1 pr-2 font-medium">유형</th>
                   <th className="text-left py-1 pr-2 font-medium">심각도</th>
@@ -467,7 +467,7 @@ export function ActivityLogPage() {
                   const sevStyle = SEVERITY_STYLES[(meta?.severity as string) || 'major'] || SEVERITY_STYLES.major
                   return (
                     <tr key={alert.id} style={{ borderBottom: '1px solid rgba(220,38,38,0.08)' }}>
-                      <td className="py-1.5 pr-2 whitespace-nowrap font-mono" style={{ color: '#756e5a' }}>{formatTime(alert.createdAt)}</td>
+                      <td className="py-1.5 pr-2 whitespace-nowrap font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(alert.createdAt)}</td>
                       <td className="py-1.5 pr-2">
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: '#dc2626' }}>
                           {SECURITY_ACTION_LABELS[alert.action] || alert.action}
@@ -478,7 +478,7 @@ export function ActivityLogPage() {
                           {(meta?.severity as string) || 'major'}
                         </span>
                       </td>
-                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: '#756e5a' }}>
+                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                         {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
                       </td>
                     </tr>
@@ -494,14 +494,14 @@ export function ActivityLogPage() {
           {activeQuery.isLoading ? (
             <div className="max-w-5xl mx-auto space-y-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: '#f5f0e8' }} />
+                <div key={i} className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
               ))}
             </div>
           ) : !activeQuery.data?.data?.items?.length ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
-              <FileText className="w-10 h-10 mb-4" style={{ color: '#756e5a' }} />
-              <h3 className="text-base font-medium mb-2" style={{ color: '#1a1a1a' }}>데이터가 없습니다</h3>
-              <p className="text-sm" style={{ color: '#6b705c' }}>선택한 기간에 해당하는 기록이 없습니다</p>
+              <FileText className="w-10 h-10 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
+              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-primary)' }}>데이터가 없습니다</h3>
+              <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>선택한 기간에 해당하는 기록이 없습니다</p>
             </div>
           ) : (
             <div className="max-w-5xl mx-auto space-y-12">
@@ -528,8 +528,8 @@ export function ActivityLogPage() {
 
         {/* Footer Pagination */}
         {totalCount > 0 && (
-          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: '#f5f0e8', borderColor: '#e5e1d3' }} data-purpose="list-pagination">
-            <span className="text-xs font-medium" style={{ color: '#6b705c' }}>
+          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)' }} data-purpose="list-pagination">
+            <span className="text-xs font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>
               Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} activities
             </span>
             <div className="flex gap-1">
@@ -537,7 +537,7 @@ export function ActivityLogPage() {
                 className="p-1 rounded disabled:opacity-30"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
-                style={{ color: '#6b705c' }}
+                style={{ color: 'var(--color-corthex-text-secondary)' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
@@ -547,8 +547,8 @@ export function ActivityLogPage() {
                   onClick={() => setPage(p)}
                   className="w-6 h-6 flex items-center justify-center text-xs font-medium rounded transition-colors"
                   style={page === p
-                    ? { backgroundColor: '#606C38', color: '#ffffff', fontWeight: 700 }
-                    : { color: '#6b705c' }
+                    ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)', fontWeight: 700 }
+                    : { color: 'var(--color-corthex-text-secondary)' }
                   }
                 >
                   {p}
@@ -558,7 +558,7 @@ export function ActivityLogPage() {
                 className="p-1 rounded disabled:opacity-30"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                style={{ color: '#6b705c' }}
+                style={{ color: 'var(--color-corthex-text-secondary)' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               </button>
@@ -589,8 +589,8 @@ function TimelineView({ items }: { items: AgentActivity[] }) {
       {Object.entries(grouped).map(([date, dateItems]) => (
         <div key={date} className="relative" style={{ paddingLeft: '10px' }}>
           {/* Timeline line */}
-          <div className="absolute" style={{ left: '19px', top: 0, bottom: 0, width: '1px', backgroundColor: '#e5e1d3' }} />
-          <h3 className="sticky top-0 py-2 text-xs font-bold uppercase tracking-widest mb-6 z-10" style={{ backgroundColor: '#faf8f5', color: '#756e5a' }}>
+          <div className="absolute" style={{ left: '19px', top: 0, bottom: 0, width: '1px', backgroundColor: 'var(--color-corthex-border)' }} />
+          <h3 className="sticky top-0 py-2 text-xs font-bold uppercase tracking-widest mb-6 z-10" style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-secondary)' }}>
             {date}
           </h3>
           <div className="space-y-6">
@@ -610,19 +610,19 @@ function TimelineView({ items }: { items: AgentActivity[] }) {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <StatusBadgeEl status={item.phase} />
-                      <span className="text-xs font-medium font-mono" style={{ color: '#756e5a' }}>
+                      <span className="text-xs font-medium font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                         {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono" style={{ color: '#756e5a' }}>ID: {item.id.slice(0, 8)}</span>
+                    <span className="text-[10px] font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>ID: {item.id.slice(0, 8)}</span>
                   </div>
-                  <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>
                     {item.action}
                     {item.detail && (
-                      <span style={{ color: '#6b705c', fontWeight: 400 }}> - {item.detail}</span>
+                      <span style={{ color: 'var(--color-corthex-text-secondary)', fontWeight: 400 }}> - {item.detail}</span>
                     )}
                   </p>
-                  <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: '#6b705c' }}>
+                  <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                     {item.agentName && (
                       <span className="flex items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
@@ -663,23 +663,23 @@ function DelegationTimeline({ items }: { items: Delegation[] }) {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <StatusBadgeEl status={item.status} />
-                  <span className="text-xs font-medium font-mono" style={{ color: '#756e5a' }}>
+                  <span className="text-xs font-medium font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                     {new Date(item.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono" style={{ color: '#756e5a' }}>ID: {item.id.slice(0, 8)}</span>
+                <span className="text-[10px] font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>ID: {item.id.slice(0, 8)}</span>
               </div>
-              <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
-                Delegation from <span style={{ textDecoration: 'underline', textDecorationColor: '#e5e1d3' }}>{item.agentName || 'System'}</span>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>
+                Delegation from <span style={{ textDecoration: 'underline', textDecorationColor: 'var(--color-corthex-border)' }}>{item.agentName || 'System'}</span>
                 {' '}to {(meta?.toAgentName as string) || '-'}
               </p>
               {item.input && (
-                <p className="mt-2 text-xs leading-relaxed" style={{ color: '#6b705c' }}>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                   {String(item.input).slice(0, 120)}
                 </p>
               )}
               {item.durationMs != null && (
-                <div className="mt-2 text-xs font-mono" style={{ color: '#6b705c' }}>
+                <div className="mt-2 text-xs font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                   Duration: {formatDuration(item.durationMs)}
                 </div>
               )}
@@ -706,7 +706,7 @@ function QualityTable({
     <div className="overflow-x-auto" data-testid="quality-table">
       <table className="w-full text-sm min-w-[560px]">
         <thead>
-          <tr className="text-xs border-b" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
+          <tr className="text-xs border-b" style={{ color: 'var(--color-corthex-text-secondary)', borderColor: 'var(--color-corthex-border)' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">명령</th>
             <th className="text-left py-2 pr-3 font-medium">검수 점수</th>
@@ -731,22 +731,22 @@ function QualityTable({
                     aria-expanded={expandedId === item.id}
                     style={{ borderBottom: '1px solid #e5e1d3' }}
                   >
-                    <div className="py-2.5 pr-3 text-xs whitespace-nowrap min-w-[90px] font-mono" style={{ color: '#756e5a' }}>{formatTime(item.createdAt)}</div>
-                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1" style={{ color: '#1a1a1a' }}>{item.commandText || '-'}</div>
+                    <div className="py-2.5 pr-3 text-xs whitespace-nowrap min-w-[90px] font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(item.createdAt)}</div>
+                    <div className="py-2.5 pr-3 text-xs truncate max-w-[200px] flex-1" style={{ color: 'var(--color-corthex-text-primary)' }}>{item.commandText || '-'}</div>
                     <div className="py-2.5 pr-3 min-w-[120px]">
                       {pct != null ? (
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
+                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-border)' }}>
                             <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: scoreColor(pct) }} />
                           </div>
                           <span className="text-xs font-bold" style={{ color: scoreColor(pct) }}>{pct}%</span>
                         </div>
                       ) : (
-                        <span className="text-xs" style={{ color: '#756e5a' }}>-</span>
+                        <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>-</span>
                       )}
                     </div>
                     <div className="py-2.5 pr-3 min-w-[60px]"><StatusBadgeEl status={item.conclusion} /></div>
-                    <div className="py-2.5 text-xs text-right min-w-[50px] font-mono" style={{ color: '#6b705c' }}>{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
+                    <div className="py-2.5 text-xs text-right min-w-[50px] font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{item.attemptNumber > 1 ? item.attemptNumber - 1 : 0}</div>
                   </div>
 
                   {expandedId === item.id && scores && (
@@ -770,8 +770,8 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
   const hasHallucination = scores.hallucinationReport != null
 
   return (
-    <div className="border-b" style={{ backgroundColor: 'rgba(245,240,232,0.5)', borderColor: '#e5e1d3' }} data-testid="qa-detail-panel">
-      <div className="px-4 pt-2 flex gap-1 border-b" style={{ borderColor: '#e5e1d3' }}>
+    <div className="border-b" style={{ backgroundColor: 'rgba(245,240,232,0.5)', borderColor: 'var(--color-corthex-border)' }} data-testid="qa-detail-panel">
+      <div className="px-4 pt-2 flex gap-1 border-b" style={{ borderColor: 'var(--color-corthex-border)' }}>
         <DetailTabButton active={detailTab === 'rules'} onClick={() => setDetailTab('rules')}>
           규칙별 결과
         </DetailTabButton>
@@ -799,7 +799,7 @@ function QualityDetailPanel({ scores, feedback }: { scores: MergedScores; feedba
 
       {feedback && (
         <div className="px-4 pb-3">
-          <p className="text-[11px] whitespace-pre-wrap border-t pt-2" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
+          <p className="text-[11px] whitespace-pre-wrap border-t pt-2" style={{ color: 'var(--color-corthex-text-secondary)', borderColor: 'var(--color-corthex-border)' }}>
             {feedback}
           </p>
         </div>
@@ -814,8 +814,8 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
       onClick={onClick}
       className="px-3 py-1.5 text-[11px] font-medium rounded-t border-b-2 transition-colors"
       style={active
-        ? { borderColor: '#606C38', color: '#1a1a1a', backgroundColor: '#f5f0e8' }
-        : { borderColor: 'transparent', color: '#6b705c' }
+        ? { borderColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-primary)', backgroundColor: 'var(--color-corthex-elevated)' }
+        : { borderColor: 'transparent', color: 'var(--color-corthex-text-secondary)' }
       }
     >
       {children}
@@ -827,7 +827,7 @@ function DetailTabButton({ active, onClick, children }: { active: boolean; onCli
 
 function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
   if (ruleResults.length === 0) {
-    return <p className="text-xs" style={{ color: '#6b705c' }}>규칙별 검수 데이터가 없습니다.</p>
+    return <p className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>규칙별 검수 데이터가 없습니다.</p>
   }
 
   const grouped = ruleResults.reduce<Record<string, RuleResult[]>>((acc, r) => {
@@ -841,7 +841,7 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
     <div className="space-y-3">
       {Object.entries(grouped).map(([category, rules]) => (
         <div key={category}>
-          <h4 className="text-[11px] font-semibold mb-1.5" style={{ color: '#6b705c' }}>
+          <h4 className="text-[11px] font-semibold mb-1.5" style={{ color: 'var(--color-corthex-text-secondary)' }}>
             {CATEGORY_LABELS[category] || category}
           </h4>
           <div className="space-y-1">
@@ -857,12 +857,12 @@ function RuleResultsPanel({ ruleResults }: { ruleResults: RuleResult[] }) {
                     {rule.result === 'pass' ? 'PASS' : rule.result === 'warn' ? 'WARN' : 'FAIL'}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{rule.ruleName}</span>
+                    <span className="text-xs font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>{rule.ruleName}</span>
                     {rule.message && (
-                      <p className="text-[10px] mt-0.5 truncate" style={{ color: '#6b705c' }}>{rule.message}</p>
+                      <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--color-corthex-text-secondary)' }}>{rule.message}</p>
                     )}
                   </div>
-                  {rule.skipped && <span className="text-[10px] italic shrink-0" style={{ color: '#6b705c' }}>건너뜀</span>}
+                  {rule.skipped && <span className="text-[10px] italic shrink-0" style={{ color: 'var(--color-corthex-text-secondary)' }}>건너뜀</span>}
                 </div>
               )
             })}
@@ -882,11 +882,11 @@ function RubricPanel({ rubricScores }: { rubricScores: RubricScore[] }) {
         <div key={item.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(245,240,232,0.5)' }}>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{item.label}</span>
-              <span className="text-[10px]" style={{ color: '#6b705c' }}>(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
+              <span className="text-xs font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>{item.label}</span>
+              <span className="text-[10px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>(가중치 {item.weight}%{item.critical ? ', 필수' : ''})</span>
             </div>
             {item.feedback && (
-              <p className="text-[10px] mt-0.5 truncate" style={{ color: '#6b705c' }}>{item.feedback}</p>
+              <p className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--color-corthex-text-secondary)' }}>{item.feedback}</p>
             )}
           </div>
           <span className="text-sm font-bold" style={{ color: item.score >= 4 ? '#4d7c0f' : item.score >= 3 ? '#b45309' : '#dc2626' }}>
@@ -908,16 +908,16 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       <div className="flex items-center gap-3 flex-wrap">
         <StatusBadgeEl status={report.verdict} />
         <div className="flex gap-4 text-xs">
-          <span style={{ color: '#6b705c' }}>총 주장: <span className="font-medium" style={{ color: '#1a1a1a' }}>{report.totalClaims}</span></span>
-          <span style={{ color: '#6b705c' }}>검증: <span className="font-medium" style={{ color: '#10b981' }}>{report.verifiedClaims}</span></span>
-          <span style={{ color: '#6b705c' }}>불일치: <span className="font-medium" style={{ color: '#ef4444' }}>{report.mismatchedClaims}</span></span>
-          <span style={{ color: '#6b705c' }}>미확인: <span className="font-medium" style={{ color: '#f59e0b' }}>{report.unsourcedCount}</span></span>
+          <span style={{ color: 'var(--color-corthex-text-secondary)' }}>총 주장: <span className="font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>{report.totalClaims}</span></span>
+          <span style={{ color: 'var(--color-corthex-text-secondary)' }}>검증: <span className="font-medium" style={{ color: '#10b981' }}>{report.verifiedClaims}</span></span>
+          <span style={{ color: 'var(--color-corthex-text-secondary)' }}>불일치: <span className="font-medium" style={{ color: '#ef4444' }}>{report.mismatchedClaims}</span></span>
+          <span style={{ color: 'var(--color-corthex-text-secondary)' }}>미확인: <span className="font-medium" style={{ color: '#f59e0b' }}>{report.unsourcedCount}</span></span>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[10px] w-16" style={{ color: '#6b705c' }}>환각 점수</span>
-        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
+        <span className="text-[10px] w-16" style={{ color: 'var(--color-corthex-text-secondary)' }}>환각 점수</span>
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-border)' }}>
           <div
             className="h-full rounded-full"
             style={{ width: `${Math.round(report.score * 100)}%`, backgroundColor: scoreColor(Math.round(report.score * 100)) }}
@@ -929,15 +929,15 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
       </div>
 
       {report.details && (
-        <p className="text-[10px]" style={{ color: '#6b705c' }}>{report.details}</p>
+        <p className="text-[10px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>{report.details}</p>
       )}
 
       {report.claims.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-medium" style={{ color: '#6b705c' }}>주장별 검증 결과</span>
+            <span className="text-[10px] font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>주장별 검증 결과</span>
             {report.claims.length > 5 && (
-              <button onClick={() => setShowAll(!showAll)} className="text-[10px]" style={{ color: '#1a1a1a', textDecoration: 'underline' }}>
+              <button onClick={() => setShowAll(!showAll)} className="text-[10px]" style={{ color: 'var(--color-corthex-text-primary)', textDecoration: 'underline' }}>
                 {showAll ? '일부만 보기' : `전체 보기 (${report.claims.length})`}
               </button>
             )}
@@ -950,9 +950,9 @@ function HallucinationPanel({ report }: { report: HallucinationReport }) {
                   style={{ backgroundColor: cv.verified ? '#10b981' : cv.severity === 'critical' ? '#ef4444' : '#f59e0b' }}
                 />
                 <div className="flex-1 min-w-0">
-                  <span className="font-medium" style={{ color: '#1a1a1a' }}>{cv.claim.value}</span>
-                  <span className="ml-1" style={{ color: '#6b705c' }}>({cv.claim.type})</span>
-                  {cv.toolSource && <span className="ml-1" style={{ color: '#6b705c' }}>via {cv.toolSource}</span>}
+                  <span className="font-medium" style={{ color: 'var(--color-corthex-text-primary)' }}>{cv.claim.value}</span>
+                  <span className="ml-1" style={{ color: 'var(--color-corthex-text-secondary)' }}>({cv.claim.type})</span>
+                  {cv.toolSource && <span className="ml-1" style={{ color: 'var(--color-corthex-text-secondary)' }}>via {cv.toolSource}</span>}
                   {cv.discrepancy && <p className="mt-0.5" style={{ color: '#ef4444' }}>{cv.discrepancy}</p>}
                 </div>
                 <span
@@ -982,7 +982,7 @@ function LegacyScoresPanel({ scores }: { scores: MergedScores }) {
         const score = (scores as unknown as Record<string, number>)[key] ?? 0
         return (
           <div key={key} className="text-center">
-            <p className="text-[10px] mb-1" style={{ color: '#6b705c' }}>{label}</p>
+            <p className="text-[10px] mb-1" style={{ color: 'var(--color-corthex-text-secondary)' }}>{label}</p>
             <p className="text-sm font-bold" style={{ color: score >= 4 ? '#4d7c0f' : score >= 3 ? '#b45309' : '#dc2626' }}>
               {score}/5
             </p>
@@ -1000,7 +1000,7 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
     <div className="overflow-x-auto" data-testid="tools-table">
       <table className="w-full text-sm min-w-[640px]">
         <thead>
-          <tr className="text-xs border-b" style={{ color: '#6b705c', borderColor: '#e5e1d3' }}>
+          <tr className="text-xs border-b" style={{ color: 'var(--color-corthex-text-secondary)', borderColor: 'var(--color-corthex-border)' }}>
             <th className="text-left py-2 pr-3 font-medium">시간</th>
             <th className="text-left py-2 pr-3 font-medium">도구명</th>
             <th className="text-left py-2 pr-3 font-medium">에이전트</th>
@@ -1012,12 +1012,12 @@ function ToolsTable({ items }: { items: ToolInvocation[] }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.id} className="transition-colors" style={{ borderBottom: '1px solid rgba(229,225,211,0.5)' }}>
-              <td className="py-2.5 pr-3 text-xs whitespace-nowrap font-mono" style={{ color: '#756e5a' }}>{formatTime(item.createdAt)}</td>
-              <td className="py-2.5 pr-3 text-xs font-medium font-mono" style={{ color: '#606C38' }}>{item.toolName}</td>
-              <td className="py-2.5 pr-3 text-xs" style={{ color: '#1a1a1a' }}>{item.agentName || '-'}</td>
-              <td className="py-2.5 pr-3 text-xs text-right font-mono" style={{ color: '#756e5a' }}>{formatDuration(item.durationMs)}</td>
+              <td className="py-2.5 pr-3 text-xs whitespace-nowrap font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(item.createdAt)}</td>
+              <td className="py-2.5 pr-3 text-xs font-medium font-mono" style={{ color: 'var(--color-corthex-accent)' }}>{item.toolName}</td>
+              <td className="py-2.5 pr-3 text-xs" style={{ color: 'var(--color-corthex-text-primary)' }}>{item.agentName || '-'}</td>
+              <td className="py-2.5 pr-3 text-xs text-right font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatDuration(item.durationMs)}</td>
               <td className="py-2.5 pr-3"><StatusBadgeEl status={item.status} /></td>
-              <td className="py-2.5 text-xs truncate max-w-[200px]" style={{ color: '#6b705c' }}>{item.input || '-'}</td>
+              <td className="py-2.5 text-xs truncate max-w-[200px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>{item.input || '-'}</td>
             </tr>
           ))}
         </tbody>

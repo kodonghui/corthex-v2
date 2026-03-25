@@ -48,13 +48,13 @@ import { Skeleton } from '@corthex/ui'
 
 // -- Natural Organic color tokens (replacing Stitch Default orange) --
 const ORGANIC = {
-  primary: '#5a7247',       // olive-green
+  primary: 'var(--color-corthex-accent)',       // olive-green
   secondary: '#c4622d',     // terracotta
   accent: '#d4a843',        // gold
-  bg: '#faf8f5',            // organic-beige
+  bg: 'var(--color-corthex-bg)',            // organic-beige
   bgDark: '#221610',
-  surface: '#ffffff',
-  text: '#3f3e3a',
+  surface: 'var(--color-corthex-surface)',
+  text: 'var(--color-corthex-text-secondary)',
 }
 
 const nodeTypes: NodeTypes = {

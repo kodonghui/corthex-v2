@@ -71,7 +71,7 @@ function SummaryCards({ data }: { data: CostSummary | undefined }) {
       trend: trend > 0 ? `+${trend}%` : `${trend}%`,
       trendLabel: 'vs 전월',
       trendUp: trend > 0,
-      color: '#5a7247',
+      color: 'var(--color-corthex-accent)',
     },
     {
       label: '잔여 예산',
@@ -97,7 +97,7 @@ function SummaryCards({ data }: { data: CostSummary | undefined }) {
         <div key={c.label} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
           <p className="text-stone-500 text-sm font-medium mb-2 uppercase tracking-wider">{c.label}</p>
           <h3 className="text-4xl font-bold" style={{ color: c.color, fontFamily: "'Playfair Display', serif" }}>{c.value}</h3>
-          <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: c.trendUp ? '#16a34a' : c.trend ? '#ef4444' : '#5a7247' }}>
+          <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: c.trendUp ? '#16a34a' : c.trend ? '#ef4444' : 'var(--color-corthex-accent)' }}>
             {c.trend && (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d={c.trendUp ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
@@ -209,7 +209,7 @@ function AgentTable({ items }: { items: CostByAgent[] }) {
           {sorted.map(r => (
             <tr key={r.agentId} className="border-b border-stone-50 hover:bg-corthex-bg/50">
               <td className="py-3 font-medium">{r.agentName}</td>
-              <td className="py-3 font-mono" style={{ color: '#5a7247' }}>${microToUsd(r.totalCostMicro)}</td>
+              <td className="py-3 font-mono" style={{ color: 'var(--color-corthex-accent)' }}>${microToUsd(r.totalCostMicro)}</td>
               <td className="py-3 text-stone-500">{formatNumber(r.inputTokens)}</td>
               <td className="py-3 text-stone-500">{formatNumber(r.outputTokens)}</td>
               <td className="py-3 text-stone-500">{formatNumber(r.callCount)}</td>
@@ -245,7 +245,7 @@ function ModelTable({ items }: { items: CostByModel[] }) {
             <tr key={`${r.provider}-${r.model}`} className="border-b border-stone-50 hover:bg-corthex-bg/50">
               <td className="py-3 font-medium">{r.displayName}</td>
               <td className="py-3 text-stone-500 capitalize">{r.provider}</td>
-              <td className="py-3 font-mono" style={{ color: '#5a7247' }}>${microToUsd(r.totalCostMicro)}</td>
+              <td className="py-3 font-mono" style={{ color: 'var(--color-corthex-accent)' }}>${microToUsd(r.totalCostMicro)}</td>
               <td className="py-3 text-stone-500">{formatNumber(r.callCount)}</td>
             </tr>
           ))}
@@ -290,7 +290,7 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
     <div className="lg:col-span-2 bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
       <div className="flex items-center justify-between mb-6">
         <h4 className="font-bold text-lg flex items-center gap-2">
-          <svg className="w-5 h-5" style={{ color: '#5a7247' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" style={{ color: 'var(--color-corthex-accent)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
             <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
@@ -306,7 +306,7 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
                   ? 'text-white'
                   : 'text-stone-500 hover:bg-stone-100'
               }`}
-              style={tab === t.value ? { backgroundColor: '#5a7247' } : {}}
+              style={tab === t.value ? { backgroundColor: 'var(--color-corthex-accent)' } : {}}
             >
               {t.label}
             </button>
@@ -430,7 +430,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">$</span>
                 <input
                   className="w-full pl-8 pr-4 py-3 border-stone-200 rounded-xl focus:border-corthex-accent focus:ring-corthex-accent transition-all"
-                  style={{ backgroundColor: '#faf8f5' }}
+                  style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                   type="number"
                   value={activeForm.monthlyBudget}
                   onChange={(e) => setField('monthlyBudget', e.target.value)}
@@ -440,7 +440,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
                 onClick={handleSave}
                 disabled={mutation.isPending}
                 className="text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm disabled:opacity-50"
-                style={{ backgroundColor: '#5a7247' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                 data-testid="budget-save-btn"
               >
                 {mutation.isPending ? '...' : '저장'}
@@ -510,7 +510,7 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
                   <td className="px-6 py-4">{formatNumber(d.inputTokens)}</td>
                   <td className="px-6 py-4">{formatNumber(d.outputTokens)}</td>
                   <td className="px-6 py-4">{formatNumber(d.callCount)}</td>
-                  <td className="px-6 py-4 text-right font-bold" style={{ fontFamily: 'serif', color: '#5a7247' }}>${microToUsd(d.costMicro)}</td>
+                  <td className="px-6 py-4 text-right font-bold" style={{ fontFamily: 'serif', color: 'var(--color-corthex-accent)' }}>${microToUsd(d.costMicro)}</td>
                 </tr>
               ))}
             </tbody>
@@ -523,7 +523,7 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
           <button className="w-8 h-8 rounded flex items-center justify-center text-stone-400 hover:bg-stone-100">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
           </button>
-          <button className="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: '#5a7247' }}>1</button>
+          <button className="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>1</button>
           <button className="w-8 h-8 rounded flex items-center justify-center text-stone-600 hover:bg-stone-100 text-xs font-medium">2</button>
           <button className="w-8 h-8 rounded flex items-center justify-center text-stone-400 hover:bg-stone-100">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
@@ -552,7 +552,7 @@ export function CostsPage() {
 
   if (!companyId) {
     return (
-      <div data-testid="costs-page" className="p-8" style={{ backgroundColor: '#faf8f5' }}>
+      <div data-testid="costs-page" className="p-8" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
         <h1 className="text-xl font-semibold" style={{ fontFamily: "'Playfair Display', serif" }}>비용 관리</h1>
         <div className="bg-corthex-surface rounded-2xl border border-stone-100 p-8 mt-4">
           <p data-testid="costs-no-company" className="text-sm text-stone-500 text-center">회사를 먼저 선택해주세요.</p>
@@ -562,7 +562,7 @@ export function CostsPage() {
   }
 
   return (
-    <div data-testid="costs-page" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
+    <div data-testid="costs-page" style={{ backgroundColor: 'var(--color-corthex-bg)', fontFamily: "'Public Sans', sans-serif", color: 'var(--color-corthex-text-secondary)' }}>
       <main className="flex-1 overflow-y-auto">
         {/* Top Bar */}
         <header className="h-16 bg-corthex-surface border-b border-stone-200 flex items-center justify-between px-8 sticky top-0 z-10">
@@ -574,7 +574,7 @@ export function CostsPage() {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="px-3 py-2 border-none rounded-full text-sm w-36"
-                style={{ backgroundColor: '#faf8f5' }}
+                style={{ backgroundColor: 'var(--color-corthex-bg)' }}
               />
               <span className="text-stone-400 text-xs">~</span>
               <input
@@ -582,7 +582,7 @@ export function CostsPage() {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="px-3 py-2 border-none rounded-full text-sm w-36"
-                style={{ backgroundColor: '#faf8f5' }}
+                style={{ backgroundColor: 'var(--color-corthex-bg)' }}
               />
             </div>
           </div>

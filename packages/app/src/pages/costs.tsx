@@ -49,7 +49,7 @@ type CostOverview = {
 // === Constants ===
 
 // Sovereign Sage Design Tokens
-const accentColor = '#606C38'
+const accentColor = 'var(--color-corthex-accent)'
 const accentHover = '#4e5a2b'
 
 // === Helpers ===

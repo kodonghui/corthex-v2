@@ -49,9 +49,9 @@ type Session = {
 
 // === Organic theme color constants ===
 const C = {
-  bgPrimary: '#faf8f5',
+  bgPrimary: 'var(--color-corthex-bg)',
   bgSecondary: '#f5f0eb',
-  accentOlive: '#5a7247',
+  accentOlive: 'var(--color-corthex-accent)',
   accentOliveLight: '#869e71',
   textMain: '#2d2d2d',
   textMuted: '#6b7280',

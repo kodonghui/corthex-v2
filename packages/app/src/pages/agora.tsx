@@ -22,9 +22,9 @@ import type { Debate, DebateTimelineEntry } from '@corthex/shared'
 
 const CATEGORY_FILTERS = ['전체 All', '전략 Strategy', '기술 Tech', '운영 Ops', '자유 Free', 'Q&A']
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  '전략': { bg: '#606C38', text: '#606C38' },
+  '전략': { bg: 'var(--color-corthex-accent)', text: 'var(--color-corthex-accent)' },
   '기술': { bg: '#2563eb', text: '#2563eb' },
-  '운영': { bg: '#283618', text: '#283618' },
+  '운영': { bg: 'var(--color-corthex-accent-deep)', text: 'var(--color-corthex-accent-deep)' },
   '자유': { bg: '#7c3aed', text: '#7c3aed' },
   'Q&A': { bg: '#2563eb', text: '#2563eb' },
 }
@@ -155,7 +155,7 @@ export function AgoraPage() {
   }, [])
 
   return (
-    <div data-testid="agora-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
+    <div data-testid="agora-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
       <div className="p-8 max-w-[1440px] mx-auto">
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">

@@ -112,7 +112,7 @@ export function SoulTemplatesPage() {
   if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: '#faf8f5' }}>
+    <div className="flex-1 flex flex-col min-h-screen" style={{ fontFamily: "'Public Sans', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }}>
         {/* Topbar */}
         <header className="h-16 bg-corthex-surface border-b border-corthex-border flex items-center justify-between px-8 sticky top-0 z-10">
           <div className="flex items-center gap-4">
@@ -123,7 +123,7 @@ export function SoulTemplatesPage() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled transition-colors" />
               <input
                 className="pl-10 pr-4 py-2 border-none rounded-xl text-sm w-64 transition-all"
-                style={{ backgroundColor: '#faf8f5' }}
+                style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                 placeholder="Search templates..."
                 type="text"
                 value={searchQuery}
@@ -133,9 +133,9 @@ export function SoulTemplatesPage() {
             <button
               onClick={() => setShowCreate(true)}
               className="text-white px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-transform active:scale-95"
-              style={{ backgroundColor: '#5a7247' }}
+              style={{ backgroundColor: 'var(--color-corthex-accent)' }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#5a7247')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-corthex-accent)')}
             >
               <PlusCircle className="w-5 h-5" />
               New Template
@@ -150,7 +150,7 @@ export function SoulTemplatesPage() {
             <div className="flex items-center gap-2 text-sm text-corthex-text-secondary font-medium">
               <span>Admin</span>
               <ChevronRight className="w-3 h-3" />
-              <span style={{ color: '#5a7247' }}>Soul Templates</span>
+              <span style={{ color: 'var(--color-corthex-accent)' }}>Soul Templates</span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-corthex-text-primary" style={{ fontFamily: "'Noto Serif KR', serif" }}>Soul Templates Library</h1>
             <p className="text-corthex-text-secondary max-w-2xl">Manage and deploy organic soul templates for cross-departmental automation. Connect your AI core with natural workflow structures.</p>
@@ -161,27 +161,27 @@ export function SoulTemplatesPage() {
             <aside className="w-64 shrink-0 space-y-8">
               <div>
                 <h4 className="font-bold text-corthex-text-primary mb-4 flex items-center gap-2">
-                  <Filter className="w-5 h-5" style={{ color: '#5a7247' }} />
+                  <Filter className="w-5 h-5" style={{ color: 'var(--color-corthex-accent)' }} />
                   Category
                 </h4>
                 <div className="space-y-2">
                   {['Finance', 'Marketing', 'Technical', 'HR & Ops'].map((cat) => (
                     <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                      <input className="rounded border-corthex-border" type="checkbox" style={{ accentColor: '#5a7247' }} />
-                      <span className="text-sm text-corthex-text-secondary group-hover:transition-colors" style={{ ['--tw-group-hover-color' as string]: '#5a7247' }}>{cat}</span>
+                      <input className="rounded border-corthex-border" type="checkbox" style={{ accentColor: 'var(--color-corthex-accent)' }} />
+                      <span className="text-sm text-corthex-text-secondary group-hover:transition-colors" style={{ ['--tw-group-hover-color' as string]: 'var(--color-corthex-accent)' }}>{cat}</span>
                     </label>
                   ))}
                 </div>
               </div>
               <div>
                 <h4 className="font-bold text-corthex-text-primary mb-4 flex items-center gap-2">
-                  <Layers className="w-5 h-5" style={{ color: '#5a7247' }} />
+                  <Layers className="w-5 h-5" style={{ color: 'var(--color-corthex-accent)' }} />
                   Tier
                 </h4>
                 <div className="space-y-2">
                   {['Manager', 'Specialist', 'Worker'].map((tier) => (
                     <label key={tier} className="flex items-center gap-3 cursor-pointer group">
-                      <input className="border-corthex-border" name="tier" type="radio" style={{ accentColor: '#5a7247' }} />
+                      <input className="border-corthex-border" name="tier" type="radio" style={{ accentColor: 'var(--color-corthex-accent)' }} />
                       <span className="text-sm text-corthex-text-secondary">{tier}</span>
                     </label>
                   ))}
@@ -189,10 +189,10 @@ export function SoulTemplatesPage() {
               </div>
               <div>
                 <h4 className="font-bold text-corthex-text-primary mb-4 flex items-center gap-2">
-                  <Brain className="w-5 h-5" style={{ color: '#5a7247' }} />
+                  <Brain className="w-5 h-5" style={{ color: 'var(--color-corthex-accent)' }} />
                   Tool Complexity
                 </h4>
-                <input className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-200" type="range" style={{ accentColor: '#5a7247' }} />
+                <input className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-200" type="range" style={{ accentColor: 'var(--color-corthex-accent)' }} />
                 <div className="flex justify-between mt-2 text-[10px] text-corthex-text-disabled font-bold uppercase tracking-wider">
                   <span>Basic</span>
                   <span>Advanced</span>
@@ -203,7 +203,7 @@ export function SoulTemplatesPage() {
             {/* Content Grid */}
             <div className="flex-1">
               <div className="mb-8">
-                <h3 className="text-sm font-bold" style={{ color: '#5a7247' }}>All Templates</h3>
+                <h3 className="text-sm font-bold" style={{ color: 'var(--color-corthex-accent)' }}>All Templates</h3>
               </div>
 
               {/* Create form */}
@@ -230,7 +230,7 @@ export function SoulTemplatesPage() {
                           value={form.name}
                           onChange={(e) => setForm({ ...form, name: e.target.value })}
                           className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder-slate-400 outline-none"
-                          style={{ backgroundColor: '#faf8f5' }}
+                          style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                           placeholder="예: 친절한 상담원"
                           required
                         />
@@ -241,7 +241,7 @@ export function SoulTemplatesPage() {
                           value={form.category}
                           onChange={(e) => setForm({ ...form, category: e.target.value })}
                           className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder-slate-400 outline-none"
-                          style={{ backgroundColor: '#faf8f5' }}
+                          style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                           placeholder="예: 고객 응대"
                         />
                       </div>
@@ -252,7 +252,7 @@ export function SoulTemplatesPage() {
                         value={form.description}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                         className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder-slate-400 outline-none"
-                        style={{ backgroundColor: '#faf8f5' }}
+                        style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                         placeholder="이 템플릿의 용도"
                       />
                     </div>
@@ -263,7 +263,7 @@ export function SoulTemplatesPage() {
                         onChange={(e) => setForm({ ...form, content: e.target.value })}
                         rows={6}
                         className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder-slate-400 outline-none resize-none font-mono"
-                        style={{ backgroundColor: '#faf8f5' }}
+                        style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                         placeholder="에이전트의 성격과 행동 방식을 마크다운으로 정의..."
                         required
                       />
@@ -276,7 +276,7 @@ export function SoulTemplatesPage() {
                         type="submit"
                         disabled={createMutation.isPending}
                         className="text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-                        style={{ backgroundColor: '#5a7247' }}
+                        style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                       >
                         {createMutation.isPending ? '생성 중...' : '생성'}
                       </button>
@@ -301,13 +301,13 @@ export function SoulTemplatesPage() {
                             value={editTemplate.name}
                             onChange={(e) => setEditTemplate({ ...editTemplate, name: e.target.value })}
                             className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none"
-                            style={{ backgroundColor: '#faf8f5' }}
+                            style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                           />
                           <input
                             value={editTemplate.description || ''}
                             onChange={(e) => setEditTemplate({ ...editTemplate, description: e.target.value })}
                             className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none"
-                            style={{ backgroundColor: '#faf8f5' }}
+                            style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                             placeholder="설명"
                           />
                           <textarea
@@ -315,7 +315,7 @@ export function SoulTemplatesPage() {
                             onChange={(e) => setEditTemplate({ ...editTemplate, content: e.target.value })}
                             rows={6}
                             className="w-full border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none resize-none font-mono"
-                            style={{ backgroundColor: '#faf8f5' }}
+                            style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                           />
                           <div className="flex gap-3 pt-3 border-t border-slate-100">
                             <button
@@ -329,7 +329,7 @@ export function SoulTemplatesPage() {
                                 })
                               }
                               className="text-xs font-medium transition-colors"
-                              style={{ color: '#5a7247' }}
+                              style={{ color: 'var(--color-corthex-accent)' }}
                             >
                               저장
                             </button>
@@ -344,7 +344,7 @@ export function SoulTemplatesPage() {
                             {!t.isBuiltin && (
                               <button
                                 className="p-2 rounded-lg"
-                                style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
+                                style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}
                                 onClick={() => setEditTemplate(t)}
                               >
                                 <Pencil className="w-4 h-4" />
@@ -355,7 +355,7 @@ export function SoulTemplatesPage() {
                             {t.category && (
                               <span
                                 className="px-2 py-1 text-[10px] font-bold uppercase rounded leading-none"
-                                style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
+                                style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}
                               >
                                 {t.category}
                               </span>
@@ -397,7 +397,7 @@ export function SoulTemplatesPage() {
                               <button
                                 onClick={() => setViewContent(t)}
                                 className="font-bold text-sm flex items-center gap-1"
-                                style={{ color: '#5a7247' }}
+                                style={{ color: 'var(--color-corthex-accent)' }}
                               >
                                 Details <ArrowRight className="w-4 h-4 inline" />
                               </button>
@@ -448,7 +448,7 @@ export function SoulTemplatesPage() {
                 <div
                   key={t.id}
                   className="flex items-center justify-between px-4 py-3 rounded-lg border border-slate-100"
-                  style={{ backgroundColor: '#faf8f5' }}
+                  style={{ backgroundColor: 'var(--color-corthex-bg)' }}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-corthex-text-primary">{t.name}</span>
@@ -526,7 +526,7 @@ export function SoulTemplatesPage() {
             {viewContent.description && (
               <p className="text-sm text-corthex-text-secondary mb-3">{viewContent.description}</p>
             )}
-            <pre className="text-sm text-corthex-text-secondary whitespace-pre-wrap font-mono rounded-lg p-4 border border-corthex-border" style={{ backgroundColor: '#faf8f5' }}>
+            <pre className="text-sm text-corthex-text-secondary whitespace-pre-wrap font-mono rounded-lg p-4 border border-corthex-border" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
               {viewContent.content}
             </pre>
           </div>

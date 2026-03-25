@@ -79,13 +79,13 @@ export function ReportLinesPage() {
   if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
+    <div className="flex-1 flex flex-col overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", color: 'var(--color-corthex-text-secondary)' }}>
       {/* Top Bar */}
       <header className="h-16 border-b border-corthex-border px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
         <div className="flex items-center gap-2 text-corthex-text-secondary text-sm">
           <span>Admin</span>
           <ChevronRight className="w-3 h-3" />
-          <span className="font-medium" style={{ color: '#3f3e3a' }}>보고 라인 설정</span>
+          <span className="font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>보고 라인 설정</span>
         </div>
         <div className="flex items-center gap-4">
           <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-full transition-colors">
@@ -100,7 +100,7 @@ export function ReportLinesPage() {
       <div className="p-8 max-w-5xl mx-auto w-full">
         {/* Page Header */}
         <div className="mb-10">
-          <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif KR', serif", color: '#3f3e3a' }}>보고 라인 설정</h2>
+          <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif KR', serif", color: 'var(--color-corthex-text-secondary)' }}>보고 라인 설정</h2>
           <p className="text-corthex-text-secondary max-w-2xl leading-relaxed">
             휴먼 사용자의 조직 내 보고 체계를 설정합니다. 이 설정은 보고서 제출 대상 결정에 사용됩니다.
             직속 상사는 하위 사용자의 성과를 관리하고 보고서를 승인할 권한을 가집니다.
@@ -117,7 +117,7 @@ export function ReportLinesPage() {
                 <UserSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
                 <select
                   className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
-                  style={{ outlineColor: '#5a7247' }}
+                  style={{ outlineColor: 'var(--color-corthex-accent)' }}
                 >
                   <option value="">사용자 선택</option>
                   {users.map((u) => (
@@ -132,7 +132,7 @@ export function ReportLinesPage() {
                 <UserCog className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
                 <select
                   className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
-                  style={{ outlineColor: '#5a7247' }}
+                  style={{ outlineColor: 'var(--color-corthex-accent)' }}
                 >
                   <option value="">상사 선택</option>
                   {users.map((u) => (
@@ -146,9 +146,9 @@ export function ReportLinesPage() {
                 onClick={handleSave}
                 disabled={!hasChanges || saveMutation.isPending}
                 className="text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 h-[38px] disabled:opacity-50"
-                style={{ backgroundColor: '#5a7247' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#5a7247')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-corthex-accent)')}
               >
                 <Plus className="w-4 h-4" />
                 {saveMutation.isPending ? '저장 중...' : '보고 라인 추가'}
@@ -195,12 +195,12 @@ export function ReportLinesPage() {
                         <div className="flex items-center gap-3">
                           <div
                             className="size-8 rounded-full flex items-center justify-center font-bold text-xs"
-                            style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}
+                            style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}
                           >
                             {initial}
                           </div>
                           <div>
-                            <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{u.name}</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>{u.name}</p>
                             <p className="text-xs text-corthex-text-secondary">@{u.username} / {u.role}</p>
                           </div>
                         </div>
@@ -215,7 +215,7 @@ export function ReportLinesPage() {
                               {reportTarget.name.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{reportTarget.name}</p>
+                              <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>{reportTarget.name}</p>
                               <p className="text-xs text-corthex-text-secondary">@{reportTarget.username}</p>
                             </div>
                           </div>
@@ -224,7 +224,7 @@ export function ReportLinesPage() {
                             value={reportsTo}
                             onChange={(e) => handleChange(u.id, e.target.value)}
                             className="bg-corthex-bg border border-corthex-border rounded-lg px-3 py-1.5 text-sm outline-none transition-colors"
-                            style={{ color: '#3f3e3a' }}
+                            style={{ color: 'var(--color-corthex-text-secondary)' }}
                           >
                             <option value="">없음 (최상위)</option>
                             {users

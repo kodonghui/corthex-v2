@@ -30,7 +30,7 @@ import { ShareToConversationModal } from '../components/messenger/share-to-conve
 // === Constants ===
 
 // Sovereign Sage Design Tokens
-const accentColor = '#606C38'
+const accentColor = 'var(--color-corthex-accent)'
 const accentHover = '#4e5a2b'
 
 // === Types ===
@@ -270,7 +270,7 @@ export function ReportsPage() {
   // === Create view ===
   if (view === 'create') {
     return (
-      <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
+      <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }} data-testid="reports-page">
         <div className="px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-corthex-surface">
           <button onClick={handleBack} className="text-sm text-corthex-text-secondary hover:text-corthex-text-secondary" data-testid="back-btn">
             &larr; 목록
@@ -318,7 +318,7 @@ export function ReportsPage() {
 
   // === List + Detail split layout ===
   return (
-    <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
+    <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }} data-testid="reports-page">
       <div className="flex h-full overflow-hidden">
         {/* Main Content Area */}
           {/* Dashboard Content */}

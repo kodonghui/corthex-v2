@@ -137,12 +137,12 @@ export function ChatPage() {
   )
 
   return (
-    <div data-testid="chat-page" className="h-screen overflow-hidden flex flex-col" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5', color: '#2d2d2d' }}>
+    <div data-testid="chat-page" className="h-screen overflow-hidden flex flex-col" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: 'var(--color-corthex-bg)', color: '#2d2d2d' }}>
       {/* BEGIN: Global Header */}
       <header className="h-16 border-b border-corthex-border bg-corthex-surface/80 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: '#5a7247' }}>C</div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX <span className="font-light" style={{ color: '#5a7247' }}>v2</span></h1>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>C</div>
+          <h1 className="text-xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX <span className="font-light" style={{ color: 'var(--color-corthex-accent)' }}>v2</span></h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right mr-2 hidden md:block">
@@ -150,7 +150,7 @@ export function ChatPage() {
             <p className="text-[10px] uppercase tracking-widest" style={{ color: '#6b6b6b' }}>Active Session</p>
           </div>
           <div className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
-            <span className="text-sm font-bold" style={{ color: '#5a7247' }}>U</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--color-corthex-accent)' }}>U</span>
           </div>
         </div>
       </header>
@@ -163,7 +163,7 @@ export function ChatPage() {
             <button
               onClick={() => setShowAgentModal(true)}
               className="w-full bg-corthex-surface border border-corthex-border py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 font-medium"
-              style={{ color: '#5a7247' }}
+              style={{ color: 'var(--color-corthex-accent)' }}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
@@ -203,7 +203,7 @@ export function ChatPage() {
         {/* END: Left Sidebar */}
 
         {/* BEGIN: Middle Pane (Active Chat Area) */}
-        <section className={`flex-1 flex flex-col relative ${!showChat ? 'hidden md:flex' : 'flex'}`} style={{ backgroundColor: '#faf8f5' }}>
+        <section className={`flex-1 flex flex-col relative ${!showChat ? 'hidden md:flex' : 'flex'}`} style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
           <ChatArea
             agent={selectedAgent}
             sessionId={selectedSessionId}
@@ -221,7 +221,7 @@ export function ChatPage() {
             <div className="p-8 text-center space-y-4">
               <div className="relative inline-block">
                 <div className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto shadow-inner relative overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
-                  <svg className="h-12 w-12 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: '#5a7247' }}>
+                  <svg className="h-12 w-12 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: 'var(--color-corthex-accent)' }}>
                     <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                   </svg>
                 </div>
@@ -229,7 +229,7 @@ export function ChatPage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>{selectedAgent.name}</h2>
-                <p className="text-xs font-bold tracking-widest uppercase mt-1" style={{ color: '#5a7247' }}>{selectedAgent.role || 'Agent'}</p>
+                <p className="text-xs font-bold tracking-widest uppercase mt-1" style={{ color: 'var(--color-corthex-accent)' }}>{selectedAgent.role || 'Agent'}</p>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-6 space-y-8 pb-10">
@@ -248,7 +248,7 @@ export function ChatPage() {
                     ? selectedAgent.allowedTools
                     : ['Web Search', 'Data Analysis']
                   ).map((tool) => (
-                    <span key={tool} className="px-3 py-1 text-[11px] font-semibold rounded-full" style={{ backgroundColor: '#f5f0eb', color: '#5a7247' }}>
+                    <span key={tool} className="px-3 py-1 text-[11px] font-semibold rounded-full" style={{ backgroundColor: '#f5f0eb', color: 'var(--color-corthex-accent)' }}>
                       {tool}
                     </span>
                   ))}
@@ -257,7 +257,7 @@ export function ChatPage() {
               {/* Context Summary */}
               <div className="p-4 rounded-2xl border border-gray-100" style={{ backgroundColor: '#f5f0eb' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: '#5a7247' }}>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: 'var(--color-corthex-accent)' }}>
                     <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                   </svg>
                   <h4 className="text-xs font-bold">Session Context</h4>

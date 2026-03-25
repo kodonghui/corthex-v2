@@ -28,8 +28,8 @@ function getFileIcon(mimeType: string): { emoji: string; bgColor: string; dotCol
   if (mimeType.includes('video') || mimeType.includes('mp4')) return { emoji: 'VID', bgColor: 'rgba(139,92,246,0.08)', dotColor: '#8b5cf6' }
   if (mimeType.includes('word') || mimeType.includes('wordprocessing')) return { emoji: 'DOC', bgColor: 'rgba(59,130,246,0.08)', dotColor: '#3b82f6' }
   if (mimeType.includes('json') || mimeType.includes('javascript') || mimeType.includes('typescript')) return { emoji: 'COD', bgColor: 'rgba(20,184,166,0.08)', dotColor: '#14b8a6' }
-  if (mimeType.includes('markdown')) return { emoji: 'MD', bgColor: 'rgba(117,110,90,0.1)', dotColor: '#756e5a' }
-  return { emoji: 'FILE', bgColor: 'rgba(117,110,90,0.1)', dotColor: '#756e5a' }
+  if (mimeType.includes('markdown')) return { emoji: 'MD', bgColor: 'rgba(117,110,90,0.1)', dotColor: 'var(--color-corthex-text-secondary)' }
+  return { emoji: 'FILE', bgColor: 'rgba(117,110,90,0.1)', dotColor: 'var(--color-corthex-text-secondary)' }
 }
 
 function formatBytes(bytes: number): string {
@@ -158,7 +158,7 @@ export function FilesPage() {
   return (
     <div
       className="min-h-screen font-sans"
-      style={{ backgroundColor: '#faf8f5', color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}
+      style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)', fontFamily: "'Inter', sans-serif" }}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -169,9 +169,9 @@ export function FilesPage() {
       {dragOver && (
         <div className="fixed inset-0 z-40 flex items-center justify-center" style={{ backgroundColor: 'rgba(96,108,56,0.06)', border: '2px dashed rgba(96,108,56,0.4)' }}>
           <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-4" style={{ color: '#6b705c' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            <p className="text-lg font-bold mb-1" style={{ color: '#1a1a1a' }}>Drag and drop files here</p>
-            <p className="text-sm" style={{ color: '#6b705c' }}>or click to browse from your computer</p>
+            <svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            <p className="text-lg font-bold mb-1" style={{ color: 'var(--color-corthex-text-primary)' }}>Drag and drop files here</p>
+            <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>or click to browse from your computer</p>
           </div>
         </div>
       )}
@@ -179,14 +179,14 @@ export function FilesPage() {
       <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-6">
         {/* Page Title */}
         <div className="flex items-center justify-between" data-testid="files-header">
-          <h1 className="text-3xl font-bold leading-tight" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>Files</h1>
+          <h1 className="text-3xl font-bold leading-tight" style={{ fontFamily: "'Inter', sans-serif", color: 'var(--color-corthex-text-primary)' }}>Files</h1>
           <div>
             <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
               className="flex cursor-pointer items-center justify-center rounded-xl text-sm font-bold h-9 px-5 transition-colors disabled:opacity-50 hover:opacity-90"
-              style={{ backgroundColor: '#606C38', color: '#ffffff' }}
+              style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
               aria-label="파일 업로드"
               data-testid="upload-button"
             >
@@ -204,8 +204,8 @@ export function FilesPage() {
               onClick={() => setFilter(opt.value)}
               className="flex h-8 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors"
               style={filter === opt.value
-                ? { backgroundColor: '#606C38', color: '#ffffff' }
-                : { backgroundColor: '#f5f0e8', color: '#6b705c', border: '1px solid #e5e1d3' }
+                ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }
+                : { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)', border: '1px solid #e5e1d3' }
               }
               data-testid={`filter-${opt.value}`}
             >
@@ -218,12 +218,12 @@ export function FilesPage() {
         <div className="w-full">
           <label
             className="flex items-center w-full h-12 bg-corthex-surface border rounded-xl overflow-hidden transition-shadow"
-            style={{ borderColor: '#e5e1d3' }}
+            style={{ borderColor: 'var(--color-corthex-border)' }}
           >
-            <svg className="w-5 h-5 ml-4" style={{ color: '#756e5a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+            <svg className="w-5 h-5 ml-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
             <input
               className="w-full bg-transparent border-none text-sm px-3 focus:outline-none focus:ring-0 placeholder:text-stone-400"
-              style={{ color: '#1a1a1a' }}
+              style={{ color: 'var(--color-corthex-text-primary)' }}
               placeholder="Search files, formats, or uploaders..."
               type="text"
               value={search}
@@ -239,7 +239,7 @@ export function FilesPage() {
             value={sortBy}
             onChange={e => setSortBy(e.target.value as 'date' | 'name' | 'size')}
             className="bg-transparent border-none text-sm font-medium transition-colors cursor-pointer p-0 focus:ring-0"
-            style={{ color: '#6b705c' }}
+            style={{ color: 'var(--color-corthex-text-secondary)' }}
           >
             <option value="date">최근 생성일순</option>
             <option value="name">이름순</option>
@@ -250,8 +250,8 @@ export function FilesPage() {
               onClick={() => setViewMode('list')}
               className="p-1.5 rounded-lg transition-colors"
               style={viewMode === 'list'
-                ? { color: '#606C38', backgroundColor: 'rgba(96,108,56,0.1)' }
-                : { color: '#6b705c' }
+                ? { color: 'var(--color-corthex-accent)', backgroundColor: 'rgba(96,108,56,0.1)' }
+                : { color: 'var(--color-corthex-text-secondary)' }
               }
               aria-label="리스트 보기"
             >
@@ -261,8 +261,8 @@ export function FilesPage() {
               onClick={() => setViewMode('grid')}
               className="p-1.5 rounded-lg transition-colors"
               style={viewMode === 'grid'
-                ? { color: '#606C38', backgroundColor: 'rgba(96,108,56,0.1)' }
-                : { color: '#6b705c' }
+                ? { color: 'var(--color-corthex-accent)', backgroundColor: 'rgba(96,108,56,0.1)' }
+                : { color: 'var(--color-corthex-text-secondary)' }
               }
               aria-label="그리드 보기"
             >
@@ -274,13 +274,13 @@ export function FilesPage() {
         {/* Drop zone */}
         <div
           className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-12 cursor-pointer transition-colors"
-          style={{ borderColor: '#e5e1d3', backgroundColor: 'rgba(242,240,233,0.5)' }}
+          style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'rgba(242,240,233,0.5)' }}
           onClick={() => fileInputRef.current?.click()}
         >
-          <svg className="w-10 h-10" style={{ color: '#6b705c' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+          <svg className="w-10 h-10" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
           <div className="text-center">
-            <p className="text-lg font-bold mb-1" style={{ color: '#1a1a1a' }}>Drag and drop files here</p>
-            <p className="text-sm" style={{ color: '#6b705c' }}>or click to browse from your computer</p>
+            <p className="text-lg font-bold mb-1" style={{ color: 'var(--color-corthex-text-primary)' }}>Drag and drop files here</p>
+            <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>or click to browse from your computer</p>
           </div>
         </div>
 
@@ -288,25 +288,25 @@ export function FilesPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-loading">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ backgroundColor: '#f5f0e8', border: '1px solid #e5e1d3' }} />
+              <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)', border: '1px solid #e5e1d3' }} />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           search || filter !== 'all' ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="files-empty-search">
-              <svg className="w-10 h-10 mb-4" style={{ color: '#756e5a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
-              <h3 className="text-base font-medium mb-2" style={{ color: '#6b705c' }}>검색 결과가 없습니다</h3>
-              <p className="text-sm" style={{ color: '#6b705c' }}>필터를 변경하거나 검색어를 수정해보세요</p>
+              <svg className="w-10 h-10 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>검색 결과가 없습니다</h3>
+              <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>필터를 변경하거나 검색어를 수정해보세요</p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
-              <svg className="w-16 h-16 mb-4" style={{ color: '#756e5a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-              <h3 className="text-base font-medium mb-2" style={{ color: '#6b705c' }}>파일이 없습니다</h3>
-              <p className="text-sm mb-4" style={{ color: '#6b705c' }}>파일을 업로드하면 여기에 표시됩니다</p>
+              <svg className="w-16 h-16 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>파일이 없습니다</h3>
+              <p className="text-sm mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>파일을 업로드하면 여기에 표시됩니다</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="rounded-xl px-4 py-2 text-sm font-bold transition-colors hover:opacity-90"
-                style={{ backgroundColor: '#606C38', color: '#ffffff' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
               >
                 파일 업로드
               </button>
@@ -320,7 +320,7 @@ export function FilesPage() {
                 <div
                   key={file.id}
                   className="flex flex-col rounded-2xl border bg-corthex-surface p-4 transition-all group cursor-pointer relative overflow-hidden"
-                  style={{ borderColor: '#e5e1d3', backgroundColor: '#f5f0e8' }}
+                  style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)' }}
                   data-testid={`file-grid-${file.id}`}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -335,7 +335,7 @@ export function FilesPage() {
                         href={`/api/workspace/files/${file.id}/download`}
                         download
                         className="p-1 rounded-lg transition-colors hover:opacity-70"
-                        style={{ color: '#6b705c' }}
+                        style={{ color: 'var(--color-corthex-text-secondary)' }}
                         title="다운로드"
                         aria-label={`다운로드: ${file.filename}`}
                         onClick={e => e.stopPropagation()}
@@ -355,8 +355,8 @@ export function FilesPage() {
                       )}
                     </div>
                   </div>
-                  <h3 className="font-medium text-sm truncate mb-1" style={{ color: '#1a1a1a' }} title={file.filename}>{file.filename}</h3>
-                  <div className="flex items-center justify-between text-xs mt-auto pt-2" style={{ color: '#6b705c' }}>
+                  <h3 className="font-medium text-sm truncate mb-1" style={{ color: 'var(--color-corthex-text-primary)' }} title={file.filename}>{file.filename}</h3>
+                  <div className="flex items-center justify-between text-xs mt-auto pt-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                     <span className="font-mono tabular-nums">{formatBytes(file.sizeBytes)}</span>
                     <span>{new Date(file.createdAt).toLocaleDateString('ko-KR')}</span>
                   </div>
@@ -372,7 +372,7 @@ export function FilesPage() {
                 <div
                   key={file.id}
                   className="flex items-center gap-3 p-3 rounded-2xl border bg-corthex-surface transition-all group cursor-pointer"
-                  style={{ borderColor: '#e5e1d3', backgroundColor: '#f5f0e8' }}
+                  style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)' }}
                   data-testid={`file-row-${file.id}`}
                 >
                   <div
@@ -382,15 +382,15 @@ export function FilesPage() {
                     {emoji}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate transition-colors" style={{ color: '#1a1a1a' }}>{file.filename}</p>
-                    <p className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: '#6b705c' }}>{formatBytes(file.sizeBytes)} &middot; {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
+                    <p className="text-sm font-medium truncate transition-colors" style={{ color: 'var(--color-corthex-text-primary)' }}>{file.filename}</p>
+                    <p className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatBytes(file.sizeBytes)} &middot; {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <a
                       href={`/api/workspace/files/${file.id}/download`}
                       download
                       className="p-2 rounded-lg transition-colors hover:opacity-70"
-                      style={{ color: '#6b705c' }}
+                      style={{ color: 'var(--color-corthex-text-secondary)' }}
                       title="다운로드"
                       aria-label={`다운로드: ${file.filename}`}
                     >
@@ -417,13 +417,13 @@ export function FilesPage() {
         {/* Storage summary */}
         {files.length > 0 && (
           <div className="flex items-center gap-4 px-1">
-            <span className="text-xs" style={{ color: '#6b705c' }}>{files.length}개 파일</span>
-            <span className="text-xs" style={{ color: '#6b705c' }}>&middot;</span>
-            <span className="text-xs" style={{ color: '#6b705c' }}>총 {formatBytes(totalSize)}</span>
-            <div className="flex-1 max-w-[200px] h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e1d3' }}>
-              <div className="h-full rounded-full" style={{ width: `${storagePercent}%`, backgroundColor: '#606C38' }} />
+            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{files.length}개 파일</span>
+            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>&middot;</span>
+            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>총 {formatBytes(totalSize)}</span>
+            <div className="flex-1 max-w-[200px] h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-border)' }}>
+              <div className="h-full rounded-full" style={{ width: `${storagePercent}%`, backgroundColor: 'var(--color-corthex-accent)' }} />
             </div>
-            <span className="text-xs font-mono tabular-nums" style={{ color: '#6b705c' }}>{storagePercent}%</span>
+            <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{storagePercent}%</span>
           </div>
         )}
       </div>

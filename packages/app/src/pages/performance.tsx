@@ -125,7 +125,7 @@ export function PerformancePage() {
   const MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32']
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#faf8f5' }} data-testid="performance-page">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }} data-testid="performance-page">
       <div className="p-8 max-w-[1440px] mx-auto space-y-8">
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -270,8 +270,8 @@ export function PerformancePage() {
                 <line x1="0" y1="80" x2="400" y2="80" stroke="#dc2626" strokeDasharray="5,5" strokeWidth="1" />
                 <defs>
                   <linearGradient id="perfGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: '#606C38', stopOpacity: 0.3 }} />
-                    <stop offset="100%" style={{ stopColor: '#606C38', stopOpacity: 0 }} />
+                    <stop offset="0%" style={{ stopColor: 'var(--color-corthex-accent)', stopOpacity: 0.3 }} />
+                    <stop offset="100%" style={{ stopColor: 'var(--color-corthex-accent)', stopOpacity: 0 }} />
                   </linearGradient>
                 </defs>
               </svg>

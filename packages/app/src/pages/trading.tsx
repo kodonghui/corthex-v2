@@ -31,9 +31,9 @@ const TICKERS = [
 ]
 
 const PORTFOLIO = [
-  { name: 'BTC', pct: 45, color: '#606C38' },
-  { name: 'ETH', pct: 25, color: '#283618' },
-  { name: 'SOL', pct: 10, color: '#6b705c' },
+  { name: 'BTC', pct: 45, color: 'var(--color-corthex-accent)' },
+  { name: 'ETH', pct: 25, color: 'var(--color-corthex-accent-deep)' },
+  { name: 'SOL', pct: 10, color: 'var(--color-corthex-text-secondary)' },
   { name: '현금 Cash', pct: 20, color: '#908a78' },
 ]
 
@@ -51,7 +51,7 @@ export function TradingPage() {
   const isCompareMode = searchParams.has('compare')
 
   return (
-    <div data-testid="trading-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
+    <div data-testid="trading-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
       <div className="p-8 max-w-[1440px] mx-auto">
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">

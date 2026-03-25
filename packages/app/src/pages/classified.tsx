@@ -240,20 +240,20 @@ export function ClassifiedPage() {
   ]
 
   return (
-    <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1a1a1a' }}>
+    <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}>
       {/* BEGIN: MainHeader */}
-      <header className="h-16 border-b bg-corthex-surface sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: '#e5e1d3' }}>
+      <header className="h-16 border-b bg-corthex-surface sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: 'var(--color-corthex-border)' }}>
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: '#606C38' }}>C</div>
-          <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#1a1a1a' }}>CORTHEX <span style={{ color: '#6b705c' }} className="font-normal">v2.0</span></h1>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>C</div>
+          <h1 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--color-corthex-text-primary)' }}>CORTHEX <span style={{ color: 'var(--color-corthex-text-secondary)' }} className="font-normal">v2.0</span></h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
-            <p className="text-xs font-medium uppercase tracking-widest leading-none" style={{ color: '#756e5a' }}>Access Level</p>
+            <p className="text-xs font-medium uppercase tracking-widest leading-none" style={{ color: 'var(--color-corthex-text-secondary)' }}>Access Level</p>
             <p className="text-sm font-bold" style={{ color: '#dc2626' }}>CLEARANCE: SECRET</p>
           </div>
-          <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden" style={{ backgroundColor: '#f5f0e8' }}>
-            <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: '#6b705c' }}>U</div>
+          <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-elevated)' }}>
+            <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: 'var(--color-corthex-text-secondary)' }}>U</div>
           </div>
         </div>
       </header>
@@ -265,7 +265,7 @@ export function ClassifiedPage() {
           {/* BEGIN: LeftSidebar (Security Classifications) */}
           <aside className="col-span-12 lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
             <div className="bg-corthex-elevated rounded-2xl p-5 border border-corthex-border h-full">
-              <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: '#6b705c' }}>Security Clearance</h2>
+              <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: 'var(--color-corthex-text-secondary)' }}>Security Clearance</h2>
               <nav className="space-y-2">
                 {classificationButtons.map((btn) => {
                   const isActive = activeClassification === btn.key
@@ -282,26 +282,26 @@ export function ClassifiedPage() {
                           ? 'shadow-lg'
                           : 'hover:bg-corthex-elevated group'
                       }`}
-                      style={isActive ? { backgroundColor: '#606C38', color: '#ffffff' } : undefined}
+                      style={isActive ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' } : undefined}
                     >
                       <div className="flex items-center gap-3">
                         <span
                           className={`w-2 h-2 rounded-full ${isActive && btn.key === 'secret' ? 'animate-pulse' : ''}`}
                           style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[btn.key] }}
                         />
-                        <span className="text-sm font-medium" style={isActive ? { color: '#ffffff' } : { color: '#1a1a1a' }}>{btn.label}</span>
+                        <span className="text-sm font-medium" style={isActive ? { color: 'var(--color-corthex-surface)' } : { color: 'var(--color-corthex-text-primary)' }}>{btn.label}</span>
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded" style={
-                        isActive ? { backgroundColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' } : { backgroundColor: '#f0ebe0', color: '#6b705c' }
+                        isActive ? { backgroundColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' } : { backgroundColor: '#f0ebe0', color: 'var(--color-corthex-text-secondary)' }
                       }>{count}</span>
                     </button>
                   )
                 })}
               </nav>
               <div className="mt-8 pt-6" style={{ borderTop: '1px solid #e5e1d3' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: '#6b705c' }}>API Archive Context</h2>
-                <div className="p-3 rounded-lg border" style={{ backgroundColor: '#faf8f5', borderColor: '#e5e1d3' }}>
-                  <code className="text-[10px] break-all font-mono" style={{ color: '#756e5a' }}>GET /api/workspace/archive</code>
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>API Archive Context</h2>
+                <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: 'var(--color-corthex-border)' }}>
+                  <code className="text-[10px] break-all font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>GET /api/workspace/archive</code>
                 </div>
               </div>
             </div>
@@ -311,11 +311,11 @@ export function ClassifiedPage() {
           {/* BEGIN: CenterContent (Document List) */}
           <section className="col-span-12 lg:col-span-5 xl:col-span-6 flex flex-col gap-4 overflow-hidden">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-xl font-bold" style={{ color: '#1a1a1a' }}>Classified Archive</h2>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--color-corthex-text-primary)' }}>Classified Archive</h2>
               <div className="flex gap-2">
                 <input
                   className="text-sm rounded-full px-4 py-1.5 w-48 transition-all border focus:ring-1 focus:ring-corthex-accent"
-                  style={{ borderColor: '#908a78', color: '#1a1a1a' }}
+                  style={{ borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
                   placeholder="Filter documents..."
                   type="text"
                   value={searchInput}
@@ -326,15 +326,15 @@ export function ClassifiedPage() {
             <div className="overflow-y-auto pr-2 space-y-4">
               {listQuery.isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="p-5 rounded-2xl h-28 animate-pulse" style={{ backgroundColor: '#f5f0e8', border: '1px solid #e5e1d3' }} />
+                  <div key={i} className="p-5 rounded-2xl h-28 animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)', border: '1px solid #e5e1d3' }} />
                 ))
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <p className="text-sm font-medium" style={{ color: '#6b705c' }}>아카이브된 문서가 없습니다</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>아카이브된 문서가 없습니다</p>
                   <button
                     onClick={() => navigate('/hub')}
                     className="mt-3 px-4 py-2 text-xs text-white rounded-md hover:opacity-90 transition-colors"
-                    style={{ backgroundColor: '#606C38' }}
+                    style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                   >
                     허브로 이동
                   </button>
@@ -486,11 +486,11 @@ export function ClassifiedPage() {
                   </div>
 
                   {/* Bottom Actions */}
-                  <div className="p-6 border-t flex gap-3" style={{ backgroundColor: '#f0ebe0', borderColor: '#e5e1d3' }}>
+                  <div className="p-6 border-t flex gap-3" style={{ backgroundColor: '#f0ebe0', borderColor: 'var(--color-corthex-border)' }}>
                     <button
                       onClick={() => navigate(`/classified/${detail.id}`)}
                       className="flex-1 text-white text-sm font-bold py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:opacity-90"
-                      style={{ backgroundColor: '#606C38' }}
+                      style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -501,7 +501,7 @@ export function ClassifiedPage() {
                     <button
                       onClick={() => setDeleteConfirmId(detail.id)}
                       className="w-12 h-12 flex items-center justify-center rounded-xl border bg-corthex-surface transition-all hover:opacity-70"
-                      style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
+                      style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -521,14 +521,14 @@ export function ClassifiedPage() {
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
-          <div className="relative bg-corthex-surface border rounded-2xl p-6 w-80 shadow-2xl" style={{ borderColor: '#e5e1d3' }}>
-            <h3 className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>문서 삭제</h3>
-            <p className="text-xs mb-4" style={{ color: '#6b705c' }}>이 기밀문서를 삭제하시겠습니까?</p>
+          <div className="relative bg-corthex-surface border rounded-2xl p-6 w-80 shadow-2xl" style={{ borderColor: 'var(--color-corthex-border)' }}>
+            <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-text-primary)' }}>문서 삭제</h3>
+            <p className="text-xs mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>이 기밀문서를 삭제하시겠습니까?</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDeleteConfirmId(null)}
                 className="px-3 py-1.5 text-xs rounded-lg border hover:opacity-70 transition-colors"
-                style={{ color: '#6b705c', borderColor: '#e5e1d3' }}
+                style={{ color: 'var(--color-corthex-text-secondary)', borderColor: 'var(--color-corthex-border)' }}
               >
                 취소
               </button>

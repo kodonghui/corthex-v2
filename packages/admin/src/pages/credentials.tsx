@@ -99,14 +99,14 @@ export function CredentialsPage() {
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
 
-  if (!selectedCompanyId) return <div className="p-8 text-center" style={{ color: '#83935d' }}>회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center" style={{ color: 'var(--color-corthex-accent)' }}>회사를 선택하세요</div>
 
   return (
     <div data-testid="credentials-page" className="min-h-screen flex" style={{ backgroundColor: '#f8faf7', fontFamily: "'Inter', 'Noto Sans KR', sans-serif", color: '#263222' }}>
       {/* BEGIN: Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-auto" style={{ backgroundColor: '#f8faf7' }}>
         {/* BEGIN: Header Section */}
-        <header className="bg-corthex-surface border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: '#dce8d5' }}>
+        <header className="bg-corthex-surface border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: 'var(--color-corthex-border)' }}>
           <div>
             <h2 data-testid="credentials-title" className="text-2xl font-bold" style={{ color: '#263222' }}>CLI 인증 관리</h2>
             <p className="text-sm text-corthex-text-secondary mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
@@ -125,8 +125,8 @@ export function CredentialsPage() {
 
         <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
           {/* BEGIN: Info Card */}
-          <section data-testid="credentials-guide-banner" className="bg-corthex-surface rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: '#dce8d5' }}>
-            <div className="p-3 rounded-full" style={{ backgroundColor: '#edf3e9' }}>
+          <section data-testid="credentials-guide-banner" className="bg-corthex-surface rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--color-corthex-elevated)' }}>
               <svg className="w-6 h-6" style={{ color: '#4a6741' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
             </div>
             <div>
@@ -140,8 +140,8 @@ export function CredentialsPage() {
           {/* END: Info Card */}
 
           {/* BEGIN: User Selection */}
-          <section data-testid="credentials-user-list" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
-            <div className="px-6 py-4 border-b" style={{ borderColor: '#edf3e9' }}>
+          <section data-testid="credentials-user-list" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
               <h3 className="text-sm font-semibold" style={{ color: '#263222' }}>직원 선택</h3>
             </div>
             <div className="p-4 flex flex-wrap gap-2">
@@ -168,14 +168,14 @@ export function CredentialsPage() {
           </section>
 
           {!selectedUserId ? (
-            <div data-testid="credentials-no-selection" className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: '#dce8d5', color: '#83935d' }}>
+            <div data-testid="credentials-no-selection" className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-accent)' }}>
               좌측에서 직원을 선택하세요
             </div>
           ) : (
             <>
               {/* BEGIN: CLI Credentials Table Section */}
-              <section data-testid="credentials-cli-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
-                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
+              <section data-testid="credentials-cli-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
+                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
                   <h3 data-testid="credentials-cli-title" className="font-semibold" style={{ color: '#263222' }}>
                     CLI OAuth 토큰 — {selectedUser?.name}
                   </h3>
@@ -212,7 +212,7 @@ export function CredentialsPage() {
                         value={tokenForm.label}
                         onChange={(e) => setTokenForm({ ...tokenForm, label: e.target.value })}
                         className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                        style={{ borderColor: '#dce8d5' }}
+                        style={{ borderColor: 'var(--color-corthex-border)' }}
                         placeholder="예: CI/CD Pipeline A"
                         required
                       />
@@ -227,7 +227,7 @@ export function CredentialsPage() {
                           onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
                           rows={2}
                           className="w-full rounded-lg border text-sm font-mono resize-none focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: '#dce8d5' }}
+                          style={{ borderColor: 'var(--color-corthex-border)' }}
                           placeholder="sk-ant-oat01-..."
                           required
                         />
@@ -239,7 +239,7 @@ export function CredentialsPage() {
                         type="button"
                         onClick={() => setShowAddToken(false)}
                         className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium text-corthex-text-secondary hover:bg-corthex-bg transition-colors"
-                        style={{ borderColor: '#dce8d5' }}
+                        style={{ borderColor: 'var(--color-corthex-border)' }}
                       >
                         취소
                       </button>
@@ -260,14 +260,14 @@ export function CredentialsPage() {
                 )}
 
                 {creds.length === 0 ? (
-                  <div data-testid="credentials-cli-empty" className="px-6 py-8 text-center text-sm" style={{ color: '#83935d' }}>
+                  <div data-testid="credentials-cli-empty" className="px-6 py-8 text-center text-sm" style={{ color: 'var(--color-corthex-accent)' }}>
                     등록된 CLI 토큰이 없습니다
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="text-xs uppercase tracking-wider font-semibold border-b" style={{ backgroundColor: '#f8faf7', color: '#31422b', borderColor: '#dce8d5' }}>
+                        <tr className="text-xs uppercase tracking-wider font-semibold border-b" style={{ backgroundColor: '#f8faf7', color: '#31422b', borderColor: 'var(--color-corthex-border)' }}>
                           <th className="px-6 py-4">사용자 ID / 이름</th>
                           <th className="px-6 py-4">식별 레이블</th>
                           <th className="px-6 py-4">생성일</th>
@@ -275,7 +275,7 @@ export function CredentialsPage() {
                           <th className="px-6 py-4 text-right">관리</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y text-sm" style={{ borderColor: '#edf3e9' }}>
+                      <tbody className="divide-y text-sm" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
                         {creds.map((c) => (
                           <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-corthex-bg transition-colors">
                             <td className="px-6 py-4">
@@ -317,19 +317,19 @@ export function CredentialsPage() {
                     </table>
                   </div>
                 )}
-                <div className="px-6 py-4 bg-corthex-surface border-t flex items-center justify-between text-xs text-corthex-text-secondary" style={{ borderColor: '#edf3e9' }}>
+                <div className="px-6 py-4 bg-corthex-surface border-t flex items-center justify-between text-xs text-corthex-text-secondary" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
                   <span>총 {creds.length}개의 인증 토큰이 검색되었습니다.</span>
                   <div className="flex gap-2">
-                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg disabled:opacity-50" style={{ borderColor: '#dce8d5' }} disabled>이전</button>
-                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg" style={{ borderColor: '#dce8d5' }}>다음</button>
+                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg disabled:opacity-50" style={{ borderColor: 'var(--color-corthex-border)' }} disabled>이전</button>
+                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg" style={{ borderColor: 'var(--color-corthex-border)' }}>다음</button>
                   </div>
                 </div>
               </section>
               {/* END: CLI Credentials Table Section */}
 
               {/* BEGIN: API Keys Section */}
-              <section data-testid="credentials-api-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
-                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
+              <section data-testid="credentials-api-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
+                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
                   <h3 data-testid="credentials-api-title" className="font-semibold" style={{ color: '#263222' }}>외부 API 키</h3>
                   <button
                     data-testid="credentials-api-add-btn"
@@ -367,7 +367,7 @@ export function CredentialsPage() {
                           value={apiKeyForm.provider}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
                           className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: '#dce8d5' }}
+                          style={{ borderColor: 'var(--color-corthex-border)' }}
                         >
                           <option value="kis">KIS (한국투자증권)</option>
                           <option value="notion">Notion</option>
@@ -382,7 +382,7 @@ export function CredentialsPage() {
                           value={apiKeyForm.scope}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
                           className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: '#dce8d5' }}
+                          style={{ borderColor: 'var(--color-corthex-border)' }}
                         >
                           <option value="user">개인용</option>
                           <option value="company">회사 공용</option>
@@ -395,7 +395,7 @@ export function CredentialsPage() {
                           value={apiKeyForm.label}
                           onChange={(e) => setApiKeyForm({ ...apiKeyForm, label: e.target.value })}
                           className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: '#dce8d5' }}
+                          style={{ borderColor: 'var(--color-corthex-border)' }}
                           placeholder="선택사항"
                         />
                       </div>
@@ -408,7 +408,7 @@ export function CredentialsPage() {
                         value={apiKeyForm.key}
                         onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
                         className="w-full rounded-lg border text-sm font-mono focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                        style={{ borderColor: '#dce8d5' }}
+                        style={{ borderColor: 'var(--color-corthex-border)' }}
                         required
                       />
                     </div>
@@ -438,9 +438,9 @@ export function CredentialsPage() {
                 )}
 
                 {apiKeys.length === 0 ? (
-                  <p data-testid="credentials-api-empty" className="px-6 py-8 text-center text-sm" style={{ color: '#83935d' }}>등록된 API 키가 없습니다</p>
+                  <p data-testid="credentials-api-empty" className="px-6 py-8 text-center text-sm" style={{ color: 'var(--color-corthex-accent)' }}>등록된 API 키가 없습니다</p>
                 ) : (
-                  <div className="divide-y" style={{ borderColor: '#edf3e9' }}>
+                  <div className="divide-y" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
                     {apiKeys.map((k) => (
                       <div
                         key={k.id}
@@ -449,7 +449,7 @@ export function CredentialsPage() {
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span data-testid={`credentials-api-provider-${k.id}`} className="text-xs px-2 py-0.5 rounded-full uppercase font-medium" style={{ backgroundColor: '#edf3e9', color: '#4a6741' }}>
+                            <span data-testid={`credentials-api-provider-${k.id}`} className="text-xs px-2 py-0.5 rounded-full uppercase font-medium" style={{ backgroundColor: 'var(--color-corthex-elevated)', color: '#4a6741' }}>
                               {k.provider}
                             </span>
                             <p data-testid={`credentials-api-key-label-${k.id}`} className="text-sm font-medium" style={{ color: '#263222' }}>

@@ -137,18 +137,18 @@ function CostTrendChart({ usage, budget }: { usage: DashboardUsage | undefined; 
         <svg className="w-full h-full" preserveAspectRatio="none" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
           <defs>
             <linearGradient id="cost-gradient" x1="0%" x2="0%" y1="0%" y2="100%">
-              <stop offset="0%" stopColor="#606C38" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#606C38" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--color-corthex-accent)" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="var(--color-corthex-accent)" stopOpacity="0" />
             </linearGradient>
           </defs>
           {/* Reference lines */}
-          <line x1="0" x2={chartWidth} y1="50" y2="50" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
-          <line x1="0" x2={chartWidth} y1="100" y2="100" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
-          <line x1="0" x2={chartWidth} y1="150" y2="150" stroke="#e5e1d3" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          <line x1="0" x2={chartWidth} y1="50" y2="50" stroke="var(--color-corthex-border)" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          <line x1="0" x2={chartWidth} y1="100" y2="100" stroke="var(--color-corthex-border)" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
+          <line x1="0" x2={chartWidth} y1="150" y2="150" stroke="var(--color-corthex-border)" strokeDasharray="4" strokeWidth="1" opacity="0.4" />
           {/* Area fill */}
           <path d={areaPath} fill="url(#cost-gradient)" />
           {/* Line */}
-          <path d={linePath} fill="none" stroke="#606C38" strokeWidth="3" strokeLinecap="round" />
+          <path d={linePath} fill="none" stroke="var(--color-corthex-accent)" strokeWidth="3" strokeLinecap="round" />
         </svg>
         {dateLabels.length > 0 && (
           <div className="absolute bottom-[-30px] left-0 right-0 flex justify-between text-[10px] font-mono text-corthex-text-secondary/60 px-2">
@@ -210,10 +210,10 @@ function TaskStatusDonut({ summary }: { summary: DashboardSummary }) {
   const circumference = 2 * Math.PI * 70 // ~440
 
   const segments = [
-    { label: 'Completed', count: completed, color: '#606C38' },
-    { label: 'In Progress', count: inProgress, color: '#5a7247' },
-    { label: 'Failed', count: failed, color: '#dc2626' },
-    { label: 'Pending', count: pending, color: '#e5e1d3' },
+    { label: 'Completed', count: completed, color: 'var(--color-corthex-accent)' },
+    { label: 'In Progress', count: inProgress, color: 'var(--color-corthex-accent-hover)' },
+    { label: 'Failed', count: failed, color: 'var(--color-corthex-error)' },
+    { label: 'Pending', count: pending, color: 'var(--color-corthex-border)' },
   ]
 
   let accOffset = 0

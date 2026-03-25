@@ -334,7 +334,7 @@ function SoulEditor({
           <p className="text-[10px] font-medium text-corthex-text-secondary mb-1">사용 가능한 변수 ({SOUL_VARIABLES.length}개):</p>
           <div className="flex flex-wrap gap-1">
             {SOUL_VARIABLES.map((v) => (
-              <span key={v.name} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: v.category === 'personality' ? 'rgba(37,99,235,0.1)' : v.category === 'memory' ? 'rgba(124,58,237,0.1)' : 'rgba(90,114,71,0.1)', color: v.category === 'personality' ? '#2563eb' : v.category === 'memory' ? '#7c3aed' : '#5a7247' }} onClick={() => setSoul((prev) => prev + `{{${v.name}}}`)} title={`${v.label}: ${v.description}`}>
+              <span key={v.name} className="px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer" style={{ backgroundColor: v.category === 'personality' ? 'rgba(37,99,235,0.1)' : v.category === 'memory' ? 'rgba(124,58,237,0.1)' : 'rgba(90,114,71,0.1)', color: v.category === 'personality' ? '#2563eb' : v.category === 'memory' ? '#7c3aed' : 'var(--color-corthex-accent)' }} onClick={() => setSoul((prev) => prev + `{{${v.name}}}`)} title={`${v.label}: ${v.description}`}>
                 {`{{${v.name}}}`}
               </span>
             ))}
@@ -377,7 +377,7 @@ function SoulEditor({
               <p className="text-[10px] font-medium text-corthex-text-secondary">치환된 변수:</p>
               {Object.entries(previewA.variables).map(([key, val]) => (
                 <div key={key} className="text-[10px] font-mono text-corthex-text-secondary truncate">
-                  <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
+                  <span style={{ color: 'var(--color-corthex-accent)' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                 </div>
               ))}
             </div>
@@ -394,7 +394,7 @@ function SoulEditor({
                 <p className="text-[10px] font-medium text-corthex-text-secondary">치환된 변수:</p>
                 {Object.entries(previewB.variables).map(([key, val]) => (
                   <div key={key} className="text-[10px] font-mono text-corthex-text-secondary truncate">
-                    <span style={{ color: '#5a7247' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
+                    <span style={{ color: 'var(--color-corthex-accent)' }}>{`{{${key}}}`}</span>{' = '}<span>{val || '(빈 값)'}</span>
                   </div>
                 ))}
               </div>
@@ -487,7 +487,7 @@ function AgentDetailPanel({
               {agent.role || 'Agent'} — {deptName}
             </p>
             <div className="flex items-center gap-2 pt-1">
-              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest" style={{ color: status.dot === 'bg-corthex-accent' ? '#4d7c0f' : status.dot === 'bg-red-600' ? '#dc2626' : '#6b705c' }}>
+              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest" style={{ color: status.dot === 'bg-corthex-accent' ? '#4d7c0f' : status.dot === 'bg-red-600' ? '#dc2626' : 'var(--color-corthex-text-secondary)' }}>
                 <span className={`w-1.5 h-1.5 rounded-full ${status.dot} ${status.dot === 'bg-corthex-accent' ? 'animate-pulse' : ''}`} />
                 {status.labelKo} {status.label}
               </span>

@@ -75,8 +75,8 @@ export function NexusCanvas({
           style={{ width: 192, height: 128 }}
           className="!bg-corthex-surface !border-corthex-border !rounded-xl !shadow-[0_4px_20px_rgba(40,54,24,0.08)] hidden md:block"
           nodeColor={(n) => {
-            if (n.type === 'company') return '#283618'
-            if (n.type === 'department') return '#5a7247'
+            if (n.type === 'company') return 'var(--color-corthex-accent-deep)'
+            if (n.type === 'department') return 'var(--color-corthex-accent)'
             return '#a3b18a'
           }}
         />
@@ -120,7 +120,7 @@ function NexusExportButton({ canvasRef }: { canvasRef: React.RefObject<HTMLDivEl
       if (!ctx) return
 
       ctx.scale(2, 2)
-      ctx.fillStyle = '#faf8f5'
+      ctx.fillStyle = 'var(--color-corthex-bg)'
       ctx.fillRect(0, 0, rect.width, rect.height)
 
       // Simple canvas-based PNG export

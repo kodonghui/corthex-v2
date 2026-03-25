@@ -137,8 +137,8 @@ function StepIndicator({ current, completed }: { current: number; completed: Set
                 className="w-10 h-10 rounded-full flex items-center justify-center border-4 mb-2"
                 style={{
                   borderColor: OC.cream,
-                  backgroundColor: isDone || isActive ? OC.olive : '#ffffff',
-                  color: isDone || isActive ? '#ffffff' : '#94a3b8',
+                  backgroundColor: isDone || isActive ? OC.olive : 'var(--color-corthex-surface)',
+                  color: isDone || isActive ? 'var(--color-corthex-surface)' : '#94a3b8',
                   ...(isActive ? { boxShadow: `0 0 0 4px rgba(85,107,47,0.2)` } : {}),
                   ...(!(isDone || isActive) ? { border: `2px solid ${OC.sand}` } : {}),
                 }}

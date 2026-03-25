@@ -128,24 +128,24 @@ function formatTime(dateStr: string) {
 
 // Demo conversation data matching Stitch design
 const DEMO_CONVERSATIONS = [
-  { id: '1', initials: 'ST', name: '전략팀 Strategy Team', preview: '시장 분석 결과를 공유합니다', time: '14:32', unread: 3, color: '#283618', active: true },
-  { id: '2', initials: 'SK', name: '김수호 Suho Kim', preview: '보고서 검토 완료했습니다', time: '14:15', unread: 1, color: '#606C38' },
-  { id: '3', initials: 'ST', name: '보안팀 Security Team', preview: '보안 감사 일정 확인', time: '13:45', unread: 0, color: '#6b705c' },
-  { id: '4', initials: 'DL', name: '이다은 Da-eun Lee', preview: '데이터 분석 진행상황...', time: '13:20', unread: 0, color: '#283618' },
-  { id: '5', initials: 'OP', name: '운영팀 Operations', preview: '시스템 점검 안내', time: '12:00', unread: 0, color: '#606C38' },
+  { id: '1', initials: 'ST', name: '전략팀 Strategy Team', preview: '시장 분석 결과를 공유합니다', time: '14:32', unread: 3, color: 'var(--color-corthex-accent-deep)', active: true },
+  { id: '2', initials: 'SK', name: '김수호 Suho Kim', preview: '보고서 검토 완료했습니다', time: '14:15', unread: 1, color: 'var(--color-corthex-accent)' },
+  { id: '3', initials: 'ST', name: '보안팀 Security Team', preview: '보안 감사 일정 확인', time: '13:45', unread: 0, color: 'var(--color-corthex-text-secondary)' },
+  { id: '4', initials: 'DL', name: '이다은 Da-eun Lee', preview: '데이터 분석 진행상황...', time: '13:20', unread: 0, color: 'var(--color-corthex-accent-deep)' },
+  { id: '5', initials: 'OP', name: '운영팀 Operations', preview: '시스템 점검 안내', time: '12:00', unread: 0, color: 'var(--color-corthex-accent)' },
   { id: '6', initials: 'YH', name: '한예진 Ye-jin Han', preview: '보안 패치 적용 완료', time: '11:30', unread: 0, color: '#908a78' },
-  { id: '7', initials: 'TT', name: '트레이딩팀 Trading', preview: '오늘 포지션 리뷰', time: '10:45', unread: 0, color: '#283618' },
-  { id: '8', initials: 'JP', name: '박지훈 Ji-hun Park', preview: '트레이딩 전략 논의', time: '09:30', unread: 0, color: '#606C38' },
+  { id: '7', initials: 'TT', name: '트레이딩팀 Trading', preview: '오늘 포지션 리뷰', time: '10:45', unread: 0, color: 'var(--color-corthex-accent-deep)' },
+  { id: '8', initials: 'JP', name: '박지훈 Ji-hun Park', preview: '트레이딩 전략 논의', time: '09:30', unread: 0, color: 'var(--color-corthex-accent)' },
   { id: '9', initials: 'RT', name: '리서치팀 Research', preview: 'Q1 보고서 초안', time: '어제', unread: 0, color: '#908a78' },
 ]
 
 const DEMO_MESSAGES = [
-  { id: 'm1', sender: '김수호', initials: 'SK', color: '#606C38', time: '14:10', content: '3월 시장 분석 리포트를 첨부합니다. 주요 포인트는 아래와 같습니다.', own: false },
-  { id: 'm2', sender: '김수호', initials: 'SK', color: '#606C38', time: '14:11', content: null, own: false, file: { name: '시장분석_2026Q1.pdf', size: '2.4 MB', type: 'PDF Document' } },
-  { id: 'm3', sender: '이다은', initials: 'DL', color: '#283618', time: '14:20', content: '분석 결과가 흥미롭네요. 경쟁사 대비 성장률이 12% 높습니다.', own: false },
-  { id: 'm4', sender: '최서연', initials: 'SY', color: '#6b705c', time: '14:25', content: '리서치팀에서 추가 데이터를 보완할 수 있을 것 같습니다.', own: false },
+  { id: 'm1', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:10', content: '3월 시장 분석 리포트를 첨부합니다. 주요 포인트는 아래와 같습니다.', own: false },
+  { id: 'm2', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:11', content: null, own: false, file: { name: '시장분석_2026Q1.pdf', size: '2.4 MB', type: 'PDF Document' } },
+  { id: 'm3', sender: '이다은', initials: 'DL', color: 'var(--color-corthex-accent-deep)', time: '14:20', content: '분석 결과가 흥미롭네요. 경쟁사 대비 성장률이 12% 높습니다.', own: false },
+  { id: 'm4', sender: '최서연', initials: 'SY', color: 'var(--color-corthex-text-secondary)', time: '14:25', content: '리서치팀에서 추가 데이터를 보완할 수 있을 것 같습니다.', own: false },
   { id: 'm5', sender: '정민우', initials: 'MW', color: '#908a78', time: '14:28', content: '다음 미팅에서 세부 전략을 논의합시다. 화요일 2시 가능한가요?', own: false },
-  { id: 'm6', sender: '나 (김수호)', initials: 'SK', color: '#283618', time: '14:32', content: '좋습니다. 미팅 일정 확정하겠습니다. 참석자 명단 공유 부탁드립니다.', own: true },
+  { id: 'm6', sender: '나 (김수호)', initials: 'SK', color: 'var(--color-corthex-accent-deep)', time: '14:32', content: '좋습니다. 미팅 일정 확정하겠습니다. 참석자 명단 공유 부탁드립니다.', own: true },
 ]
 
 export function MessengerPage() {
@@ -157,7 +157,7 @@ export function MessengerPage() {
   }
 
   return (
-    <div className="min-h-screen flex" data-testid="messenger-page" style={{ backgroundColor: '#faf8f5' }}>
+    <div className="min-h-screen flex" data-testid="messenger-page" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
       <div className="p-8 max-w-[1440px] mx-auto flex-1 flex gap-6">
         {/* LEFT PANEL: Conversation List */}
         <aside className="w-[380px] flex flex-col bg-corthex-elevated rounded-2xl overflow-hidden shadow-sm border border-corthex-border">

@@ -39,13 +39,13 @@ const MODEL_OPTIONS = [
 ]
 
 const TIER_BADGE_STYLES: Record<number, { bg: string; label: string }> = {
-  0: { bg: '#283618', label: 'Manager' },
-  1: { bg: '#606C38', label: 'Specialist' },
-  2: { bg: '#6b705c', label: 'Worker' },
+  0: { bg: 'var(--color-corthex-accent-deep)', label: 'Manager' },
+  1: { bg: 'var(--color-corthex-accent)', label: 'Specialist' },
+  2: { bg: 'var(--color-corthex-text-secondary)', label: 'Worker' },
 }
 
 const TIER_LEVEL_COLORS: string[] = [
-  '#283618', '#606C38', '#6b705c', '#908a78', '#e5e1d3', '#f5f0e8',
+  'var(--color-corthex-accent-deep)', 'var(--color-corthex-accent)', 'var(--color-corthex-text-secondary)', '#908a78', 'var(--color-corthex-border)', 'var(--color-corthex-elevated)',
 ]
 
 // ── Tier Form ──

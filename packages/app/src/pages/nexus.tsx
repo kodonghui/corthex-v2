@@ -136,7 +136,7 @@ function buildOrgGraph(org: OrgChartData['data']): { nodes: Node[]; edges: Edge[
 
 // ── Toolbar ──
 
-const oliveColor = '#5a7247'
+const oliveColor = 'var(--color-corthex-accent)'
 
 function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boolean; onToggleEditMode: () => void; isAdmin: boolean }) {
   const { zoomIn, zoomOut, getZoom } = useReactFlow()

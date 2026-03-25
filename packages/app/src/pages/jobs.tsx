@@ -592,7 +592,7 @@ export function JobsPage() {
               <div className="flex gap-3 flex-wrap">
                 {([['oneTime', '일회성'], ['schedule', '반복 스케줄'], ['trigger', '이벤트 트리거']] as const).map(([val, label]) => (
                   <label key={val} className="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="jobType" checked={modalType === val} onChange={() => setModalType(val)} style={{ accentColor: '#606C38' }} />
+                    <input type="radio" name="jobType" checked={modalType === val} onChange={() => setModalType(val)} style={{ accentColor: 'var(--color-corthex-accent)' }} />
                     <span className="text-sm text-corthex-text-secondary">{label}</span>
                   </label>
                 ))}
@@ -601,7 +601,7 @@ export function JobsPage() {
 
             <div>
               <label className="block text-xs font-medium text-corthex-text-secondary mb-1">담당 에이전트</label>
-              <select value={modalAgent} onChange={e => setModalAgent(e.target.value)} className={selectClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} data-testid="agent-select">
+              <select value={modalAgent} onChange={e => setModalAgent(e.target.value)} className={selectClass} style={{ ['--tw-ring-color' as string]: 'var(--color-corthex-accent)' }} data-testid="agent-select">
                 <option value="">에이전트 선택...</option>
                 {agentList.map(a => (<option key={a.id} value={a.id}>{a.name} {a.isSecretary ? '(비서)' : ''} — {a.role}</option>))}
               </select>
@@ -609,13 +609,13 @@ export function JobsPage() {
 
             <div>
               <label className="block text-xs font-medium text-corthex-text-secondary mb-1">작업 지시</label>
-              <textarea value={modalInstruction} onChange={e => setModalInstruction(e.target.value)} placeholder="예: 이번 달 마케팅 채널별 성과를 분석해서 보고서로 정리해줘" rows={3} className={inputClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} data-testid="instruction-input" />
+              <textarea value={modalInstruction} onChange={e => setModalInstruction(e.target.value)} placeholder="예: 이번 달 마케팅 채널별 성과를 분석해서 보고서로 정리해줘" rows={3} className={inputClass} style={{ ['--tw-ring-color' as string]: 'var(--color-corthex-accent)' }} data-testid="instruction-input" />
             </div>
 
             {modalType === 'oneTime' && chainSteps.length === 0 && (
               <div>
                 <label className="block text-xs font-medium text-corthex-text-secondary mb-1">실행 시간 (비워두면 즉시)</label>
-                <input type="datetime-local" value={modalScheduledFor} onChange={e => setModalScheduledFor(e.target.value)} className={inputClass} style={{ ['--tw-ring-color' as string]: '#606C38' }} />
+                <input type="datetime-local" value={modalScheduledFor} onChange={e => setModalScheduledFor(e.target.value)} className={inputClass} style={{ ['--tw-ring-color' as string]: 'var(--color-corthex-accent)' }} />
               </div>
             )}
 
@@ -623,7 +623,7 @@ export function JobsPage() {
               <div>
                 {chainSteps.length > 0 && (
                   <div className="space-y-3 mb-3">
-                    <p className="text-xs font-medium" style={{ color: '#606C38' }}>체인 후속 단계</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--color-corthex-accent)' }}>체인 후속 단계</p>
                     {chainSteps.map((step, i) => (
                       <div key={i} className="pl-4 border-l-2 space-y-2" style={{ borderColor: '#606C3880' }}>
                         <div className="flex items-center gap-2">
@@ -640,7 +640,7 @@ export function JobsPage() {
                   </div>
                 )}
                 {chainSteps.length < 4 && (
-                  <button type="button" onClick={() => setChainSteps(prev => [...prev, { agentId: modalAgent || '', instruction: '' }])} className="text-xs" style={{ color: '#606C38' }}>
+                  <button type="button" onClick={() => setChainSteps(prev => [...prev, { agentId: modalAgent || '', instruction: '' }])} className="text-xs" style={{ color: 'var(--color-corthex-accent)' }}>
                     + 체인 단계 추가 (순차 실행)
                   </button>
                 )}
@@ -658,7 +658,7 @@ export function JobsPage() {
                   <div className="flex gap-3">
                     {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
                       <label key={val} className="flex items-center gap-1.5 cursor-pointer">
-                        <input type="radio" name="frequency" checked={modalFrequency === val} onChange={() => setModalFrequency(val)} style={{ accentColor: '#606C38' }} />
+                        <input type="radio" name="frequency" checked={modalFrequency === val} onChange={() => setModalFrequency(val)} style={{ accentColor: 'var(--color-corthex-accent)' }} />
                         <span className="text-sm text-corthex-text-secondary">{label}</span>
                       </label>
                     ))}
@@ -669,7 +669,7 @@ export function JobsPage() {
                     <label className="block text-xs font-medium text-corthex-text-secondary mb-2">요일 선택</label>
                     <div className="flex gap-2">
                       {DAY_NAMES.map((name, i) => (
-                        <button key={i} type="button" onClick={() => toggleDay(i)} className="w-9 h-9 rounded-full text-xs font-medium transition-colors" style={modalDays.includes(i) ? { backgroundColor: '#606C38', color: 'white' } : { backgroundColor: '#f5f0e8', color: '#6b705c' }}>
+                        <button key={i} type="button" onClick={() => toggleDay(i)} className="w-9 h-9 rounded-full text-xs font-medium transition-colors" style={modalDays.includes(i) ? { backgroundColor: 'var(--color-corthex-accent)', color: 'white' } : { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)' }}>
                           {name}
                         </button>
                       ))}
@@ -712,7 +712,7 @@ export function JobsPage() {
                 onClick={handleSubmit}
                 disabled={!modalAgent || !modalInstruction.trim() || isPending}
                 className="flex-1 py-2.5 text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
-                style={{ backgroundColor: '#606C38' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                 data-testid="submit-job-btn"
               >
                 {isPending ? '처리 중...' : (editingSchedule || editingTrigger) ? '수정' : '등록'}

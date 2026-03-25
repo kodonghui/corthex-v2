@@ -71,7 +71,7 @@ const DEMO_POSTS = [
     id: 'p1',
     author: 'Suho Kim',
     badge: 'Strategy Team',
-    badgeBg: '#283618',
+    badgeBg: 'var(--color-corthex-accent-deep)',
     badgeText: 'white',
     timeAgo: '2시간 전 - Public',
     content: 'Q1 시장 분석 보고서가 완성되었습니다. 경쟁사 대비 성장률 12% 달성! 자세한 내용은 리포트를 확인해주세요.',
@@ -99,7 +99,7 @@ const DEMO_POSTS = [
     id: 'p3',
     author: 'Da-eun Lee',
     badge: 'Analysis Team',
-    badgeBg: '#606C38',
+    badgeBg: 'var(--color-corthex-accent)',
     badgeText: 'white',
     timeAgo: '6시간 전',
     content: '새로운 데이터 파이프라인 구축 완료! 처리 속도가 기존 대비 40% 향상되었습니다. 팀원들의 노력에 감사드립니다.',
@@ -114,7 +114,7 @@ const DEMO_POSTS = [
     id: 'p4',
     author: 'Han Ye-jin',
     badge: 'Security Team',
-    badgeBg: '#283618',
+    badgeBg: 'var(--color-corthex-accent-deep)',
     badgeText: 'white',
     timeAgo: '어제',
     content: '보안 감사 결과: 전체 시스템 보안 등급 A+ 달성. 취약점 0건. 다음 분기 감사 일정은 추후 공지하겠습니다.',
@@ -129,12 +129,12 @@ const DEMO_POSTS = [
     id: 'p5',
     author: 'Song Hyun-woo',
     badge: 'Finance Team',
-    badgeBg: '#606C38',
+    badgeBg: 'var(--color-corthex-accent)',
     badgeText: 'white',
     timeAgo: '2일 전',
     content: '3월 비용 보고서 요약: 총 비용 $4,287.50 (전월 대비 -12.3%). 예산 절감 목표 초과 달성했습니다!',
     stats: [
-      { label: 'Monthly Cost', value: '$4,287.50', color: '#283618' },
+      { label: 'Monthly Cost', value: '$4,287.50', color: 'var(--color-corthex-accent-deep)' },
       { label: 'MoM Growth', value: '-12.3%', color: '#4d7c0f' },
     ],
     reactions: [
@@ -168,7 +168,7 @@ export function SnsPage() {
   const agents = agentsData?.data || []
 
   return (
-    <div data-testid="sns-page" className="min-h-screen" style={{ backgroundColor: '#faf8f5' }}>
+    <div data-testid="sns-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
       <div className="p-8 max-w-[1440px] mx-auto">
         {/* Header */}
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">

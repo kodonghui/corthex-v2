@@ -36,10 +36,10 @@ const TYPE_CATEGORY: Record<string, string> = {
 }
 
 const TYPE_ICON_STYLE: Record<string, { bg: string; dot: string; label: string; icon: 'success' | 'warning' | 'error' | 'info' | 'handoff' | 'system' }> = {
-  chat_complete: { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Agent', icon: 'success' },
+  chat_complete: { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
   delegation_complete: { bg: 'rgba(124,58,237,0.10)', dot: '#7c3aed', label: 'Handoff', icon: 'handoff' },
   tool_error: { bg: 'rgba(180,83,9,0.10)', dot: '#b45309', label: 'System Alert', icon: 'warning' },
-  job_complete: { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Agent', icon: 'success' },
+  job_complete: { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
   job_error: { bg: 'rgba(220,38,38,0.10)', dot: '#dc2626', label: 'Error', icon: 'error' },
   system: { bg: 'rgba(37,99,235,0.10)', dot: '#2563eb', label: 'System', icon: 'info' },
 }
@@ -299,7 +299,7 @@ export function NotificationsPage() {
                 <div className="space-y-0">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="p-5 border-b border-corthex-border/10">
-                      <Skeleton className="h-16 rounded-xl" style={{ backgroundColor: '#f5f0e8' }} />
+                      <Skeleton className="h-16 rounded-xl" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
                     </div>
                   ))}
                 </div>
@@ -311,7 +311,7 @@ export function NotificationsPage() {
                 </div>
               ) : (
                 filteredNotifications.map((n) => {
-                  const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Alert', icon: 'info' as const }
+                  const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
                   const isSelected = selectedId === n.id
                   const borderColor = iconStyle.icon === 'error' ? '#dc2626'
                     : iconStyle.icon === 'handoff' ? '#7c3aed'
@@ -382,7 +382,7 @@ export function NotificationsPage() {
                   {/* Detail Header */}
                   <div className="mb-8">
                     {(() => {
-                      const style = TYPE_ICON_STYLE[selectedNotification.type] || { bg: 'rgba(96,108,56,0.10)', dot: '#606C38', label: 'Alert', icon: 'info' as const }
+                      const style = TYPE_ICON_STYLE[selectedNotification.type] || { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
                       return (
                         <div
                           className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
@@ -418,7 +418,7 @@ export function NotificationsPage() {
                         </h4>
                         <div
                           className="p-4 bg-corthex-elevated rounded-xl border-l-2"
-                          style={{ borderLeftColor: (TYPE_ICON_STYLE[selectedNotification.type] || { dot: '#606C38' }).dot }}
+                          style={{ borderLeftColor: (TYPE_ICON_STYLE[selectedNotification.type] || { dot: 'var(--color-corthex-accent)' }).dot }}
                         >
                           <p className="text-sm leading-relaxed text-corthex-text-primary/80">
                             {selectedNotification.body}

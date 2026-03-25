@@ -98,9 +98,9 @@ type Agent = { id: string; name: string; departmentId: string | null }
 
 const PAGE_SIZE = 20
 
-const oliveColor = '#606C38'
-const sandBg = '#faf8f5'
-const borderColor = '#e5e1d3'
+const oliveColor = 'var(--color-corthex-accent)'
+const sandBg = 'var(--color-corthex-bg)'
+const borderColor = 'var(--color-corthex-border)'
 
 const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
   markdown: 'bg-blue-100 text-blue-700',

@@ -376,7 +376,7 @@ function ScoreRing({ score }: { score: number }) {
   const radius = 36
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
-  const color = score >= 70 ? '#606C38' : score >= 40 ? '#d97706' : '#dc2626'
+  const color = score >= 70 ? 'var(--color-corthex-accent)' : score >= 40 ? '#d97706' : '#dc2626'
   return (
     <div className="relative w-24 h-24">
       <svg className="w-24 h-24 -rotate-90" viewBox="0 0 80 80">

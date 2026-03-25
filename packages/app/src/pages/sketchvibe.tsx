@@ -688,7 +688,7 @@ function NexusPageInner() {
   return (
     <div className="flex h-screen w-full" style={{ fontFamily: "'Pretendard', sans-serif" }}>
       {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: '#faf8f5' }}>
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
         {/* Top Bar */}
         <header className="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05), transparent)' }}>
           <div className="flex items-center gap-4 pointer-events-auto backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}>
@@ -699,7 +699,7 @@ function NexusPageInner() {
           </div>
           <div className="flex items-center gap-4 pointer-events-auto">
             {autoSaveToast && (
-              <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: '#5a7247' }}>
+              <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}>
                 Auto-saved
               </span>
             )}
@@ -713,7 +713,7 @@ function NexusPageInner() {
             <button
               onClick={() => setShowExportKnowledge(true)}
               className="text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
-              style={{ backgroundColor: '#5a7247' }}
+              style={{ backgroundColor: 'var(--color-corthex-accent)' }}
             >
               Share
             </button>
@@ -739,7 +739,7 @@ function NexusPageInner() {
             <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1c9b2" />
             <Controls
               className="!rounded-2xl !border !shadow-md"
-              style={{ borderColor: '#e5e1d3', backgroundColor: '#ffffff' }}
+              style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-surface)' }}
             />
             <MiniMap
               nodeStrokeWidth={3}
@@ -789,7 +789,7 @@ function NexusPageInner() {
           <button
             onClick={handleAutoLayout}
             className="w-10 h-10 rounded-full shadow-md flex items-center justify-center border transition-colors"
-            style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3', color: '#6a5d43' }}
+            style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
           >
             <Maximize className="w-5 h-5" />
           </button>
@@ -797,7 +797,7 @@ function NexusPageInner() {
 
         {/* Floating Toolbar */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="rounded-full shadow-xl px-6 py-3 flex items-center gap-6 border" style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d3' }}>
+          <div className="rounded-full shadow-xl px-6 py-3 flex items-center gap-6 border" style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)' }}>
             {Object.entries(NODE_PALETTE).slice(0, 4).map(([type, config]) => (
               <button
                 key={type}
@@ -813,7 +813,7 @@ function NexusPageInner() {
                 <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>{config.label || type}</span>
               </button>
             ))}
-            <div className="w-px h-8" style={{ backgroundColor: '#e5e1d3' }}></div>
+            <div className="w-px h-8" style={{ backgroundColor: 'var(--color-corthex-border)' }}></div>
             <button
               onClick={handleMermaidExport}
               className="flex flex-col items-center gap-1 group"
@@ -834,7 +834,7 @@ function NexusPageInner() {
 
       {/* Chat Panel */}
       {chatOpen && selectedAgent && selectedSessionId && (
-        <div className="w-96 border-l flex flex-col h-full" style={{ borderColor: '#e5e1d3', backgroundColor: '#fbfaf8' }}>
+        <div className="w-96 border-l flex flex-col h-full" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: '#fbfaf8' }}>
           <ChatArea
             agent={selectedAgent}
             sessionId={selectedSessionId}
@@ -857,7 +857,7 @@ function NexusPageInner() {
       {/* Save Dialog */}
       {showSaveDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <div className="rounded-2xl shadow-2xl p-6 w-96 mx-4" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e1d3' }}>
+          <div className="rounded-2xl shadow-2xl p-6 w-96 mx-4" style={{ backgroundColor: 'var(--color-corthex-surface)', border: '1px solid #e5e1d3' }}>
             <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Save Canvas</h3>
             <input
               type="text"
@@ -865,21 +865,21 @@ function NexusPageInner() {
               onChange={(e) => setSaveNameInput(e.target.value)}
               placeholder="Canvas name"
               className="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-1"
-              style={{ borderColor: '#e5e1d3', color: '#463e30', backgroundColor: '#fbfaf8' }}
+              style={{ borderColor: 'var(--color-corthex-border)', color: '#463e30', backgroundColor: '#fbfaf8' }}
               autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowSaveDialog(false)}
                 className="border rounded-lg px-4 py-2 text-sm transition-colors"
-                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                style={{ borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveNew}
                 className="text-white rounded-lg px-4 py-2 text-sm font-medium"
-                style={{ backgroundColor: '#5a7247' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
               >
                 Save
               </button>
@@ -891,7 +891,7 @@ function NexusPageInner() {
       {/* Mermaid Import Modal */}
       {showMermaidModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <div className="rounded-2xl shadow-2xl p-6 w-[500px] mx-4" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e1d3' }}>
+          <div className="rounded-2xl shadow-2xl p-6 w-[500px] mx-4" style={{ backgroundColor: 'var(--color-corthex-surface)', border: '1px solid #e5e1d3' }}>
             <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Import Mermaid</h3>
             <textarea
               value={mermaidInput}
@@ -899,7 +899,7 @@ function NexusPageInner() {
               placeholder="Paste Mermaid code here..."
               rows={8}
               className="w-full border rounded-lg px-3 py-2 text-sm mb-2 font-mono focus:outline-none focus:ring-1"
-              style={{ borderColor: '#e5e1d3', color: '#463e30', backgroundColor: '#fbfaf8' }}
+              style={{ borderColor: 'var(--color-corthex-border)', color: '#463e30', backgroundColor: '#fbfaf8' }}
             />
             {mermaidError && (
               <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{mermaidError}</p>
@@ -908,14 +908,14 @@ function NexusPageInner() {
               <button
                 onClick={() => { setShowMermaidModal(false); setMermaidInput(''); setMermaidError('') }}
                 className="border rounded-lg px-4 py-2 text-sm"
-                style={{ borderColor: '#e5e1d3', color: '#6a5d43' }}
+                style={{ borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleMermaidImport}
                 className="text-white rounded-lg px-4 py-2 text-sm font-medium"
-                style={{ backgroundColor: '#5a7247' }}
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
               >
                 Import
               </button>
