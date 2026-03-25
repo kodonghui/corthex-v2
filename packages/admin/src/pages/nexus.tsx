@@ -46,13 +46,13 @@ import { exportToPng, exportToSvg, exportToJson, printCanvas } from '../lib/nexu
 import { PropertyPanel } from '../components/nexus/property-panel'
 import { Skeleton } from '@corthex/ui'
 
-// -- Natural Organic color tokens (replacing Stitch Default orange) --
+// -- Command Theme color tokens --
 const ORGANIC = {
-  primary: 'var(--color-corthex-accent)',       // olive-green
-  secondary: '#c4622d',     // terracotta
-  accent: '#d4a843',        // gold
-  bg: 'var(--color-corthex-bg)',            // organic-beige
-  bgDark: '#221610',
+  primary: 'var(--color-corthex-accent)',
+  secondary: 'var(--color-corthex-error)',
+  accent: 'var(--color-corthex-accent)',
+  bg: 'var(--color-corthex-bg)',
+  bgDark: 'var(--color-corthex-bg)',
   surface: 'var(--color-corthex-surface)',
   text: 'var(--color-corthex-text-secondary)',
 }
@@ -72,20 +72,20 @@ type SavedLayoutData = {
 
 function miniMapNodeColor(node: { type?: string }) {
   switch (node.type) {
-    case 'company': return '#e2e8f0'
-    case 'department': return ORGANIC.primary
+    case 'company': return '#44403C'
+    case 'department': return '#CA8A04'
     case 'agent': return '#10b981'
     case 'human': return '#a855f7'
-    case 'unassigned-group': return ORGANIC.accent
-    default: return '#64748b'
+    case 'unassigned-group': return '#EAB308'
+    default: return '#57534E'
   }
 }
 
 function NexusSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-40" style={{ backgroundColor: '#e2e8f0' }} />
-      <Skeleton className="h-[600px] w-full rounded-xl" style={{ backgroundColor: 'rgba(226,232,240,0.5)' }} />
+      <Skeleton className="h-8 w-40 bg-corthex-elevated" />
+      <Skeleton className="h-[600px] w-full rounded-xl bg-corthex-surface" />
     </div>
   )
 }
@@ -443,19 +443,18 @@ function NexusCanvas() {
           <div className="relative hidden sm:block">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
             <input
-              className="border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64"
-              style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}
+              className="border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64 bg-corthex-elevated"
               placeholder="Search infrastructure..."
               type="text"
             />
           </div>
-          <button className="p-2 rounded-xl transition-colors" style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}>
+          <button className="p-2 rounded-xl transition-colors bg-corthex-elevated hover:bg-corthex-border">
             <Bell className="w-5 h-5" />
           </button>
-          <button className="p-2 rounded-xl transition-colors" style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}>
+          <button className="p-2 rounded-xl transition-colors bg-corthex-elevated hover:bg-corthex-border">
             <Settings className="w-5 h-5" />
           </button>
-          <div className="h-8 w-8 rounded-full border-2 overflow-hidden" style={{ backgroundColor: 'rgba(90,114,71,0.2)', borderColor: ORGANIC.primary }}></div>
+          <div className="h-8 w-8 rounded-full border-2 overflow-hidden bg-corthex-accent-muted border-corthex-accent"></div>
         </div>
       </header>
 
@@ -465,11 +464,11 @@ function NexusCanvas() {
           <div className="mb-4 px-2 hidden lg:block">
             <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-disabled">Management</h3>
           </div>
-          <button className="flex items-center gap-3 p-3 rounded-xl transition-colors" style={{ ['--hover-bg' as string]: 'rgba(90,114,71,0.1)' }}>
+          <button className="flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-corthex-elevated">
             <LayoutDashboard className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Dashboard</span>
           </button>
-          <button className="flex items-center gap-3 p-3 rounded-xl text-white shadow-lg" style={{ backgroundColor: ORGANIC.primary, boxShadow: `0 10px 15px -3px rgba(90,114,71,0.3)` }}>
+          <button className="flex items-center gap-3 p-3 rounded-xl text-corthex-text-on-accent shadow-lg bg-corthex-accent">
             <GitBranch className="w-5 h-5" />
             <span className="hidden lg:block text-sm font-medium">Nexus Canvas</span>
           </button>
@@ -485,10 +484,9 @@ function NexusCanvas() {
 
         {/* Main Content: Canvas Area */}
         <main
-          className="flex-1 relative overflow-hidden"
+          className="flex-1 relative overflow-hidden bg-corthex-bg"
           style={{
-            backgroundColor: '#f1f5f0',
-            backgroundImage: `radial-gradient(circle, ${ORGANIC.primary}22 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle, rgba(202,138,4,0.15) 1px, transparent 1px)`,
             backgroundSize: '30px 30px',
           }}
         >
@@ -501,7 +499,7 @@ function NexusCanvas() {
             </div>
           ) : (
             <>
-              <div className="absolute inset-0 pointer-events-none z-10" style={{ backgroundColor: 'rgba(34,22,16,0.1)', backdropFilter: 'blur(1px)' }}></div>
+              <div className="absolute inset-0 pointer-events-none z-10"></div>
 
               <div ref={reactFlowRef} className="absolute inset-0 z-20">
                 <NexusToolbar
@@ -597,7 +595,7 @@ function NexusCanvas() {
               />
             </div>
             {/* Footer Action */}
-            <div className="p-6 border-t border-corthex-border" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>
+            <div className="p-6 border-t border-corthex-border bg-corthex-elevated">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs text-corthex-text-secondary">Last sync: 2 mins ago</span>
                 <div className="flex gap-2">
@@ -609,8 +607,7 @@ function NexusCanvas() {
               <button
                 onClick={handleSaveLayout}
                 disabled={!isDirty || saveMutation.isPending}
-                className="w-full text-white font-bold py-4 rounded-xl shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95 disabled:opacity-50"
-                style={{ backgroundColor: ORGANIC.primary, boxShadow: `0 20px 25px -5px rgba(90,114,71,0.3)` }}
+                className="w-full bg-corthex-accent text-corthex-text-on-accent font-bold py-4 rounded-xl shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95 disabled:opacity-50 hover:bg-corthex-accent-hover"
               >
                 <RefreshCw className="w-5 h-5" />
                 {saveMutation.isPending ? 'Syncing...' : 'Sync to Live Environment'}

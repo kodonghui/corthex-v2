@@ -1,5 +1,5 @@
 /**
- * Report Lines Page — Natural Organic Theme
+ * Report Lines Page
  *
  * API Endpoints:
  *   GET  /api/admin/report-lines?companyId=...
@@ -7,7 +7,7 @@
  *   POST /api/admin/report-lines   (add single)
  */
 import { useState, useEffect } from 'react'
-import { ChevronRight, Bell, Search, UserSearch, UserCog, Plus, Trash2, ChevronLeft } from 'lucide-react'
+import { UserSearch, UserCog, Plus, Trash2 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -76,213 +76,174 @@ export function ReportLinesPage() {
     saveMutation.mutate({ companyId: selectedCompanyId, lines: payload })
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">회사를 선택하세요</div>
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", color: 'var(--color-corthex-text-secondary)' }}>
-      {/* Top Bar */}
-      <header className="h-16 border-b border-corthex-border px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
-        <div className="flex items-center gap-2 text-corthex-text-secondary text-sm">
-          <span>Admin</span>
-          <ChevronRight className="w-3 h-3" />
-          <span className="font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>보고 라인 설정</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-full transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-full transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
+    <div className="p-8 space-y-6 max-w-4xl">
+      {/* Header */}
+      <div className="border-b border-corthex-border pb-6">
+        <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">
+          보고 라인 설정
+        </h1>
+        <p className="text-xs font-mono text-corthex-text-secondary uppercase tracking-wider mt-1">
+          Human org reporting hierarchy configuration
+        </p>
+      </div>
 
-      <div className="p-8 max-w-5xl mx-auto w-full">
-        {/* Page Header */}
-        <div className="mb-10">
-          <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif KR', serif", color: 'var(--color-corthex-text-secondary)' }}>보고 라인 설정</h2>
-          <p className="text-corthex-text-secondary max-w-2xl leading-relaxed">
-            휴먼 사용자의 조직 내 보고 체계를 설정합니다. 이 설정은 보고서 제출 대상 결정에 사용됩니다.
-            직속 상사는 하위 사용자의 성과를 관리하고 보고서를 승인할 권한을 가집니다.
-          </p>
+      {/* Add New Line Section */}
+      <section className="bg-corthex-surface border border-corthex-border p-6 space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="w-1.5 h-4 bg-corthex-accent flex-shrink-0"></span>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">새 보고 라인 추가</h2>
         </div>
-
-        {/* Add New Line Row (Inline Form) */}
-        <div className="bg-corthex-surface rounded-xl border border-corthex-border p-6 shadow-sm mb-8">
-          <h3 className="text-sm font-semibold text-corthex-text-secondary uppercase tracking-wider mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 보고 라인 추가</h3>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">대상 사용자 (Reporter)</label>
-              <div className="relative">
-                <UserSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
-                <select
-                  className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
-                  style={{ outlineColor: 'var(--color-corthex-accent)' }}
-                >
-                  <option value="">사용자 선택</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">직속 상사 (Supervisor)</label>
-              <div className="relative">
-                <UserCog className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
-                <select
-                  className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
-                  style={{ outlineColor: 'var(--color-corthex-accent)' }}
-                >
-                  <option value="">상사 선택</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex items-end">
-              <button
-                onClick={handleSave}
-                disabled={!hasChanges || saveMutation.isPending}
-                className="text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 h-[38px] disabled:opacity-50"
-                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(90,114,71,0.9)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-corthex-accent)')}
-              >
-                <Plus className="w-4 h-4" />
-                {saveMutation.isPending ? '저장 중...' : '보고 라인 추가'}
-              </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-corthex-text-secondary mb-1">
+              대상 사용자 (Reporter)
+            </label>
+            <div className="relative">
+              <UserSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
+              <select className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
+                <option value="">사용자 선택</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
+                ))}
+              </select>
             </div>
           </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-corthex-text-secondary mb-1">
+              직속 상사 (Supervisor)
+            </label>
+            <div className="relative">
+              <UserCog className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
+              <select className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
+                <option value="">상사 선택</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges || saveMutation.isPending}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {saveMutation.isPending ? '저장 중...' : '추가'}
+            </button>
+          </div>
         </div>
+      </section>
 
-        {saveMutation.isSuccess && !hasChanges && (
-          <div className="px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm mb-6">
-            저장 완료
+      {/* Save success banner */}
+      {saveMutation.isSuccess && !hasChanges && (
+        <div className="px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono uppercase tracking-widest">
+          저장 완료
+        </div>
+      )}
+
+      {/* Table */}
+      <section className="bg-corthex-surface border border-corthex-border overflow-hidden">
+        {isLoading ? (
+          <div className="p-5 space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div className="bg-corthex-elevated animate-pulse h-4 w-24" />
+                <div className="bg-corthex-elevated animate-pulse h-8 w-48" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <table className="w-full text-left border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-corthex-elevated border-b border-corthex-border">
+                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">대상 사용자 (Reporter)</th>
+                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">직속 상사 (Supervisor)</th>
+                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-corthex-border">
+              {users.map((u) => {
+                const reportsTo = lines[u.id] || ''
+                const reportTarget = users.find((t) => t.id === reportsTo)
+                const initial = u.name.charAt(0)
+
+                return (
+                  <tr key={u.id} className="hover:bg-corthex-elevated/50 transition-colors">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center text-corthex-accent font-bold text-xs font-mono flex-shrink-0">
+                          {initial}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold font-mono text-corthex-text-primary uppercase tracking-tight">{u.name}</p>
+                          <p className="text-xs font-mono text-corthex-text-disabled">@{u.username} / {u.role}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      {reportTarget ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center text-corthex-accent font-bold text-xs font-mono flex-shrink-0">
+                            {reportTarget.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold font-mono text-corthex-text-primary uppercase tracking-tight">{reportTarget.name}</p>
+                            <p className="text-xs font-mono text-corthex-text-disabled">@{reportTarget.username}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <select
+                          value={reportsTo}
+                          onChange={(e) => handleChange(u.id, e.target.value)}
+                          className="bg-corthex-bg border border-corthex-border px-3 py-1.5 text-xs font-mono text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none"
+                        >
+                          <option value="">없음 (최상위)</option>
+                          {users.filter((t) => t.id !== u.id).map((t) => (
+                            <option key={t.id} value={t.id}>{t.name} (@{t.username})</option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        className="text-corthex-text-disabled hover:text-corthex-error transition-colors p-1"
+                        onClick={() => handleChange(u.id, '')}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+
+        {!isLoading && users.length === 0 && (
+          <div className="py-12 text-center text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">
+            직원을 먼저 등록하세요
           </div>
         )}
 
-        {/* Table Content */}
-        <div className="bg-corthex-surface rounded-xl border border-corthex-border shadow-sm overflow-hidden">
-          {isLoading ? (
-            <div className="p-5 space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className="bg-slate-200 animate-pulse rounded h-4 w-24" />
-                  <div className="bg-slate-200 animate-pulse rounded h-8 w-48" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-corthex-bg">
-                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider">대상 사용자 (Reporter)</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider">직속 상사 (Supervisor)</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider text-right">관리</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {users.map((u) => {
-                  const reportsTo = lines[u.id] || ''
-                  const reportTarget = users.find((t) => t.id === reportsTo)
-                  const initial = u.name.charAt(0)
-
-                  return (
-                    <tr key={u.id} className="group hover:bg-corthex-bg/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="size-8 rounded-full flex items-center justify-center font-bold text-xs"
-                            style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}
-                          >
-                            {initial}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>{u.name}</p>
-                            <p className="text-xs text-corthex-text-secondary">@{u.username} / {u.role}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {reportTarget ? (
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="size-8 rounded-full flex items-center justify-center font-bold text-xs"
-                              style={{ backgroundColor: 'rgba(212,168,67,0.1)', color: '#d4a843' }}
-                            >
-                              {reportTarget.name.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>{reportTarget.name}</p>
-                              <p className="text-xs text-corthex-text-secondary">@{reportTarget.username}</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <select
-                            value={reportsTo}
-                            onChange={(e) => handleChange(u.id, e.target.value)}
-                            className="bg-corthex-bg border border-corthex-border rounded-lg px-3 py-1.5 text-sm outline-none transition-colors"
-                            style={{ color: 'var(--color-corthex-text-secondary)' }}
-                          >
-                            <option value="">없음 (최상위)</option>
-                            {users
-                              .filter((t) => t.id !== u.id)
-                              .map((t) => (
-                                <option key={t.id} value={t.id}>
-                                  {t.name} (@{t.username})
-                                </option>
-                              ))}
-                          </select>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          className="text-corthex-text-disabled p-2 transition-colors"
-                          style={{ cursor: 'pointer' }}
-                          onMouseEnter={(e) => (e.currentTarget.style.color = '#c4622d')}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                          onClick={() => handleChange(u.id, '')}
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+        <div className="px-5 py-3 border-t border-corthex-border bg-corthex-elevated flex items-center justify-between">
+          <p className="text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">
+            전체 {users.length}명 · 보고 라인 {Object.keys(lines).filter((k) => lines[k]).length}개 설정됨
+          </p>
+          {hasChanges && (
+            <button
+              onClick={handleSave}
+              disabled={saveMutation.isPending}
+              className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 transition-colors"
+            >
+              {saveMutation.isPending ? '저장 중...' : '변경사항 저장'}
+            </button>
           )}
-
-          {!isLoading && users.length === 0 && (
-            <div className="py-12 text-center text-sm text-corthex-text-secondary">
-              직원을 먼저 등록하세요
-            </div>
-          )}
-
-          <div className="px-6 py-4 bg-corthex-bg border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs text-corthex-text-secondary">전체 {users.length}개의 보고 라인이 설정됨</p>
-            <div className="flex gap-2">
-              <button className="p-1 text-corthex-text-disabled transition-colors disabled:opacity-30" disabled>
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button className="p-1 text-corthex-text-disabled transition-colors" style={{ cursor: 'pointer' }}>
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
         </div>
-
-        {/* Footer / API Info */}
-        <div className="mt-12 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center gap-4 text-corthex-text-disabled text-xs">
-          <p>&copy; 2024 CORTHEX v2. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span className="bg-corthex-elevated px-2 py-1 rounded">GET /api/admin/report-lines</span>
-            <span className="bg-corthex-elevated px-2 py-1 rounded">POST /api/admin/report-lines</span>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   )
 }

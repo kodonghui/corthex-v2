@@ -50,66 +50,89 @@ export function N8nEditorPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-120px)]">
-        <RefreshCw className="h-8 w-8 animate-spin text-stone-400" />
+        <RefreshCw className="h-6 w-6 animate-spin text-corthex-text-disabled" />
       </div>
     )
   }
 
   if (!isAvailable) {
     return (
-      <div className="space-y-6">
+      <div className="p-8 space-y-6">
+        {/* Page Header */}
         <div className="flex items-center gap-3">
-          <Workflow className="h-6 w-6 text-stone-400" />
-          <h1 className="text-xl font-semibold text-stone-800">n8n 에디터</h1>
+          <div className="w-8 h-8 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center">
+            <Workflow className="w-4 h-4 text-corthex-accent" />
+          </div>
+          <div>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">
+              n8n Workflow Editor
+            </h1>
+          </div>
         </div>
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
-          <AlertTriangle className="h-10 w-10 text-amber-500 mx-auto mb-3" />
-          <h2 className="text-lg font-medium text-amber-800">워크플로우 서비스 일시 중단</h2>
-          <p className="text-amber-600 mt-2">
-            n8n 서비스가 일시적으로 중단되었습니다. 자동 재시작 중입니다.
-          </p>
-          <p className="text-sm text-amber-500 mt-1">
-            상태: {health?.status || 'unreachable'}
-          </p>
+
+        {/* Unavailable State */}
+        <div className="bg-corthex-surface border border-corthex-border p-8 text-center space-y-4">
+          <div className="w-12 h-12 mx-auto bg-corthex-elevated border border-corthex-border flex items-center justify-center">
+            <AlertTriangle className="w-6 h-6 text-corthex-warning" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold uppercase tracking-widest text-corthex-text-primary mb-2">
+              워크플로우 서비스 일시 중단
+            </h2>
+            <p className="text-sm text-corthex-text-secondary">
+              n8n 서비스가 일시적으로 중단되었습니다. 자동 재시작 중입니다.
+            </p>
+            <p className="text-xs font-mono text-corthex-text-disabled mt-2 uppercase tracking-widest">
+              STATUS: {health?.status || 'UNREACHABLE'}
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between px-6 py-3 border-b border-corthex-border bg-corthex-surface">
         <div className="flex items-center gap-3">
-          <Workflow className="h-6 w-6 text-olive-600" />
-          <h1 className="text-xl font-semibold text-stone-800">n8n 에디터</h1>
+          <div className="w-7 h-7 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center">
+            <Workflow className="w-3.5 h-3.5 text-corthex-accent" />
+          </div>
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">
+              n8n Workflow Editor
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-emerald-500" />
-            <span className="text-sm text-stone-500">
-              n8n 정상 ({health?.responseTimeMs}ms)
+            <Activity className="h-3.5 w-3.5 text-corthex-success" />
+            <span className="text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">
+              {health?.responseTimeMs}ms
             </span>
           </div>
           <button
             onClick={() => setIframeKey(k => k + 1)}
-            className="flex items-center gap-1.5 text-sm text-olive-600 hover:text-olive-700"
+            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-3 w-3" />
             새로고침
           </button>
           <a
             href="/api/admin/n8n-editor/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-olive-600 hover:text-olive-700"
+            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3 w-3" />
             새 탭
           </a>
         </div>
       </div>
 
-      <div className="rounded-lg border border-sand-200 overflow-hidden bg-corthex-surface">
+      {/* iframe */}
+      <div className="flex-1 bg-corthex-bg overflow-hidden">
         <iframe
           key={iframeKey}
           src="/api/admin/n8n-editor/"
