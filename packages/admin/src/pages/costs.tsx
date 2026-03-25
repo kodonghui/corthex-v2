@@ -94,7 +94,7 @@ function SummaryCards({ data }: { data: CostSummary | undefined }) {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="costs-summary-cards">
       {cards.map((c) => (
-        <div key={c.label} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+        <div key={c.label} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
           <p className="text-stone-500 text-sm font-medium mb-2 uppercase tracking-wider">{c.label}</p>
           <h3 className="text-4xl font-bold" style={{ color: c.color, fontFamily: "'Playfair Display', serif" }}>{c.value}</h3>
           <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: c.trendUp ? '#16a34a' : c.trend ? '#ef4444' : '#5a7247' }}>
@@ -115,7 +115,7 @@ function SummaryCardsSkeleton() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+        <div key={i} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
           <div className="h-4 w-24 bg-stone-100 rounded animate-pulse mb-4" />
           <div className="h-10 w-40 bg-stone-100 rounded animate-pulse" />
         </div>
@@ -287,7 +287,7 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
   ]
 
   return (
-    <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+    <div className="lg:col-span-2 bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
       <div className="flex items-center justify-between mb-6">
         <h4 className="font-bold text-lg flex items-center gap-2">
           <svg className="w-5 h-5" style={{ color: '#5a7247' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,14 +405,14 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
 
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+      <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
         <div className="h-40 bg-stone-50 rounded animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between">
+    <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between">
       <div>
         <h4 className="font-bold text-lg mb-4 flex items-center gap-2" data-testid="budget-panel-title">
           <svg className="w-5 h-5" style={{ color: '#d4a843' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,7 +475,7 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
   const items = data?.data?.items ?? []
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
       <div className="p-6 border-b border-stone-100 flex items-center justify-between">
         <h4 className="font-bold text-lg flex items-center gap-2">
           <svg className="w-5 h-5" style={{ color: '#c4622d' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -554,7 +554,7 @@ export function CostsPage() {
     return (
       <div data-testid="costs-page" className="p-8" style={{ backgroundColor: '#faf8f5' }}>
         <h1 className="text-xl font-semibold" style={{ fontFamily: "'Playfair Display', serif" }}>비용 관리</h1>
-        <div className="bg-white rounded-2xl border border-stone-100 p-8 mt-4">
+        <div className="bg-corthex-surface rounded-2xl border border-stone-100 p-8 mt-4">
           <p data-testid="costs-no-company" className="text-sm text-stone-500 text-center">회사를 먼저 선택해주세요.</p>
         </div>
       </div>
@@ -565,7 +565,7 @@ export function CostsPage() {
     <div data-testid="costs-page" style={{ backgroundColor: '#faf8f5', fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
       <main className="flex-1 overflow-y-auto">
         {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-8 sticky top-0 z-10">
+        <header className="h-16 bg-corthex-surface border-b border-stone-200 flex items-center justify-between px-8 sticky top-0 z-10">
           <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>비용 및 예산 관리</h2>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">

@@ -200,10 +200,10 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
     <div className="flex flex-col h-full">
       {/* 툴바 */}
       <div className="px-3 sm:px-4 py-2 border-b border-zinc-700 flex items-center gap-1.5 sm:gap-2">
-        <button onClick={handleBack} className="text-sm text-zinc-400 hover:text-zinc-200 shrink-0">
+        <button onClick={handleBack} className="text-sm text-corthex-text-disabled hover:text-corthex-text-disabled shrink-0">
           ← 목록
         </button>
-        <span className="text-zinc-600 hidden sm:inline">|</span>
+        <span className="text-corthex-text-secondary hidden sm:inline">|</span>
         <span className="text-sm font-semibold truncate max-w-[120px] sm:max-w-none">{workflow.name}</span>
         {isDirty && (
           <span className="text-xs text-amber-400 hidden sm:inline">● 저장되지 않은 변경</span>
@@ -230,13 +230,13 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         <div className="hidden md:flex items-center gap-2">
           <button
             onClick={handleAddNode}
-            className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-zinc-600 rounded transition-colors"
           >
             + 노드
           </button>
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-corthex-elevated hover:bg-zinc-600'}`}
           >
             실행 기록
           </button>
@@ -246,7 +246,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
             className={`px-2 py-1 text-xs rounded transition-colors ${
               workflow.isTemplate
                 ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
+                : 'text-corthex-text-disabled hover:text-corthex-text-disabled hover:bg-corthex-elevated'
             }`}
           >
             {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
@@ -263,28 +263,28 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         <div className="relative md:hidden" ref={moreMenuRef}>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className="px-2 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-zinc-600 rounded transition-colors"
           >
             ···
           </button>
           {showMoreMenu && (
-            <div className="absolute right-0 top-full mt-1 w-44 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg z-50 py-1">
+            <div className="absolute right-0 top-full mt-1 w-44 bg-corthex-surface border border-zinc-700 rounded-lg shadow-lg z-50 py-1">
               <button
                 onClick={handleAddNode}
-                className="w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors"
+                className="w-full text-left px-3 py-2 text-xs hover:bg-corthex-elevated transition-colors"
               >
                 + 노드 추가
               </button>
               <button
                 onClick={() => { setShowHistory(!showHistory); setShowMoreMenu(false) }}
-                className="w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors"
+                className="w-full text-left px-3 py-2 text-xs hover:bg-corthex-elevated transition-colors"
               >
                 {showHistory ? '실행 기록 닫기' : '실행 기록'}
               </button>
               <button
                 onClick={() => { templateMutation.mutate(!workflow.isTemplate); setShowMoreMenu(false) }}
                 disabled={templateMutation.isPending}
-                className={`w-full text-left px-3 py-2 text-xs hover:bg-zinc-700 transition-colors ${
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-corthex-elevated transition-colors ${
                   workflow.isTemplate ? 'text-purple-400' : ''
                 }`}
               >
@@ -293,7 +293,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
               <hr className="border-zinc-700 my-1" />
               <button
                 onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
-                className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-zinc-700 transition-colors"
+                className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-corthex-elevated transition-colors"
               >
                 삭제
               </button>
@@ -324,7 +324,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
           <MiniMap
             nodeStrokeWidth={3}
             style={{ width: 150, height: 100 }}
-            className="!bg-zinc-100 hidden md:block"
+            className="!bg-corthex-elevated hidden md:block"
           />
         </ReactFlow>
       </div>

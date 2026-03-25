@@ -120,7 +120,7 @@ export function SettingsMcp() {
     <div className="space-y-6">
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-zinc-500">MCP 서버 연결</h3>
+          <h3 className="text-sm font-medium text-corthex-text-secondary">MCP 서버 연결</h3>
           {isAdmin && (
             <button
               onClick={() => { setShowForm(!showForm); setTestResult(null) }}
@@ -133,30 +133,30 @@ export function SettingsMcp() {
         </div>
 
         {isAdmin && isMaxReached && !showForm && (
-          <p className="text-xs text-zinc-500 mb-3">최대 {MAX_SERVERS}개까지 등록 가능합니다</p>
+          <p className="text-xs text-corthex-text-secondary mb-3">최대 {MAX_SERVERS}개까지 등록 가능합니다</p>
         )}
 
         {isAdmin && showForm && (
           <div className="mb-4 p-4 rounded-lg border border-indigo-200 bg-indigo-50 space-y-3">
             <div>
-              <label className="block text-xs font-medium text-zinc-500 mb-1">서버 URL</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">서버 URL</label>
               <input
                 type="url"
                 value={formUrl}
                 onChange={(e) => setFormUrl(e.target.value)}
                 onBlur={handleUrlBlur}
                 placeholder="http://localhost:3000/mcp 또는 https://host/sse"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-white text-sm"
+                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-corthex-surface text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-500 mb-1">서버 이름</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">서버 이름</label>
               <input
                 type="text"
                 value={formName}
                 onChange={(e) => { setFormName(e.target.value); setNameManuallySet(true) }}
                 placeholder="자동 제안됨 (URL 입력 후)"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-white text-sm"
+                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-corthex-surface text-sm"
               />
             </div>
 
@@ -164,7 +164,7 @@ export function SettingsMcp() {
               <button
                 onClick={() => testConnection.mutate(formUrl)}
                 disabled={!formUrl || testConnection.isPending}
-                className="px-3 py-2 text-xs border border-zinc-300 rounded-md hover:bg-zinc-100 disabled:opacity-50"
+                className="px-3 py-2 text-xs border border-zinc-300 rounded-md hover:bg-corthex-elevated disabled:opacity-50"
               >
                 {testConnection.isPending ? (
                   <span className="flex items-center gap-1">
@@ -192,9 +192,9 @@ export function SettingsMcp() {
 
         <div className="space-y-2">
           {isLoading ? (
-            <div className="text-center py-6 text-sm text-zinc-400">불러오는 중...</div>
+            <div className="text-center py-6 text-sm text-corthex-text-disabled">불러오는 중...</div>
           ) : servers.length === 0 ? (
-            <div className="text-center py-12 text-sm text-zinc-400">
+            <div className="text-center py-12 text-sm text-corthex-text-disabled">
               <p className="mb-2">연결된 MCP 서버가 없습니다</p>
               <p className="text-xs">서버를 추가하면 에이전트가 외부 도구를 사용할 수 있습니다</p>
             </div>
@@ -261,16 +261,16 @@ function ServerCard({
   return (
     <div className="rounded-md border border-zinc-200 overflow-hidden">
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-zinc-50"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-corthex-bg"
         onClick={onToggle}
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium truncate">{server.name}</span>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot}`} />
-            <span className="text-[10px] text-zinc-400">{statusLabel}</span>
+            <span className="text-[10px] text-corthex-text-disabled">{statusLabel}</span>
           </div>
-          <p className="text-xs text-zinc-400 truncate mt-0.5">{server.url}</p>
+          <p className="text-xs text-corthex-text-disabled truncate mt-0.5">{server.url}</p>
           {server.url.startsWith('http://') && (
             <p className="text-[10px] text-yellow-600 mt-0.5">HTTPS 사용을 권장합니다</p>
           )}
@@ -278,7 +278,7 @@ function ServerCard({
         {isAdmin && (
           <button
             onClick={(e) => { e.stopPropagation(); onDelete() }}
-            className="text-zinc-400 hover:text-red-500 ml-2 flex-shrink-0"
+            className="text-corthex-text-disabled hover:text-red-500 ml-2 flex-shrink-0"
             title="삭제"
           >
             🗑
@@ -287,22 +287,22 @@ function ServerCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-zinc-200 p-3 bg-zinc-50">
-          <p className="text-xs font-medium text-zinc-500 mb-2">도구 목록</p>
+        <div className="border-t border-zinc-200 p-3 bg-corthex-bg">
+          <p className="text-xs font-medium text-corthex-text-secondary mb-2">도구 목록</p>
           {toolsLoading ? (
             <div className="space-y-2">
               <div className="h-4 bg-zinc-200 rounded animate-pulse w-3/4" />
               <div className="h-4 bg-zinc-200 rounded animate-pulse w-1/2" />
             </div>
           ) : tools.length === 0 ? (
-            <p className="text-xs text-zinc-400">등록된 도구가 없습니다</p>
+            <p className="text-xs text-corthex-text-disabled">등록된 도구가 없습니다</p>
           ) : (
             <div className="space-y-1">
               {tools.map((tool) => (
                 <div key={tool.name}>
                   <span className="font-mono text-sm">{tool.name}</span>
                   {tool.description && (
-                    <span className="text-xs text-zinc-500 ml-2">{tool.description}</span>
+                    <span className="text-xs text-corthex-text-secondary ml-2">{tool.description}</span>
                   )}
                 </div>
               ))}

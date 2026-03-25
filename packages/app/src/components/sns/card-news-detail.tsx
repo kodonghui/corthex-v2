@@ -91,7 +91,7 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
 
   return (
     <div data-testid="sns-cardnews-detail" className="max-w-3xl space-y-4">
-      <button onClick={onBack} className="text-sm text-stone-500 hover:text-slate-200">← 카드뉴스 목록</button>
+      <button onClick={onBack} className="text-sm text-stone-500 hover:text-corthex-text-disabled">← 카드뉴스 목록</button>
 
       <StatusStepper status={series.status} createdAt={series.createdAt} reviewedAt={series.reviewedAt} scheduledAt={series.scheduledAt} publishedAt={series.publishedAt} />
 
@@ -172,7 +172,7 @@ export function CardNewsDetail({ seriesId, onBack }: CardNewsDetailProps) {
                 </span>
                 <span className="text-xs text-stone-400">#{idx + 1}</span>
               </div>
-              <p className="text-sm text-slate-200 truncate">{card.caption || '(캡션 없음)'}</p>
+              <p className="text-sm text-corthex-text-disabled truncate">{card.caption || '(캡션 없음)'}</p>
             </div>
             {series.status === 'draft' && (
               <div className="flex gap-1 shrink-0">

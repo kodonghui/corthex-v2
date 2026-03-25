@@ -21,7 +21,7 @@ const Thumb = React.forwardRef<HTMLDivElement, ThumbProps>(function Thumb(
     <SubframeCore.Switch.Thumb asChild={true} {...otherProps}>
       <div
         className={SubframeUtils.twClassNames(
-          "flex h-3.5 w-3.5 flex-col items-start gap-2 rounded-full bg-white shadow-sm",
+          "flex h-3.5 w-3.5 flex-col items-start gap-2 rounded-full bg-corthex-surface shadow-sm",
           className
         )}
         ref={ref}

@@ -36,7 +36,7 @@ type CostData = {
 
 const SECTION_COLORS: Record<string, string> = {
   conclusion: 'bg-blue-50 border-l-4 border-blue-400',
-  analysis: 'bg-zinc-50 border-l-4 border-zinc-400',
+  analysis: 'bg-corthex-bg border-l-4 border-zinc-400',
   risk: 'bg-orange-50 border-l-4 border-orange-400',
   recommendation: 'bg-emerald-50 border-l-4 border-emerald-400',
 }
@@ -111,9 +111,9 @@ function QualityBadge({ qualityGate }: { qualityGate: QualityGateMeta }) {
         </Badge>
       </button>
       {showDetail && (
-        <div className="absolute z-20 top-full mt-1 left-0 bg-white rounded-lg shadow-lg border border-zinc-200 p-3 min-w-[200px]">
-          <p className="text-xs font-semibold text-zinc-600 mb-2">품질 검수 상세</p>
-          <p className="text-xs text-zinc-500">시도 횟수: {qualityGate.attemptNumber}회</p>
+        <div className="absolute z-20 top-full mt-1 left-0 bg-corthex-surface rounded-lg shadow-lg border border-zinc-200 p-3 min-w-[200px]">
+          <p className="text-xs font-semibold text-corthex-text-secondary mb-2">품질 검수 상세</p>
+          <p className="text-xs text-corthex-text-secondary">시도 횟수: {qualityGate.attemptNumber}회</p>
           <button
             onClick={() => setShowDetail(false)}
             className="mt-2 text-xs text-indigo-500 hover:text-indigo-700"
@@ -139,7 +139,7 @@ function CostSummary({ commandId }: { commandId: string }) {
   if (!cost || (cost.inputTokens === 0 && cost.outputTokens === 0)) return null
 
   return (
-    <span className="text-xs text-zinc-400">
+    <span className="text-xs text-corthex-text-disabled">
       {cost.inputTokens.toLocaleString()}+{cost.outputTokens.toLocaleString()} 토큰
       {cost.totalCostUsd > 0 && ` · $${cost.totalCostUsd.toFixed(4)}`}
     </span>
@@ -175,7 +175,7 @@ function FeedbackButtons({
         className={`p-1 rounded transition-colors ${
           selected === 'up'
             ? 'text-emerald-500 bg-emerald-50'
-            : 'text-zinc-400 hover:text-emerald-500 hover:bg-emerald-50'
+            : 'text-corthex-text-disabled hover:text-emerald-500 hover:bg-emerald-50'
         }`}
         title="좋아요"
       >
@@ -189,7 +189,7 @@ function FeedbackButtons({
         className={`p-1 rounded transition-colors ${
           selected === 'down'
             ? 'text-red-500 bg-red-50'
-            : 'text-zinc-400 hover:text-red-500 hover:bg-red-50'
+            : 'text-corthex-text-disabled hover:text-red-500 hover:bg-red-50'
         }`}
         title="별로예요"
       >
@@ -224,7 +224,7 @@ export function ReportView({ commandId, result, metadata, onDetailClick }: Repor
 
       {/* Report content with section highlighting */}
       <div
-        className={onDetailClick ? 'cursor-pointer hover:bg-zinc-50 rounded-lg transition-colors' : ''}
+        className={onDetailClick ? 'cursor-pointer hover:bg-corthex-bg rounded-lg transition-colors' : ''}
         onClick={onDetailClick}
       >
         <HighlightedReport content={result} />

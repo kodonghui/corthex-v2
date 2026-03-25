@@ -104,7 +104,7 @@ function InfoContent({ debate }: { debate: Debate }) {
     <>
       {/* Header */}
       <div className="p-6 border-b border-corthex-accent/10">
-        <h3 className="text-lg font-semibold text-slate-100 mb-1">Debate Info</h3>
+        <h3 className="text-lg font-semibold text-corthex-text-primary mb-1">Debate Info</h3>
         {isActive && (
           <div className="flex items-center gap-2 text-emerald-500">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

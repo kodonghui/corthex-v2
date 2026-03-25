@@ -13,7 +13,7 @@ export function OpsMetricCard({ title, value, unit, trendValue, isPositive, valu
     const trendColorClass = isPositive ? 'text-emerald-500' : 'text-rose-500';
 
     return (
-        <div className="flex flex-col gap-2 rounded-xl p-6 bg-white border border-stone-200 shadow-sm">
+        <div className="flex flex-col gap-2 rounded-xl p-6 bg-corthex-surface border border-stone-200 shadow-sm">
             <p className="text-stone-500 text-sm font-medium uppercase tracking-wider">{title}</p>
             <div className="flex items-baseline gap-3">
                 <p className={`text-3xl font-bold font-mono ${valueColorClass || ''}`}>

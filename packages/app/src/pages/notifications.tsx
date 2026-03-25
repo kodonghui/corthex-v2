@@ -327,7 +327,7 @@ export function NotificationsPage() {
                           ? 'bg-corthex-border/60'
                           : n.isRead
                             ? 'hover:bg-corthex-elevated/60'
-                            : 'bg-white/40 hover:bg-corthex-elevated'
+                            : 'bg-corthex-surface/40 hover:bg-corthex-elevated'
                       }`}
                       style={{ borderLeftWidth: '4px', borderLeftColor: borderColor }}
                       data-testid={`notification-${n.id}`}

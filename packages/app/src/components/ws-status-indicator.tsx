@@ -12,7 +12,7 @@ export function WsStatusIndicator() {
             : 'bg-red-500 animate-pulse'
         }`}
       />
-      <span className="text-[10px] text-zinc-500">
+      <span className="text-[10px] text-corthex-text-secondary">
         {isConnected ? '실시간' : `재연결 중${reconnectAttempt > 0 ? ` (${reconnectAttempt})` : '...'}`}
       </span>
     </div>

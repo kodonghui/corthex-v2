@@ -34,7 +34,7 @@ export function LibraryTreeItem({ label, icon, isExpanded, isActive, children }:
 export function LibraryTreeSubItem({ label, icon, isActive }: { label: string, icon: ReactNode, isActive?: boolean }) {
     return (
         <div className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${isActive
-                ? 'bg-stone-100/80 text-slate-100'
+                ? 'bg-stone-100/80 text-corthex-text-primary'
                 : 'hover:bg-stone-100/50 text-stone-500'
             }`}>
             <div className={`${isActive ? 'text-corthex-accent' : ''}`}>

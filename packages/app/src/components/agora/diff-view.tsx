@@ -99,7 +99,7 @@ export function DiffView({ debate }: { debate: Debate }) {
                   <div className={cn('w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold', getAvatarColor(track.agentId))}>
                     {track.agentName[0]}
                   </div>
-                  <span className="text-xs font-medium text-slate-100">{track.agentName}</span>
+                  <span className="text-xs font-medium text-corthex-text-primary">{track.agentName}</span>
                   {changed && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400">변화</span>
                   )}

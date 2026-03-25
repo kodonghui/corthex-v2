@@ -146,7 +146,7 @@ function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boole
   const handleZoomOut = () => { zoomOut(); setZoom(Math.round(getZoom() * 100)) }
 
   return (
-    <header className="h-14 bg-white border-b border-corthex-border px-6 flex items-center justify-between z-10 shrink-0">
+    <header className="h-14 bg-corthex-surface border-b border-corthex-border px-6 flex items-center justify-between z-10 shrink-0">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <Network className="w-5 h-5 text-corthex-accent" />
@@ -173,11 +173,11 @@ function NexusToolbar({ editMode, onToggleEditMode, isAdmin }: { editMode: boole
               <span className="text-xs font-medium text-corthex-text-secondary">편집 모드</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input className="sr-only peer" type="checkbox" checked={editMode} onChange={onToggleEditMode} />
-                <div className="w-9 h-5 bg-corthex-border peer-focus:outline-none rounded-full peer peer-checked:bg-corthex-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+                <div className="w-9 h-5 bg-corthex-border peer-focus:outline-none rounded-full peer peer-checked:bg-corthex-accent after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
               </label>
             </div>
 
-            <button className="px-4 py-1.5 text-sm bg-white border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors shadow-sm text-corthex-accent-deep font-medium">
+            <button className="px-4 py-1.5 text-sm bg-corthex-surface border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors shadow-sm text-corthex-accent-deep font-medium">
               Save Draft
             </button>
             <button className="px-4 py-1.5 text-sm text-corthex-bg bg-corthex-accent rounded-lg hover:bg-corthex-accent-deep transition-colors shadow-sm font-medium">
@@ -273,7 +273,7 @@ function NexusPageInner() {
       <div data-testid="nexus-page" className="flex flex-col h-full">
         <NexusToolbar editMode={false} onToggleEditMode={() => {}} isAdmin={isAdmin} />
         <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-corthex-bg" style={{ backgroundSize: '24px 24px', backgroundImage: 'radial-gradient(#d1cfcc 0.5px, transparent 0.5px)' }}>
-          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-corthex-border bg-white/80 backdrop-blur-sm max-w-md text-center">
+          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border border-dashed border-corthex-border bg-corthex-surface/80 backdrop-blur-sm max-w-md text-center">
             <div className="w-16 h-16 rounded-full bg-corthex-accent/10 flex items-center justify-center mb-2">
               <Network className="w-8 h-8 text-corthex-accent" />
             </div>

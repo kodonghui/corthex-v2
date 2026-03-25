@@ -560,7 +560,7 @@ function CommandCenterTab() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={autoScroll} onChange={toggleAutoScroll} className="sr-only peer" type="checkbox" />
               <div
-                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
                 style={{ backgroundColor: autoScroll ? '#606C38' : '#756e5a' }}
               />
             </label>
@@ -574,7 +574,7 @@ function CommandCenterTab() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input checked={sound} onChange={toggleSound} className="sr-only peer" type="checkbox" />
               <div
-                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                className="w-12 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
                 style={{ backgroundColor: sound ? '#606C38' : '#756e5a' }}
               />
             </label>
@@ -738,7 +738,7 @@ function ApiKeyTab() {
             keys.map((key) => (
               <div
                 key={key.id}
-                className="flex items-center justify-between p-4 rounded-2xl border bg-white"
+                className="flex items-center justify-between p-4 rounded-2xl border bg-corthex-surface"
                 style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}
               >
                 <div>
@@ -777,11 +777,11 @@ function ApiKeyTab() {
       <section>
         <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a' }}>서비스 연동 안내</h2>
         <div className="flex flex-col gap-3">
-          <div className="p-4 rounded-2xl bg-white border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+          <div className="p-4 rounded-2xl bg-corthex-surface border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
             <span className="font-medium" style={{ color: '#1a1a1a' }}>KIS 증권</span>
             <span className="text-sm" style={{ color: '#6b705c' }}> -- 한국투자증권 API key를 등록하면 에이전트가 매매 현황을 조회할 수 있습니다.</span>
           </div>
-          <div className="p-4 rounded-2xl bg-white border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+          <div className="p-4 rounded-2xl bg-corthex-surface border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
             <span className="font-medium" style={{ color: '#1a1a1a' }}>노션</span>
             <span className="text-sm" style={{ color: '#6b705c' }}> -- 노션 API key를 등록하면 노션 연동 도구를 사용할 수 있습니다.</span>
           </div>

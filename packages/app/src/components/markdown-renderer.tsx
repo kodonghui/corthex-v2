@@ -10,7 +10,7 @@ const markdownStyles = [
   '[&_li]:mb-0.5',
   '[&_code]:bg-zinc-200 [&_code]:[&_code]:px-1 [&_code]:rounded [&_code]:text-xs',
   '[&_pre]:bg-zinc-200 [&_pre]:[&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:mb-2',
-  '[&_blockquote]:border-l-2 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-3 [&_blockquote]:text-zinc-500',
+  '[&_blockquote]:border-l-2 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-3 [&_blockquote]:text-corthex-text-secondary',
   '[&_strong]:font-semibold',
   '[&_a]:text-indigo-600 [&_a]:underline',
 ].join(' ')

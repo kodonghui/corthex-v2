@@ -16,9 +16,9 @@ export function TrackerActiveJobs({ jobs = [
     { id: '2', name: 'CRM Data Ingestion', type: 'running', detail: 'Running for 4m 12s' },
 ] }: TrackerActiveJobsProps) {
     return (
-        <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div className="bg-corthex-surface rounded-xl border border-stone-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-stone-200">
-                <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-display">Active Jobs</h3>
+                <h3 className="text-sm font-bold text-corthex-text-primary uppercase tracking-wider font-display">Active Jobs</h3>
             </div>
 
             <div className="divide-y divide-slate-800">
@@ -32,7 +32,7 @@ export function TrackerActiveJobs({ jobs = [
                                     <RefreshCw className="w-[18px] h-[18px] text-corthex-accent mt-0.5 translate-y-[1px] animate-spin-slow" />
                                 )}
                                 <div>
-                                    <p className="text-sm font-medium text-slate-100">{job.name}</p>
+                                    <p className="text-sm font-medium text-corthex-text-primary">{job.name}</p>
                                     <p className="text-xs text-stone-500 mt-1 tabular-nums">{job.detail}</p>
                                 </div>
                             </div>

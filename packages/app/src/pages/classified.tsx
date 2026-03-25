@@ -242,7 +242,7 @@ export function ClassifiedPage() {
   return (
     <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: '#faf8f5', color: '#1a1a1a' }}>
       {/* BEGIN: MainHeader */}
-      <header className="h-16 border-b bg-white sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: '#e5e1d3' }}>
+      <header className="h-16 border-b bg-corthex-surface sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: '#e5e1d3' }}>
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: '#606C38' }}>C</div>
           <h1 className="text-lg font-semibold tracking-tight" style={{ color: '#1a1a1a' }}>CORTHEX <span style={{ color: '#6b705c' }} className="font-normal">v2.0</span></h1>
@@ -405,7 +405,7 @@ export function ClassifiedPage() {
                 </div>
               ) : detailQuery.isLoading || !detail ? (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-corthex-border border-t-slate-600 rounded-full animate-spin" />
                 </div>
               ) : (
                 <>
@@ -436,7 +436,7 @@ export function ClassifiedPage() {
                           <div className="absolute left-5 top-2 bottom-8 w-px bg-corthex-elevated" />
                           {detail.delegationChain.map((step, i) => {
                             const initials = step.agentName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-                            const bgColor = i === 0 ? 'bg-white text-white' : i === 1 ? 'bg-corthex-elevated text-corthex-text-secondary' : 'bg-corthex-elevated text-corthex-text-secondary'
+                            const bgColor = i === 0 ? 'bg-corthex-surface text-white' : i === 1 ? 'bg-corthex-elevated text-corthex-text-secondary' : 'bg-corthex-elevated text-corthex-text-secondary'
                             return (
                               <div key={i} className="flex items-start gap-4 relative z-10">
                                 <div className={`w-10 h-10 rounded-full ${bgColor} flex items-center justify-center text-xs border-4 border-white shadow-sm`}>
@@ -500,7 +500,7 @@ export function ClassifiedPage() {
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(detail.id)}
-                      className="w-12 h-12 flex items-center justify-center rounded-xl border bg-white transition-all hover:opacity-70"
+                      className="w-12 h-12 flex items-center justify-center rounded-xl border bg-corthex-surface transition-all hover:opacity-70"
                       style={{ borderColor: '#e5e1d3', color: '#6b705c' }}
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -521,7 +521,7 @@ export function ClassifiedPage() {
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
-          <div className="relative bg-white border rounded-2xl p-6 w-80 shadow-2xl" style={{ borderColor: '#e5e1d3' }}>
+          <div className="relative bg-corthex-surface border rounded-2xl p-6 w-80 shadow-2xl" style={{ borderColor: '#e5e1d3' }}>
             <h3 className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a' }}>문서 삭제</h3>
             <p className="text-xs mb-4" style={{ color: '#6b705c' }}>이 기밀문서를 삭제하시겠습니까?</p>
             <div className="flex justify-end gap-2">

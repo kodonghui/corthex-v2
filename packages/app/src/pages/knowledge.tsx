@@ -185,7 +185,7 @@ export function KnowledgePage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-corthex-bg" data-testid="knowledge-page">
       {/* Page Header with Tabs */}
-      <header className="border-b border-corthex-border px-6 py-4 bg-white flex items-center justify-between shrink-0">
+      <header className="border-b border-corthex-border px-6 py-4 bg-corthex-surface flex items-center justify-between shrink-0">
         <div>
           <h1 className="text-2xl font-bold text-corthex-accent-deep">Library</h1>
           <p className="text-sm text-corthex-text-secondary mt-0.5">Knowledge documents & agent memories</p>
@@ -194,14 +194,14 @@ export function KnowledgePage() {
           <div className="flex bg-corthex-elevated rounded-lg p-0.5">
             <button
               onClick={() => setActiveTab('docs')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'docs' ? 'bg-white text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'docs' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
               data-testid="tab-docs"
             >
               문서
             </button>
             <button
               onClick={() => setActiveTab('memories')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'memories' ? 'bg-white text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'memories' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
               data-testid="tab-memories"
             >
               에이전트 기억
@@ -329,7 +329,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Top bar matching tabs */}
-      <div className="flex items-center justify-between px-6 py-3 shrink-0 bg-white" style={{ borderBottom: `1px solid ${borderColor}` }}>
+      <div className="flex items-center justify-between px-6 py-3 shrink-0 bg-corthex-surface" style={{ borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
@@ -374,7 +374,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel: Library Tree */}
         {showFolderTree && (
-          <aside className="w-64 flex-shrink-0 bg-white flex flex-col p-4 overflow-y-auto" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
+          <aside className="w-64 flex-shrink-0 bg-corthex-surface flex flex-col p-4 overflow-y-auto" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
             <FolderTree
               folders={folders}
               selectedFolderId={selectedFolderId}
@@ -387,7 +387,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
         {/* Center Panel: Document List */}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ borderRight: `1px solid ${borderColor}`, backgroundColor: sandBg }}>
           {/* Center header */}
-          <div className="p-4 bg-white/50 backdrop-blur-sm flex flex-col gap-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
+          <div className="p-4 bg-corthex-surface/50 backdrop-blur-sm flex flex-col gap-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-corthex-text-primary" style={{ fontFamily: "'Inter', sans-serif" }}>Documents</h2>
               <span className="text-xs font-medium text-corthex-text-secondary bg-corthex-border px-2 py-0.5 rounded-full">{total} Files</span>
@@ -397,7 +397,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
                 <span
                   key={mode}
                   onClick={() => { setSearchMode(mode); setPage(1) }}
-                  className="whitespace-nowrap bg-white px-3 py-1 rounded-full text-xs font-medium text-corthex-text-secondary cursor-pointer transition-colors"
+                  className="whitespace-nowrap bg-corthex-surface px-3 py-1 rounded-full text-xs font-medium text-corthex-text-secondary cursor-pointer transition-colors"
                   style={searchMode === mode ? { borderColor: oliveColor, borderWidth: '1px', borderStyle: 'solid', color: oliveColor } : { borderColor, borderWidth: '1px', borderStyle: 'solid' }}
                 >
                   {mode === 'hybrid' ? '혼합' : mode === 'semantic' ? '의미' : '키워드'}
@@ -406,7 +406,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
               <select
                 value={contentTypeFilter}
                 onChange={(e) => { setContentTypeFilter(e.target.value as ContentType | ''); setPage(1) }}
-                className="bg-white border rounded-full px-3 py-1 text-xs text-corthex-text-secondary outline-none"
+                className="bg-corthex-surface border rounded-full px-3 py-1 text-xs text-corthex-text-secondary outline-none"
                 style={{ borderColor }}
               >
                 <option value="">전체 유형</option>
@@ -468,7 +468,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
                   <div
                     key={doc.id}
                     onClick={() => setDetailDoc(doc)}
-                    className={`bg-white p-4 rounded-2xl shadow-sm cursor-pointer transition-all ${
+                    className={`bg-corthex-surface p-4 rounded-2xl shadow-sm cursor-pointer transition-all ${
                       isActive ? 'ring-4' : 'border border-transparent hover:shadow-md'
                     }`}
                     style={isActive ? { borderColor: oliveColor, borderWidth: '2px', borderStyle: 'solid', ['--tw-ring-color' as string]: `${oliveColor}14` } : { borderColor: 'transparent' }}
@@ -500,7 +500,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
           {/* Pagination */}
           {total > 0 && (
-            <div className="px-5 py-3 flex items-center justify-between bg-white" style={{ borderTop: `1px solid ${borderColor}` }}>
+            <div className="px-5 py-3 flex items-center justify-between bg-corthex-surface" style={{ borderTop: `1px solid ${borderColor}` }}>
               <span className="text-xs text-corthex-text-secondary">{total}건 중 {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, total)}</span>
               <div className="flex items-center gap-2">
                 <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 text-xs border rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated disabled:opacity-30 transition-colors" style={{ borderColor }}>이전</button>
@@ -513,7 +513,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
         {/* Right Panel: Document Preview */}
         {detailDoc ? (
-          <aside className="w-[500px] flex-shrink-0 bg-white flex flex-col overflow-hidden hidden lg:flex">
+          <aside className="w-[500px] flex-shrink-0 bg-corthex-surface flex flex-col overflow-hidden hidden lg:flex">
             <DocDetailView
               doc={detailDoc}
               folders={folders}
@@ -612,7 +612,7 @@ function FolderTree({ folders, selectedFolderId, onSelectFolder, queryClient }: 
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); if (e.key === 'Escape') { setCreating(false); setNewName('') } }}
             onBlur={handleSubmit}
-            className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-corthex-text-primary outline-none"
+            className="w-full text-sm px-3 py-1.5 border rounded-lg bg-corthex-surface text-corthex-text-primary outline-none"
             style={{ borderColor: oliveColor }}
             placeholder="폴더 이름"
           />
@@ -670,7 +670,7 @@ function FolderNode({ folder, depth, selectedFolderId, onSelectFolder, queryClie
     <div>
       {editing ? (
         <div style={{ paddingLeft: `${depth * 16 + 4}px` }} className="py-0.5">
-          <input ref={editRef} value={editName} onChange={(e) => setEditName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) } }} onBlur={handleRename} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-corthex-text-primary outline-none" style={{ borderColor: oliveColor }} />
+          <input ref={editRef} value={editName} onChange={(e) => setEditName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') { setEditing(false); setEditName(folder.name) } }} onBlur={handleRename} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-corthex-surface text-corthex-text-primary outline-none" style={{ borderColor: oliveColor }} />
         </div>
       ) : (
         <div className="relative group">
@@ -692,7 +692,7 @@ function FolderNode({ folder, depth, selectedFolderId, onSelectFolder, queryClie
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full z-50 bg-white border border-corthex-border rounded-lg shadow-xl py-1 min-w-[160px]">
+              <div className="absolute right-0 top-full z-50 bg-corthex-surface border border-corthex-border rounded-lg shadow-xl py-1 min-w-[160px]">
                 <button onClick={() => { setEditing(true); setEditName(folder.name); setShowMenu(false) }} className="w-full text-left px-3 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated">이름 변경</button>
                 <button onClick={() => { setCreatingChild(true); setShowMenu(false) }} className="w-full text-left px-3 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated">하위 폴더 추가</button>
                 <div className="border-t border-corthex-border my-1" />
@@ -707,7 +707,7 @@ function FolderNode({ folder, depth, selectedFolderId, onSelectFolder, queryClie
       ))}
       {creatingChild && (
         <div style={{ paddingLeft: `${(depth + 1) * 16 + 4}px` }} className="py-0.5">
-          <input ref={childRef} value={childName} onChange={(e) => setChildName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleCreateChild(); if (e.key === 'Escape') { setCreatingChild(false); setChildName('') } }} onBlur={handleCreateChild} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-white text-corthex-text-primary outline-none" style={{ borderColor: oliveColor }} placeholder="하위 폴더 이름" />
+          <input ref={childRef} value={childName} onChange={(e) => setChildName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleCreateChild(); if (e.key === 'Escape') { setCreatingChild(false); setChildName('') } }} onBlur={handleCreateChild} className="w-full text-sm px-3 py-1.5 border rounded-lg bg-corthex-surface text-corthex-text-primary outline-none" style={{ borderColor: oliveColor }} placeholder="하위 폴더 이름" />
         </div>
       )}
     </div>
@@ -736,7 +736,7 @@ function DocDetailView({ doc, folders, onBack, onEdit, onDelete, onShowVersions,
   return (
     <div className="flex-1 flex flex-col overflow-hidden" data-testid="doc-detail">
       {/* Toolbar */}
-      <div className="h-12 flex items-center justify-between px-6 bg-white shrink-0" style={{ borderBottom: `1px solid ${borderColor}` }}>
+      <div className="h-12 flex items-center justify-between px-6 bg-corthex-surface shrink-0" style={{ borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center gap-4">
           <button onClick={() => onEdit(fullDoc)} className="p-1.5 hover:bg-corthex-elevated rounded-lg text-corthex-text-secondary transition-colors" title="Edit">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
@@ -865,12 +865,12 @@ function DocModal({ isOpen, doc, folders, selectedFolderId, onClose, queryClient
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-corthex-text-secondary mb-1">제목 *</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none" placeholder="문서 제목" autoFocus />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none" placeholder="문서 제목" autoFocus />
         </div>
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="block text-sm font-medium text-corthex-text-secondary mb-1">유형</label>
-            <select value={contentType} onChange={(e) => setContentType(e.target.value as ContentType)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+            <select value={contentType} onChange={(e) => setContentType(e.target.value as ContentType)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
               <option value="markdown">마크다운</option>
               <option value="text">텍스트</option>
               <option value="html">HTML</option>
@@ -879,7 +879,7 @@ function DocModal({ isOpen, doc, folders, selectedFolderId, onClose, queryClient
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium text-corthex-text-secondary mb-1">폴더</label>
-            <select value={folderId} onChange={(e) => setFolderId(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+            <select value={folderId} onChange={(e) => setFolderId(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
               <option value="">폴더 없음</option>
               {flattenFolders(folders).map(f => (<option key={f.id} value={f.id}>{f.indent}{f.name}</option>))}
             </select>
@@ -887,11 +887,11 @@ function DocModal({ isOpen, doc, folders, selectedFolderId, onClose, queryClient
         </div>
         <div>
           <label className="block text-sm font-medium text-corthex-text-secondary mb-1">태그 (쉼표 구분)</label>
-          <input value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-secondary" placeholder="태그1, 태그2, ..." />
+          <input value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-secondary" placeholder="태그1, 태그2, ..." />
         </div>
         <div>
           <label className="block text-sm font-medium text-corthex-text-secondary mb-1">내용</label>
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary font-mono min-h-[256px] resize-y outline-none placeholder:text-corthex-text-secondary" placeholder={contentType === 'markdown' ? '마크다운으로 작성...' : '내용을 입력하세요...'} />
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary font-mono min-h-[256px] resize-y outline-none placeholder:text-corthex-text-secondary" placeholder={contentType === 'markdown' ? '마크다운으로 작성...' : '내용을 입력하세요...'} />
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button onClick={onClose} className="px-4 py-2 text-sm text-corthex-text-secondary hover:text-corthex-text-secondary transition-colors">취소</button>
@@ -990,19 +990,19 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden" data-testid="memories-tab">
-      <div className="px-6 py-3 flex flex-wrap gap-3 items-center bg-white" style={{ borderBottom: `1px solid ${borderColor}` }}>
-        <select value={agentFilter} onChange={(e) => setAgentFilter(e.target.value)} className="bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+      <div className="px-6 py-3 flex flex-wrap gap-3 items-center bg-corthex-surface" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <select value={agentFilter} onChange={(e) => setAgentFilter(e.target.value)} className="bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
           <option value="">전체 에이전트</option>
           {agents.map(a => (<option key={a.id} value={a.id}>{a.name}</option>))}
         </select>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as MemoryType | '')} className="bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as MemoryType | '')} className="bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
           <option value="">전체 유형</option>
           <option value="learning">학습</option>
           <option value="insight">인사이트</option>
           <option value="preference">선호</option>
           <option value="fact">사실</option>
         </select>
-        <input className="bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary outline-none w-40" placeholder="검색..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
+        <input className="bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary outline-none w-40" placeholder="검색..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
         <div className="flex-1" />
         <button onClick={() => setShowCreateModal(true)} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors" style={{ backgroundColor: oliveColor }} data-testid="add-memory">+ 기억 추가</button>
       </div>
@@ -1017,7 +1017,7 @@ function MemoriesTab({ queryClient }: { queryClient: ReturnType<typeof useQueryC
           </div>
         ) : (
           filteredMemories.map(mem => (
-            <div key={mem.id} className="bg-white border border-corthex-border rounded-xl p-4 space-y-3 hover:shadow-sm transition-all" data-testid={`memory-card-${mem.id}`}>
+            <div key={mem.id} className="bg-corthex-surface border border-corthex-border rounded-xl p-4 space-y-3 hover:shadow-sm transition-all" data-testid={`memory-card-${mem.id}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-corthex-text-primary">{mem.key}</span>
@@ -1099,7 +1099,7 @@ function MemoryModal({ isOpen, memory, agents, onClose, queryClient }: {
         {!isEdit && (
           <div>
             <label className="block text-sm font-medium text-corthex-text-secondary mb-1">에이전트</label>
-            <select value={agentId} onChange={(e) => setAgentId(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+            <select value={agentId} onChange={(e) => setAgentId(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
               <option value="">에이전트 선택</option>
               {agents.map(a => (<option key={a.id} value={a.id}>{a.name}</option>))}
             </select>
@@ -1108,7 +1108,7 @@ function MemoryModal({ isOpen, memory, agents, onClose, queryClient }: {
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="block text-sm font-medium text-corthex-text-secondary mb-1">유형</label>
-            <select value={memoryType} onChange={(e) => setMemoryType(e.target.value as MemoryType)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
+            <select value={memoryType} onChange={(e) => setMemoryType(e.target.value as MemoryType)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary outline-none">
               <option value="learning">학습</option>
               <option value="insight">인사이트</option>
               <option value="preference">선호</option>
@@ -1122,11 +1122,11 @@ function MemoryModal({ isOpen, memory, agents, onClose, queryClient }: {
         </div>
         <div>
           <label className="block text-sm font-medium text-corthex-text-secondary mb-1">제목</label>
-          <input value={key} onChange={(e) => setKey(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-secondary" placeholder="기억 제목" />
+          <input value={key} onChange={(e) => setKey(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-secondary" placeholder="기억 제목" />
         </div>
         <div>
           <label className="block text-sm font-medium text-corthex-text-secondary mb-1">내용</label>
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary h-32 resize-y outline-none placeholder:text-corthex-text-secondary" placeholder="학습 내용..." />
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary h-32 resize-y outline-none placeholder:text-corthex-text-secondary" placeholder="학습 내용..." />
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button onClick={onClose} className="px-4 py-2 text-sm text-corthex-text-secondary hover:text-corthex-text-secondary transition-colors">취소</button>

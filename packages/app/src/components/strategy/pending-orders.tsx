@@ -117,12 +117,12 @@ export function PendingOrders() {
       <div className="px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-zinc-900">승인 대기 주문</h3>
+            <h3 className="text-sm font-semibold text-corthex-text-primary">승인 대기 주문</h3>
             <Badge variant="warning">{orders.length}건</Badge>
           </div>
           {orders.length > 1 && (
             <div className="flex items-center gap-2">
-              <label className="flex items-center gap-1 text-xs text-zinc-400 cursor-pointer">
+              <label className="flex items-center gap-1 text-xs text-corthex-text-disabled cursor-pointer">
                 <input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-indigo-600" />
                 전체 선택
               </label>
@@ -153,7 +153,7 @@ export function PendingOrders() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50"
+              className="flex items-center gap-3 p-2 rounded-lg bg-corthex-bg"
             >
               {orders.length > 1 && (
                 <input
@@ -168,16 +168,16 @@ export function PendingOrders() {
                   <Badge variant={order.side === 'buy' ? 'success' : 'error'}>
                     {order.side === 'buy' ? '매수' : '매도'}
                   </Badge>
-                  <span className="text-sm font-medium text-zinc-900 truncate">{order.tickerName}</span>
-                  <span className="text-xs text-zinc-400">{order.ticker}</span>
+                  <span className="text-sm font-medium text-corthex-text-primary truncate">{order.tickerName}</span>
+                  <span className="text-xs text-corthex-text-disabled">{order.ticker}</span>
                 </div>
-                <div className="flex gap-3 mt-1 text-xs text-zinc-400">
+                <div className="flex gap-3 mt-1 text-xs text-corthex-text-disabled">
                   <span>{order.quantity}주</span>
                   <span>@{formatPrice(order.price)}원</span>
                   <span>총 {formatPrice(order.totalAmount)}원</span>
                 </div>
                 {order.reason && (
-                  <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{order.reason}</p>
+                  <p className="mt-1 text-xs text-corthex-text-secondary line-clamp-2">{order.reason}</p>
                 )}
               </div>
               <div className="flex gap-1 shrink-0">

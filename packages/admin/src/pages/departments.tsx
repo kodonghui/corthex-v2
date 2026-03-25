@@ -139,7 +139,7 @@ export function DepartmentsPage() {
     setCascadeMode('wait_completion')
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: cream, fontFamily: "'Inter', sans-serif" }} data-testid="departments-page">
@@ -148,8 +148,8 @@ export function DepartmentsPage() {
         {/* Content Header */}
         <div className="flex items-center justify-between mb-8" data-purpose="page-header">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid="departments-title">부서 관리</h1>
-            <p className="text-slate-500">조직 내 부서를 생성하고 팀원 현황을 관리하세요.</p>
+            <h1 className="text-3xl font-bold text-corthex-text-primary mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid="departments-title">부서 관리</h1>
+            <p className="text-corthex-text-secondary">조직 내 부서를 생성하고 팀원 현황을 관리하세요.</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
@@ -164,8 +164,8 @@ export function DepartmentsPage() {
 
         {/* Create Form */}
         {showCreate && (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6" data-testid="departments-create-form">
-            <h3 className="text-xl font-bold text-slate-900 mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 부서</h3>
+          <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-slate-100 mb-6" data-testid="departments-create-form">
+            <h3 className="text-xl font-bold text-corthex-text-primary mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 부서</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -178,24 +178,24 @@ export function DepartmentsPage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">부서명 *</label>
+                  <label className="block text-sm text-corthex-text-secondary mb-1">부서명 *</label>
                   <input
                     data-testid="departments-create-name"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:outline-none"
+                    className="w-full px-4 py-3 border border-corthex-border rounded-xl bg-corthex-surface text-sm focus:ring-2 focus:outline-none"
                     style={{ outlineColor: olive }}
                     placeholder="예: 마케팅부"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">설명</label>
+                  <label className="block text-sm text-corthex-text-secondary mb-1">설명</label>
                   <input
                     data-testid="departments-create-desc"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:outline-none"
+                    className="w-full px-4 py-3 border border-corthex-border rounded-xl bg-corthex-surface text-sm focus:ring-2 focus:outline-none"
                     placeholder="부서의 역할과 목적"
                   />
                 </div>
@@ -205,7 +205,7 @@ export function DepartmentsPage() {
                   data-testid="departments-create-cancel"
                   type="button"
                   onClick={() => { setShowCreate(false); setForm({ name: '', description: '' }) }}
-                  className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700"
+                  className="px-4 py-2 text-sm text-corthex-text-secondary hover:text-corthex-text-primary"
                 >
                   취소
                 </button>
@@ -225,10 +225,10 @@ export function DepartmentsPage() {
 
         {/* Department Grid */}
         {isLoading ? (
-          <div data-testid="departments-loading" className="text-center text-slate-400 py-8">로딩 중...</div>
+          <div data-testid="departments-loading" className="text-center text-corthex-text-disabled py-8">로딩 중...</div>
         ) : depts.length === 0 ? (
           <div data-testid="departments-empty-state" className="flex flex-col items-center justify-center py-16">
-            <p className="text-slate-400 mb-4">등록된 부서가 없습니다</p>
+            <p className="text-corthex-text-disabled mb-4">등록된 부서가 없습니다</p>
             <button
               onClick={() => setShowCreate(true)}
               className="text-white px-6 py-3 rounded-2xl font-semibold transition-all"
@@ -245,20 +245,20 @@ export function DepartmentsPage() {
 
               if (isEditing) {
                 return (
-                  <div key={d.id} className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-300">
+                  <div key={d.id} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border-2 border-corthex-border">
                     <div className="space-y-3">
                       <input
                         data-testid={`departments-edit-name-${d.id}`}
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:outline-none"
+                        className="w-full px-3 py-2 border border-corthex-border rounded-xl text-sm focus:ring-2 focus:outline-none"
                         style={{ outlineColor: olive }}
                       />
                       <input
                         data-testid={`departments-edit-desc-${d.id}`}
                         value={editForm.description}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:outline-none"
+                        className="w-full px-3 py-2 border border-corthex-border rounded-xl text-sm focus:ring-2 focus:outline-none"
                         placeholder="설명"
                       />
                       <div className="flex gap-2 justify-end">
@@ -274,7 +274,7 @@ export function DepartmentsPage() {
                         <button
                           data-testid={`departments-edit-cancel-${d.id}`}
                           onClick={() => setEditId(null)}
-                          className="text-xs text-slate-400 hover:text-slate-600"
+                          className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary"
                         >
                           취소
                         </button>
@@ -285,7 +285,7 @@ export function DepartmentsPage() {
               }
 
               return (
-                <div key={d.id} data-testid={`departments-row-${d.id}`} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
+                <div key={d.id} data-testid={`departments-row-${d.id}`} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-3 rounded-xl" style={{ backgroundColor: oliveLight }}>
                       <svg className="w-6 h-6" style={{ color: olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,7 +299,7 @@ export function DepartmentsPage() {
                           setEditId(d.id)
                           setEditForm({ name: d.name, description: d.description || '' })
                         }}
-                        className="p-2 text-slate-400 hover:bg-slate-50 rounded-lg transition-colors"
+                        className="p-2 text-corthex-text-disabled hover:bg-corthex-bg rounded-lg transition-colors"
                         style={{ }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = olive)}
                         onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
@@ -309,17 +309,17 @@ export function DepartmentsPage() {
                       <button
                         data-testid={`departments-delete-${d.id}`}
                         onClick={() => openCascadeModal(d)}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors"
+                        className="p-2 text-corthex-text-disabled hover:text-red-500 hover:bg-corthex-bg rounded-lg transition-colors"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
                       </button>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid={`departments-name-${d.id}`}>{d.name}</h3>
-                  <p className="text-slate-500 text-sm mb-6 line-clamp-2">{d.description || '설명이 없습니다.'}</p>
+                  <h3 className="text-xl font-bold text-corthex-text-primary mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid={`departments-name-${d.id}`}>{d.name}</h3>
+                  <p className="text-corthex-text-secondary text-sm mb-6 line-clamp-2">{d.description || '설명이 없습니다.'}</p>
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm font-medium text-slate-600 flex items-center" data-testid={`departments-agent-count-${d.id}`}>
-                      <svg className="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                    <span className="text-sm font-medium text-corthex-text-secondary flex items-center" data-testid={`departments-agent-count-${d.id}`}>
+                      <svg className="w-4 h-4 mr-1.5 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
                       {count} Members
                     </span>
                     <span
@@ -340,13 +340,13 @@ export function DepartmentsPage() {
             {/* Empty State / CTA Card */}
             <button
               onClick={() => setShowCreate(true)}
-              className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-slate-400 transition-all group"
+              className="border-2 border-dashed border-corthex-border rounded-2xl p-6 flex flex-col items-center justify-center text-corthex-text-disabled transition-all group"
               style={{}}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = olive; e.currentTarget.style.color = olive }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#94a3b8' }}
               data-purpose="create-new-card"
             >
-              <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-4 group-hover:transition-colors" style={{}}>
+              <div className="w-12 h-12 bg-corthex-bg rounded-full flex items-center justify-center mb-4 group-hover:transition-colors" style={{}}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
               </div>
               <span className="font-semibold text-lg">새 부서 생성</span>
@@ -357,7 +357,7 @@ export function DepartmentsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-auto p-8 border-t border-slate-200 text-sm text-slate-400 text-center">
+      <footer className="mt-auto p-8 border-t border-corthex-border text-sm text-corthex-text-disabled text-center">
         <p>&copy; 2024 CORTHEX v2. All rights reserved.</p>
       </footer>
 
@@ -366,15 +366,15 @@ export function DepartmentsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={closeCascadeModal}>
           <div
             data-testid="departments-cascade-modal"
-            className="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col"
+            className="bg-corthex-surface rounded-2xl border border-corthex-border shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
-              <h2 className="text-lg font-semibold text-slate-900" style={{ fontFamily: "'Noto Serif KR', serif" }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border shrink-0">
+              <h2 className="text-lg font-semibold text-corthex-text-primary" style={{ fontFamily: "'Noto Serif KR', serif" }}>
                 부서 삭제 - {cascadeTarget.name}
               </h2>
-              <button data-testid="departments-cascade-close" onClick={closeCascadeModal} className="text-slate-400 hover:text-slate-600">
+              <button data-testid="departments-cascade-close" onClick={closeCascadeModal} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -384,30 +384,30 @@ export function DepartmentsPage() {
             {/* Modal Body */}
             <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
               {cascadeLoading ? (
-                <div className="text-center text-slate-400 py-8">영향 분석 중...</div>
+                <div className="text-center text-corthex-text-disabled py-8">영향 분석 중...</div>
               ) : cascadeData ? (
                 <>
                   {/* Impact Summary */}
                   <div>
-                    <h3 className="text-sm font-medium text-slate-900 mb-3">
+                    <h3 className="text-sm font-medium text-corthex-text-primary mb-3">
                       &quot;{cascadeData.departmentName}&quot;을(를) 삭제하면 다음이 영향 받습니다:
                     </h3>
                     <div data-testid="departments-impact-summary" className="grid grid-cols-2 gap-3">
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <p className="text-xs text-slate-400">소속 에이전트</p>
-                        <p className="text-lg font-semibold text-slate-900">{cascadeData.agentCount}명</p>
+                      <div className="bg-corthex-bg rounded-xl p-3">
+                        <p className="text-xs text-corthex-text-disabled">소속 에이전트</p>
+                        <p className="text-lg font-semibold text-corthex-text-primary">{cascadeData.agentCount}명</p>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <p className="text-xs text-slate-400">진행 중 작업</p>
-                        <p className="text-lg font-semibold text-slate-900">{cascadeData.activeTaskCount}건</p>
+                      <div className="bg-corthex-bg rounded-xl p-3">
+                        <p className="text-xs text-corthex-text-disabled">진행 중 작업</p>
+                        <p className="text-lg font-semibold text-corthex-text-primary">{cascadeData.activeTaskCount}건</p>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <p className="text-xs text-slate-400">학습 기록</p>
-                        <p className="text-lg font-semibold text-slate-900">{cascadeData.knowledgeCount}건</p>
+                      <div className="bg-corthex-bg rounded-xl p-3">
+                        <p className="text-xs text-corthex-text-disabled">학습 기록</p>
+                        <p className="text-lg font-semibold text-corthex-text-primary">{cascadeData.knowledgeCount}건</p>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <p className="text-xs text-slate-400">누적 비용</p>
-                        <p className="text-lg font-semibold text-slate-900">{formatCost(cascadeData.totalCostUsdMicro)}</p>
+                      <div className="bg-corthex-bg rounded-xl p-3">
+                        <p className="text-xs text-corthex-text-disabled">누적 비용</p>
+                        <p className="text-lg font-semibold text-corthex-text-primary">{formatCost(cascadeData.totalCostUsdMicro)}</p>
                       </div>
                     </div>
                   </div>
@@ -415,13 +415,13 @@ export function DepartmentsPage() {
                   {/* Agent Breakdown */}
                   {cascadeData.agentBreakdown.length > 0 && (
                     <div>
-                      <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">영향 받는 에이전트</h4>
+                      <h4 className="text-xs font-medium text-corthex-text-disabled uppercase tracking-wider mb-2">영향 받는 에이전트</h4>
                       <div data-testid="departments-agent-breakdown" className="space-y-1 max-h-32 overflow-y-auto">
                         {cascadeData.agentBreakdown.map((a) => (
                           <div key={a.id} className="flex items-center justify-between text-sm py-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-900">{a.name}</span>
-                              <span className="text-xs text-slate-400">{tierLabels[a.tier] || a.tier}</span>
+                              <span className="text-corthex-text-primary">{a.name}</span>
+                              <span className="text-xs text-corthex-text-disabled">{tierLabels[a.tier] || a.tier}</span>
                               {a.isSystem && (
                                 <span className="text-xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-600">
                                   시스템
@@ -439,7 +439,7 @@ export function DepartmentsPage() {
 
                   {/* Mode Selection */}
                   <div>
-                    <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">삭제 방식 선택</h4>
+                    <h4 className="text-xs font-medium text-corthex-text-disabled uppercase tracking-wider mb-2">삭제 방식 선택</h4>
                     <div className="space-y-2">
                       <label
                         data-testid="departments-mode-wait"
@@ -459,8 +459,8 @@ export function DepartmentsPage() {
                           style={{ accentColor: olive }}
                         />
                         <div>
-                          <p className="text-sm font-medium text-slate-900">완료 대기 (권장)</p>
-                          <p className="text-xs text-slate-400 mt-0.5">진행 중 작업이 끝난 후 삭제합니다. 에이전트는 미배속으로 전환됩니다.</p>
+                          <p className="text-sm font-medium text-corthex-text-primary">완료 대기 (권장)</p>
+                          <p className="text-xs text-corthex-text-disabled mt-0.5">진행 중 작업이 끝난 후 삭제합니다. 에이전트는 미배속으로 전환됩니다.</p>
                         </div>
                       </label>
                       <label
@@ -480,15 +480,15 @@ export function DepartmentsPage() {
                           className="mt-0.5"
                         />
                         <div>
-                          <p className="text-sm font-medium text-slate-900">강제 종료</p>
-                          <p className="text-xs text-slate-400 mt-0.5">진행 중 작업을 즉시 중단하고 삭제합니다.</p>
+                          <p className="text-sm font-medium text-corthex-text-primary">강제 종료</p>
+                          <p className="text-xs text-corthex-text-disabled mt-0.5">진행 중 작업을 즉시 중단하고 삭제합니다.</p>
                         </div>
                       </label>
                     </div>
                   </div>
 
                   {/* Preservation notice */}
-                  <div data-testid="departments-preservation-notice" className="bg-slate-50 rounded-xl p-3 text-xs text-slate-400 space-y-1">
+                  <div data-testid="departments-preservation-notice" className="bg-corthex-bg rounded-xl p-3 text-xs text-corthex-text-disabled space-y-1">
                     <p>* 학습 기록은 아카이브에 보존됩니다</p>
                     <p>* 비용 기록은 영구 보존됩니다 (회계 추적)</p>
                     <p>* 에이전트는 미배속으로 전환되지만 활성 상태가 유지됩니다</p>
@@ -498,11 +498,11 @@ export function DepartmentsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 shrink-0">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-corthex-border shrink-0">
               <button
                 data-testid="departments-cascade-cancel"
                 onClick={closeCascadeModal}
-                className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700"
+                className="px-4 py-2 text-sm text-corthex-text-secondary hover:text-corthex-text-primary"
               >
                 취소
               </button>

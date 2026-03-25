@@ -131,7 +131,7 @@ function WorkflowCard({ workflow, selected, onClick }: {
       className={`w-full text-left p-4 rounded-lg border transition-colors ${
         selected
           ? 'border-olive-500 bg-olive-50'
-          : 'border-sand-200 hover:border-sand-300 bg-white'
+          : 'border-sand-200 hover:border-sand-300 bg-corthex-surface'
       }`}
     >
       <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ export function N8nWorkflowsPage() {
           <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
             {selectedWorkflowId ? '실행 결과' : '최근 실행'}
           </h2>
-          <div className="rounded-lg border border-sand-200 bg-white overflow-hidden">
+          <div className="rounded-lg border border-sand-200 bg-corthex-surface overflow-hidden">
             {execLoading ? (
               <div className="p-8 text-center text-stone-400">
                 <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />

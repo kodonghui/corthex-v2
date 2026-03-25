@@ -76,22 +76,22 @@ export function ReportLinesPage() {
     saveMutation.mutate({ companyId: selectedCompanyId, lines: payload })
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto" style={{ fontFamily: "'Public Sans', sans-serif", color: '#3f3e3a' }}>
       {/* Top Bar */}
-      <header className="h-16 border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
-        <div className="flex items-center gap-2 text-slate-500 text-sm">
+      <header className="h-16 border-b border-corthex-border px-8 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}>
+        <div className="flex items-center gap-2 text-corthex-text-secondary text-sm">
           <span>Admin</span>
           <ChevronRight className="w-3 h-3" />
           <span className="font-medium" style={{ color: '#3f3e3a' }}>보고 라인 설정</span>
         </div>
         <div className="flex items-center gap-4">
-          <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+          <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-full transition-colors">
             <Bell className="w-5 h-5" />
           </button>
-          <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+          <button className="p-2 text-corthex-text-secondary hover:bg-corthex-elevated rounded-full transition-colors">
             <Search className="w-5 h-5" />
           </button>
         </div>
@@ -101,22 +101,22 @@ export function ReportLinesPage() {
         {/* Page Header */}
         <div className="mb-10">
           <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif KR', serif", color: '#3f3e3a' }}>보고 라인 설정</h2>
-          <p className="text-slate-600 max-w-2xl leading-relaxed">
+          <p className="text-corthex-text-secondary max-w-2xl leading-relaxed">
             휴먼 사용자의 조직 내 보고 체계를 설정합니다. 이 설정은 보고서 제출 대상 결정에 사용됩니다.
             직속 상사는 하위 사용자의 성과를 관리하고 보고서를 승인할 권한을 가집니다.
           </p>
         </div>
 
         {/* Add New Line Row (Inline Form) */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm mb-8">
-          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 보고 라인 추가</h3>
+        <div className="bg-corthex-surface rounded-xl border border-corthex-border p-6 shadow-sm mb-8">
+          <h3 className="text-sm font-semibold text-corthex-text-secondary uppercase tracking-wider mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 보고 라인 추가</h3>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1">대상 사용자 (Reporter)</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">대상 사용자 (Reporter)</label>
               <div className="relative">
-                <UserSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <UserSearch className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
                 <select
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
+                  className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
                   style={{ outlineColor: '#5a7247' }}
                 >
                   <option value="">사용자 선택</option>
@@ -127,11 +127,11 @@ export function ReportLinesPage() {
               </div>
             </div>
             <div className="flex-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1">직속 상사 (Supervisor)</label>
+              <label className="block text-xs font-medium text-corthex-text-secondary mb-1">직속 상사 (Supervisor)</label>
               <div className="relative">
-                <UserCog className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <UserCog className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
                 <select
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm"
+                  className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-corthex-border rounded-lg text-sm"
                   style={{ outlineColor: '#5a7247' }}
                 >
                   <option value="">상사 선택</option>
@@ -164,7 +164,7 @@ export function ReportLinesPage() {
         )}
 
         {/* Table Content */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-corthex-surface rounded-xl border border-corthex-border shadow-sm overflow-hidden">
           {isLoading ? (
             <div className="p-5 space-y-4">
               {[1, 2, 3, 4].map((i) => (
@@ -177,10 +177,10 @@ export function ReportLinesPage() {
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50">
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">대상 사용자 (Reporter)</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">직속 상사 (Supervisor)</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">관리</th>
+                <tr className="bg-corthex-bg">
+                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider">대상 사용자 (Reporter)</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider">직속 상사 (Supervisor)</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider text-right">관리</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -190,7 +190,7 @@ export function ReportLinesPage() {
                   const initial = u.name.charAt(0)
 
                   return (
-                    <tr key={u.id} className="group hover:bg-slate-50/50 transition-colors">
+                    <tr key={u.id} className="group hover:bg-corthex-bg/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div
@@ -201,7 +201,7 @@ export function ReportLinesPage() {
                           </div>
                           <div>
                             <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{u.name}</p>
-                            <p className="text-xs text-slate-500">@{u.username} / {u.role}</p>
+                            <p className="text-xs text-corthex-text-secondary">@{u.username} / {u.role}</p>
                           </div>
                         </div>
                       </td>
@@ -216,14 +216,14 @@ export function ReportLinesPage() {
                             </div>
                             <div>
                               <p className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{reportTarget.name}</p>
-                              <p className="text-xs text-slate-500">@{reportTarget.username}</p>
+                              <p className="text-xs text-corthex-text-secondary">@{reportTarget.username}</p>
                             </div>
                           </div>
                         ) : (
                           <select
                             value={reportsTo}
                             onChange={(e) => handleChange(u.id, e.target.value)}
-                            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm outline-none transition-colors"
+                            className="bg-corthex-bg border border-corthex-border rounded-lg px-3 py-1.5 text-sm outline-none transition-colors"
                             style={{ color: '#3f3e3a' }}
                           >
                             <option value="">없음 (최상위)</option>
@@ -239,7 +239,7 @@ export function ReportLinesPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
-                          className="text-slate-400 p-2 transition-colors"
+                          className="text-corthex-text-disabled p-2 transition-colors"
                           style={{ cursor: 'pointer' }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = '#c4622d')}
                           onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
@@ -256,18 +256,18 @@ export function ReportLinesPage() {
           )}
 
           {!isLoading && users.length === 0 && (
-            <div className="py-12 text-center text-sm text-slate-500">
+            <div className="py-12 text-center text-sm text-corthex-text-secondary">
               직원을 먼저 등록하세요
             </div>
           )}
 
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs text-slate-500">전체 {users.length}개의 보고 라인이 설정됨</p>
+          <div className="px-6 py-4 bg-corthex-bg border-t border-slate-100 flex items-center justify-between">
+            <p className="text-xs text-corthex-text-secondary">전체 {users.length}개의 보고 라인이 설정됨</p>
             <div className="flex gap-2">
-              <button className="p-1 text-slate-400 transition-colors disabled:opacity-30" disabled>
+              <button className="p-1 text-corthex-text-disabled transition-colors disabled:opacity-30" disabled>
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <button className="p-1 text-slate-400 transition-colors" style={{ cursor: 'pointer' }}>
+              <button className="p-1 text-corthex-text-disabled transition-colors" style={{ cursor: 'pointer' }}>
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -275,11 +275,11 @@ export function ReportLinesPage() {
         </div>
 
         {/* Footer / API Info */}
-        <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
+        <div className="mt-12 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center gap-4 text-corthex-text-disabled text-xs">
           <p>&copy; 2024 CORTHEX v2. All rights reserved.</p>
           <div className="flex gap-4">
-            <span className="bg-slate-100 px-2 py-1 rounded">GET /api/admin/report-lines</span>
-            <span className="bg-slate-100 px-2 py-1 rounded">POST /api/admin/report-lines</span>
+            <span className="bg-corthex-elevated px-2 py-1 rounded">GET /api/admin/report-lines</span>
+            <span className="bg-corthex-elevated px-2 py-1 rounded">POST /api/admin/report-lines</span>
           </div>
         </div>
       </div>

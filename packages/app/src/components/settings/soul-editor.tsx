@@ -127,12 +127,12 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
     <section className="space-y-4">
       {/* 상단: 에이전트 선택 + 초기화 */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-zinc-500">소울 편집</h3>
+        <h3 className="text-sm font-medium text-corthex-text-secondary">소울 편집</h3>
         {selectedAgent && detail?.adminSoul && (
           <button
             onClick={handleReset}
             disabled={resetSoul.isPending}
-            className="text-xs text-zinc-500 hover:text-zinc-700"
+            className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary"
           >
             {resetSoul.isPending ? '초기화 중...' : '초기화 ↺'}
           </button>
@@ -160,7 +160,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                   setShowTemplateConfirm(true)
                 }
               }}
-              className="w-full px-3 py-1.5 border border-zinc-200 rounded-md bg-white text-xs text-zinc-900 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+              className="w-full px-3 py-1.5 border border-zinc-200 rounded-md bg-corthex-surface text-xs text-corthex-text-primary focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
             >
               <option value="">템플릿 불러오기...</option>
               {soulTemplates.map((t) => (
@@ -190,7 +190,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               className={`flex-1 py-2 text-sm font-medium text-center ${
                 mobileTab === 'edit'
                   ? 'text-indigo-600 border-b-2 border-indigo-600'
-                  : 'text-zinc-500'
+                  : 'text-corthex-text-secondary'
               }`}
             >
               편집
@@ -200,7 +200,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               className={`flex-1 py-2 text-sm font-medium text-center ${
                 mobileTab === 'preview'
                   ? 'text-indigo-600 border-b-2 border-indigo-600'
-                  : 'text-zinc-500'
+                  : 'text-corthex-text-secondary'
               }`}
             >
               미리보기
@@ -214,7 +214,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               <div className="relative">
                 <Suspense
                   fallback={
-                    <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] animate-pulse bg-zinc-100" />
+                    <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] animate-pulse bg-corthex-elevated" />
                   }
                 >
                   <CodeMirrorEditor
@@ -229,7 +229,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                   className={`absolute bottom-2 right-3 text-[10px] z-10 ${
                     isOverLimit
                       ? 'text-amber-500 font-medium'
-                      : 'text-zinc-400'
+                      : 'text-corthex-text-disabled'
                   }`}
                 >
                   {charCount} / {MAX_CHARS}자
@@ -243,7 +243,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                 {soulText ? (
                   <MarkdownRenderer content={soulText} />
                 ) : (
-                  <p className="text-sm text-zinc-400 italic">미리보기가 여기에 표시됩니다</p>
+                  <p className="text-sm text-corthex-text-disabled italic">미리보기가 여기에 표시됩니다</p>
                 )}
               </div>
             </div>

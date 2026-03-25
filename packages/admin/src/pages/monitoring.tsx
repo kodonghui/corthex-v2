@@ -86,7 +86,7 @@ export function MonitoringPage() {
           <h1 className="text-3xl font-black tracking-tight mb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
             System Monitoring
           </h1>
-          <div className="bg-white rounded-xl border p-8 text-center" style={{ borderColor: sand }}>
+          <div className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: sand }}>
             <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
               <AlertCircle className="w-6 h-6" style={{ color: '#ef4444' }} />
             </div>
@@ -119,7 +119,7 @@ export function MonitoringPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-testid="loading-state">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white border rounded-xl h-44 animate-pulse" style={{ borderColor: sand }} />
+              <div key={i} className="bg-corthex-surface border rounded-xl h-44 animate-pulse" style={{ borderColor: sand }} />
             ))}
           </div>
         </div>
@@ -156,7 +156,7 @@ export function MonitoringPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Server Status Card */}
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="server-card">
+          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="server-card">
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
@@ -185,7 +185,7 @@ export function MonitoringPage() {
           </div>
 
           {/* Memory Card */}
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="memory-card">
+          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="memory-card">
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
@@ -209,7 +209,7 @@ export function MonitoringPage() {
           </div>
 
           {/* Database Card */}
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="db-card">
+          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="db-card">
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
@@ -241,7 +241,7 @@ export function MonitoringPage() {
           </div>
 
           {/* Error Card */}
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="error-card">
+          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="error-card">
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: d.errors.count24h > 0 ? 'rgba(239,68,68,0.1)' : oliveBg }}>

@@ -428,7 +428,7 @@ export function ChatArea({
             <button
               data-testid="mobile-back-btn"
               onClick={onBack}
-              className="md:hidden flex items-center justify-center rounded-xl size-10 text-stone-500 hover:text-slate-200 hover:bg-stone-100 transition-colors mr-1"
+              className="md:hidden flex items-center justify-center rounded-xl size-10 text-stone-500 hover:text-corthex-text-disabled hover:bg-stone-100 transition-colors mr-1"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -488,7 +488,7 @@ export function ChatArea({
               className={`flex items-center justify-center rounded-xl size-10 transition-colors ${
                 showDelegations
                   ? 'text-corthex-accent bg-corthex-accent/10'
-                  : 'text-stone-500 hover:text-slate-200 hover:bg-stone-100'
+                  : 'text-stone-500 hover:text-corthex-text-disabled hover:bg-stone-100'
               }`}
             >
               <MoreHorizontal className="w-5 h-5" />
@@ -506,7 +506,7 @@ export function ChatArea({
               className="bg-stone-100 border border-stone-200 rounded-2xl p-4"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-200">{del.targetAgentName}</span>
+                <span className="text-sm font-medium text-corthex-text-disabled">{del.targetAgentName}</span>
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded-full font-mono ${
                     del.status === 'completed'
@@ -525,7 +525,7 @@ export function ChatArea({
               {del.agentResponse && (
                 <p className="text-xs text-stone-600 line-clamp-3">{del.agentResponse}</p>
               )}
-              <div className="flex items-center gap-3 mt-2 text-xs text-slate-600 font-mono">
+              <div className="flex items-center gap-3 mt-2 text-xs text-corthex-text-secondary font-mono">
                 <span>생성: {new Date(del.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
                 {del.completedAt && (
                   <span>완료: {new Date(del.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -666,7 +666,7 @@ export function ChatArea({
                       </div>
                     )}
                     {/* Message Bubble */}
-                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-corthex-text-disabled w-full shadow-sm">
                       <p className="whitespace-pre-wrap">{renderTextWithLinks(mainContent, navigate)}</p>
                       {msg.attachments && msg.attachments.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-2">
@@ -729,7 +729,7 @@ export function ChatArea({
                     </div>
                   )}
                   {streamingText && (
-                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
+                    <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-corthex-text-disabled w-full shadow-sm">
                       <p className="whitespace-pre-wrap">
                         {renderTextWithLinks(streamingText, navigate)}
                         <span className="inline-block w-2 h-4 bg-corthex-accent ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
@@ -877,7 +877,7 @@ export function ChatArea({
                   }
                   disabled={sendMessage.isPending || isStreaming}
                   aria-label="메시지 입력"
-                  className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-slate-200 placeholder:text-stone-400 py-3 px-2 h-full block font-display disabled:opacity-40"
+                  className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-corthex-text-disabled placeholder:text-stone-400 py-3 px-2 h-full block font-display disabled:opacity-40"
                   rows={1}
                 />
               </div>

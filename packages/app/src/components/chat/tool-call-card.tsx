@@ -26,7 +26,7 @@ export function ToolCallCard({ tool }: { tool: ToolCall }) {
     : 'border-stone-200/50'
 
   return (
-    <div data-testid={`tool-call-${tool.toolId}`} className={`bg-white/50 border ${borderColor} rounded-lg p-2.5 mt-2`}>
+    <div data-testid={`tool-call-${tool.toolId}`} className={`bg-corthex-surface/50 border ${borderColor} rounded-lg p-2.5 mt-2`}>
       <div className="flex items-center gap-2">
         <span className={`text-xs ${isRunning ? 'animate-pulse' : ''}`}>{icon}</span>
         <span className="text-xs font-mono text-stone-600">{tool.toolName}</span>
@@ -36,7 +36,7 @@ export function ToolCallCard({ tool }: { tool: ToolCall }) {
           </span>
         )}
         {!isRunning && tool.durationMs != null && (
-          <span className="text-xs text-slate-600 ml-auto">{formatDuration(tool.durationMs)}</span>
+          <span className="text-xs text-corthex-text-secondary ml-auto">{formatDuration(tool.durationMs)}</span>
         )}
       </div>
       {!isRunning && (
@@ -53,12 +53,12 @@ export function ToolCallCard({ tool }: { tool: ToolCall }) {
       {expanded && (
         <div className="mt-2 space-y-2">
           {tool.input && (
-            <pre className="text-xs text-stone-400 bg-white rounded p-2 max-h-20 overflow-y-auto font-mono">
+            <pre className="text-xs text-stone-400 bg-corthex-surface rounded p-2 max-h-20 overflow-y-auto font-mono">
               {tool.input.length > 300 ? tool.input.slice(0, 300) + '...' : tool.input}
             </pre>
           )}
           {tool.result && (
-            <pre className={`text-xs bg-white rounded p-2 max-h-20 overflow-y-auto font-mono ${isError ? 'text-red-400' : 'text-stone-500'}`}>
+            <pre className={`text-xs bg-corthex-surface rounded p-2 max-h-20 overflow-y-auto font-mono ${isError ? 'text-red-400' : 'text-stone-500'}`}>
               {tool.result.length > 300 ? tool.result.slice(0, 300) + '...' : tool.result}
             </pre>
           )}

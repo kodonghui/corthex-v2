@@ -19,11 +19,11 @@ export function DepartmentCard({
     featured = false
 }: DepartmentCardProps) {
     const borderClass = featured ? 'border-2 border-corthex-accent' : 'border border-stone-200 hover:border-corthex-accent/50';
-    const headerClass = featured ? 'text-slate-100' : 'text-slate-100 group-hover:text-corthex-accent';
+    const headerClass = featured ? 'text-corthex-text-primary' : 'text-corthex-text-primary group-hover:text-corthex-accent';
     const badgeClass = featured ? 'bg-[rgba(34,211,238,0.10)] text-corthex-accent' : 'bg-stone-100 text-stone-600';
 
     return (
-        <div className={`group flex flex-col bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer ${borderClass}`}>
+        <div className={`group flex flex-col bg-corthex-surface rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer ${borderClass}`}>
             <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-4">
                     <h3 className={`text-xl font-bold transition-colors ${headerClass}`}>{name}</h3>

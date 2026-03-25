@@ -99,7 +99,7 @@ function SortableStockItem({
             <span
               {...attributes}
               {...listeners}
-              className="shrink-0 cursor-grab text-slate-600 hover:text-stone-500 text-xs select-none"
+              className="shrink-0 cursor-grab text-corthex-text-secondary hover:text-stone-500 text-xs select-none"
               onClick={(e) => e.stopPropagation()}
             >
               ⠿
@@ -113,11 +113,11 @@ function SortableStockItem({
               className="accent-corthex-accent shrink-0"
             />
           )}
-          <span className="font-bold text-sm text-slate-100 truncate">{stock.stockName}</span>
+          <span className="font-bold text-sm text-corthex-text-primary truncate">{stock.stockName}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {priceData && (
-            <span className="font-mono text-sm text-slate-100">
+            <span className="font-mono text-sm text-corthex-text-primary">
               {priceData.price.toLocaleString('ko-KR')}
             </span>
           )}
@@ -279,13 +279,13 @@ export function StockSidebar({ className }: StockSidebarProps) {
     <div className={className}>
       <div className="p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-zinc-500">관심종목 ({items.length})</span>
+          <span className="text-xs font-medium text-corthex-text-secondary">관심종목 ({items.length})</span>
           <button
             onClick={toggleCompare}
             className={`text-xs px-2 py-1 rounded-md transition-colors ${
               compareActive
                 ? 'bg-indigo-100 text-indigo-600'
-                : 'text-zinc-400 hover:text-zinc-600'
+                : 'text-corthex-text-disabled hover:text-corthex-text-secondary'
             }`}
           >
             비교 {compareActive ? '●' : '○'}
@@ -305,7 +305,7 @@ export function StockSidebar({ className }: StockSidebarProps) {
               className={`text-[10px] px-2 py-0.5 rounded-full transition-colors ${
                 marketFilter === f
                   ? 'bg-indigo-100 text-indigo-600'
-                  : 'text-zinc-400 hover:text-zinc-600 bg-zinc-100'
+                  : 'text-corthex-text-disabled hover:text-corthex-text-secondary bg-corthex-elevated'
               }`}
             >
               {f === 'all' ? '전체' : f}
@@ -331,7 +331,7 @@ export function StockSidebar({ className }: StockSidebarProps) {
           </SortableContext>
         </DndContext>
         {filtered.length === 0 && (
-          <p className="px-3 py-6 text-xs text-zinc-400 text-center">
+          <p className="px-3 py-6 text-xs text-corthex-text-disabled text-center">
             {search ? '검색 결과가 없습니다' : '관심 종목이 없습니다'}
           </p>
         )}

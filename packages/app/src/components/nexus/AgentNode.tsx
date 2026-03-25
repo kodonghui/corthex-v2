@@ -30,7 +30,7 @@ export function AgentNode({ data, selected }: NodeProps) {
 
   return (
     <div
-      className={`px-4 py-3 rounded-xl bg-white shadow-[0_2px_12px_rgba(40,54,24,0.06)] border min-w-[170px] transition-all hover:shadow-[0_4px_20px_rgba(40,54,24,0.12)] ${
+      className={`px-4 py-3 rounded-xl bg-corthex-surface shadow-[0_2px_12px_rgba(40,54,24,0.06)] border min-w-[170px] transition-all hover:shadow-[0_4px_20px_rgba(40,54,24,0.12)] ${
         selected
           ? 'border-corthex-accent ring-2 ring-corthex-accent/20'
           : 'border-corthex-border'

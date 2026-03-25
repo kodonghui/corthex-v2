@@ -113,7 +113,7 @@ function AgentCard({ agent, onClick }: { agent: AgentOverview; onClick: () => vo
   return (
     <button
       onClick={onClick}
-      className="text-left w-full p-4 rounded-lg border border-corthex-border bg-white hover:border-corthex-accent/40 transition-colors"
+      className="text-left w-full p-4 rounded-lg border border-corthex-border bg-corthex-surface hover:border-corthex-accent/40 transition-colors"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-medium text-stone-800 truncate">{agent.agentName || agent.agentId.slice(0, 8)}</h3>
@@ -184,21 +184,21 @@ function ObservationsTab({ agentId }: { agentId: string }) {
       <div className="flex gap-2 flex-wrap">
         <Filter className="w-4 h-4 text-stone-400 mt-1" />
         <select value={domainFilter} onChange={(e) => setDomainFilter(e.target.value)}
-          className="text-xs border rounded px-2 py-1 bg-white">
+          className="text-xs border rounded px-2 py-1 bg-corthex-surface">
           <option value="">전체 도메인</option>
           <option value="conversation">conversation</option>
           <option value="tool_use">tool_use</option>
           <option value="error">error</option>
         </select>
         <select value={outcomeFilter} onChange={(e) => setOutcomeFilter(e.target.value)}
-          className="text-xs border rounded px-2 py-1 bg-white">
+          className="text-xs border rounded px-2 py-1 bg-corthex-surface">
           <option value="">전체 결과</option>
           <option value="success">success</option>
           <option value="failure">failure</option>
           <option value="unknown">unknown</option>
         </select>
         <select value={flaggedFilter} onChange={(e) => setFlaggedFilter(e.target.value)}
-          className="text-xs border rounded px-2 py-1 bg-white">
+          className="text-xs border rounded px-2 py-1 bg-corthex-surface">
           <option value="">전체</option>
           <option value="true">플래그됨</option>
           <option value="false">정상</option>
@@ -214,7 +214,7 @@ function ObservationsTab({ agentId }: { agentId: string }) {
         </div>
       ) : (
         obs.map((o) => (
-          <div key={o.id} className={`p-3 rounded-lg border ${o.flagged ? 'border-red-200 bg-red-50/50' : 'border-corthex-border bg-white'}`}>
+          <div key={o.id} className={`p-3 rounded-lg border ${o.flagged ? 'border-red-200 bg-red-50/50' : 'border-corthex-border bg-corthex-surface'}`}>
             <div className="flex items-start justify-between gap-2">
               <p className="text-sm text-stone-700 line-clamp-2 flex-1">{o.content}</p>
               <button
@@ -280,13 +280,13 @@ function MemoriesTab({ agentId }: { agentId: string }) {
       <div className="flex gap-2 flex-wrap">
         <Filter className="w-4 h-4 text-stone-400 mt-1" />
         <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}
-          className="text-xs border rounded px-2 py-1 bg-white">
+          className="text-xs border rounded px-2 py-1 bg-corthex-surface">
           <option value="">전체 출처</option>
           <option value="manual">manual</option>
           <option value="reflection">reflection</option>
         </select>
         <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-          className="text-xs border rounded px-2 py-1 bg-white">
+          className="text-xs border rounded px-2 py-1 bg-corthex-surface">
           <option value="">전체 카테고리</option>
           <option value="skill">skill</option>
           <option value="preference">preference</option>
@@ -305,7 +305,7 @@ function MemoriesTab({ agentId }: { agentId: string }) {
         </div>
       ) : (
         memories.map((m) => (
-          <div key={m.id} className={`p-3 rounded-lg border ${m.pinned ? 'border-corthex-accent/40 bg-corthex-bg' : 'border-corthex-border bg-white'}`}>
+          <div key={m.id} className={`p-3 rounded-lg border ${m.pinned ? 'border-corthex-accent/40 bg-corthex-bg' : 'border-corthex-border bg-corthex-surface'}`}>
             <div className="flex items-start justify-between gap-2">
               <p className="text-sm text-stone-700 flex-1">{m.content}</p>
               <button
@@ -423,7 +423,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
   return (
     <div className="space-y-6">
       {/* Overall Score */}
-      <div className="flex items-center gap-6 p-4 rounded-lg border border-corthex-border bg-white">
+      <div className="flex items-center gap-6 p-4 rounded-lg border border-corthex-border bg-corthex-surface">
         <ScoreRing score={score.overall} />
         <div className="flex-1">
           <h3 className="font-medium text-stone-800 mb-1">Overall Capability</h3>
@@ -443,7 +443,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
           if (!meta) return null
           const Icon = meta.icon
           return (
-            <div key={key} className="p-3 rounded-lg border border-corthex-border bg-white">
+            <div key={key} className="p-3 rounded-lg border border-corthex-border bg-corthex-surface">
               <div className="flex items-center gap-2 mb-2">
                 <Icon className={`w-4 h-4 ${meta.color}`} />
                 <span className="text-sm font-medium text-stone-700">{meta.label}</span>
@@ -462,7 +462,7 @@ function CapabilityTab({ agentId }: { agentId: string }) {
 
       {/* History Trend */}
       {history.length > 1 && (
-        <div className="p-4 rounded-lg border border-corthex-border bg-white">
+        <div className="p-4 rounded-lg border border-corthex-border bg-corthex-surface">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-corthex-accent" />
             <h3 className="text-sm font-medium text-stone-700">Score History</h3>

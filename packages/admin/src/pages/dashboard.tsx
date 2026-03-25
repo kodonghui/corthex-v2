@@ -44,7 +44,7 @@ export function DashboardPage() {
   const activeUsers = users.filter((u) => u.isActive).length
   const onlineAgents = agents.filter((a) => a.status === 'online').length
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-slate-500">회사를 선택하세요</div>
+  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
 
   return (
     <div className="min-h-screen p-8 max-w-7xl mx-auto w-full" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
@@ -84,17 +84,17 @@ export function DashboardPage() {
       </div>
 
       {/* Recent Activity Table */}
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }}>
+      <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }}>
         <div className="p-6 border-b flex items-center justify-between" style={{ borderColor: sand }}>
           <div>
             <h4 className="font-bold text-lg leading-none" style={{ color: warmBrown }}>Recent Activity</h4>
-            <p className="text-xs text-slate-400 mt-2">Users and agents in this workspace</p>
+            <p className="text-xs text-corthex-text-disabled mt-2">Users and agents in this workspace</p>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-wider" style={{ backgroundColor: cream }}>
+              <tr className="text-corthex-text-disabled text-[11px] font-bold uppercase tracking-wider" style={{ backgroundColor: cream }}>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Type</th>
@@ -104,21 +104,21 @@ export function DashboardPage() {
             <tbody className="divide-y" style={{ borderColor: sand }}>
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-corthex-text-disabled">
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-corthex-border border-t-transparent rounded-full animate-spin" />
                       Loading...
                     </div>
                   </td>
                 </tr>
               ) : users.length === 0 && agents.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">No users or agents yet</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-corthex-text-disabled">No users or agents yet</td>
                 </tr>
               ) : (
                 <>
                   {users.map((u) => (
-                    <tr key={`user-${u.id}`} className="hover:bg-slate-50 transition-colors">
+                    <tr key={`user-${u.id}`} className="hover:bg-corthex-bg transition-colors">
                       <td className="px-6 py-4">
                         <span className="flex items-center gap-1.5 font-bold text-xs uppercase" style={{ color: u.isActive ? olive : '#94a3b8' }}>
                           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: u.isActive ? olive : '#94a3b8' }} />
@@ -127,14 +127,14 @@ export function DashboardPage() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-sm font-bold" style={{ color: warmBrown }}>{u.name}</p>
-                        <p className="text-xs text-slate-400">@{u.username}</p>
+                        <p className="text-xs text-corthex-text-disabled">@{u.username}</p>
                       </td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>User</td>
                       <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>{u.role}</td>
                     </tr>
                   ))}
                   {agents.map((a) => (
-                    <tr key={`agent-${a.id}`} className="hover:bg-slate-50 transition-colors">
+                    <tr key={`agent-${a.id}`} className="hover:bg-corthex-bg transition-colors">
                       <td className="px-6 py-4">
                         <span className={`flex items-center gap-1.5 font-bold text-xs uppercase ${a.status === 'online' ? '' : 'text-amber-500'}`} style={a.status === 'online' ? { color: olive } : {}}>
                           <span className={`w-2 h-2 rounded-full ${a.status === 'online' ? '' : 'bg-amber-500'}`} style={a.status === 'online' ? { backgroundColor: olive } : {}} />
@@ -169,21 +169,21 @@ function StatCard({ icon, label, value, sub, badge, isLoading, accent }: {
 }) {
   return (
     <div
-      className="bg-white p-6 rounded-xl border shadow-sm"
+      className="bg-corthex-surface p-6 rounded-xl border shadow-sm"
       style={{ borderColor: sand, ...(accent ? { borderLeftWidth: '4px', borderLeftColor: olive } : {}) }}
     >
       <div className="flex justify-between items-start mb-4">
-        <p className="text-sm font-medium text-slate-500">{label}</p>
+        <p className="text-sm font-medium text-corthex-text-secondary">{label}</p>
         {badge ? (
           <span className="px-2 py-0.5 rounded text-[10px] font-bold" style={{ backgroundColor: oliveBg, color: olive }}>{badge}</span>
         ) : icon}
       </div>
       {isLoading ? (
-        <div className="h-9 w-16 bg-slate-100 rounded animate-pulse" />
+        <div className="h-9 w-16 bg-corthex-elevated rounded animate-pulse" />
       ) : (
         <h3 className="text-3xl font-bold tracking-tight" style={{ color: warmBrown }}>{value}</h3>
       )}
-      <p className="text-[10px] text-slate-400 mt-2">{sub}</p>
+      <p className="text-[10px] text-corthex-text-disabled mt-2">{sub}</p>
     </div>
   )
 }

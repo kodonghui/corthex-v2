@@ -7,13 +7,13 @@ export interface ChatInputBarProps {
 export function ChatInputBar({ agentName = 'Agent' }: ChatInputBarProps) {
     return (
         <div className="p-4 bg-[#0B1120] border-t border-stone-200">
-            <div className="flex items-end gap-2 bg-white rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-corthex-accent/50 transition-all">
+            <div className="flex items-end gap-2 bg-corthex-surface rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-corthex-accent/50 transition-all">
                 <button className="flex items-center justify-center p-2.5 text-stone-500 hover:text-stone-600 rounded-xl hover:bg-stone-200 transition-colors shrink-0">
                     <Paperclip className="w-5 h-5" />
                 </button>
                 <div className="flex-1 max-h-32 min-h-[44px] flex items-center">
                     <textarea
-                        className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-slate-200 placeholder:text-stone-400 py-3 px-2 h-full block font-display"
+                        className="w-full bg-transparent border-0 focus:ring-0 resize-none text-[15px] text-corthex-text-disabled placeholder:text-stone-400 py-3 px-2 h-full block font-display"
                         placeholder={`Message ${agentName}...`}
                         rows={1}
                     />

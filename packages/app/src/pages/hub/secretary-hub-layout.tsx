@@ -336,7 +336,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             <h1 className="text-xl font-bold tracking-tight" style={{ color: C.accentOlive }}>CORTHEX v2</h1>
           </div>
           <nav className="space-y-1">
-            <span className="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-white rounded-lg shadow-sm" style={{ color: C.accentOlive }}>
+            <span className="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-corthex-surface rounded-lg shadow-sm" style={{ color: C.accentOlive }}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
               Workspace Hub
             </span>
@@ -607,7 +607,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                   ))}
                 </div>
               )}
-              <div className="max-w-4xl mx-auto bg-white border shadow-lg rounded-xl overflow-hidden terminal-focus transition-all" style={{ borderColor: C.border }}>
+              <div className="max-w-4xl mx-auto bg-corthex-surface border shadow-lg rounded-xl overflow-hidden terminal-focus transition-all" style={{ borderColor: C.border }}>
                 <div className="flex items-center px-4 py-2 border-b" style={{ backgroundColor: C.bgSecondary, borderColor: C.border }}>
                   <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-stone-300"></div>
@@ -670,8 +670,8 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                 </div>
                 <div className="px-4 py-1 border-t flex justify-between" style={{ backgroundColor: '#fafaf9', borderColor: C.border }}>
                   <div className="flex gap-4">
-                    <span className="text-[10px] text-stone-400"><kbd className="bg-white border px-1 rounded">@</kbd> Mention Agent</span>
-                    <span className="text-[10px] text-stone-400"><kbd className="bg-white border px-1 rounded">/</kbd> Command</span>
+                    <span className="text-[10px] text-stone-400"><kbd className="bg-corthex-surface border px-1 rounded">@</kbd> Mention Agent</span>
+                    <span className="text-[10px] text-stone-400"><kbd className="bg-corthex-surface border px-1 rounded">/</kbd> Command</span>
                   </div>
                   <span className="text-[10px] text-stone-400">API: /api/workspace/hub/stream</span>
                 </div>
@@ -680,7 +680,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
           </section>
 
           {/* Handoff Tracker Sidebar */}
-          <aside className="w-72 border-l bg-white flex flex-col" style={{ borderColor: C.border }} data-purpose="handoff-tracker">
+          <aside className="w-72 border-l bg-corthex-surface flex flex-col" style={{ borderColor: C.border }} data-purpose="handoff-tracker">
             <div className="p-6 border-b" style={{ borderColor: C.border, backgroundColor: `${C.bgSecondary}4d` }}>
               <h3 className="font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Process Delegation</h3>
               <p className="text-xs text-stone-500 mt-1">Real-time handoff chain</p>

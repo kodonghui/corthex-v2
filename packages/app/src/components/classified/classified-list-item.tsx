@@ -16,16 +16,16 @@ export interface ClassifiedListItemProps {
 
 export function ClassifiedListItem({ title, levelText, levelColorClass, dateLabel, dateValue, viewCount, icon, iconType = 'visibility', isActive, isRevoked }: ClassifiedListItemProps) {
     return (
-        <div className={`flex gap-4 px-4 py-3 border-b border-stone-200 cursor-pointer transition-colors relative ${isActive ? 'bg-white hover:bg-stone-100/50' : 'hover:bg-white'
+        <div className={`flex gap-4 px-4 py-3 border-b border-stone-200 cursor-pointer transition-colors relative ${isActive ? 'bg-corthex-surface hover:bg-stone-100/50' : 'hover:bg-corthex-surface'
             } ${isRevoked ? 'opacity-50' : ''}`}>
             {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>}
             <div className="flex items-start gap-4 w-full">
-                <div className="text-slate-100 flex items-center justify-center rounded-md bg-stone-100 shrink-0 size-10">
+                <div className="text-corthex-text-primary flex items-center justify-center rounded-md bg-stone-100 shrink-0 size-10">
                     {icon}
                 </div>
                 <div className="flex flex-1 flex-col justify-center">
                     <div className="flex justify-between items-center mb-1">
-                        <p className={`text-slate-100 text-sm font-medium leading-normal truncate ${isRevoked ? 'line-through decoration-slate-400' : ''}`}>
+                        <p className={`text-corthex-text-primary text-sm font-medium leading-normal truncate ${isRevoked ? 'line-through decoration-slate-400' : ''}`}>
                             {title}
                         </p>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${levelColorClass}`}>

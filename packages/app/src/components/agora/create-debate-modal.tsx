@@ -69,13 +69,13 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal content */}
-      <div className="relative bg-white border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-corthex-surface border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-accent/10">
-          <h2 className="text-base font-bold text-slate-100">새 토론 시작</h2>
+          <h2 className="text-base font-bold text-corthex-text-primary">새 토론 시작</h2>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-corthex-text-primary hover:bg-stone-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -90,7 +90,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="예: 신규 사업 진출 전략에 대한 논의"
-              className="w-full bg-stone-100/50 border border-stone-200 text-slate-100 rounded-lg px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline-none focus:border-corthex-accent/50 focus:ring-1 focus:ring-corthex-accent/20 transition-all"
+              className="w-full bg-stone-100/50 border border-stone-200 text-corthex-text-primary rounded-lg px-4 py-2.5 text-sm placeholder:text-stone-400 focus:outline-none focus:border-corthex-accent/50 focus:ring-1 focus:ring-corthex-accent/20 transition-all"
             />
           </div>
 
@@ -141,14 +141,14 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
                       className={cn(
                         'w-5 h-5 rounded border flex items-center justify-center',
                         selected
-                          ? 'bg-corthex-accent border-corthex-accent text-slate-900'
+                          ? 'bg-corthex-accent border-corthex-accent text-corthex-text-primary'
                           : 'border-stone-300',
                       )}
                     >
                       {selected && <Check className="w-3 h-3" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-medium text-slate-100">{agent.name}</span>
+                      <span className="text-xs font-medium text-corthex-text-primary">{agent.name}</span>
                       <span className="text-[10px] text-stone-500 ml-1.5">{agent.role}</span>
                     </div>
                     {agent.departmentName && (

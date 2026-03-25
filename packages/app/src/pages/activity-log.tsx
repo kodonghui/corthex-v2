@@ -354,7 +354,7 @@ export function ActivityLogPage() {
       {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
         {/* Header Section */}
-        <header className="border-b border-corthex-border px-8 py-6 bg-white shrink-0" data-purpose="page-header">
+        <header className="border-b border-corthex-border px-8 py-6 bg-corthex-surface shrink-0" data-purpose="page-header">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-corthex-accent-deep">Activity Log</h1>

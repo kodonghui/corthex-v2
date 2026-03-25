@@ -19,7 +19,7 @@ export function JobCard({ iconType, name, agentName, schedule, status }: JobCard
     }
 
     return (
-        <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-stone-200 hover:border-stone-200 transition-colors">
+        <div className="flex items-center gap-4 bg-corthex-surface p-4 rounded-xl border border-stone-200 hover:border-stone-200 transition-colors">
             <div className="flex items-center justify-center rounded-lg bg-stone-100 shrink-0 w-12 h-12">
                 {getIcon()}
             </div>
@@ -29,7 +29,7 @@ export function JobCard({ iconType, name, agentName, schedule, status }: JobCard
                     <span className="flex items-center gap-1">
                         <Bot className="w-4 h-4" /> Agent: {agentName}
                     </span>
-                    <span className="text-slate-600">•</span>
+                    <span className="text-corthex-text-secondary">•</span>
                     <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" /> {schedule}
                     </span>

@@ -60,10 +60,10 @@ type ApplyResult = {
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
   manager: { label: 'Manager', color: 'bg-corthex-accent-deep text-corthex-accent-hover' },
   specialist: { label: 'Specialist', color: 'bg-cyan-900 text-cyan-300' },
-  worker: { label: 'Worker', color: 'bg-slate-700 text-slate-400' },
+  worker: { label: 'Worker', color: 'bg-corthex-elevated text-corthex-text-disabled' },
 }
 
-const modalInput = 'bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none rounded-lg px-3 py-2 text-sm text-slate-50 w-full'
+const modalInput = 'bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none rounded-lg px-3 py-2 text-sm text-slate-50 w-full'
 
 // ============================================================
 // Preview Modal
@@ -93,19 +93,19 @@ function PreviewModal({
       <div
         role="dialog"
         aria-modal="true"
-        className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
+        className="bg-corthex-bg rounded-xl border border-corthex-border shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
         data-testid="preview-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border">
           <div>
             <h2 className="text-lg font-semibold text-slate-50">{template.name}</h2>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-corthex-text-disabled mt-0.5">
               {depts.length}개 부서 · {totalAgents}명 에이전트
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+          <button onClick={onClose} className="text-corthex-text-secondary hover:text-corthex-text-disabled">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -115,17 +115,17 @@ function PreviewModal({
         {/* Content */}
         <div className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
           {template.description && (
-            <p className="text-sm text-slate-400">{template.description}</p>
+            <p className="text-sm text-corthex-text-disabled">{template.description}</p>
           )}
 
           {depts.map((dept) => (
-            <div key={dept.name} className="border border-slate-700 rounded-lg overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-800">
+            <div key={dept.name} className="border border-corthex-border rounded-lg overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-corthex-surface">
                 <span className="text-sm font-medium text-slate-50">{dept.name}</span>
                 {dept.description && (
-                  <span className="text-xs text-slate-500 truncate">— {dept.description}</span>
+                  <span className="text-xs text-corthex-text-secondary truncate">— {dept.description}</span>
                 )}
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-700 text-slate-400 ml-auto flex-shrink-0">
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-disabled ml-auto flex-shrink-0">
                   {dept.agents.length}명
                 </span>
               </div>
@@ -137,7 +137,7 @@ function PreviewModal({
                       <div key={agent.name} className="flex items-center gap-3 px-4 py-2">
                         <span className="text-sm text-slate-50">{agent.name}</span>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.color}`}>{tier.label}</span>
-                        <span className="text-xs text-slate-500 ml-auto">{agent.modelName}</span>
+                        <span className="text-xs text-corthex-text-secondary ml-auto">{agent.modelName}</span>
                       </div>
                     )
                   })}
@@ -148,10 +148,10 @@ function PreviewModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-corthex-border">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+            className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled"
           >
             닫기
           </button>
@@ -183,13 +183,13 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
       <div
         role="dialog"
         aria-modal="true"
-        className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-lg mx-4"
+        className="bg-corthex-bg rounded-xl border border-corthex-border shadow-xl w-full max-w-lg mx-4"
         onClick={(e) => e.stopPropagation()}
         data-testid="apply-result-modal"
       >
-        <div className="px-6 py-4 border-b border-slate-700">
+        <div className="px-6 py-4 border-b border-corthex-border">
           <h2 className="text-lg font-semibold text-slate-50">적용 완료</h2>
-          <p className="text-sm text-slate-400 mt-0.5">{result.templateName}</p>
+          <p className="text-sm text-corthex-text-disabled mt-0.5">{result.templateName}</p>
         </div>
 
         <div className="px-6 py-5 space-y-4">
@@ -207,8 +207,8 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
 
           {/* Skipped info */}
           {(result.departmentsSkipped > 0 || result.agentsSkipped > 0) && (
-            <div className="bg-slate-800 rounded-lg px-4 py-3">
-              <p className="text-xs text-slate-500">
+            <div className="bg-corthex-surface rounded-lg px-4 py-3">
+              <p className="text-xs text-corthex-text-secondary">
                 이미 존재하는 항목: 부서 {result.departmentsSkipped}개, 에이전트 {result.agentsSkipped}명 (건너뜀)
               </p>
             </div>
@@ -219,13 +219,13 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
             {result.details.map((d) => (
               <div key={d.departmentName} className="text-sm">
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${d.action === 'created' ? 'bg-emerald-900/30 text-emerald-300' : 'bg-slate-800 text-slate-500'}`}>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${d.action === 'created' ? 'bg-emerald-900/30 text-emerald-300' : 'bg-corthex-surface text-corthex-text-secondary'}`}>
                     {d.action === 'created' ? '생성' : '기존'}
                   </span>
                   <span className="font-medium text-slate-50">{d.departmentName}</span>
                 </div>
                 {d.agentsCreated.length > 0 && (
-                  <p className="text-xs text-slate-500 ml-12 mt-0.5">
+                  <p className="text-xs text-corthex-text-secondary ml-12 mt-0.5">
                     + {d.agentsCreated.join(', ')}
                   </p>
                 )}
@@ -234,7 +234,7 @@ function ApplyResultModal({ result, onClose }: { result: ApplyResult; onClose: (
           </div>
         </div>
 
-        <div className="flex justify-end px-6 py-4 border-t border-slate-700">
+        <div className="flex justify-end px-6 py-4 border-t border-corthex-border">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg transition-colors"
@@ -257,7 +257,7 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
+      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-corthex-surface/50 border border-corthex-border hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
       data-testid={`template-card-${template.id}`}
     >
       <div className="flex items-start justify-between mb-3">
@@ -279,10 +279,10 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
       </div>
 
       {template.description && (
-        <p className="text-sm text-slate-400 mb-4 line-clamp-2">{template.description}</p>
+        <p className="text-sm text-corthex-text-disabled mb-4 line-clamp-2">{template.description}</p>
       )}
 
-      <div className="flex items-center gap-4 text-xs text-slate-500">
+      <div className="flex items-center gap-4 text-xs text-corthex-text-secondary">
         <span>{depts.length}개 부서</span>
         <span>{totalAgents}명 에이전트</span>
       </div>
@@ -291,7 +291,7 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
         {depts.map((d) => (
           <span
             key={d.name}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-400"
+            className="text-[10px] px-2 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-disabled"
           >
             {d.name}
           </span>
@@ -383,8 +383,8 @@ export function OrgTemplatesPage() {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
-          <p className="text-sm text-slate-500 text-center py-8">사이드바에서 회사를 선택해주세요.</p>
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
+          <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
         </div>
       </div>
     )
@@ -394,7 +394,7 @@ export function OrgTemplatesPage() {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-        <div className="text-center text-slate-500 py-8">로딩 중...</div>
+        <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
       </div>
     )
   }
@@ -403,7 +403,7 @@ export function OrgTemplatesPage() {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-red-500">템플릿을 불러올 수 없습니다.</p>
             <button
@@ -423,7 +423,7 @@ export function OrgTemplatesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-corthex-text-disabled mt-1">
             템플릿을 선택하면 부서와 에이전트가 자동으로 생성됩니다. 기존 조직과 중복되는 항목은 건너뜁니다.
           </p>
         </div>
@@ -436,9 +436,9 @@ export function OrgTemplatesPage() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
           <div className="text-center py-12">
-            <p className="text-sm text-slate-500">등록된 템플릿이 없습니다.</p>
+            <p className="text-sm text-corthex-text-secondary">등록된 템플릿이 없습니다.</p>
           </div>
         </div>
       ) : (
@@ -466,20 +466,20 @@ export function OrgTemplatesPage() {
 
       {/* Publish Controls per template (below the grid) */}
       {templates.some((t) => t.companyId && !t.isBuiltin) && (
-        <div className="border border-slate-700 rounded-lg p-4">
+        <div className="border border-corthex-border rounded-lg p-4">
           <h3 className="text-sm font-medium text-slate-50 mb-3">마켓 공개 관리</h3>
           <div className="space-y-2">
             {templates.filter((t) => t.companyId && !t.isBuiltin).map((t) => (
-              <div key={t.id} className="flex items-center justify-between py-2 px-3 bg-slate-800 rounded-lg">
+              <div key={t.id} className="flex items-center justify-between py-2 px-3 bg-corthex-surface rounded-lg">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-50">{t.name}</span>
                   {t.isPublished ? (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-900 text-emerald-300">공개</span>
                   ) : (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-500">비공개</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-elevated text-corthex-text-secondary">비공개</span>
                   )}
                   {t.downloadCount > 0 && (
-                    <span className="text-[10px] text-slate-500">{t.downloadCount}회 다운로드</span>
+                    <span className="text-[10px] text-corthex-text-secondary">{t.downloadCount}회 다운로드</span>
                   )}
                 </div>
                 {t.isPublished ? (
@@ -511,21 +511,21 @@ export function OrgTemplatesPage() {
           <div
             role="dialog"
             aria-modal="true"
-            className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-sm mx-4"
+            className="bg-corthex-bg rounded-xl border border-corthex-border shadow-xl w-full max-w-sm mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 border-b border-slate-700">
+            <div className="px-6 py-4 border-b border-corthex-border">
               <h2 className="text-lg font-semibold text-slate-50">마켓에 공개</h2>
             </div>
             <div className="px-6 py-5">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-corthex-text-disabled">
                 이 템플릿을 마켓에 공개하시겠습니까? 다른 회사에서 이 조직 구조를 복제할 수 있게 됩니다.
               </p>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-corthex-border">
               <button
                 onClick={() => setPublishConfirmId(null)}
-                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+                className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled"
               >
                 취소
               </button>
@@ -546,17 +546,17 @@ export function OrgTemplatesPage() {
           <div
             role="dialog"
             aria-modal="true"
-            className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-md mx-4"
+            className="bg-corthex-bg rounded-xl border border-corthex-border shadow-xl w-full max-w-md mx-4"
             onClick={(e) => e.stopPropagation()}
             data-testid="create-template-modal"
           >
-            <div className="px-6 py-4 border-b border-slate-700">
+            <div className="px-6 py-4 border-b border-corthex-border">
               <h2 className="text-lg font-semibold text-slate-50">현재 조직을 템플릿으로 저장</h2>
-              <p className="text-sm text-slate-400 mt-0.5">현재 부서와 에이전트 구조가 템플릿으로 저장됩니다.</p>
+              <p className="text-sm text-corthex-text-disabled mt-0.5">현재 부서와 에이전트 구조가 템플릿으로 저장됩니다.</p>
             </div>
             <div className="px-6 py-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">템플릿 이름</label>
+                <label className="block text-sm font-medium text-corthex-text-disabled mb-1">템플릿 이름</label>
                 <input
                   type="text"
                   value={newTemplateName}
@@ -566,7 +566,7 @@ export function OrgTemplatesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">설명 (선택)</label>
+                <label className="block text-sm font-medium text-corthex-text-disabled mb-1">설명 (선택)</label>
                 <textarea
                   value={newTemplateDesc}
                   onChange={(e) => setNewTemplateDesc(e.target.value)}
@@ -576,10 +576,10 @@ export function OrgTemplatesPage() {
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-corthex-border">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+                className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled"
               >
                 취소
               </button>

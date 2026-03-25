@@ -15,8 +15,8 @@ export function WatchlistItem({ symbol, price, name, change, isPositive, active 
     return (
         <div className={`flex flex-col gap-1 px-4 py-3 border-l-2 cursor-pointer transition-colors ${containerClass}`}>
             <div className="flex justify-between items-center">
-                <span className="font-bold text-sm text-slate-100">{symbol}</span>
-                <span className="font-mono text-sm text-slate-100">{price}</span>
+                <span className="font-bold text-sm text-corthex-text-primary">{symbol}</span>
+                <span className="font-mono text-sm text-corthex-text-primary">{price}</span>
             </div>
             <div className="flex justify-between items-center text-xs">
                 <span className="text-stone-500">{name}</span>

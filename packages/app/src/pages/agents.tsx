@@ -353,11 +353,11 @@ function SoulEditor({
         </label>
         {abMode && (
           <>
-            <select value={presetA} onChange={(e) => setPresetA(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-white">
+            <select value={presetA} onChange={(e) => setPresetA(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-corthex-surface">
               <option value="">A: 현재 성격</option>
               {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>A: {p.nameKo}</option>)}
             </select>
-            <select value={presetB} onChange={(e) => setPresetB(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-white">
+            <select value={presetB} onChange={(e) => setPresetB(e.target.value)} className="text-xs border border-corthex-border rounded px-2 py-1 bg-corthex-surface">
               <option value="">B: 현재 성격</option>
               {PERSONALITY_PRESETS.map(p => <option key={p.id} value={p.id}>B: {p.nameKo}</option>)}
             </select>
@@ -506,24 +506,24 @@ function AgentDetailPanel({
 
       {/* Stats Grid */}
       <section className="grid grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+        <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">총 작업</p>
           <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--</p>
           <p className="text-[10px] text-corthex-accent mt-2 font-medium">실적 집계 중</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+        <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">성공률</p>
           <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--%</p>
           <div className="w-full bg-corthex-border h-1 rounded-full mt-4 overflow-hidden">
             <div className="bg-corthex-accent h-full" style={{ width: '0%' }} />
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+        <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">평균 응답</p>
           <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--s</p>
           <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">데이터 수집 중</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30">
+        <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">월간 비용</p>
           <p className="text-3xl font-bold font-mono text-corthex-accent-deep">$--</p>
           <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">예산 집계 중</p>
@@ -559,7 +559,7 @@ function AgentDetailPanel({
                 최근 활동 <span className="text-corthex-text-secondary font-normal text-sm ml-2">Recent Activity</span>
               </h3>
             </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-corthex-border/30">
+            <div className="bg-corthex-surface rounded-xl overflow-hidden shadow-sm border border-corthex-border/30">
               <div className="divide-y divide-corthex-border/30">
                 {recentActivities.map((act) => (
                   <div key={act.id} className="px-6 py-4 flex items-center justify-between hover:bg-corthex-bg/50 transition-colors">
@@ -583,7 +583,7 @@ function AgentDetailPanel({
             <h3 className="text-lg font-bold tracking-tight text-corthex-text-primary">
               성능 지표 <span className="text-corthex-text-secondary font-normal text-sm block">Performance</span>
             </h3>
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-corthex-border/30 space-y-6">
+            <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30 space-y-6">
               <div>
                 <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">모델</p>
                 <p className="text-sm font-mono font-medium text-corthex-accent-deep">{agent.modelName}</p>

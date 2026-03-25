@@ -8,7 +8,7 @@ export interface SettingsSectionProps {
 export function SettingsSection({ title, children }: SettingsSectionProps) {
     return (
         <section>
-            <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6 text-slate-100">{title}</h2>
+            <h2 className="text-[22px] font-bold leading-tight tracking-tight pb-6 text-corthex-text-primary">{title}</h2>
             <div className="flex flex-col gap-6">
                 {children}
             </div>

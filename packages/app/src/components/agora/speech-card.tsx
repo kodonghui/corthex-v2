@@ -63,7 +63,7 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, in
       <div className={cn('flex flex-col gap-1', isRight ? 'items-end' : 'items-start')}>
         <div className={cn('flex items-center gap-2', isRight && 'flex-row-reverse')}>
           <p className="text-stone-400 text-xs font-medium uppercase tracking-wider">{agentName}</p>
-          <span className="text-slate-600 text-[10px] font-mono">R{roundNum}</span>
+          <span className="text-corthex-text-secondary text-[10px] font-mono">R{roundNum}</span>
           {position && (
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-corthex-accent/10 text-corthex-accent">
               {position}
@@ -77,7 +77,7 @@ export function SpeechCard({ agentName, agentId, content, position, roundNum, in
           )}
         </div>
         <div className={cn(
-          'text-sm font-normal leading-relaxed px-5 py-3 text-slate-100 border',
+          'text-sm font-normal leading-relaxed px-5 py-3 text-corthex-text-primary border',
           theme.bubble,
           theme.bubbleRadius,
         )}>

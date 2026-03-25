@@ -155,7 +155,7 @@ export function BigFiveSliderGroup({ value, onChange, disabled = false }: BigFiv
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all
                   ${activePreset === preset.id
                     ? 'bg-corthex-accent-deep text-white border-corthex-accent-deep shadow-sm'
-                    : 'bg-white text-corthex-text-secondary border-corthex-border hover:bg-corthex-elevated hover:border-corthex-accent'
+                    : 'bg-corthex-surface text-corthex-text-secondary border-corthex-border hover:bg-corthex-elevated hover:border-corthex-accent'
                   } disabled:opacity-40`}
               >
                 {preset.nameKo} <span className="opacity-70">{preset.name}</span>

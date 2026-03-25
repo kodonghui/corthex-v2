@@ -149,7 +149,7 @@ export function CostsPage() {
                 <Calendar className="w-5 h-5 text-corthex-text-secondary" />
                 <span className="font-medium">{new Date().getFullYear()}년 {new Date().getMonth() + 1}월</span>
               </button>
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-corthex-border rounded-lg hover:shadow-sm transition-all text-corthex-text-primary font-medium">
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-corthex-surface border border-corthex-border rounded-lg hover:shadow-sm transition-all text-corthex-text-primary font-medium">
                 <Download className="w-5 h-5" />
                 내보내기 Export CSV
               </button>

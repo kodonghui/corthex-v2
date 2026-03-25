@@ -15,20 +15,20 @@ export function DebateMessage({ sender, time, message, icon, iconBgClass, avatar
     const getThemeClasses = () => {
         switch (theme) {
             case 'cyan': return {
-                bgClass: 'bg-corthex-accent/10 text-slate-900 border border-corthex-accent/20',
+                bgClass: 'bg-corthex-accent/10 text-corthex-text-primary border border-corthex-accent/20',
                 iconClass: iconBgClass || 'bg-corthex-accent/20 text-corthex-accent border border-corthex-accent/30'
             };
             case 'violet': return {
-                bgClass: 'bg-violet-500/10 text-slate-900 border border-violet-500/20',
+                bgClass: 'bg-violet-500/10 text-corthex-text-primary border border-violet-500/20',
                 iconClass: iconBgClass || 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
             };
             case 'amber': return {
-                bgClass: 'bg-amber-500/10 text-slate-900 border border-amber-500/20',
+                bgClass: 'bg-amber-500/10 text-corthex-text-primary border border-amber-500/20',
                 iconClass: iconBgClass || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
             };
             case 'slate': return {
-                bgClass: 'bg-slate-200 text-slate-900 border border-slate-300',
-                iconClass: iconBgClass || 'bg-slate-200 border border-slate-300'
+                bgClass: 'bg-slate-200 text-corthex-text-primary border border-corthex-border',
+                iconClass: iconBgClass || 'bg-slate-200 border border-corthex-border'
             };
         }
     }
@@ -51,7 +51,7 @@ export function DebateMessage({ sender, time, message, icon, iconBgClass, avatar
             <div className={`flex flex-col gap-1 ${itemAlignClass}`}>
                 <div className={`flex items-center gap-2 ${flexRowReverseClass}`}>
                     <p className="text-stone-400 text-xs font-medium uppercase tracking-wider">{sender}</p>
-                    <span className="text-slate-600 text-[10px] font-mono">{time}</span>
+                    <span className="text-corthex-text-secondary text-[10px] font-mono">{time}</span>
                 </div>
                 <div className={`text-sm font-normal leading-relaxed px-5 py-3 ${borderRadiusClass} ${classes.bgClass}`}>
                     {message}

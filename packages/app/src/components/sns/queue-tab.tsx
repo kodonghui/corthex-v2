@@ -147,7 +147,7 @@ export function QueueTab() {
                     <span className="bg-orange-500/20 text-orange-400 text-xs px-1.5 py-0.5 rounded">카드뉴스</span>
                   )}
                 </div>
-                <h4 className="text-sm font-medium text-slate-100 truncate">{item.title}</h4>
+                <h4 className="text-sm font-medium text-corthex-text-primary truncate">{item.title}</h4>
               </div>
               <div className="text-right shrink-0">
                 {item.scheduledAt && (

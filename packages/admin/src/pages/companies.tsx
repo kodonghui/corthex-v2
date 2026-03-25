@@ -118,7 +118,7 @@ export function CompaniesPage() {
         </div>
 
         {/* Search */}
-        <div className="bg-white rounded-xl border p-4 mb-6 flex items-center" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border p-4 mb-6 flex items-center" style={{ borderColor: sand }}>
           <div className="relative w-full md:w-96">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: lightMuted }} />
             <input
@@ -135,7 +135,7 @@ export function CompaniesPage() {
 
         {/* Create Form */}
         {showCreate && (
-          <div className="bg-white rounded-xl border p-6 mb-6 shadow-sm" style={{ borderColor: sand }} data-testid="company-create-form">
+          <div className="bg-corthex-surface rounded-xl border p-6 mb-6 shadow-sm" style={{ borderColor: sand }} data-testid="company-create-form">
             <h3 className="text-lg font-bold mb-4" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>New Company</h3>
             <form
               onSubmit={(e) => {
@@ -197,7 +197,7 @@ export function CompaniesPage() {
               return (
                 <div
                   key={c.id}
-                  className="bg-white rounded-xl border p-6 shadow-sm transition-all hover:shadow-md"
+                  className="bg-corthex-surface rounded-xl border p-6 shadow-sm transition-all hover:shadow-md"
                   style={{ borderColor: sand }}
                   data-testid={`company-card-${c.slug}`}
                 >
@@ -261,7 +261,7 @@ export function CompaniesPage() {
                             setEditId(c.id)
                             setEditForm({ name: c.name, slug: c.slug })
                           }}
-                          className="p-1.5 rounded hover:bg-slate-100 transition-colors"
+                          className="p-1.5 rounded hover:bg-corthex-elevated transition-colors"
                           title="Edit"
                         >
                           <Pencil size={16} style={{ color: muted }} />
@@ -289,11 +289,11 @@ export function CompaniesPage() {
               Showing {filteredCompanies.length} of {companies.length} companies
             </p>
             <div className="flex gap-2">
-              <button className="p-1 border rounded bg-white transition-colors disabled:opacity-50" style={{ borderColor: sand }} disabled>
+              <button className="p-1 border rounded bg-corthex-surface transition-colors disabled:opacity-50" style={{ borderColor: sand }} disabled>
                 <ChevronLeft size={18} style={{ color: lightMuted }} />
               </button>
               <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
-              <button className="p-1 border rounded bg-white transition-colors" style={{ borderColor: sand }}>
+              <button className="p-1 border rounded bg-corthex-surface transition-colors" style={{ borderColor: sand }}>
                 <ChevronRight size={18} style={{ color: lightMuted }} />
               </button>
             </div>

@@ -81,14 +81,14 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-sm">
-      <h3 className="text-sm font-semibold text-zinc-900 mb-4">
+      <h3 className="text-sm font-semibold text-corthex-text-primary mb-4">
         전략 데이터 내보내기
       </h3>
 
       <div className="space-y-4">
         {/* 내보내기 유형 */}
         <div>
-          <p className="text-xs text-zinc-500 mb-2">내보내기 유형</p>
+          <p className="text-xs text-corthex-text-secondary mb-2">내보내기 유형</p>
           <div className="flex flex-col gap-1.5">
             {TYPE_OPTIONS.map((opt) => (
               <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
@@ -99,7 +99,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
                   onChange={() => handleTypeChange(opt.value)}
                   className="accent-indigo-600"
                 />
-                <span className="text-sm text-zinc-700">{opt.label}</span>
+                <span className="text-sm text-corthex-text-primary">{opt.label}</span>
               </label>
             ))}
           </div>
@@ -108,7 +108,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
         {/* 포맷 선택 */}
         {selectedOption.formats.length > 1 && (
           <div>
-            <p className="text-xs text-zinc-500 mb-2">파일 형식</p>
+            <p className="text-xs text-corthex-text-secondary mb-2">파일 형식</p>
             <div className="flex gap-2">
               {selectedOption.formats.map((f) => (
                 <button
@@ -117,7 +117,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                     format === f
                       ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                      : 'border-zinc-200 text-zinc-500 hover:bg-zinc-50'
+                      : 'border-zinc-200 text-corthex-text-secondary hover:bg-corthex-bg'
                   }`}
                 >
                   {FORMAT_LABELS[f]}

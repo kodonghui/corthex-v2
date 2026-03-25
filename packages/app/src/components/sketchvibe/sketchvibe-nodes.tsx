@@ -127,7 +127,7 @@ export function SystemNode({ id, data, selected }: NodeProps) {
       <Handle type="target" position={Position.Top} className="!bg-slate-400" />
       <Handle type="target" position={Position.Left} className="!bg-slate-400" />
       <div className="text-[10px] text-stone-400 font-medium mb-1">SYSTEM</div>
-      <EditableLabel value={label} onChange={onChange} className="text-sm font-bold text-slate-200" />
+      <EditableLabel value={label} onChange={onChange} className="text-sm font-bold text-corthex-text-disabled" />
       <Handle type="source" position={Position.Bottom} className="!bg-slate-400" />
       <Handle type="source" position={Position.Right} className="!bg-slate-400" />
     </div>

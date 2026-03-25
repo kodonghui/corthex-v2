@@ -7,7 +7,7 @@ export function DepartmentNode({ data, selected }: NodeProps) {
   const d = data as unknown as DepartmentData
   return (
     <div
-      className={`px-5 py-3.5 rounded-xl bg-white shadow-[0_4px_20px_rgba(40,54,24,0.08)] border min-w-[180px] transition-all ${
+      className={`px-5 py-3.5 rounded-xl bg-corthex-surface shadow-[0_4px_20px_rgba(40,54,24,0.08)] border min-w-[180px] transition-all ${
         selected
           ? 'border-corthex-accent ring-2 ring-corthex-accent/20'
           : 'border-corthex-border'

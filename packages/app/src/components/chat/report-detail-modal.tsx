@@ -80,14 +80,14 @@ const SCORE_LABELS: Record<string, string> = {
 // === Delegation Chain Visualization ===
 
 function DelegationChain({ chain }: { chain: DelegationChainItem[] }) {
-  if (chain.length === 0) return <p className="text-sm text-zinc-400">위임 데이터가 없습니다</p>
+  if (chain.length === 0) return <p className="text-sm text-corthex-text-disabled">위임 데이터가 없습니다</p>
 
   return (
     <div className="space-y-2">
       {chain.map((item) => (
         <div
           key={item.taskId}
-          className="flex items-center gap-3 p-2 rounded-lg bg-zinc-50"
+          className="flex items-center gap-3 p-2 rounded-lg bg-corthex-bg"
         >
           <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
             <span className="text-xs font-medium text-indigo-600">
@@ -95,15 +95,15 @@ function DelegationChain({ chain }: { chain: DelegationChainItem[] }) {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-900 truncate">
+            <p className="text-sm font-medium text-corthex-text-primary truncate">
               {item.agentName}
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-corthex-text-secondary">
               {TIER_LABELS[item.agentTier] ?? item.agentTier} · {TASK_TYPE_LABELS[item.taskType] ?? item.taskType}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-400">{formatDuration(item.durationMs)}</span>
+            <span className="text-xs text-corthex-text-disabled">{formatDuration(item.durationMs)}</span>
             <Badge variant={item.status === 'completed' ? 'success' : item.status === 'failed' ? 'error' : 'default'}>
               {item.status === 'completed' ? '완료' : item.status === 'failed' ? '실패' : '진행중'}
             </Badge>
@@ -117,7 +117,7 @@ function DelegationChain({ chain }: { chain: DelegationChainItem[] }) {
 // === Quality Score Card ===
 
 function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
-  if (reviews.length === 0) return <p className="text-sm text-zinc-400">검수 데이터가 없습니다</p>
+  if (reviews.length === 0) return <p className="text-sm text-corthex-text-disabled">검수 데이터가 없습니다</p>
 
   // Show the latest review
   const latest = reviews[reviews.length - 1]
@@ -136,8 +136,8 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
           return (
             <div key={key}>
               <div className="flex justify-between text-xs mb-0.5">
-                <span className="text-zinc-600">{label}</span>
-                <span className="text-zinc-500">{score}/{maxScore}</span>
+                <span className="text-corthex-text-secondary">{label}</span>
+                <span className="text-corthex-text-secondary">{score}/{maxScore}</span>
               </div>
               <div className="h-1.5 bg-zinc-200 rounded-full overflow-hidden">
                 <div
@@ -152,7 +152,7 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
         })}
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
-        <span className="text-sm font-medium text-zinc-700">총점</span>
+        <span className="text-sm font-medium text-corthex-text-primary">총점</span>
         <Badge variant={latest.conclusion === 'pass' ? 'success' : 'error'}>
           {latest.conclusion === 'pass' ? 'PASS' : 'FAIL'}{' '}
           {Object.values(scores).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0)}/25
@@ -223,9 +223,9 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
 
       {/* Cost Summary */}
       {cost && (cost.inputTokens > 0 || cost.outputTokens > 0) && (
-        <div className="mb-4 p-3 bg-zinc-50 rounded-lg">
-          <h3 className="text-sm font-semibold text-zinc-700 mb-2">비용 요약</h3>
-          <div className="flex gap-4 text-xs text-zinc-600">
+        <div className="mb-4 p-3 bg-corthex-bg rounded-lg">
+          <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">비용 요약</h3>
+          <div className="flex gap-4 text-xs text-corthex-text-secondary">
             <span>입력: {cost.inputTokens.toLocaleString()} 토큰</span>
             <span>출력: {cost.outputTokens.toLocaleString()} 토큰</span>
             <span className="font-medium">${cost.totalCostUsd.toFixed(4)}</span>
@@ -235,13 +235,13 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
 
       {/* Delegation Chain */}
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-700 mb-2">위임 체인</h3>
+        <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">위임 체인</h3>
         {loadingDelegation ? <Spinner /> : <DelegationChain chain={chain} />}
       </div>
 
       {/* Quality Gate Details */}
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-700 mb-2">품질 검수</h3>
+        <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">품질 검수</h3>
         {loadingDelegation ? <Spinner /> : <QualityScoreCard reviews={reviews} />}
       </div>
 
@@ -249,7 +249,7 @@ export function ReportDetailModal({ isOpen, onClose, commandId }: ReportDetailMo
       <div className="flex justify-end pt-2">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 bg-zinc-100 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium text-corthex-text-secondary hover:text-corthex-text-primary bg-corthex-elevated rounded-lg transition-colors"
         >
           닫기
         </button>

@@ -86,7 +86,7 @@ export function AccountsTab({ accounts }: AccountsTabProps) {
                 {acct.isActive ? '활성' : '비활성'}
               </span>
             </div>
-            <p className="text-sm font-medium text-slate-100 mt-1">{acct.accountName}</p>
+            <p className="text-sm font-medium text-corthex-text-primary mt-1">{acct.accountName}</p>
             <p className="text-xs text-stone-400">{acct.accountId}</p>
           </div>
           <div className="flex gap-2">
@@ -120,7 +120,7 @@ export function AccountsTab({ accounts }: AccountsTabProps) {
                 className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600 font-mono" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={closeModal} className="text-stone-500 text-sm px-3 py-1.5 hover:text-slate-200">취소</button>
+              <button onClick={closeModal} className="text-stone-500 text-sm px-3 py-1.5 hover:text-corthex-text-disabled">취소</button>
               <button onClick={handleSave}
                 disabled={!form.accountName || !form.accountId || createAccount.isPending || updateAccount.isPending}
                 className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">

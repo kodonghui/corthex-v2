@@ -129,7 +129,7 @@ export function UsersPage() {
   if (!selectedCompanyId) {
     return (
       <div className="flex items-center justify-center h-64" data-testid="no-company">
-        <p className="text-sm text-slate-400">회사를 선택하세요</p>
+        <p className="text-sm text-corthex-text-disabled">회사를 선택하세요</p>
       </div>
     )
   }
@@ -140,8 +140,8 @@ export function UsersPage() {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">User Management</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">Manage, invite and assign roles across the CORTHEX platform.</p>
+            <h1 className="text-3xl font-black tracking-tight text-corthex-text-primary dark:text-white">User Management</h1>
+            <p className="text-corthex-text-secondary dark:text-corthex-text-disabled mt-1">Manage, invite and assign roles across the CORTHEX platform.</p>
           </div>
           <button
             onClick={() => setShowCreate(!showCreate)}
@@ -156,8 +156,8 @@ export function UsersPage() {
 
         {/* Create User Form */}
         {showCreate && (
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 mb-6 space-y-4" data-testid="create-form">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">새 직원 추가</h3>
+          <div className="bg-corthex-surface dark:bg-corthex-bg p-5 rounded-xl border border-corthex-border dark:border-slate-800 mb-6 space-y-4" data-testid="create-form">
+            <h3 className="text-lg font-semibold text-corthex-text-primary dark:text-white">새 직원 추가</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -167,53 +167,53 @@ export function UsersPage() {
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">아이디</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">아이디</label>
                 <input
                   value={form.username}
                   onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
+                  className="w-full bg-corthex-bg dark:bg-corthex-surface border border-corthex-border dark:border-corthex-border rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
                   style={{ outlineColor: olive }}
                   placeholder="사용자 아이디"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">비밀번호</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">비밀번호</label>
                 <input
                   type="password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
+                  className="w-full bg-corthex-bg dark:bg-corthex-surface border border-corthex-border dark:border-corthex-border rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
                   placeholder="비밀번호"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이름</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이름</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
+                  className="w-full bg-corthex-bg dark:bg-corthex-surface border border-corthex-border dark:border-corthex-border rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
                   placeholder="직원 이름"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이메일</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이메일</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
+                  className="w-full bg-corthex-bg dark:bg-corthex-surface border border-corthex-border dark:border-corthex-border rounded-lg px-3 py-2 text-sm focus:ring-2 transition-colors"
                   placeholder="email@example.com"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">역할</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">역할</label>
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm"
+                  className="w-full bg-corthex-bg dark:bg-corthex-surface border border-corthex-border dark:border-corthex-border rounded-lg px-3 py-2 text-sm"
                 >
                   <option value="user">일반 직원</option>
                   <option value="admin">관리자</option>
@@ -223,7 +223,7 @@ export function UsersPage() {
                 <button
                   type="button"
                   onClick={() => setShowCreate(false)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-corthex-elevated hover:bg-slate-200 text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
@@ -244,24 +244,24 @@ export function UsersPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-6 flex flex-col md:flex-row gap-4 items-center">
+        <div className="bg-corthex-surface dark:bg-corthex-bg p-4 rounded-xl border border-corthex-border dark:border-slate-800 mb-6 flex flex-col md:flex-row gap-4 items-center">
           <div className="relative w-full md:w-96">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-corthex-bg dark:bg-corthex-surface border-corthex-border dark:border-corthex-border text-sm"
               style={{ outlineColor: olive }}
               placeholder="Search by name, email or company..."
               type="text"
             />
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <label className="text-sm font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Filter by:</label>
+            <label className="text-sm font-semibold text-corthex-text-secondary dark:text-corthex-text-disabled whitespace-nowrap">Filter by:</label>
             <select
               value={deptFilter}
               onChange={(e) => setDeptFilter(e.target.value)}
-              className="rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm py-2 px-3 min-w-[140px]"
+              className="rounded-lg bg-corthex-bg dark:bg-corthex-surface border-corthex-border dark:border-corthex-border text-sm py-2 px-3 min-w-[140px]"
             >
               <option value="all">All Departments</option>
               {depts.map((d) => (
@@ -273,7 +273,7 @@ export function UsersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm py-2 px-3 min-w-[140px]"
+              className="rounded-lg bg-corthex-bg dark:bg-corthex-surface border-corthex-border dark:border-corthex-border text-sm py-2 px-3 min-w-[140px]"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -283,7 +283,7 @@ export function UsersPage() {
         </div>
 
         {/* Table Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm" data-testid="user-table">
+        <div className="bg-corthex-surface dark:bg-corthex-bg rounded-xl border border-corthex-border dark:border-slate-800 overflow-hidden shadow-sm" data-testid="user-table">
           {isLoading ? (
             <div className="p-5"><SkeletonTable rows={5} /></div>
           ) : filteredUsers.length === 0 ? (
@@ -294,19 +294,19 @@ export function UsersPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                <thead className="bg-corthex-bg dark:bg-corthex-surface/50 border-b border-corthex-border dark:border-slate-800">
                   <tr>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">User Details</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Company</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Joined Date</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider">User Details</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider">Company</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider">Joined Date</th>
+                    <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary dark:text-corthex-text-disabled uppercase tracking-wider text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {filteredUsers.map((u) => (
-                    <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <tr key={u.id} className="hover:bg-corthex-bg dark:hover:bg-corthex-surface/30 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
@@ -317,12 +317,12 @@ export function UsersPage() {
                               <input
                                 value={editForm.name}
                                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                className="bg-slate-50 border border-slate-300 rounded px-2 py-1 text-sm w-full"
+                                className="bg-corthex-bg border border-corthex-border rounded px-2 py-1 text-sm w-full"
                               />
                             ) : (
                               <>
                                 <p className="font-bold text-sm">{u.name}</p>
-                                <p className="text-xs text-slate-500">{u.email || `@${u.username}`}</p>
+                                <p className="text-xs text-corthex-text-secondary">{u.email || `@${u.username}`}</p>
                               </>
                             )}
                           </div>
@@ -333,13 +333,13 @@ export function UsersPage() {
                           <select
                             value={editForm.role}
                             onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                            className="bg-slate-50 border border-slate-300 rounded px-2 py-1 text-sm"
+                            className="bg-corthex-bg border border-corthex-border rounded px-2 py-1 text-sm"
                           >
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                           </select>
                         ) : (
-                          <span className="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-xs font-bold">
+                          <span className="px-2 py-1 rounded bg-corthex-elevated dark:bg-corthex-surface text-xs font-bold">
                             {u.role === 'admin' ? 'Admin' : 'User'}
                           </span>
                         )}
@@ -352,13 +352,13 @@ export function UsersPage() {
                             Active
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-corthex-elevated dark:bg-corthex-surface text-corthex-text-secondary dark:text-corthex-text-disabled text-xs font-bold">
                             <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                             Inactive
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500">
+                      <td className="px-6 py-4 text-sm text-corthex-text-secondary">
                         {u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -371,14 +371,14 @@ export function UsersPage() {
                                 email: editForm.email || undefined,
                                 role: editForm.role,
                               })}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-xs font-medium"
+                              className="p-1.5 hover:bg-corthex-elevated dark:hover:bg-corthex-surface rounded text-xs font-medium"
                               style={{ color: olive }}
                             >
                               저장
                             </button>
                             <button
                               onClick={() => setEditUser(null)}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 text-xs"
+                              className="p-1.5 hover:bg-corthex-elevated dark:hover:bg-corthex-surface rounded text-corthex-text-disabled text-xs"
                             >
                               취소
                             </button>
@@ -390,7 +390,7 @@ export function UsersPage() {
                                 setEditUser(u)
                                 setEditForm({ name: u.name, email: u.email || '', role: u.role })
                               }}
-                              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                              className="p-1.5 hover:bg-corthex-elevated dark:hover:bg-corthex-surface rounded text-corthex-text-disabled hover:text-corthex-text-primary dark:hover:text-white"
                               title="Edit"
                             >
                               <Pencil className="w-5 h-5" />
@@ -398,7 +398,7 @@ export function UsersPage() {
                             {u.isActive ? (
                               <button
                                 onClick={() => setDeactivateTarget(u)}
-                                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-red-500"
+                                className="p-1.5 hover:bg-corthex-elevated dark:hover:bg-corthex-surface rounded text-corthex-text-disabled hover:text-red-500"
                                 title="Deactivate"
                               >
                                 <Ban className="w-5 h-5" />
@@ -406,7 +406,7 @@ export function UsersPage() {
                             ) : (
                               <button
                                 onClick={() => setResetPasswordTarget(u)}
-                                className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded text-slate-400 hover:text-emerald-600"
+                                className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded text-corthex-text-disabled hover:text-emerald-600"
                                 title="Reset Password"
                               >
                                 <CheckCircle className="w-5 h-5" />
@@ -424,14 +424,14 @@ export function UsersPage() {
 
           {/* Pagination */}
           {filteredUsers.length > 0 && (
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-              <p className="text-xs font-medium text-slate-500">Showing 1 to {filteredUsers.length} of {users.length} users</p>
+            <div className="p-4 bg-corthex-bg dark:bg-corthex-surface/50 border-t border-corthex-border dark:border-slate-800 flex items-center justify-between">
+              <p className="text-xs font-medium text-corthex-text-secondary">Showing 1 to {filteredUsers.length} of {users.length} users</p>
               <div className="flex gap-2">
-                <button className="p-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-400 transition-colors disabled:opacity-50" disabled>
+                <button className="p-1 border border-corthex-border dark:border-corthex-border rounded bg-corthex-surface dark:bg-corthex-bg text-corthex-text-disabled transition-colors disabled:opacity-50" disabled>
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
-                <button className="p-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-400 transition-colors">
+                <button className="p-1 border border-corthex-border dark:border-corthex-border rounded bg-corthex-surface dark:bg-corthex-bg text-corthex-text-disabled transition-colors">
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
@@ -440,7 +440,7 @@ export function UsersPage() {
         </div>
 
         {/* Footer/System Info */}
-        <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 dark:text-slate-600 gap-4">
+        <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-xs text-corthex-text-disabled dark:text-corthex-text-secondary gap-4">
           <p>&copy; 2024 CORTHEX Technologies. All rights reserved.</p>
           <div className="flex gap-6">
             <span>System Status: <span className="text-emerald-500">Healthy</span></span>

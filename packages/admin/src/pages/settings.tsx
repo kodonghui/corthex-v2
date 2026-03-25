@@ -84,7 +84,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
   }
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-company-info">
+    <div className="bg-corthex-surface rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-company-info">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
           <Building2 className="w-5 h-5" style={{ color: olive }} />
@@ -98,7 +98,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
           <input
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="w-full px-3 py-2.5 border rounded-lg bg-white text-sm focus:outline-none focus:ring-1"
+            className="w-full px-3 py-2.5 border rounded-lg bg-corthex-surface text-sm focus:outline-none focus:ring-1"
             style={{ borderColor: sand, color: warmBrown, outlineColor: olive }}
           />
         </div>
@@ -239,7 +239,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
   const inputStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-api-keys">
+    <div className="bg-corthex-surface rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-api-keys">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
@@ -480,7 +480,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }}>
+      <div className="bg-corthex-surface rounded-xl border shadow-sm p-6" style={{ borderColor: sand }}>
         <Skeleton className="h-6 w-40 mb-4" />
         <Skeleton className="h-10 w-full" />
       </div>
@@ -488,7 +488,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-handoff-depth">
+    <div className="bg-corthex-surface rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-handoff-depth">
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
           <ArrowLeftRight className="w-5 h-5" style={{ color: olive }} />
@@ -572,7 +572,7 @@ function DefaultSettingsSection({
   const selectStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-defaults">
+    <div className="bg-corthex-surface rounded-xl border shadow-sm p-6" style={{ borderColor: sand }} data-testid="settings-defaults">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
           <SlidersHorizontal className="w-5 h-5" style={{ color: olive }} />

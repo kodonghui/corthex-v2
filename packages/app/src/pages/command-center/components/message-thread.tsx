@@ -77,7 +77,7 @@ const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick
         </svg>
       </div>
       <p className="text-base font-semibold text-stone-600 mb-1">아직 명령이 없습니다</p>
-      <p className="text-xs text-slate-600 mb-5">아래 예시를 클릭하거나 직접 명령을 입력하세요</p>
+      <p className="text-xs text-corthex-text-secondary mb-5">아래 예시를 클릭하거나 직접 명령을 입력하세요</p>
 
       {/* Example command cards */}
       <div className="grid grid-cols-1 gap-2.5 w-full max-w-xs">
@@ -97,9 +97,9 @@ const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-stone-600 group-hover:text-blue-300 transition-colors">{cmd.label}</p>
-                <p className="text-xs text-slate-600 mt-0.5 truncate">{cmd.text}</p>
+                <p className="text-xs text-corthex-text-secondary mt-0.5 truncate">{cmd.text}</p>
               </div>
-              <svg className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
+              <svg className="w-3.5 h-3.5 text-corthex-text-secondary group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
                 <path d="M4.5 2.5l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>

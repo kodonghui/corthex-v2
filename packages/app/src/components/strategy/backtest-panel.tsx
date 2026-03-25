@@ -120,18 +120,18 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
     onParamsChange?.(null)
   }
 
-  const returnColor = (v: number) => v > 0 ? 'text-emerald-500' : v < 0 ? 'text-red-500' : 'text-zinc-400'
+  const returnColor = (v: number) => v > 0 ? 'text-emerald-500' : v < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
   const returnSign = (v: number) => v > 0 ? '+' : ''
 
   return (
     <Card variant="bordered" className="shrink-0">
       <div className="px-5 py-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-900">백테스트</h3>
+          <h3 className="text-sm font-semibold text-corthex-text-primary">백테스트</h3>
           {result && (
             <button
               onClick={clearResult}
-              className="text-xs text-zinc-400 hover:text-zinc-600"
+              className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary"
             >
               초기화
             </button>
@@ -141,25 +141,25 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
         {/* Settings */}
         <div className="flex items-end gap-3 flex-wrap">
           <label className="space-y-1">
-            <span className="text-xs text-zinc-500">단기 MA</span>
+            <span className="text-xs text-corthex-text-secondary">단기 MA</span>
             <input
               type="number"
               min={2}
               max={50}
               value={shortPeriod}
               onChange={(e) => setShortPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900"
+              className="block w-20 rounded-md border border-zinc-300 bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
             />
           </label>
           <label className="space-y-1">
-            <span className="text-xs text-zinc-500">장기 MA</span>
+            <span className="text-xs text-corthex-text-secondary">장기 MA</span>
             <input
               type="number"
               min={5}
               max={200}
               value={longPeriod}
               onChange={(e) => setLongPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900"
+              className="block w-20 rounded-md border border-zinc-300 bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
             />
           </label>
           <Button size="sm" onClick={runBacktest} disabled={candles.length === 0}>
@@ -172,21 +172,21 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
           <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="text-xs text-zinc-500">총 수익률</span>
+                <span className="text-xs text-corthex-text-secondary">총 수익률</span>
                 <div className={`font-semibold ${returnColor(result.metrics.totalReturn)}`}>
                   {returnSign(result.metrics.totalReturn)}{result.metrics.totalReturn}%
                 </div>
               </div>
               <div>
-                <span className="text-xs text-zinc-500">거래 횟수</span>
-                <div className="font-semibold text-zinc-900">{result.metrics.tradeCount}회</div>
+                <span className="text-xs text-corthex-text-secondary">거래 횟수</span>
+                <div className="font-semibold text-corthex-text-primary">{result.metrics.tradeCount}회</div>
               </div>
               <div>
-                <span className="text-xs text-zinc-500">승률</span>
-                <div className="font-semibold text-zinc-900">{result.metrics.winRate}%</div>
+                <span className="text-xs text-corthex-text-secondary">승률</span>
+                <div className="font-semibold text-corthex-text-primary">{result.metrics.winRate}%</div>
               </div>
               <div>
-                <span className="text-xs text-zinc-500">최대 손실</span>
+                <span className="text-xs text-corthex-text-secondary">최대 손실</span>
                 <div className="font-semibold text-red-500">-{result.metrics.maxDrawdown}%</div>
               </div>
             </div>
@@ -199,7 +199,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
         {/* Saved List */}
         {savedList.length > 0 && (
           <div className="space-y-1">
-            <span className="text-xs text-zinc-500">저장된 백테스트 ({savedList.length})</span>
+            <span className="text-xs text-corthex-text-secondary">저장된 백테스트 ({savedList.length})</span>
             {savedList.map((item) => (
               <div
                 key={item.id}
@@ -207,16 +207,16 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
                 tabIndex={0}
                 onClick={() => loadSaved(item)}
                 onKeyDown={(e) => e.key === 'Enter' && loadSaved(item)}
-                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-zinc-50 cursor-pointer text-sm min-h-[36px]"
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-corthex-bg cursor-pointer text-sm min-h-[36px]"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-zinc-500 text-xs">
+                  <span className="text-corthex-text-secondary text-xs">
                     MA({item.strategyParams.shortPeriod}/{item.strategyParams.longPeriod})
                   </span>
                   <span className={`font-medium ${returnColor(item.metrics.totalReturn)}`}>
                     {returnSign(item.metrics.totalReturn)}{item.metrics.totalReturn}%
                   </span>
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-corthex-text-disabled">
                     {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
@@ -225,7 +225,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
                     e.stopPropagation()
                     setDeleteTarget(item.id)
                   }}
-                  className="ml-2 shrink-0 text-zinc-400 hover:text-red-500 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
+                  className="ml-2 shrink-0 text-corthex-text-disabled hover:text-red-500 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center"
                   title="삭제"
                 >
                   x

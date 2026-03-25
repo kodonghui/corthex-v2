@@ -17,7 +17,7 @@ export function KnowledgeDetailHeader({ title, version, author, lastModified, ta
                         <FileText className="w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-slate-100 leading-tight">{title}</h2>
+                        <h2 className="text-lg font-bold text-corthex-text-primary leading-tight">{title}</h2>
                         <div className="flex items-center gap-2 text-xs text-stone-500 mt-1">
                             <span>버전 {version}</span>
                             <span className="w-1 h-1 rounded-full bg-slate-600"></span>
@@ -28,7 +28,7 @@ export function KnowledgeDetailHeader({ title, version, author, lastModified, ta
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="p-2 rounded border border-stone-200 text-stone-600 hover:text-slate-100 hover:bg-stone-100 transition-colors" title="편집">
+                    <button className="p-2 rounded border border-stone-200 text-stone-600 hover:text-corthex-text-primary hover:bg-stone-100 transition-colors" title="편집">
                         <Edit2 className="w-[18px] h-[18px]" />
                     </button>
                     <button className="p-2 rounded border border-red-900/50 text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors" title="삭제">

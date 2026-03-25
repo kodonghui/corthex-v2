@@ -85,11 +85,11 @@ export function ComparisonPanel() {
       <Card variant="bordered" className="shrink-0">
         <div className="px-5 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-zinc-900">
+            <h2 className="text-lg font-semibold text-corthex-text-primary">
               종목 비교 ({codes.length}개)
             </h2>
             <div className="flex items-center gap-2">
-              {!marketOpen && <span className="text-xs text-zinc-500">장 마감</span>}
+              {!marketOpen && <span className="text-xs text-corthex-text-secondary">장 마감</span>}
               <Button
                 size="sm"
                 variant="ghost"
@@ -112,13 +112,13 @@ export function ComparisonPanel() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-200">
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">종목명</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">현재가</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">등락률</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">시가</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">고가</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">저가</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 whitespace-nowrap">거래량</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">종목명</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">현재가</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">등락률</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">시가</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">고가</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">저가</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">거래량</th>
               </tr>
             </thead>
             <tbody>
@@ -126,37 +126,37 @@ export function ComparisonPanel() {
                 const p = prices[code]
                 const hasData = p && !p.error
                 const changeColor = hasData
-                  ? p.changeRate > 0 ? 'text-emerald-500' : p.changeRate < 0 ? 'text-red-500' : 'text-zinc-400'
-                  : 'text-zinc-400'
+                  ? p.changeRate > 0 ? 'text-emerald-500' : p.changeRate < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
+                  : 'text-corthex-text-disabled'
                 const sign = hasData && p.changeRate > 0 ? '+' : ''
 
                 return (
                   <tr
                     key={code}
-                    className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 cursor-pointer"
+                    className="border-b border-zinc-100 last:border-0 hover:bg-corthex-bg cursor-pointer"
                     onClick={() => goToStock(code)}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-medium text-zinc-900">
+                      <div className="font-medium text-corthex-text-primary">
                         {hasData ? p.name : code}
                       </div>
-                      <div className="text-xs text-zinc-400">{code}</div>
+                      <div className="text-xs text-corthex-text-disabled">{code}</div>
                     </td>
                     {hasData ? (
                       <>
-                        <td className="text-right px-4 py-3 font-mono font-semibold text-zinc-900 whitespace-nowrap">
+                        <td className="text-right px-4 py-3 font-mono font-semibold text-corthex-text-primary whitespace-nowrap">
                           {formatPrice(p.price)}
                         </td>
                         <td className={`text-right px-4 py-3 font-medium whitespace-nowrap ${changeColor}`}>
                           {sign}{p.changeRate.toFixed(2)}%
                         </td>
-                        <td className="text-right px-4 py-3 text-zinc-500 whitespace-nowrap">{formatPrice(p.open)}</td>
+                        <td className="text-right px-4 py-3 text-corthex-text-secondary whitespace-nowrap">{formatPrice(p.open)}</td>
                         <td className="text-right px-4 py-3 text-emerald-500 whitespace-nowrap">{formatPrice(p.high)}</td>
                         <td className="text-right px-4 py-3 text-red-500 whitespace-nowrap">{formatPrice(p.low)}</td>
-                        <td className="text-right px-4 py-3 text-zinc-500 whitespace-nowrap">{formatVolume(p.volume)}</td>
+                        <td className="text-right px-4 py-3 text-corthex-text-secondary whitespace-nowrap">{formatVolume(p.volume)}</td>
                       </>
                     ) : (
-                      <td colSpan={6} className="text-center px-4 py-3 text-zinc-400 text-xs">
+                      <td colSpan={6} className="text-center px-4 py-3 text-corthex-text-disabled text-xs">
                         {p?.error ? '시세 정보를 불러올 수 없습니다' : '로딩 중...'}
                       </td>
                     )}

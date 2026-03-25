@@ -265,13 +265,13 @@ export function ReportsPage() {
     }
   }
 
-  const inputClass = 'w-full bg-white border border-corthex-border focus:border-corthex-accent text-corthex-text-primary rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-corthex-accent/20 focus:outline-none'
+  const inputClass = 'w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent text-corthex-text-primary rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-corthex-accent/20 focus:outline-none'
 
   // === Create view ===
   if (view === 'create') {
     return (
       <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: '#faf8f5' }} data-testid="reports-page">
-        <div className="px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-white">
+        <div className="px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-corthex-surface">
           <button onClick={handleBack} className="text-sm text-corthex-text-secondary hover:text-corthex-text-secondary" data-testid="back-btn">
             &larr; 목록
           </button>
@@ -333,7 +333,7 @@ export function ReportsPage() {
                     className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                       activeTab === tab.value
                         ? 'text-white'
-                        : 'bg-white border border-corthex-border text-corthex-text-secondary'
+                        : 'bg-corthex-surface border border-corthex-border text-corthex-text-secondary'
                     }`}
                     style={activeTab === tab.value ? { backgroundColor: accentColor } : {}}
                   >
@@ -344,7 +344,7 @@ export function ReportsPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {isLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-4 bg-white rounded-xl h-24 animate-pulse border border-corthex-border" />
+                    <div key={i} className="p-4 bg-corthex-surface rounded-xl h-24 animate-pulse border border-corthex-border" />
                   ))
                 ) : filteredReports.length === 0 ? (
                   <div className="text-center py-16 text-sm text-corthex-text-secondary" data-testid="reports-empty">
@@ -358,7 +358,7 @@ export function ReportsPage() {
                       <div
                         key={r.id}
                         onClick={() => handleOpenDetail(r.id)}
-                        className={`p-4 bg-white rounded-xl transition-all cursor-pointer shadow-sm ${
+                        className={`p-4 bg-corthex-surface rounded-xl transition-all cursor-pointer shadow-sm ${
                           isSelected
                             ? 'border-2 ring-1'
                             : 'border border-corthex-border hover:border-stone-400'
@@ -387,7 +387,7 @@ export function ReportsPage() {
             </div>
 
             {/* Report Detail Viewer */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-white">
+            <div className="flex-1 flex flex-col overflow-hidden bg-corthex-surface">
               {!selectedReport || !report ? (
                 <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
                   보고서를 선택하세요
@@ -557,7 +557,7 @@ export function ReportsPage() {
                             <label className="block text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary mb-2 px-1">Add your feedback</label>
                             <div className="relative">
                               <textarea
-                                className="w-full bg-white border-corthex-border rounded-2xl p-4 text-sm placeholder:text-corthex-text-secondary border"
+                                className="w-full bg-corthex-surface border-corthex-border rounded-2xl p-4 text-sm placeholder:text-corthex-text-secondary border"
                                 placeholder="Write a comment..."
                                 rows={3}
                                 value={commentInput}
@@ -591,7 +591,7 @@ export function ReportsPage() {
       {/* ConfirmDialog: CEO 보고 */}
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
             <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">CEO에게 보고</h3>
             <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
             <div className="flex justify-end gap-2">
@@ -605,7 +605,7 @@ export function ReportsPage() {
       {/* ConfirmDialog: 삭제 */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
             <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">보고서 삭제</h3>
             <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
             <div className="flex justify-end gap-2">

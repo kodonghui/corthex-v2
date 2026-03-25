@@ -384,11 +384,11 @@ export function OpsLogPage() {
       {/* KPI Stats Cards */}
       <div className="px-8 pt-6 pb-2">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
             <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Daily Operations</p>
             <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#1a1a1a' }}>{total}</p>
           </div>
-          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
             <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Avg Quality Score</p>
             <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#606C38' }}>
               {items.length > 0
@@ -397,7 +397,7 @@ export function OpsLogPage() {
               <span className="text-xl" style={{ color: '#6b705c' }}>/5</span>
             </p>
           </div>
-          <div className="bg-white rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
+          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: '#e5e1d3', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
             <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#6b705c' }}>Total Op Cost</p>
             <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: '#1a1a1a' }}>
               {items.length > 0
@@ -574,7 +574,7 @@ export function OpsLogPage() {
                       />
 
                       <div
-                        className="flex-1 bg-white p-5 rounded-2xl border transition-all group-hover:border-l-4"
+                        className="flex-1 bg-corthex-surface p-5 rounded-2xl border transition-all group-hover:border-l-4"
                         style={{
                           borderColor: '#e5e1d3',
                           boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
@@ -682,7 +682,7 @@ export function OpsLogPage() {
       {replayConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setReplayConfirm(null)} />
-          <div className="relative bg-white border rounded-2xl shadow-2xl p-6 w-96" style={{ borderColor: '#e5e1d3' }}>
+          <div className="relative bg-corthex-surface border rounded-2xl shadow-2xl p-6 w-96" style={{ borderColor: '#e5e1d3' }}>
             <h3 className="text-sm font-semibold mb-2" style={{ color: '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>명령 리플레이</h3>
             <p className="text-xs mb-4" style={{ color: '#6b705c' }}>동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
             <div className="flex justify-end gap-2">
@@ -731,7 +731,7 @@ function DetailModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative bg-white border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
         style={{ borderColor: '#e5e1d3' }}
         onClick={e => e.stopPropagation()}
         data-testid="detail-modal"
@@ -857,7 +857,7 @@ function CompareModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative bg-white border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
         style={{ borderColor: '#e5e1d3' }}
         onClick={e => e.stopPropagation()}
         data-testid="compare-modal"

@@ -155,7 +155,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
                     <CommandIcon type={cmd.icon} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <span className="font-medium text-slate-200">{cmd.cmd}</span>
+                    <span className="font-medium text-corthex-text-disabled">{cmd.cmd}</span>
                     {cmd.args && <span className="text-xs text-stone-400 ml-1">{cmd.args}</span>}
                     <p className="text-xs text-stone-400">{cmd.desc}</p>
                   </div>
@@ -190,7 +190,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-200 truncate">{preset.name}</span>
+                      <span className="font-medium text-corthex-text-disabled truncate">{preset.name}</span>
                       {preset.category && (
                         <span className="text-xs px-1 py-0.5 rounded bg-stone-200 text-stone-400">{preset.category}</span>
                       )}

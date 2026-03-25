@@ -71,7 +71,7 @@ export function McpAccessPage() {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-slate-400 text-sm">회사를 선택해 주세요.</div>
+    return <div className="p-6 text-corthex-text-disabled text-sm">회사를 선택해 주세요.</div>
   }
 
   return (
@@ -79,18 +79,18 @@ export function McpAccessPage() {
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-white">에이전트-MCP 접근 권한</h2>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <p className="text-xs text-corthex-text-disabled mt-0.5">
           에이전트별로 MCP 서버 접근 권한을 설정하세요. 기본값은 모두 OFF입니다. (D22)
         </p>
       </div>
 
       {/* Agent Selector */}
       <div className="space-y-1">
-        <label className="text-xs text-slate-400 font-medium">에이전트 선택</label>
+        <label className="text-xs text-corthex-text-disabled font-medium">에이전트 선택</label>
         <select
           value={selectedAgentId ?? ''}
           onChange={e => setSelectedAgentId(e.target.value || null)}
-          className="bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-corthex-accent min-w-48"
+          className="bg-corthex-surface border border-corthex-border rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-corthex-accent min-w-48"
         >
           <option value="">에이전트를 선택하세요</option>
           {agents.map(a => (
@@ -101,19 +101,19 @@ export function McpAccessPage() {
 
       {/* Access Matrix */}
       {!selectedAgentId ? (
-        <div className="text-slate-500 text-sm">에이전트를 선택하면 MCP 접근 권한 목록이 표시됩니다.</div>
+        <div className="text-corthex-text-secondary text-sm">에이전트를 선택하면 MCP 접근 권한 목록이 표시됩니다.</div>
       ) : mcpServers.length === 0 ? (
-        <div className="text-slate-400 text-sm">
+        <div className="text-corthex-text-disabled text-sm">
           <p>등록된 MCP 서버가 없습니다.</p>
-          <p className="text-xs mt-1 text-slate-500">
+          <p className="text-xs mt-1 text-corthex-text-secondary">
             먼저 <a href="/admin/mcp-servers" className="text-corthex-accent-hover hover:underline">MCP 서버 관리</a>에서 서버를 등록하세요.
           </p>
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+        <div className="bg-corthex-surface border border-corthex-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-slate-400 border-b border-slate-700 bg-slate-800/80">
+              <tr className="text-left text-xs text-corthex-text-disabled border-b border-corthex-border bg-corthex-surface/80">
                 <th className="px-4 py-3 font-medium w-8">접근</th>
                 <th className="px-4 py-3 font-medium">MCP 서버</th>
                 <th className="px-4 py-3 font-medium">Transport</th>
@@ -125,14 +125,14 @@ export function McpAccessPage() {
                 const granted = accessibleIds.has(server.id)
                 const isSaving = saving[server.id] ?? false
                 return (
-                  <tr key={server.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                  <tr key={server.id} className="border-b border-corthex-border/50 hover:bg-corthex-surface/50 transition-colors">
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
                         checked={granted}
                         disabled={isSaving}
                         onChange={() => handleToggle(server.id, granted)}
-                        className="w-4 h-4 rounded border-slate-600 text-corthex-accent bg-slate-900 focus:ring-corthex-accent focus:ring-offset-slate-900 cursor-pointer disabled:cursor-wait"
+                        className="w-4 h-4 rounded border-corthex-border text-corthex-accent bg-corthex-bg focus:ring-corthex-accent focus:ring-offset-slate-900 cursor-pointer disabled:cursor-wait"
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -149,11 +149,11 @@ export function McpAccessPage() {
                     </td>
                     <td className="px-4 py-3">
                       {isSaving ? (
-                        <span className="text-xs text-slate-400">저장 중...</span>
+                        <span className="text-xs text-corthex-text-disabled">저장 중...</span>
                       ) : granted ? (
                         <span className="text-xs text-emerald-400">✓ 허용됨</span>
                       ) : (
-                        <span className="text-xs text-slate-500">— 차단됨</span>
+                        <span className="text-xs text-corthex-text-secondary">— 차단됨</span>
                       )}
                     </td>
                   </tr>
@@ -161,8 +161,8 @@ export function McpAccessPage() {
               })}
             </tbody>
           </table>
-          <div className="px-4 py-3 border-t border-slate-700 bg-slate-800/50">
-            <p className="text-xs text-slate-500">
+          <div className="px-4 py-3 border-t border-corthex-border bg-corthex-surface/50">
+            <p className="text-xs text-corthex-text-secondary">
               체크박스 클릭 시 즉시 저장됩니다. 변경 사항은 다음 에이전트 세션부터 적용됩니다.
             </p>
           </div>

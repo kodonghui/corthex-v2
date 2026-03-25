@@ -109,7 +109,7 @@ export function N8nEditorPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-sand-200 overflow-hidden bg-white">
+      <div className="rounded-lg border border-sand-200 overflow-hidden bg-corthex-surface">
         <iframe
           key={iframeKey}
           src="/api/admin/n8n-editor/"

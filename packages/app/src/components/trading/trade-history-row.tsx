@@ -12,8 +12,8 @@ export function TradeHistoryRow({ time, type, price, amount }: TradeHistoryRowPr
             <td className="py-2.5 px-4">
                 <span className={type === 'Buy' ? 'text-emerald-500' : 'text-red-500'}>{type}</span>
             </td>
-            <td className="py-2.5 px-4 text-right text-slate-100">{price}</td>
-            <td className="py-2.5 px-4 text-right text-slate-100">{amount}</td>
+            <td className="py-2.5 px-4 text-right text-corthex-text-primary">{price}</td>
+            <td className="py-2.5 px-4 text-right text-corthex-text-primary">{amount}</td>
         </tr>
     )
 }

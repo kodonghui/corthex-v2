@@ -62,10 +62,10 @@ function formatEnvForDisplay(env: Record<string, string>): string {
 
 function StatusDot({ result }: { result: TestResult }) {
   if (result.status === 'idle') {
-    return <span className="inline-flex items-center gap-1 text-xs text-slate-500">—</span>
+    return <span className="inline-flex items-center gap-1 text-xs text-corthex-text-secondary">—</span>
   }
   if (result.status === 'testing') {
-    return <span className="inline-flex items-center gap-1 text-xs text-slate-400">⟳ Testing...</span>
+    return <span className="inline-flex items-center gap-1 text-xs text-corthex-text-disabled">⟳ Testing...</span>
   }
   if (result.status === 'success') {
     return (
@@ -188,7 +188,7 @@ export function McpServersPage() {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-slate-400 text-sm">회사를 선택해 주세요.</div>
+    return <div className="p-6 text-corthex-text-disabled text-sm">회사를 선택해 주세요.</div>
   }
 
   return (
@@ -197,7 +197,7 @@ export function McpServersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white">MCP 서버 관리</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-corthex-text-disabled mt-0.5">
             에이전트가 사용할 MCP 서버를 등록하고 연결 테스트를 실행하세요
           </p>
         </div>
@@ -211,28 +211,28 @@ export function McpServersPage() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
+        <div className="bg-corthex-surface border border-corthex-border rounded-lg p-5">
           <h3 className="text-sm font-semibold text-white mb-4">
             {editId ? 'MCP 서버 수정' : '새 MCP 서버 등록'}
           </h3>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">Display Name *</label>
+              <label className="text-xs text-corthex-text-disabled">Display Name *</label>
               <input
                 required
                 value={form.displayName}
                 onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
                 placeholder="notion"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">Transport *</label>
+              <label className="text-xs text-corthex-text-disabled">Transport *</label>
               <select
                 value={form.transport}
                 onChange={e => setForm(f => ({ ...f, transport: e.target.value }))}
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               >
                 <option value="stdio">stdio (Phase 1 — 권장)</option>
                 <option value="sse">sse (Phase 2 — 미지원)</option>
@@ -246,36 +246,36 @@ export function McpServersPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">Command</label>
+              <label className="text-xs text-corthex-text-disabled">Command</label>
               <input
                 value={form.command}
                 onChange={e => setForm(f => ({ ...f, command: e.target.value }))}
                 placeholder="npx"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">Args (공백 구분)</label>
+              <label className="text-xs text-corthex-text-disabled">Args (공백 구분)</label>
               <input
                 value={form.args}
                 onChange={e => setForm(f => ({ ...f, args: e.target.value }))}
                 placeholder="-y @notionhq/notion-mcp-server"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
 
             <div className="col-span-2 space-y-1">
-              <label className="text-xs text-slate-400">
+              <label className="text-xs text-corthex-text-disabled">
                 Env Variables (KEY=VALUE 형식 또는 JSON)
-                <span className="text-slate-500 ml-1">— 크리덴셜 템플릿: {'{{credential:key_name}}'}</span>
+                <span className="text-corthex-text-secondary ml-1">— 크리덴셜 템플릿: {'{{credential:key_name}}'}</span>
               </label>
               <textarea
                 value={form.env}
                 onChange={e => setForm(f => ({ ...f, env: e.target.value }))}
                 rows={3}
                 placeholder={'NOTION_TOKEN={{credential:notion_integration_token}}'}
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-corthex-accent resize-none"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 focus:ring-corthex-accent resize-none"
               />
             </div>
 
@@ -290,7 +290,7 @@ export function McpServersPage() {
               <button
                 type="button"
                 onClick={() => { setShowForm(false); setEditId(null); setForm(EMPTY_FORM) }}
-                className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-colors"
+                className="px-4 py-1.5 bg-corthex-elevated hover:bg-slate-600 text-white text-sm rounded transition-colors"
               >
                 취소
               </button>
@@ -304,11 +304,11 @@ export function McpServersPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-slate-400 text-sm">로딩 중...</div>
+        <div className="text-corthex-text-disabled text-sm">로딩 중...</div>
       ) : servers.length === 0 ? (
-        <div className="text-center py-12 text-slate-400 text-sm">
+        <div className="text-center py-12 text-corthex-text-disabled text-sm">
           <p>등록된 MCP 서버가 없습니다.</p>
-          <p className="text-xs mt-1 text-slate-500">
+          <p className="text-xs mt-1 text-corthex-text-secondary">
             "MCP 서버 추가" 버튼으로 Notion, Playwright 등 MCP 서버를 연결하세요.
           </p>
         </div>
@@ -316,7 +316,7 @@ export function McpServersPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-slate-400 border-b border-slate-700">
+              <tr className="text-left text-xs text-corthex-text-disabled border-b border-corthex-border">
                 <th className="pb-2 pr-4 font-medium">Display Name</th>
                 <th className="pb-2 pr-4 font-medium">Transport</th>
                 <th className="pb-2 pr-4 font-medium">Command</th>
@@ -328,7 +328,7 @@ export function McpServersPage() {
               {servers.map((server) => {
                 const testResult = testResults[server.id] ?? { status: 'idle' }
                 return (
-                  <tr key={server.id} className="border-b border-slate-700/50">
+                  <tr key={server.id} className="border-b border-corthex-border/50">
                     <td className="py-3 pr-4">
                       <span className="font-medium text-white">{server.displayName}</span>
                     </td>
@@ -341,7 +341,7 @@ export function McpServersPage() {
                         {server.transport}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 font-mono text-xs text-slate-300">
+                    <td className="py-3 pr-4 font-mono text-xs text-corthex-text-disabled">
                       {server.command ?? '—'}
                       {server.args?.length ? ` ${server.args.join(' ')}` : ''}
                     </td>
@@ -353,13 +353,13 @@ export function McpServersPage() {
                         <button
                           onClick={() => handleTest(server.id)}
                           disabled={testResult.status === 'testing'}
-                          className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white rounded transition-colors"
+                          className="text-xs px-2 py-1 bg-corthex-elevated hover:bg-slate-600 disabled:opacity-50 text-white rounded transition-colors"
                         >
                           {testResult.status === 'testing' ? '테스트 중...' : '연결 테스트'}
                         </button>
                         <button
                           onClick={() => handleEdit(server)}
-                          className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
+                          className="text-xs px-2 py-1 bg-corthex-elevated hover:bg-slate-600 text-white rounded transition-colors"
                         >
                           수정
                         </button>

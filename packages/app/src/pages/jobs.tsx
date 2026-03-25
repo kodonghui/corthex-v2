@@ -98,8 +98,8 @@ const STATUS_STYLES: Record<string, { label: string; dotClass: string; textClass
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 
-const inputClass = 'w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent'
-const selectClass = 'w-full bg-white border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent appearance-none'
+const inputClass = 'w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent'
+const selectClass = 'w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent appearance-none'
 
 export function JobsPage() {
   const queryClient = useQueryClient()
@@ -366,7 +366,7 @@ export function JobsPage() {
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-secondary group-focus-within:text-corthex-accent transition-colors" />
                 <input
-                  className="pl-12 pr-4 py-3 bg-white border border-corthex-border rounded-xl focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent outline-none min-w-[300px] text-sm transition-all shadow-sm"
+                  className="pl-12 pr-4 py-3 bg-corthex-surface border border-corthex-border rounded-xl focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent outline-none min-w-[300px] text-sm transition-all shadow-sm"
                   placeholder="작업 이름 또는 에이전트 검색..."
                   type="text"
                   value={searchQuery}
@@ -486,7 +486,7 @@ export function JobsPage() {
           {activeTab === 'oneTime' && expandedJob && jobs.find(j => j.id === expandedJob) && (() => {
             const job = jobs.find(j => j.id === expandedJob)!
             return (job.result || job.error || (job.status === 'completed' && job.resultData)) ? (
-              <div className="bg-white border border-corthex-border rounded-xl p-5 -mt-2 ml-14">
+              <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 -mt-2 ml-14">
                 {job.result && <div className="text-xs text-corthex-text-secondary bg-corthex-elevated rounded-lg p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">{job.result}</div>}
                 {job.error && <div className="text-xs text-red-600 bg-red-50 rounded-lg p-3">{job.error}</div>}
                 {job.status === 'completed' && job.resultData && (
@@ -563,15 +563,15 @@ export function JobsPage() {
         {/* Summary Bar */}
         <div className="fixed bottom-8 left-[280px] right-8 max-w-[1440px] mx-auto z-40 pointer-events-none">
           <div className="bg-corthex-elevated/90 backdrop-blur-xl border border-corthex-border/30 rounded-2xl shadow-2xl p-2 flex flex-wrap md:flex-nowrap gap-2 items-stretch pointer-events-auto">
-            <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
+            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
               <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">완료된 작업</span>
               <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'completed').length}건</p>
             </div>
-            <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
+            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
               <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">실행 중</span>
               <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'processing').length}건</p>
             </div>
-            <div className="bg-white p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
+            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
               <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">활성 스케줄</span>
               <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{schedules.filter(s => s.isActive).length}건</p>
             </div>
@@ -585,7 +585,7 @@ export function JobsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => closeModal()}>
-          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()} data-testid="job-modal">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()} data-testid="job-modal">
             <h3 className="text-lg font-bold text-corthex-text-primary">{editingSchedule ? '스케줄 수정' : editingTrigger ? '트리거 수정' : '작업 등록'}</h3>
 
             {!editingSchedule && !editingTrigger && (
@@ -725,7 +725,7 @@ export function JobsPage() {
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white border border-corthex-border rounded-2xl shadow-2xl p-6 w-96" data-testid="delete-confirm-modal">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96" data-testid="delete-confirm-modal">
             <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">
               {deleteTarget.type === 'chain' ? '체인 취소' : deleteTarget.type === 'schedule' ? '스케줄 삭제' : deleteTarget.type === 'trigger' ? '트리거 삭제' : '작업 취소'}
             </h3>

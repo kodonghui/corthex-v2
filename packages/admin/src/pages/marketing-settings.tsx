@@ -167,7 +167,7 @@ export function MarketingSettingsPage() {
             return (
               <div
                 key={key}
-                className="border border-corthex-border rounded-xl p-4 bg-white"
+                className="border border-corthex-border rounded-xl p-4 bg-corthex-surface"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-corthex-accent/10 flex items-center justify-center">
@@ -185,7 +185,7 @@ export function MarketingSettingsPage() {
                     <select
                       value={current?.provider || ''}
                       onChange={(e) => handleProviderChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
+                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-corthex-surface text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
                     >
                       {categoryProviders.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -197,7 +197,7 @@ export function MarketingSettingsPage() {
                     <select
                       value={current?.model || ''}
                       onChange={(e) => handleModelChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
+                      className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-corthex-surface text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none"
                     >
                       {(selectedProvider?.models || []).map((m) => (
                         <option key={m} value={m}>{m}</option>
@@ -242,7 +242,7 @@ export function MarketingSettingsPage() {
             return (
               <div
                 key={providerId}
-                className="border border-corthex-border rounded-xl p-4 bg-white"
+                className="border border-corthex-border rounded-xl p-4 bg-corthex-surface"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export function MarketingSettingsPage() {
                       onChange={(e) =>
                         setApiKeyInputs((prev) => ({ ...prev, [providerId]: e.target.value }))
                       }
-                      className="w-full px-3 py-2 pr-8 text-sm border border-corthex-border rounded-lg bg-white text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none font-mono"
+                      className="w-full px-3 py-2 pr-8 text-sm border border-corthex-border rounded-lg bg-corthex-surface text-corthex-accent-deep focus:ring-2 focus:ring-corthex-accent/30 focus:outline-none font-mono"
                     />
                     <button
                       onClick={() =>
@@ -304,7 +304,7 @@ export function MarketingSettingsPage() {
       {/* Watermark Toggle (FR-MKT6) */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-corthex-accent-deep">저작권 워터마크</h2>
-        <div className="border border-corthex-border rounded-xl p-4 bg-white flex items-center justify-between">
+        <div className="border border-corthex-border rounded-xl p-4 bg-corthex-surface flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-corthex-accent-deep">생성 콘텐츠 워터마크</p>
             <p className="text-xs text-corthex-accent mt-0.5">
@@ -318,7 +318,7 @@ export function MarketingSettingsPage() {
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+              className={`inline-block h-4 w-4 rounded-full bg-corthex-surface transition-transform ${
                 config.watermark ? 'translate-x-6' : 'translate-x-1'
               }`}
             />

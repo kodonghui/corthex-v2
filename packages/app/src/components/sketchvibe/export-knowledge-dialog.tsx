@@ -38,17 +38,17 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className="bg-white border border-stone-200 rounded-lg p-5 w-96 max-w-[90vw]"
+        className="bg-corthex-surface border border-stone-200 rounded-lg p-5 w-96 max-w-[90vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">지식 베이스에 다이어그램 저장</h3>
+        <h3 className="text-sm font-semibold text-corthex-text-disabled mb-4">지식 베이스에 다이어그램 저장</h3>
 
         <label className="block text-xs text-stone-500 mb-1">제목</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-3 py-1.5 bg-stone-100 border border-stone-200 rounded text-sm text-slate-200 mb-3 focus:outline-none focus:border-blue-500"
+          className="w-full px-3 py-1.5 bg-stone-100 border border-stone-200 rounded text-sm text-corthex-text-disabled mb-3 focus:outline-none focus:border-blue-500"
           placeholder="다이어그램 제목"
           autoFocus
           onKeyDown={(e) => {
@@ -62,7 +62,7 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
         <select
           value={folderId}
           onChange={(e) => setFolderId(e.target.value)}
-          className="w-full px-3 py-1.5 bg-stone-100 border border-stone-200 rounded text-sm text-slate-200 mb-4 focus:outline-none focus:border-blue-500"
+          className="w-full px-3 py-1.5 bg-stone-100 border border-stone-200 rounded text-sm text-corthex-text-disabled mb-4 focus:outline-none focus:border-blue-500"
         >
           <option value="">루트 (폴더 없음)</option>
           {folders.map((f) => (
@@ -77,7 +77,7 @@ export function ExportKnowledgeDialog({ sketchId, sketchName, onClose }: ExportK
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs text-stone-500 hover:text-slate-200 transition-colors"
+            className="px-3 py-1.5 text-xs text-stone-500 hover:text-corthex-text-disabled transition-colors"
           >
             취소
           </button>

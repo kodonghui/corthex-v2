@@ -38,7 +38,7 @@ export function ConsensusCard({ result }: { result: DebateResult }) {
       {/* Header */}
       <div className="flex items-center gap-2">
         <Icon className={cn('w-5 h-5', style.iconColor)} />
-        <h3 className="text-sm font-bold text-slate-100">{style.label}</h3>
+        <h3 className="text-sm font-bold text-corthex-text-primary">{style.label}</h3>
         <span className="text-[10px] text-stone-500 font-mono ml-auto">{result.roundCount}R</span>
       </div>
 

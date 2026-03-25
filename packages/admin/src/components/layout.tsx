@@ -21,7 +21,7 @@ class PageErrorBoundary extends Component<{ children: ReactNode }, { error: Erro
       return (
         <div className="p-8 text-center">
           <p className="text-red-600 font-bold mb-2">페이지 오류</p>
-          <p className="text-sm text-slate-500 mb-4">{this.state.error.message}</p>
+          <p className="text-sm text-corthex-text-secondary mb-4">{this.state.error.message}</p>
           <button
             onClick={() => this.setState({ error: null })}
             className="px-4 py-2 rounded-lg text-white text-sm font-bold bg-corthex-accent"

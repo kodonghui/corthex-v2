@@ -264,7 +264,7 @@ export function CronBasePage() {
             <h3 className="text-sm font-semibold text-slate-50">크론 삭제</h3>
             <p className="text-xs text-stone-500 mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setDeleteTarget(null)} className="text-xs text-stone-500 hover:text-slate-200 px-3 py-1.5 rounded-lg">취소</button>
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-stone-500 hover:text-corthex-text-disabled px-3 py-1.5 rounded-lg">취소</button>
               <button onClick={() => deleteTarget && deleteScheduleMutation.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
             </div>
           </div>
@@ -324,7 +324,7 @@ function ScheduleCard({
             </span>
           </div>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-            <button onClick={onEdit} className="text-xs text-stone-500 hover:text-slate-200 px-2 py-1 rounded hover:bg-stone-200/50 transition-colors">편집</button>
+            <button onClick={onEdit} className="text-xs text-stone-500 hover:text-corthex-text-disabled px-2 py-1 rounded hover:bg-stone-200/50 transition-colors">편집</button>
             <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${s.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
               {s.isActive ? '중지' : '시작'}
             </button>
@@ -356,7 +356,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
   const pagination = runsData?.pagination
 
   return (
-    <div className="border-t border-stone-200 bg-white/30">
+    <div className="border-t border-stone-200 bg-corthex-surface/30">
       {isLoading ? (
         <div className="py-6 text-center text-xs text-stone-400">로딩 중...</div>
       ) : runs.length === 0 ? (
@@ -409,7 +409,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="text-[10px] text-stone-500 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-stone-500 hover:text-corthex-text-disabled disabled:opacity-30 px-2 py-1"
               >
                 ← 이전
               </button>
@@ -417,7 +417,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
               <button
                 onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                 disabled={page >= pagination.totalPages}
-                className="text-[10px] text-stone-500 hover:text-slate-200 disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-stone-500 hover:text-corthex-text-disabled disabled:opacity-30 px-2 py-1"
               >
                 다음 →
               </button>
@@ -506,7 +506,7 @@ function ScheduleModal({
     mode === 'legacy' ? (frequency !== 'custom' || days.length > 0) : !!cronExpression
   )
 
-  const inputClasses = 'w-full bg-white/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-slate-600'
+  const inputClasses = 'w-full bg-corthex-surface/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-secondary'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="cron-modal">
@@ -518,7 +518,7 @@ function ScheduleModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
           <h3 className="text-lg font-semibold text-slate-50">{editing ? '크론 수정' : '크론 추가'}</h3>
-          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 transition-colors">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-corthex-text-disabled transition-colors">✕</button>
         </div>
 
         {/* Body */}
@@ -557,7 +557,7 @@ function ScheduleModal({
             <label className="text-xs font-medium text-stone-600 mb-1.5 block">실행 주기</label>
 
             {/* Tabs */}
-            <div className="flex bg-white/50 rounded-lg p-0.5 mb-3">
+            <div className="flex bg-corthex-surface/50 rounded-lg p-0.5 mb-3">
               {([['preset', '프리셋'], ['custom', '커스텀'], ['legacy', '시간 지정']] as const).map(([val, label]) => (
                 <button
                   key={val}
@@ -666,7 +666,7 @@ function ScheduleModal({
 
         {/* Footer */}
         <div className="flex justify-end gap-2 px-5 py-4 border-t border-stone-200">
-          <button onClick={onClose} className="text-sm text-stone-500 hover:text-slate-200 px-4 py-2 rounded-lg hover:bg-stone-200/50 transition-colors">취소</button>
+          <button onClick={onClose} className="text-sm text-stone-500 hover:text-corthex-text-disabled px-4 py-2 rounded-lg hover:bg-stone-200/50 transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}

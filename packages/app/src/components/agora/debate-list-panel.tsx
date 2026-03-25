@@ -130,7 +130,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
                 <div className="flex flex-col justify-center min-w-0">
                   <p className={cn(
                     'text-sm font-medium leading-normal line-clamp-1',
-                    isSelected ? 'text-slate-100' : 'text-stone-600',
+                    isSelected ? 'text-corthex-text-primary' : 'text-stone-600',
                   )}>
                     {debate.topic}
                   </p>

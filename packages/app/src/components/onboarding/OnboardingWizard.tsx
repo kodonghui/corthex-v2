@@ -110,7 +110,7 @@ function StepCompany({ data, onChange }: { data: WizardData; onChange: (d: Parti
             value={data.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
             placeholder="예: CORTHEX Corp."
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
@@ -119,7 +119,7 @@ function StepCompany({ data, onChange }: { data: WizardData; onChange: (d: Parti
             value={data.companyLogo}
             onChange={(e) => onChange({ companyLogo: e.target.value })}
             placeholder="https://example.com/logo.png"
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
       </div>
@@ -141,7 +141,7 @@ function StepDepartment({ data, onChange }: { data: WizardData; onChange: (d: Pa
             value={data.departmentName}
             onChange={(e) => onChange({ departmentName: e.target.value })}
             placeholder="예: 경영전략부"
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
@@ -151,7 +151,7 @@ function StepDepartment({ data, onChange }: { data: WizardData; onChange: (d: Pa
             onChange={(e) => onChange({ departmentDescription: e.target.value })}
             placeholder="부서의 역할과 목적을 간단히 설명해 주세요"
             rows={3}
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent resize-none"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent resize-none"
           />
         </div>
       </div>
@@ -173,7 +173,7 @@ function StepAgent({ data, onChange }: { data: WizardData; onChange: (d: Partial
             value={data.agentName}
             onChange={(e) => onChange({ agentName: e.target.value })}
             placeholder="예: 전략 분석관"
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
@@ -182,7 +182,7 @@ function StepAgent({ data, onChange }: { data: WizardData; onChange: (d: Partial
             value={data.agentRole}
             onChange={(e) => onChange({ agentRole: e.target.value })}
             placeholder="예: 시장 분석 및 전략 보고서 작성"
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
         </div>
         <div>
@@ -190,7 +190,7 @@ function StepAgent({ data, onChange }: { data: WizardData; onChange: (d: Partial
           <select
             value={data.agentModel}
             onChange={(e) => onChange({ agentModel: e.target.value })}
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
           >
             {MODEL_OPTIONS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
@@ -215,7 +215,7 @@ function StepApiKey({ data, onChange }: { data: WizardData; onChange: (d: Partia
           <select
             value={data.apiProvider}
             onChange={(e) => onChange({ apiProvider: e.target.value })}
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent appearance-none"
           >
             <option value="anthropic">Anthropic (Claude)</option>
           </select>
@@ -227,7 +227,7 @@ function StepApiKey({ data, onChange }: { data: WizardData; onChange: (d: Partia
             value={data.apiKey}
             onChange={(e) => onChange({ apiKey: e.target.value })}
             placeholder="sk-ant-..."
-            className="w-full rounded-lg border border-corthex-border bg-white px-3 py-2 text-sm font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
+            className="w-full rounded-lg border border-corthex-border bg-corthex-surface px-3 py-2 text-sm font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 focus:border-corthex-accent"
           />
           <p className="text-xs text-corthex-text-secondary mt-1">나중에 설정 페이지에서 변경할 수 있습니다.</p>
         </div>
@@ -316,7 +316,7 @@ export function OnboardingWizard() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-corthex-bg">
       <main className="w-full max-w-lg" data-testid="onboarding-wizard">
-        <section className="bg-white rounded-2xl shadow-sm border border-corthex-border overflow-hidden">
+        <section className="bg-corthex-surface rounded-2xl shadow-sm border border-corthex-border overflow-hidden">
           <div className="px-6 pt-6">
             <StepProgress currentStep={step} />
           </div>

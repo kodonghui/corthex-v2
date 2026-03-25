@@ -35,7 +35,7 @@ export function OrganizationPage() {
   return (
     <div data-testid="organization-page" className="flex-1 flex flex-col overflow-hidden bg-corthex-bg">
       {/* Tab Header */}
-      <header className="border-b border-corthex-border bg-white shrink-0">
+      <header className="border-b border-corthex-border bg-corthex-surface shrink-0">
         <div className="px-6 pt-4 pb-0">
           <h1 className="text-2xl font-bold text-corthex-accent-deep mb-3">Organization</h1>
           <nav className="flex gap-1" aria-label="Organization tabs">

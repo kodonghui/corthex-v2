@@ -10,7 +10,7 @@ export function BudgetExceededModal({ data, onConfirm }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full shadow-xl border border-red-200">
+      <div className="bg-corthex-surface rounded-xl p-6 mx-4 max-w-sm w-full shadow-xl border border-red-200">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">🚨</span>
           <h2 className="text-lg font-bold text-red-600">
@@ -20,18 +20,18 @@ export function BudgetExceededModal({ data, onConfirm }: Props) {
 
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-zinc-500">현재 비용</span>
+            <span className="text-corthex-text-secondary">현재 비용</span>
             <span className="font-semibold text-red-600">
               ${data.currentSpendUsd.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-zinc-500">예산 한도</span>
+            <span className="text-corthex-text-secondary">예산 한도</span>
             <span className="font-semibold">${data.budgetUsd.toFixed(2)}</span>
           </div>
         </div>
 
-        <p className="text-sm text-zinc-500 mb-4">
+        <p className="text-sm text-corthex-text-secondary mb-4">
           {levelLabel} 예산 초과로 AI 호출이 차단되었습니다.
           관리자에게 문의하여 예산을 조정하세요.
         </p>

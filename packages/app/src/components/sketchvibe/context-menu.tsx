@@ -46,7 +46,7 @@ export function ContextMenu({ x, y, target, nodeId, nodeType, selectedCount, onA
     <div
       ref={ref}
       data-testid="nexus-context-menu"
-      className="fixed bg-white border border-stone-200 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
+      className="fixed bg-corthex-surface border border-stone-200 rounded-lg shadow-xl py-1 z-[100] min-w-[160px]"
       style={{ left: x, top: y }}
     >
       {target === 'node' && nodeId && (
@@ -122,7 +122,7 @@ function MenuItem({
     <button
       onClick={onClick}
       className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-stone-100 transition-colors ${
-        danger ? 'text-red-400 hover:text-red-300' : 'text-slate-200'
+        danger ? 'text-red-400 hover:text-red-300' : 'text-corthex-text-disabled'
       }`}
     >
       <span>{label}</span>

@@ -56,7 +56,7 @@ export function ShareToConversationModal({ reportId, reportTitle, onClose, onSha
             <h3 className="font-medium text-sm text-slate-50">메신저로 공유</h3>
             <p className="text-xs text-stone-500 mt-0.5 truncate">{reportTitle}</p>
           </div>
-          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 text-sm">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-corthex-text-disabled text-sm">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 min-h-0 max-h-80">
@@ -75,7 +75,7 @@ export function ShareToConversationModal({ reportId, reportTitle, onClose, onSha
             >
               <span className="text-lg">{conv.type === 'group' ? '👥' : '💬'}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate text-slate-100">
+                <p className="font-medium truncate text-corthex-text-primary">
                   {conv.type === 'group' ? (conv.name || '그룹 대화') : (conv.name || '1:1 대화')}
                 </p>
                 <p className="text-[10px] text-stone-400">{conv.participantCount}명</p>

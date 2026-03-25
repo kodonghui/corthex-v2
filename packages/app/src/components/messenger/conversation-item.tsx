@@ -14,7 +14,7 @@ export interface ConversationItemProps {
 export function ConversationItem({ name, time, previewMessage, icon, imageUrl, active, unreadCount, status }: ConversationItemProps) {
     const containerClass = active
         ? 'bg-corthex-accent/10 border-l-corthex-accent'
-        : 'hover:bg-slate-100 border-l-transparent';
+        : 'hover:bg-corthex-elevated border-l-transparent';
 
     return (
         <div className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-l-2 ${containerClass}`}>
@@ -32,10 +32,10 @@ export function ConversationItem({ name, time, previewMessage, icon, imageUrl, a
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className={`text-sm truncate ${active ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>{name}</h3>
+                    <h3 className={`text-sm truncate ${active ? 'font-semibold text-corthex-text-primary' : 'font-medium text-corthex-text-primary'}`}>{name}</h3>
                     <span className="text-xs text-stone-400">{time}</span>
                 </div>
-                <p className={`text-sm truncate ${active ? 'text-slate-600' : 'text-stone-400'}`}>{previewMessage}</p>
+                <p className={`text-sm truncate ${active ? 'text-corthex-text-secondary' : 'text-stone-400'}`}>{previewMessage}</p>
             </div>
             {unreadCount !== undefined && unreadCount > 0 && (
                 <div className="h-2 w-2 rounded-full bg-corthex-accent shrink-0"></div>

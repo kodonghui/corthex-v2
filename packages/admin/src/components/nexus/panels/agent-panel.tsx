@@ -133,7 +133,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
       {/* Header */}
       <div className="flex items-center gap-2">
         <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusColor[agent.status] ?? 'bg-slate-500'}`} />
-        <h3 className="text-sm font-semibold text-slate-100 truncate flex-1">{agent.name}</h3>
+        <h3 className="text-sm font-semibold text-corthex-text-primary truncate flex-1">{agent.name}</h3>
         <SaveIndicator status={saveStatus} />
       </div>
 
@@ -148,7 +148,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
 
       {/* Name */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">이름</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">이름</label>
         <Input
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
@@ -159,11 +159,11 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
 
       {/* Tier */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">Tier</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">Tier</label>
         <select
           value={tierLevel}
           onChange={(e) => handleTierChange(e.target.value)}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-corthex-accent"
+          className="mt-1 w-full rounded-lg bg-corthex-surface border border-corthex-border text-sm text-corthex-text-primary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-corthex-accent"
           data-testid="agent-tier-select"
         >
           <option value={1}>Manager (T1)</option>
@@ -174,8 +174,8 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
 
       {/* Model */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">모델</label>
-        <p className="mt-1 text-sm text-slate-300">{agent.modelName || '미설정'}</p>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">모델</label>
+        <p className="mt-1 text-sm text-corthex-text-disabled">{agent.modelName || '미설정'}</p>
       </div>
 
       {/* Soul edit link */}
@@ -194,25 +194,25 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
 
       {/* Allowed Tools */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">허용 도구 ({allowedTools.length})</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">허용 도구 ({allowedTools.length})</label>
         <div className="mt-2 max-h-48 overflow-y-auto space-y-1">
           {availableTools.length > 0 ? (
             availableTools.map((tool) => (
               <label
                 key={tool.name}
-                className="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-800/50 cursor-pointer"
+                className="flex items-center gap-2 px-2 py-1 rounded hover:bg-corthex-surface/50 cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={allowedTools.includes(tool.name)}
                   onChange={() => handleToolToggle(tool.name)}
-                  className="rounded border-slate-600 bg-slate-800 text-corthex-accent focus:ring-corthex-accent focus:ring-offset-0"
+                  className="rounded border-corthex-border bg-corthex-surface text-corthex-accent focus:ring-corthex-accent focus:ring-offset-0"
                 />
-                <span className="text-xs text-slate-300 truncate">{tool.name}</span>
+                <span className="text-xs text-corthex-text-disabled truncate">{tool.name}</span>
               </label>
             ))
           ) : (
-            <p className="text-xs text-slate-600 py-2">도구 목록을 불러오는 중...</p>
+            <p className="text-xs text-corthex-text-secondary py-2">도구 목록을 불러오는 중...</p>
           )}
         </div>
       </div>

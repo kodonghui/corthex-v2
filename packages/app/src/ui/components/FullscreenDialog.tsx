@@ -16,7 +16,7 @@ const FullscreenDialogRoot = React.forwardRef<HTMLDivElement, FullscreenDialogRo
     if (!open && open !== undefined) return null;
     return children ? (
       <div
-        className={twClassNames("fixed inset-0 z-50 flex h-full w-full flex-col items-start bg-white", className)}
+        className={twClassNames("fixed inset-0 z-50 flex h-full w-full flex-col items-start bg-corthex-surface", className)}
         ref={ref}
         {...otherProps}
       >

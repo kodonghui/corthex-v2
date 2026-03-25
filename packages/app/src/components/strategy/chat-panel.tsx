@@ -70,7 +70,7 @@ export function ChatPanel() {
   if (isLoading || createSession.isPending) {
     return (
       <div className="flex items-center justify-center h-full border-l border-zinc-200">
-        <p className="text-sm text-zinc-400">채팅 준비 중...</p>
+        <p className="text-sm text-corthex-text-disabled">채팅 준비 중...</p>
       </div>
     )
   }

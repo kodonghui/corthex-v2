@@ -175,8 +175,8 @@ export function ChartPanel() {
   const hasError = price?.error || failCount >= 3
 
   const changeColor = price && !price.error
-    ? price.changeRate > 0 ? 'text-emerald-500' : price.changeRate < 0 ? 'text-red-500' : 'text-zinc-400'
-    : 'text-zinc-400'
+    ? price.changeRate > 0 ? 'text-emerald-500' : price.changeRate < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
+    : 'text-corthex-text-disabled'
 
   const changeSign = price && !price.error && price.changeRate > 0 ? '+' : ''
 
@@ -186,14 +186,14 @@ export function ChartPanel() {
       <div className="flex-none p-6 border-b border-stone-200 flex justify-between items-end">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-2xl font-bold text-slate-100">{stock.stockName}</h2>
+            <h2 className="text-2xl font-bold text-corthex-text-primary">{stock.stockName}</h2>
             <span className="px-2 py-0.5 bg-stone-200 text-xs rounded text-stone-500 font-medium">
               {stock.market}
             </span>
           </div>
           {price && !price.error && (
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-mono font-bold text-slate-100">
+              <span className="text-3xl font-mono font-bold text-corthex-text-primary">
                 {formatPrice(price.price)}
               </span>
               <span className={`font-mono font-medium flex items-center ${changeColor}`}>
@@ -219,7 +219,7 @@ export function ChartPanel() {
         </div>
         {/* Timeframe Selectors + Action Buttons */}
         <div className="flex items-center gap-2">
-          <div className="flex gap-1 bg-white p-1 rounded border border-stone-200">
+          <div className="flex gap-1 bg-corthex-surface p-1 rounded border border-stone-200">
             {TIMEFRAMES.map((tf) => (
               <button
                 key={tf}
@@ -255,7 +255,7 @@ export function ChartPanel() {
       )}
 
       {/* Chart Area */}
-      <div className="flex-none h-[400px] border-b border-stone-200 relative bg-white/50">
+      <div className="flex-none h-[400px] border-b border-stone-200 relative bg-corthex-surface/50">
         {chartLoading && (
           <div className="flex items-center justify-center h-full">
             <p className="text-sm text-stone-500">차트 로딩 중...</p>
@@ -289,7 +289,7 @@ export function ChartPanel() {
       {/* Recent Trades Table — Stitch layout */}
       <div className="flex-1 flex flex-col p-6">
         <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-4">Recent Trades</h3>
-        <div className="border border-stone-200 rounded bg-white overflow-hidden">
+        <div className="border border-stone-200 rounded bg-corthex-surface overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-stone-200 bg-stone-100/50 text-xs text-stone-500 uppercase tracking-wide">
@@ -313,8 +313,8 @@ export function ChartPanel() {
                       {trade.type}
                     </span>
                   </td>
-                  <td className="py-2.5 px-4 text-right text-slate-100">{trade.price}</td>
-                  <td className="py-2.5 px-4 text-right text-slate-100">{trade.amount}</td>
+                  <td className="py-2.5 px-4 text-right text-corthex-text-primary">{trade.price}</td>
+                  <td className="py-2.5 px-4 text-right text-corthex-text-primary">{trade.amount}</td>
                 </tr>
               ))}
             </tbody>

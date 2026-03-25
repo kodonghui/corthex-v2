@@ -26,7 +26,7 @@ export default function SketchVibePage() {
         </div>
 
         {/* Status Card */}
-        <div className="bg-white rounded-xl border p-6 mb-6" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border p-6 mb-6" style={{ borderColor: sand }}>
           <div className="flex items-center gap-3 mb-4">
             <Terminal className="w-5 h-5" style={{ color: terracotta }} />
             <h2 className="text-lg font-bold" style={{ color: warmBrown }}>MCP 연동 상태</h2>
@@ -42,7 +42,7 @@ export default function SketchVibePage() {
         </div>
 
         {/* How it works */}
-        <div className="bg-white rounded-xl border p-6 mb-6" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border p-6 mb-6" style={{ borderColor: sand }}>
           <h2 className="text-lg font-bold mb-4" style={{ color: warmBrown }}>사용 방법</h2>
           <div className="space-y-4">
             {[

@@ -105,7 +105,7 @@ export function AgentListModal({
                   {/* 정보 */}
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-200">{agent.name}</span>
+                      <span className="text-sm font-medium text-corthex-text-disabled">{agent.name}</span>
                       {agent.isSecretary && (
                         <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">⭐ 비서</span>
                       )}

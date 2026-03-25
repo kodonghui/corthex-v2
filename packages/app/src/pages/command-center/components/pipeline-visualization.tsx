@@ -94,7 +94,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/10 to-slate-800/60 flex items-center justify-center">
           <span className="w-2 h-2 rounded-full bg-blue-500/40" />
         </div>
-        <p className="text-xs text-slate-600">명령을 입력하면 처리 파이프라인이 표시됩니다</p>
+        <p className="text-xs text-corthex-text-secondary">명령을 입력하면 처리 파이프라인이 표시됩니다</p>
       </div>
     )
   }
@@ -132,7 +132,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             ? 'text-blue-400'
             : isFailed
               ? 'text-red-400'
-              : 'text-slate-600'
+              : 'text-corthex-text-secondary'
 
         const dotClass = isDone
           ? 'bg-emerald-400'
@@ -184,7 +184,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             {idx < stages.length - 1 && (
               <div className="flex items-center gap-0.5 shrink-0">
                 <div className={`w-6 h-px ${connectorColor} transition-colors`} />
-                <svg className={`w-3 h-3 ${hasFailed ? 'text-red-500/60' : isDone ? 'text-emerald-500/60' : 'text-slate-600'}`} fill="none" viewBox="0 0 12 12">
+                <svg className={`w-3 h-3 ${hasFailed ? 'text-red-500/60' : isDone ? 'text-emerald-500/60' : 'text-corthex-text-secondary'}`} fill="none" viewBox="0 0 12 12">
                   <path d="M4.5 2.5l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>

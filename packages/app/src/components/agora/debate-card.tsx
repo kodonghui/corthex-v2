@@ -22,7 +22,7 @@ export function DebateCard({ title, participants, icon, iconBgClass, active }: D
                     {icon}
                 </div>
                 <div className="flex flex-col justify-center">
-                    <p className={`text-sm font-medium leading-normal line-clamp-1 ${active ? 'text-slate-900' : 'text-slate-700'}`}>{title}</p>
+                    <p className={`text-sm font-medium leading-normal line-clamp-1 ${active ? 'text-corthex-text-primary' : 'text-corthex-text-primary'}`}>{title}</p>
                     <p className="text-stone-400 text-xs font-normal leading-normal line-clamp-1">{participants} participants</p>
                 </div>
             </div>

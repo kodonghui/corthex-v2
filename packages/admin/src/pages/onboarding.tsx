@@ -109,7 +109,7 @@ const STEPS = [
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
   manager: { label: 'Manager', color: 'bg-corthex-accent-deep/10 text-corthex-accent-deep' },
   specialist: { label: 'Specialist', color: 'bg-corthex-accent/10 text-corthex-accent' },
-  worker: { label: 'Worker', color: 'bg-gray-100 text-gray-600' },
+  worker: { label: 'Worker', color: 'bg-corthex-elevated text-corthex-text-secondary' },
 }
 
 const ONBOARDING_PROVIDERS = ['anthropic'] as const
@@ -196,7 +196,7 @@ function FooterNav({
         {step > 1 && (
           <button
             onClick={onPrev}
-            className="px-6 py-2 text-slate-500 font-medium hover:text-slate-800 transition-colors flex items-center"
+            className="px-6 py-2 text-corthex-text-secondary font-medium hover:text-corthex-text-primary transition-colors flex items-center"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
@@ -209,7 +209,7 @@ function FooterNav({
         {showSkip && onSkip && (
           <button
             onClick={onSkip}
-            className="px-6 py-2 text-slate-400 font-medium hover:text-slate-600"
+            className="px-6 py-2 text-corthex-text-disabled font-medium hover:text-corthex-text-secondary"
           >
             Skip for now
           </button>
@@ -260,14 +260,14 @@ function WelcomeStep({
   })
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
       <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
         <div className="text-center space-y-3 mb-6">
           <div className="w-16 h-16 mx-auto rounded-2xl text-white flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: OC.olive }}>
             C
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900">CORTHEX에 오신 것을 환영합니다!</h1>
-          <p className="text-slate-500 max-w-md mx-auto">
+          <h1 className="text-2xl font-semibold text-corthex-text-primary">CORTHEX에 오신 것을 환영합니다!</h1>
+          <p className="text-corthex-text-secondary max-w-md mx-auto">
             AI 조직을 구성하고 운영하기 위한 관리자 콘솔입니다.
             몇 가지 기본 설정을 완료하면 바로 시작할 수 있습니다.
           </p>
@@ -275,7 +275,7 @@ function WelcomeStep({
 
         <div className="rounded-xl p-5 max-w-md mx-auto" style={{ backgroundColor: `${OC.cream}80` }}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-slate-900">회사 정보</h3>
+            <h3 className="text-sm font-semibold text-corthex-text-primary">회사 정보</h3>
             {!editing && (
               <button onClick={() => setEditing(true)} className="text-xs" style={{ color: OC.olive }}>
                 수정
@@ -286,16 +286,16 @@ function WelcomeStep({
           {editing ? (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-slate-500 mb-1">회사명</label>
+                <label className="block text-xs text-corthex-text-secondary mb-1">회사명</label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900"
+                  className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
                   style={{ borderColor: OC.sand }}
                 />
               </div>
               <div className="flex gap-2 justify-end">
-                <button onClick={() => { setEditing(false); setName(company.name) }} className="px-3 py-1.5 text-xs text-slate-500">
+                <button onClick={() => { setEditing(false); setName(company.name) }} className="px-3 py-1.5 text-xs text-corthex-text-secondary">
                   취소
                 </button>
                 <button
@@ -310,8 +310,8 @@ function WelcomeStep({
             </div>
           ) : (
             <div>
-              <p className="text-lg font-semibold text-slate-900">{company.name}</p>
-              <p className="text-xs text-slate-400 mt-1">slug: {company.slug}</p>
+              <p className="text-lg font-semibold text-corthex-text-primary">{company.name}</p>
+              <p className="text-xs text-corthex-text-disabled mt-1">slug: {company.slug}</p>
             </div>
           )}
         </div>
@@ -366,7 +366,7 @@ function TemplateStep({
   // Show apply result
   if (applyResult) {
     return (
-      <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+      <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
         <div className="p-8">
           <div className="text-center space-y-2 mb-6">
             <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(85,107,47,0.1)' }}>
@@ -374,7 +374,7 @@ function TemplateStep({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-slate-900">
+            <h3 className="text-lg font-semibold text-corthex-text-primary">
               &quot;{applyResult.templateName}&quot; 적용 완료
             </h3>
           </div>
@@ -396,18 +396,18 @@ function TemplateStep({
 
   // Content card matching Stitch HTML structure
   return (
-    <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
       <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-slate-900">Define Your Departments</h1>
-        <p className="mt-2 text-slate-500">Configure the logical structures of your organization. This helps CORTHEX categorize data and agent permissions.</p>
+        <h1 className="text-2xl font-semibold text-corthex-text-primary">Define Your Departments</h1>
+        <p className="mt-2 text-corthex-text-secondary">Configure the logical structures of your organization. This helps CORTHEX categorize data and agent permissions.</p>
       </div>
       <div className="p-8">
         {/* Suggested Departments List */}
         <div className="space-y-4 mb-10">
-          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Suggested Departments</h3>
+          <h3 className="text-sm font-semibold text-corthex-text-disabled uppercase tracking-widest mb-4">Suggested Departments</h3>
 
           {isLoading ? (
-            <div className="text-center text-slate-500 py-8">로딩 중...</div>
+            <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
           ) : (
             <>
               {templates.map((t) => {
@@ -424,14 +424,14 @@ function TemplateStep({
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = OC.sand)}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                      <div className="w-10 h-10 bg-corthex-surface rounded-full flex items-center justify-center shadow-sm">
                         <svg className="w-5 h-5" style={{ color: OC.olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                         </svg>
                       </div>
                       <div>
-                        <p className="font-medium text-slate-800">{dept.name}</p>
-                        <p className="text-xs text-slate-500">{dept.agents.length} agents &middot; {dept.description || t.name}</p>
+                        <p className="font-medium text-corthex-text-primary">{dept.name}</p>
+                        <p className="text-xs text-corthex-text-secondary">{dept.agents.length} agents &middot; {dept.description || t.name}</p>
                       </div>
                     </div>
                     <button
@@ -458,14 +458,14 @@ function TemplateStep({
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = OC.sand)}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-corthex-surface rounded-full flex items-center justify-center shadow-sm">
+                    <svg className="w-5 h-5 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                     </svg>
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">빈 조직으로 시작</p>
-                    <p className="text-xs text-slate-500">템플릿 없이 부서와 에이전트를 직접 구성</p>
+                    <p className="font-medium text-corthex-text-primary">빈 조직으로 시작</p>
+                    <p className="text-xs text-corthex-text-secondary">템플릿 없이 부서와 에이전트를 직접 구성</p>
                   </div>
                 </div>
               </div>
@@ -475,10 +475,10 @@ function TemplateStep({
 
         {/* Custom Department Add */}
         <div className="mt-8 pt-8 border-t" style={{ borderColor: `${OC.sand}80` }}>
-          <label className="block text-sm font-semibold text-slate-700 mb-3" htmlFor="custom-dept">Add Custom Department</label>
+          <label className="block text-sm font-semibold text-corthex-text-primary mb-3" htmlFor="custom-dept">Add Custom Department</label>
           <div className="flex gap-4">
             <input
-              className="flex-grow rounded-lg bg-white"
+              className="flex-grow rounded-lg bg-corthex-surface"
               style={{ borderColor: OC.sand }}
               id="custom-dept"
               placeholder="e.g. Research & Development"
@@ -572,10 +572,10 @@ function ApiKeyStep({
   }
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
       <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-slate-900">API Key Setup</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="text-2xl font-semibold text-corthex-text-primary">API Key Setup</h1>
+        <p className="mt-2 text-corthex-text-secondary">
           AI 에이전트가 사용할 외부 API 키를 등록합니다. 나중에 설정해도 됩니다.
         </p>
       </div>
@@ -591,7 +591,7 @@ function ApiKeyStep({
               style={{ borderColor: OC.sand, backgroundColor: `${OC.cream}40` }}
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-corthex-text-primary">
                   {PROVIDER_LABELS[provider]}
                 </h3>
                 {alreadyExists && (
@@ -602,12 +602,12 @@ function ApiKeyStep({
               </div>
 
               {alreadyExists ? (
-                <p className="text-xs text-slate-500">이미 등록된 키가 있습니다. 설정 페이지에서 변경할 수 있습니다.</p>
+                <p className="text-xs text-corthex-text-secondary">이미 등록된 키가 있습니다. 설정 페이지에서 변경할 수 있습니다.</p>
               ) : (
                 <div className="space-y-2">
                   {schemaFields.map((field) => (
                     <div key={field}>
-                      <label className="block text-xs text-slate-500 mb-1">{field}</label>
+                      <label className="block text-xs text-corthex-text-secondary mb-1">{field}</label>
                       <input
                         type="password"
                         value={fields[provider]?.[field] || ''}
@@ -617,7 +617,7 @@ function ApiKeyStep({
                             [provider]: { ...f[provider], [field]: e.target.value },
                           }))
                         }
-                        className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900 font-mono"
+                        className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary font-mono"
                         style={{ borderColor: OC.sand }}
                         placeholder={`${PROVIDER_LABELS[provider]} ${field}`}
                       />
@@ -711,10 +711,10 @@ function InviteStep({
   }, [addToast])
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
       <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-slate-900">Invite Team Members</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="text-2xl font-semibold text-corthex-text-primary">Invite Team Members</h1>
+        <p className="mt-2 text-corthex-text-secondary">
           팀원을 초대해보세요. 나중에 직원 관리 페이지에서도 추가할 수 있습니다.
         </p>
       </div>
@@ -725,11 +725,11 @@ function InviteStep({
             {invited.map((emp, idx) => (
               <div key={idx} className="flex items-center justify-between px-4 py-3 rounded-lg border" style={{ backgroundColor: 'rgba(85,107,47,0.05)', borderColor: OC.leaf }}>
                 <div>
-                  <p className="text-sm font-medium text-slate-900">{emp.name}</p>
-                  <p className="text-xs text-slate-500">{emp.email}</p>
+                  <p className="text-sm font-medium text-corthex-text-primary">{emp.name}</p>
+                  <p className="text-xs text-corthex-text-secondary">{emp.email}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs bg-white px-2 py-1 rounded border font-mono" style={{ borderColor: OC.sand }}>
+                  <code className="text-xs bg-corthex-surface px-2 py-1 rounded border font-mono" style={{ borderColor: OC.sand }}>
                     {emp.initialPassword}
                   </code>
                   <button
@@ -748,44 +748,44 @@ function InviteStep({
         <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: OC.sand }}>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">아이디</label>
+              <label className="block text-xs text-corthex-text-secondary mb-1">아이디</label>
               <input
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900"
+                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
                 style={{ borderColor: OC.sand }}
                 placeholder="user01"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">이름</label>
+              <label className="block text-xs text-corthex-text-secondary mb-1">이름</label>
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900"
+                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
                 style={{ borderColor: OC.sand }}
                 placeholder="홍길동"
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs text-slate-500 mb-1">이메일</label>
+            <label className="block text-xs text-corthex-text-secondary mb-1">이메일</label>
             <input
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900"
+              className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
               style={{ borderColor: OC.sand }}
               placeholder="hong@company.com"
             />
           </div>
           {departments.length > 0 && (
             <div>
-              <label className="block text-xs text-slate-500 mb-1">부서 (선택)</label>
+              <label className="block text-xs text-corthex-text-secondary mb-1">부서 (선택)</label>
               <select
                 value={form.departmentIds[0] || ''}
                 onChange={(e) => setForm({ ...form, departmentIds: e.target.value ? [e.target.value] : [] })}
-                className="w-full px-3 py-2 border rounded-lg bg-white text-sm text-slate-900"
+                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
                 style={{ borderColor: OC.sand }}
               >
                 <option value="">부서 선택 (선택사항)</option>
@@ -874,7 +874,7 @@ function SummaryStep({
   ]
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
+    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
       <div className="p-8">
         <div className="text-center space-y-3 mb-8">
           <div className="w-16 h-16 mx-auto rounded-2xl text-white flex items-center justify-center" style={{ backgroundColor: OC.olive }}>
@@ -882,15 +882,15 @@ function SummaryStep({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Setup Complete!</h2>
-          <p className="text-sm text-slate-500">아래 설정이 완료되었습니다. 관리자 콘솔에서 조직을 관리하세요.</p>
+          <h2 className="text-2xl font-bold text-corthex-text-primary">Setup Complete!</h2>
+          <p className="text-sm text-corthex-text-secondary">아래 설정이 완료되었습니다. 관리자 콘솔에서 조직을 관리하세요.</p>
         </div>
 
         <div className="max-w-md mx-auto space-y-3">
           {summaryItems.map((item) => (
             <div key={item.label} className="flex items-center justify-between px-4 py-3 rounded-lg" style={{ backgroundColor: `${OC.cream}80` }}>
-              <span className="text-sm text-slate-600">{item.label}</span>
-              <span className="text-sm font-medium text-slate-900">{item.value}</span>
+              <span className="text-sm text-corthex-text-secondary">{item.label}</span>
+              <span className="text-sm font-medium text-corthex-text-primary">{item.value}</span>
             </div>
           ))}
         </div>
@@ -909,7 +909,7 @@ function SummaryStep({
           </button>
           <button
             onClick={onPrev}
-            className="text-xs text-slate-500 hover:text-slate-700"
+            className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary"
           >
             &larr; 이전 단계로 돌아가기
           </button>
@@ -956,7 +956,7 @@ export function OnboardingWizardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif" }}>
         <div className="text-center space-y-3">
-          <p className="text-sm text-slate-500">사이드바에서 회사를 선택해주세요.</p>
+          <p className="text-sm text-corthex-text-secondary">사이드바에서 회사를 선택해주세요.</p>
           <button
             onClick={() => navigate('/')}
             className="px-4 py-2 text-white text-sm rounded-lg transition-colors"
@@ -972,7 +972,7 @@ export function OnboardingWizardPage() {
   if (isLoading || !company) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="text-center text-slate-500">로딩 중...</div>
+        <div className="text-center text-corthex-text-secondary">로딩 중...</div>
       </div>
     )
   }
@@ -980,17 +980,17 @@ export function OnboardingWizardPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif", color: '#1e293b' }}>
       {/* Navigation Header */}
-      <header className="w-full py-6 px-8 border-b bg-white/50 backdrop-blur-md sticky top-0 z-50" style={{ borderColor: OC.sand }}>
+      <header className="w-full py-6 px-8 border-b bg-corthex-surface/50 backdrop-blur-md sticky top-0 z-50" style={{ borderColor: OC.sand }}>
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: OC.olive }}>
               <span className="text-white font-bold text-xl">C</span>
             </div>
             <span className="text-xl font-semibold tracking-tight" style={{ color: OC.olive }}>
-              CORTHEX <span className="text-slate-400 font-light">v2</span>
+              CORTHEX <span className="text-corthex-text-disabled font-light">v2</span>
             </span>
           </div>
-          <div className="text-sm text-slate-500 italic">Admin Onboarding Experience</div>
+          <div className="text-sm text-corthex-text-secondary italic">Admin Onboarding Experience</div>
         </div>
       </header>
 
@@ -1058,7 +1058,7 @@ export function OnboardingWizardPage() {
           />
         )}
 
-        <p className="text-center mt-8 text-xs text-slate-400">
+        <p className="text-center mt-8 text-xs text-corthex-text-disabled">
           Need help? Check our <span className="underline" style={{ color: OC.olive }}>Onboarding Documentation</span>
         </p>
       </main>

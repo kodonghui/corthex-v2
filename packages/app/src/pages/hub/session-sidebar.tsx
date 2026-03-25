@@ -91,7 +91,7 @@ export function SessionSidebar({
         data-testid="session-sidebar"
         className={`
           fixed lg:relative inset-y-0 left-0 z-40 lg:z-0
-          w-64 bg-white border-r border-stone-200 flex flex-col
+          w-64 bg-corthex-surface border-r border-stone-200 flex flex-col
           transition-transform duration-200 lg:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
@@ -138,7 +138,7 @@ export function SessionSidebar({
               }}
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-200 truncate">
+                <p className="text-sm text-corthex-text-disabled truncate">
                   {session.title || '새 대화'}
                 </p>
                 <p className="text-xs text-stone-400 mt-0.5">

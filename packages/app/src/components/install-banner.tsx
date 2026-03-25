@@ -66,7 +66,7 @@ export function InstallBanner() {
       <div className="mx-2 mb-2 bg-indigo-600 rounded-xl p-4 shadow-2xl flex items-center justify-between gap-3"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-corthex-surface/20 flex items-center justify-center text-white font-bold text-sm shrink-0">
             C
           </div>
           <p className="text-white text-sm font-medium truncate">CORTHEX 앱 설치하기</p>
@@ -77,7 +77,7 @@ export function InstallBanner() {
             나중에
           </button>
           <button onClick={handleInstall}
-            className="px-4 py-2 bg-white text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-50 transition-colors">
+            className="px-4 py-2 bg-corthex-surface text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-50 transition-colors">
             설치
           </button>
         </div>

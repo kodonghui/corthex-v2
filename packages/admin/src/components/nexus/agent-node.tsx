@@ -11,7 +11,7 @@ const STATUS_DOT: Record<string, { color: string; pulse?: boolean; label: string
 const TIER_BADGE: Record<string, { bg: string; label: string }> = {
   manager: { bg: 'bg-corthex-accent-deep text-corthex-accent-hover', label: 'Manager' },
   specialist: { bg: 'bg-cyan-900 text-cyan-300', label: 'Specialist' },
-  worker: { bg: 'bg-slate-700 text-slate-400', label: 'Worker' },
+  worker: { bg: 'bg-corthex-elevated text-corthex-text-disabled', label: 'Worker' },
 }
 
 type AgentNodeData = {
@@ -65,7 +65,7 @@ export const AgentNode = memo(function AgentNode({ data, selected }: { data: Age
               <div className="flex gap-1 ml-auto">
                 <span className="text-[10px] px-1 py-0.5 rounded bg-amber-800 text-amber-200">비서</span>
                 {data.subordinateCount > 0 && (
-                  <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">↓{data.subordinateCount}</span>
+                  <span className="text-[10px] px-1 py-0.5 rounded bg-corthex-elevated text-corthex-text-disabled">↓{data.subordinateCount}</span>
                 )}
               </div>
             </div>
@@ -90,10 +90,10 @@ export const AgentNode = memo(function AgentNode({ data, selected }: { data: Age
         <span className="text-[10px] text-emerald-400">{status.label}</span>
         <div className="flex gap-1 ml-auto">
           {data.isSystem && (
-            <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">시스템</span>
+            <span className="text-[10px] px-1 py-0.5 rounded bg-corthex-elevated text-corthex-text-disabled">시스템</span>
           )}
           {data.subordinateCount > 0 && (
-            <span className="text-[10px] px-1 py-0.5 rounded bg-slate-700 text-slate-300">↓{data.subordinateCount}</span>
+            <span className="text-[10px] px-1 py-0.5 rounded bg-corthex-elevated text-corthex-text-disabled">↓{data.subordinateCount}</span>
           )}
         </div>
       </div>

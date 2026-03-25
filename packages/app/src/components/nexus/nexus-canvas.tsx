@@ -68,12 +68,12 @@ export function NexusCanvas({
         <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1cfcc" />
         <Controls
           showInteractive={false}
-          className="!bg-white !border-corthex-border !shadow-[0_4px_20px_rgba(40,54,24,0.08)] !rounded-xl [&_button]:!bg-corthex-bg [&_button]:!border-corthex-border [&_button]:!text-corthex-text-secondary [&_button:hover]:!bg-corthex-elevated [&_button]:!rounded-lg"
+          className="!bg-corthex-surface !border-corthex-border !shadow-[0_4px_20px_rgba(40,54,24,0.08)] !rounded-xl [&_button]:!bg-corthex-bg [&_button]:!border-corthex-border [&_button]:!text-corthex-text-secondary [&_button:hover]:!bg-corthex-elevated [&_button]:!rounded-lg"
         />
         <MiniMap
           nodeStrokeWidth={3}
           style={{ width: 192, height: 128 }}
-          className="!bg-white !border-corthex-border !rounded-xl !shadow-[0_4px_20px_rgba(40,54,24,0.08)] hidden md:block"
+          className="!bg-corthex-surface !border-corthex-border !rounded-xl !shadow-[0_4px_20px_rgba(40,54,24,0.08)] hidden md:block"
           nodeColor={(n) => {
             if (n.type === 'company') return '#283618'
             if (n.type === 'department') return '#5a7247'
@@ -146,7 +146,7 @@ function NexusExportButton({ canvasRef }: { canvasRef: React.RefObject<HTMLDivEl
     <div className="absolute bottom-4 right-4 z-10 flex gap-2">
       <button
         onClick={() => handleExport('png')}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-elevated transition-colors shadow-sm"
+        className="flex items-center gap-1.5 px-3 py-2 bg-corthex-surface border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-elevated transition-colors shadow-sm"
         title="Export as PNG"
       >
         <Download className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ function NexusExportButton({ canvasRef }: { canvasRef: React.RefObject<HTMLDivEl
       </button>
       <button
         onClick={() => handleExport('svg')}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-elevated transition-colors shadow-sm"
+        className="flex items-center gap-1.5 px-3 py-2 bg-corthex-surface border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-elevated transition-colors shadow-sm"
         title="Export as SVG"
       >
         <Download className="w-3.5 h-3.5" />

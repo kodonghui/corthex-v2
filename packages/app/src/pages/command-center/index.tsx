@@ -162,7 +162,7 @@ export function CommandCenterPage() {
 
         {/* Right Panel: Info & Tracking */}
         <div
-          className={`flex-[4] bg-white flex flex-col overflow-y-auto border-l border-stone-200
+          className={`flex-[4] bg-corthex-surface flex flex-col overflow-y-auto border-l border-stone-200
             ${mobileTab === 'report' ? 'flex' : 'hidden'} md:flex`}
         >
           <div className="p-6 flex flex-col gap-6">

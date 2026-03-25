@@ -103,7 +103,7 @@ export function DepartmentPanel({
       {/* Header */}
       <div className="flex items-center gap-2">
         <div className="w-2.5 h-2.5 rounded bg-corthex-accent flex-shrink-0" />
-        <h3 className="text-sm font-semibold text-slate-100 truncate flex-1">{department.name}</h3>
+        <h3 className="text-sm font-semibold text-corthex-text-primary truncate flex-1">{department.name}</h3>
         <SaveIndicator status={saveStatus} />
       </div>
 
@@ -117,7 +117,7 @@ export function DepartmentPanel({
 
       {/* Name */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">부서명</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">부서명</label>
         <Input
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
@@ -128,26 +128,26 @@ export function DepartmentPanel({
 
       {/* Description */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">설명</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">설명</label>
         <textarea
           value={description}
           onChange={(e) => handleDescriptionChange(e.target.value)}
           rows={3}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-corthex-accent"
+          className="mt-1 w-full rounded-lg bg-corthex-surface border border-corthex-border text-sm text-corthex-text-primary px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-corthex-accent"
           data-testid="dept-description-input"
         />
       </div>
 
       {/* Manager selection */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">매니저</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">매니저</label>
         <select
           value={managerAgent?.id ?? ''}
           onChange={() => {
             // Manager assignment would need agent tier change API — mark as read-only hint for now
             addToast({ type: 'info', message: '매니저 변경은 에이전트 관리에서 설정하세요' })
           }}
-          className="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-corthex-accent"
+          className="mt-1 w-full rounded-lg bg-corthex-surface border border-corthex-border text-sm text-corthex-text-primary px-3 py-2 focus:outline-none focus:ring-2 focus:ring-corthex-accent"
           data-testid="dept-manager-select"
         >
           <option value="">없음</option>
@@ -161,21 +161,21 @@ export function DepartmentPanel({
 
       {/* Agent list */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">소속 에이전트 ({agents.length})</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">소속 에이전트 ({agents.length})</label>
         <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
           {agents.map((a) => (
             <button
               key={a.id}
               onClick={() => onSelectNode?.(`agent-${a.id}`)}
-              className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800/50 transition-colors"
+              className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-surface/50 transition-colors"
             >
               <span className={`w-1.5 h-1.5 rounded-full ${a.status === 'online' ? 'bg-emerald-500' : 'bg-slate-500'}`} />
-              <span className="text-xs text-slate-300 truncate">{a.name}</span>
-              <span className="text-[10px] text-slate-600 ml-auto">{a.tier}</span>
+              <span className="text-xs text-corthex-text-disabled truncate">{a.name}</span>
+              <span className="text-[10px] text-corthex-text-secondary ml-auto">{a.tier}</span>
             </button>
           ))}
           {agents.length === 0 && (
-            <p className="text-xs text-slate-600 py-2">소속 에이전트 없음</p>
+            <p className="text-xs text-corthex-text-secondary py-2">소속 에이전트 없음</p>
           )}
         </div>
       </div>
@@ -183,17 +183,17 @@ export function DepartmentPanel({
       {/* Employee list */}
       {employees.length > 0 && (
         <div>
-          <label className="text-xs text-slate-500 uppercase tracking-wide">소속 직원 ({employees.length})</label>
+          <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">소속 직원 ({employees.length})</label>
           <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
             {employees.map((e: OrgEmployee) => (
               <button
                 key={e.id}
                 onClick={() => onSelectNode?.(`human-${e.id}`)}
-                className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-800/50 transition-colors"
+                className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-surface/50 transition-colors"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                <span className="text-xs text-slate-300 truncate">{e.name}</span>
-                <span className="text-[10px] text-slate-600 ml-auto">{e.role}</span>
+                <span className="text-xs text-corthex-text-disabled truncate">{e.name}</span>
+                <span className="text-[10px] text-corthex-text-secondary ml-auto">{e.role}</span>
               </button>
             ))}
           </div>
@@ -204,7 +204,7 @@ export function DepartmentPanel({
 }
 
 function SaveIndicator({ status }: { status: SaveStatus }) {
-  if (status === 'saving') return <span className="text-[10px] text-slate-400">저장 중...</span>
+  if (status === 'saving') return <span className="text-[10px] text-corthex-text-disabled">저장 중...</span>
   if (status === 'saved') return <span className="text-[10px] text-emerald-400">✓ 저장됨</span>
   if (status === 'error') return <span className="text-[10px] text-red-400">저장 실패</span>
   return null

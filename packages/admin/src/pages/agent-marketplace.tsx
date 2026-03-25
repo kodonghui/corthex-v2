@@ -23,13 +23,13 @@ function tierLabel(tier: string | null) {
 }
 
 function tierColor(tier: string | null) {
-  if (!tier) return 'bg-slate-700 text-slate-300'
+  if (!tier) return 'bg-corthex-elevated text-corthex-text-disabled'
   const map: Record<string, string> = {
     manager: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
     specialist: 'bg-corthex-accent/20 text-corthex-accent-hover border border-corthex-accent/30',
     worker: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
   }
-  return map[tier] || 'bg-slate-700 text-slate-300'
+  return map[tier] || 'bg-corthex-elevated text-corthex-text-disabled'
 }
 
 function MarketPreviewModal({
@@ -47,7 +47,7 @@ function MarketPreviewModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
         data-testid="marketplace-preview-modal"
-        className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-6 max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto"
+        className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
@@ -55,7 +55,7 @@ function MarketPreviewModal({
             <h3 className="text-lg font-semibold text-slate-50">{template.name}</h3>
             <div className="flex items-center gap-2 mt-1.5">
               {template.category && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate-300">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-corthex-elevated text-corthex-text-disabled">
                   {template.category}
                 </span>
               )}
@@ -71,7 +71,7 @@ function MarketPreviewModal({
               )}
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-slate-700">
+          <button onClick={onClose} className="text-corthex-text-secondary hover:text-corthex-text-disabled transition-colors p-1 rounded-lg hover:bg-corthex-elevated">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -79,19 +79,19 @@ function MarketPreviewModal({
         </div>
 
         {template.description && (
-          <p className="text-sm text-slate-400 mb-4">{template.description}</p>
+          <p className="text-sm text-corthex-text-disabled mb-4">{template.description}</p>
         )}
 
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-slate-300 mb-2">Soul 내용</h4>
-          <pre className="text-sm text-slate-300 whitespace-pre-wrap font-mono bg-slate-900 rounded-lg p-4 max-h-60 overflow-y-auto border border-slate-700">
+          <h4 className="text-sm font-medium text-corthex-text-disabled mb-2">Soul 내용</h4>
+          <pre className="text-sm text-corthex-text-disabled whitespace-pre-wrap font-mono bg-corthex-bg rounded-lg p-4 max-h-60 overflow-y-auto border border-corthex-border">
             {template.content}
           </pre>
         </div>
 
         {template.allowedTools && (template.allowedTools as string[]).length > 0 && (
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-slate-300 mb-2">
+            <h4 className="text-sm font-medium text-corthex-text-disabled mb-2">
               추천 도구 ({(template.allowedTools as string[]).length}개)
             </h4>
             <div className="flex flex-wrap gap-1.5">
@@ -107,8 +107,8 @@ function MarketPreviewModal({
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-700">
-          <span className="text-xs text-slate-500">다운로드 {template.downloadCount}회</span>
+        <div className="flex items-center justify-between pt-4 border-t border-corthex-border">
+          <span className="text-xs text-corthex-text-secondary">다운로드 {template.downloadCount}회</span>
           <button
             onClick={onImport}
             disabled={importing}
@@ -136,19 +136,19 @@ function MarketCard({
     <div
       data-testid={`marketplace-card-${template.id}`}
       onClick={onClick}
-      className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 cursor-pointer hover:border-corthex-accent/50 hover:bg-slate-800 transition-all duration-200"
+      className="bg-corthex-surface/50 border border-corthex-border rounded-xl p-5 cursor-pointer hover:border-corthex-accent/50 hover:bg-corthex-surface transition-all duration-200"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-base font-semibold text-slate-50 line-clamp-1">
           {template.name}
         </h3>
-        <span className="text-xs text-slate-500 whitespace-nowrap ml-2 font-mono">
+        <span className="text-xs text-corthex-text-secondary whitespace-nowrap ml-2 font-mono">
           ↓ {template.downloadCount}
         </span>
       </div>
       <div className="flex items-center gap-1.5 mb-2">
         {template.category && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700 text-slate-300">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-corthex-elevated text-corthex-text-disabled">
             {template.category}
           </span>
         )}
@@ -164,9 +164,9 @@ function MarketCard({
         )}
       </div>
       {template.description && (
-        <p className="text-sm text-slate-400 line-clamp-2 mb-2">{template.description}</p>
+        <p className="text-sm text-corthex-text-disabled line-clamp-2 mb-2">{template.description}</p>
       )}
-      <pre className="text-xs text-slate-500 whitespace-pre-wrap line-clamp-3 font-mono leading-relaxed">{truncated}</pre>
+      <pre className="text-xs text-corthex-text-secondary whitespace-pre-wrap line-clamp-3 font-mono leading-relaxed">{truncated}</pre>
     </div>
   )
 }
@@ -214,7 +214,7 @@ export function AgentMarketplacePage() {
     <div className="space-y-6">
       <div data-testid="marketplace-header">
         <h1 className="text-2xl font-bold tracking-tight text-slate-50">에이전트 마켓</h1>
-        <p className="text-sm text-slate-400 mt-1">다른 회사가 공유한 에이전트 Soul 템플릿을 찾아 가져올 수 있습니다</p>
+        <p className="text-sm text-corthex-text-disabled mt-1">다른 회사가 공유한 에이전트 Soul 템플릿을 찾아 가져올 수 있습니다</p>
       </div>
 
       {/* Filters */}
@@ -223,12 +223,12 @@ export function AgentMarketplacePage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="템플릿 검색..."
-          className="flex-1 bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition-colors"
+          className="flex-1 bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition-colors"
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[160px]"
+          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[160px]"
         >
           <option value="">전체 카테고리</option>
           {categories.map((cat) => (
@@ -238,7 +238,7 @@ export function AgentMarketplacePage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-600 focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[130px]"
+          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded-lg px-3 py-2 text-sm text-white outline-none transition-colors min-w-[130px]"
         >
           <option value="">전체 티어</option>
           <option value="manager">매니저</option>
@@ -248,16 +248,16 @@ export function AgentMarketplacePage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center text-slate-500 py-12">로딩 중...</div>
+        <div className="text-center text-corthex-text-secondary py-12">로딩 중...</div>
       ) : templates.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-corthex-text-disabled">
             {search || categoryFilter || tierFilter
               ? '검색 결과가 없습니다'
               : '공개된 에이전트 템플릿이 없습니다'}
           </p>
           {!search && !categoryFilter && !tierFilter && (
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-corthex-text-secondary mt-2">
               다른 회사가 에이전트 Soul 템플릿을 공개하면 여기에서 가져올 수 있습니다.
             </p>
           )}

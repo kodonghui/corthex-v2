@@ -28,7 +28,7 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 function typeColor(type: string | null): string {
-  if (!type) return 'bg-slate-500/20 text-slate-400'
+  if (!type) return 'bg-slate-500/20 text-corthex-text-disabled'
   return TYPE_COLORS[type] ?? 'bg-amber-500/20 text-amber-400'
 }
 
@@ -61,7 +61,7 @@ export function AgentReportsPage() {
 
   if (!selectedCompanyId) {
     return (
-      <div className="p-6 text-slate-400 text-sm">
+      <div className="p-6 text-corthex-text-disabled text-sm">
         회사를 선택해 주세요.
       </div>
     )
@@ -71,24 +71,24 @@ export function AgentReportsPage() {
     <div className="flex h-full divide-x divide-slate-700">
       {/* Left: Report List */}
       <div className="w-96 flex flex-col">
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-corthex-border">
           <h2 className="text-lg font-semibold text-white mb-3">에이전트 리포트</h2>
           <input
             type="text"
             placeholder="타입 필터 (예: competitor_analysis)"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+            className="w-full bg-corthex-surface border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
           />
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-slate-400 text-sm">로딩 중...</div>
+            <div className="p-4 text-corthex-text-disabled text-sm">로딩 중...</div>
           ) : reports.length === 0 ? (
-            <div className="p-6 text-center text-slate-400 text-sm">
+            <div className="p-6 text-center text-corthex-text-disabled text-sm">
               <p>리포트가 없습니다.</p>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-corthex-text-secondary">
                 에이전트에게 save_report 실행을 요청하면 여기에 표시됩니다.
               </p>
             </div>
@@ -98,7 +98,7 @@ export function AgentReportsPage() {
                 <li
                   key={r.id}
                   onClick={() => setSelectedId(r.id)}
-                  className={`p-4 cursor-pointer border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors ${selectedId === r.id ? 'bg-slate-800' : ''}`}
+                  className={`p-4 cursor-pointer border-b border-corthex-border/50 hover:bg-corthex-surface/50 transition-colors ${selectedId === r.id ? 'bg-corthex-surface' : ''}`}
                 >
                   <p className="text-sm font-medium text-white truncate">{r.title}</p>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -108,12 +108,12 @@ export function AgentReportsPage() {
                       </span>
                     )}
                     {r.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                      <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-corthex-elevated text-corthex-text-disabled">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-corthex-text-secondary mt-1">
                     {new Date(r.createdAt).toLocaleString('ko-KR')}
                   </p>
                 </li>
@@ -126,17 +126,17 @@ export function AgentReportsPage() {
       {/* Right: Report Detail */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {!selectedId ? (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+          <div className="flex-1 flex items-center justify-center text-corthex-text-disabled text-sm">
             리포트를 선택하세요
           </div>
         ) : detailLoading ? (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+          <div className="flex-1 flex items-center justify-center text-corthex-text-disabled text-sm">
             로딩 중...
           </div>
         ) : detail ? (
           <>
             {/* Detail Header */}
-            <div className="p-4 border-b border-slate-700 flex items-start justify-between gap-4">
+            <div className="p-4 border-b border-corthex-border flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-semibold text-white truncate">{detail.title}</h3>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -146,12 +146,12 @@ export function AgentReportsPage() {
                     </span>
                   )}
                   {detail.tags.map((tag) => (
-                    <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                    <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-corthex-elevated text-corthex-text-disabled">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-corthex-text-secondary mt-1">
                   {new Date(detail.createdAt).toLocaleString('ko-KR')}
                   {detail.agentId && ` · Agent ${detail.agentId.slice(0, 8)}...`}
                 </p>
@@ -166,8 +166,8 @@ export function AgentReportsPage() {
 
             {/* Distribution Results */}
             {detail.distributionResults && Object.keys(detail.distributionResults).length > 0 && (
-              <div className="px-4 py-2 border-b border-slate-700 bg-slate-800/50">
-                <p className="text-xs text-slate-400 font-medium mb-1">배포 결과</p>
+              <div className="px-4 py-2 border-b border-corthex-border bg-corthex-surface/50">
+                <p className="text-xs text-corthex-text-disabled font-medium mb-1">배포 결과</p>
                 <div className="flex gap-3 flex-wrap">
                   {Object.entries(detail.distributionResults).map(([channel, status]) => (
                     <span
@@ -187,7 +187,7 @@ export function AgentReportsPage() {
 
             {/* Markdown Content */}
             <div className="flex-1 overflow-y-auto p-4">
-              <pre className="text-sm text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">
+              <pre className="text-sm text-corthex-text-disabled whitespace-pre-wrap font-mono leading-relaxed">
                 {detail.content}
               </pre>
             </div>

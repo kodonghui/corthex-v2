@@ -155,14 +155,14 @@ export function AgentPickerPanel({
   return (
     <div
       data-testid="agent-picker-panel"
-      className="w-full md:w-72 flex flex-col border-r border-zinc-200 bg-zinc-50 shrink-0 h-full"
+      className="w-full md:w-72 flex flex-col border-r border-zinc-200 bg-corthex-bg shrink-0 h-full"
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-zinc-200 shrink-0">
-        <h2 className="text-sm font-semibold text-zinc-900">
+        <h2 className="text-sm font-semibold text-corthex-text-primary">
           에이전트 선택
         </h2>
-        <p className="text-xs text-zinc-500 mt-0.5">
+        <p className="text-xs text-corthex-text-secondary mt-0.5">
           대화할 에이전트를 선택하세요
         </p>
       </div>
@@ -176,14 +176,14 @@ export function AgentPickerPanel({
           onChange={(e) => setSearch(e.target.value)}
           placeholder="이름, 역할, 부서 검색..."
           disabled={searchDisabled}
-          className="w-full bg-zinc-100 border border-zinc-200 focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-zinc-900 outline-none placeholder-zinc-400 disabled:opacity-40 transition-colors"
+          className="w-full bg-corthex-elevated border border-zinc-200 focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder-zinc-400 disabled:opacity-40 transition-colors"
         />
       </div>
 
       {/* Agent list grouped by department */}
       <div className="flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]">
         {filtered.length === 0 ? (
-          <p className="text-center text-sm text-zinc-500 py-6">
+          <p className="text-center text-sm text-corthex-text-secondary py-6">
             {search ? '검색 결과가 없습니다' : '에이전트가 없습니다'}
           </p>
         ) : (
@@ -192,11 +192,11 @@ export function AgentPickerPanel({
               {/* Department header */}
               <button
                 onClick={() => toggleDept(group.deptId)}
-                className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:bg-zinc-100 transition-colors"
+                className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold uppercase tracking-wider text-corthex-text-disabled hover:bg-corthex-elevated transition-colors"
               >
                 <span className="flex items-center gap-1.5">
                   <span>{group.deptName}</span>
-                  <span className="text-[10px] font-normal text-zinc-400">
+                  <span className="text-[10px] font-normal text-corthex-text-disabled">
                     ({group.agents.length})
                   </span>
                 </span>
@@ -230,11 +230,11 @@ export function AgentPickerPanel({
                       className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${
                         isSelected
                           ? 'bg-indigo-50 border-l-2 border-indigo-600'
-                          : 'hover:bg-zinc-100 border-l-2 border-transparent'
+                          : 'hover:bg-corthex-elevated border-l-2 border-transparent'
                       } ${isOffline ? 'opacity-40 cursor-not-allowed' : ''}`}
                     >
                       {/* Avatar */}
-                      <span className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-sm font-bold text-zinc-600 shrink-0 relative">
+                      <span className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-sm font-bold text-corthex-text-secondary shrink-0 relative">
                         {initial}
                         <span
                           className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-50 ${statusColor}`}
@@ -245,7 +245,7 @@ export function AgentPickerPanel({
                       {/* Info */}
                       <div className="flex-1 min-w-0 text-left">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-medium text-zinc-900 truncate">
+                          <span className="text-sm font-medium text-corthex-text-primary truncate">
                             {agent.name}
                           </span>
                           {agent.isSecretary && (
@@ -254,7 +254,7 @@ export function AgentPickerPanel({
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-500 truncate mt-0.5">
+                        <p className="text-xs text-corthex-text-secondary truncate mt-0.5">
                           {agent.role}
                         </p>
                       </div>
@@ -268,7 +268,7 @@ export function AgentPickerPanel({
 
       {/* Footer: agent count */}
       <div className="px-4 py-2 border-t border-zinc-200 shrink-0">
-        <p className="text-[10px] text-zinc-400">
+        <p className="text-[10px] text-corthex-text-disabled">
           {totalAgents}개 에이전트 · {departments.length}개 부서
         </p>
       </div>

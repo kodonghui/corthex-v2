@@ -28,7 +28,7 @@ export function AgentCard({ tier, name, department, status, jobCount }: AgentCar
     }
 
     return (
-        <div className="flex flex-col gap-4 p-5 rounded-xl bg-white/50 border border-stone-200 hover:border-corthex-accent/50 transition-colors cursor-pointer group">
+        <div className="flex flex-col gap-4 p-5 rounded-xl bg-corthex-surface/50 border border-stone-200 hover:border-corthex-accent/50 transition-colors cursor-pointer group">
             <div className="flex items-start justify-between">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner ${bg}`}>
                     <Icon className="text-white w-6 h-6" />
@@ -36,7 +36,7 @@ export function AgentCard({ tier, name, department, status, jobCount }: AgentCar
                 <TierBadge level={tier} />
             </div>
             <div>
-                <h3 className="text-slate-100 text-lg font-bold leading-tight group-hover:text-corthex-accent transition-colors">{name}</h3>
+                <h3 className="text-corthex-text-primary text-lg font-bold leading-tight group-hover:text-corthex-accent transition-colors">{name}</h3>
                 <p className="text-stone-500 text-sm font-medium mt-1">{department}</p>
             </div>
             <div className="flex items-center justify-between mt-2 pt-4 border-t border-stone-200">

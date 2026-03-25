@@ -41,7 +41,7 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className={`w-2.5 h-2.5 rounded-full ${statusInfo.dotColor}`} />
-          <span className="text-base font-semibold text-slate-100">{node.label}</span>
+          <span className="text-base font-semibold text-corthex-text-primary">{node.label}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-xs font-medium uppercase tracking-wider ${statusInfo.color}`}>
@@ -93,7 +93,7 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       <div className="md:hidden fixed inset-0 z-40" onClick={onClose}>
         <div className="absolute inset-0 bg-black/40" />
         <div
-          className="absolute bottom-0 inset-x-0 bg-white border-t border-stone-200 rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto [-webkit-overflow-scrolling:touch] animate-slide-up"
+          className="absolute bottom-0 inset-x-0 bg-corthex-surface border-t border-stone-200 rounded-t-2xl p-4 max-h-[60vh] overflow-y-auto [-webkit-overflow-scrolling:touch] animate-slide-up"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Drag handle */}
@@ -101,10 +101,10 @@ export function NexusInfoPanel({ node, onClose }: Props) {
             <div className="w-10 h-1 bg-stone-200 rounded-full" />
           </div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-slate-100">에이전트 정보</h3>
+            <h3 className="text-sm font-semibold text-corthex-text-primary">에이전트 정보</h3>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-corthex-text-primary hover:bg-stone-100 transition-colors"
               aria-label="닫기"
             >
               <X className="w-4 h-4" />
@@ -115,13 +115,13 @@ export function NexusInfoPanel({ node, onClose }: Props) {
       </div>
 
       {/* Desktop: right sidebar */}
-      <div className="hidden md:flex flex-col w-80 border-l border-stone-200 bg-white/80 backdrop-blur-md overflow-y-auto transition-all">
+      <div className="hidden md:flex flex-col w-80 border-l border-stone-200 bg-corthex-surface/80 backdrop-blur-md overflow-y-auto transition-all">
         <div className="p-6 border-b border-stone-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-100">에이전트 정보</h3>
+            <h3 className="text-lg font-semibold text-corthex-text-primary">에이전트 정보</h3>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-slate-100 hover:bg-stone-100 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-500 hover:text-corthex-text-primary hover:bg-stone-100 transition-colors"
               aria-label="닫기"
             >
               <X className="w-4 h-4" />

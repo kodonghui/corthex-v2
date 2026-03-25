@@ -18,7 +18,7 @@ export function EventTimelineItem({ time, message, duration, status }: EventTime
             default:
                 return {
                     bg: 'bg-emerald-500',
-                    text: 'text-slate-900'
+                    text: 'text-corthex-text-primary'
                 }
         }
     }

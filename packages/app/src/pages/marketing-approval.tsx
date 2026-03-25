@@ -154,7 +154,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
   }
 
   return (
-    <div className="rounded-xl border border-sand-200 bg-white overflow-hidden">
+    <div className="rounded-xl border border-sand-200 bg-corthex-surface overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-sand-100">
         <div className="flex items-center gap-3">
@@ -378,12 +378,12 @@ export function MarketingApprovalPage() {
         </div>
 
         {pendingLoading ? (
-          <div className="rounded-xl border border-sand-200 bg-white p-8 text-center text-stone-400">
+          <div className="rounded-xl border border-sand-200 bg-corthex-surface p-8 text-center text-stone-400">
             <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />
             <p>로딩 중...</p>
           </div>
         ) : pendingApprovals.length === 0 ? (
-          <div className="rounded-xl border border-sand-200 bg-white p-8 text-center text-stone-400">
+          <div className="rounded-xl border border-sand-200 bg-corthex-surface p-8 text-center text-stone-400">
             <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p>대기중인 승인 요청이 없습니다</p>
           </div>
@@ -401,7 +401,7 @@ export function MarketingApprovalPage() {
         <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
           승인 이력 ({historyTotal}건)
         </h2>
-        <div className="rounded-xl border border-sand-200 bg-white overflow-hidden">
+        <div className="rounded-xl border border-sand-200 bg-corthex-surface overflow-hidden">
           {historyLoading ? (
             <div className="p-8 text-center text-stone-400">
               <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />

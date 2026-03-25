@@ -143,7 +143,7 @@ function formatRelativeTime(dateStr: string): string {
   return `${Math.floor(hours / 24)}일 전`
 }
 
-const inputClasses = 'w-full bg-white border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 text-sm text-corthex-text-primary rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-secondary'
+const inputClasses = 'w-full bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 text-sm text-corthex-text-primary rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-secondary'
 
 // ── Main Page ──
 
@@ -363,7 +363,7 @@ export function ArgosPage() {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setDeleteTarget(null)} />
-          <div className="relative bg-white border border-corthex-border rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
+          <div className="relative bg-corthex-surface border border-corthex-border rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
             <h3 className="text-sm font-semibold text-corthex-accent-deep">트리거 삭제</h3>
             <p className="text-xs text-corthex-text-secondary mt-2">이 트리거와 관련된 이벤트 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
@@ -557,19 +557,19 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
                     {evt.eventData && (
                       <div>
                         <p className="text-[10px] text-corthex-text-secondary font-medium uppercase tracking-wider">이벤트 데이터</p>
-                        <pre className="text-xs text-corthex-text-secondary font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{JSON.stringify(evt.eventData, null, 2)}</pre>
+                        <pre className="text-xs text-corthex-text-secondary font-mono bg-corthex-surface/50 rounded p-2 mt-0.5 break-all">{JSON.stringify(evt.eventData, null, 2)}</pre>
                       </div>
                     )}
                     {evt.result && (
                       <div>
                         <p className="text-[10px] text-corthex-text-secondary font-medium uppercase tracking-wider">실행 결과</p>
-                        <pre className="text-xs text-corthex-text-secondary font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{evt.result}</pre>
+                        <pre className="text-xs text-corthex-text-secondary font-mono bg-corthex-surface/50 rounded p-2 mt-0.5 break-all">{evt.result}</pre>
                       </div>
                     )}
                     {evt.error && (
                       <div>
                         <p className="text-[10px] text-corthex-text-secondary font-medium uppercase tracking-wider">오류 메시지</p>
-                        <pre className="text-xs text-red-400 font-mono bg-white/50 rounded p-2 mt-0.5 break-all">{evt.error}</pre>
+                        <pre className="text-xs text-red-400 font-mono bg-corthex-surface/50 rounded p-2 mt-0.5 break-all">{evt.error}</pre>
                       </div>
                     )}
                     {evt.processedAt && (

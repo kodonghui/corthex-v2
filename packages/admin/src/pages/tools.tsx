@@ -215,8 +215,8 @@ export function ToolsPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="h-16 bg-white border-b flex items-center justify-between px-8 shrink-0" style={{ borderColor: '#e5e7eb' }}>
-          <div className="flex items-center gap-2 text-slate-400">
+        <header className="h-16 bg-corthex-surface border-b flex items-center justify-between px-8 shrink-0" style={{ borderColor: '#e5e7eb' }}>
+          <div className="flex items-center gap-2 text-corthex-text-disabled">
             <span className="text-xs font-medium" style={{ color: '#5a7247' }}>Admin Tools</span>
           </div>
           <div className="flex items-center gap-4">
@@ -225,7 +225,7 @@ export function ToolsPage() {
                 <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: 'rgba(196,98,45,0.1)', color: '#c4622d' }}>
                   변경사항 {changeCount}건
                 </span>
-                <button onClick={handleCancel} className="text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }} data-testid="cancel-btn">
+                <button onClick={handleCancel} className="text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-corthex-elevated transition-colors" style={{ color: '#3f3e3a' }} data-testid="cancel-btn">
                   취소
                 </button>
                 <button onClick={handleSave} disabled={saving} className="text-sm font-medium px-4 py-1.5 text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }} data-testid="save-btn">
@@ -242,7 +242,7 @@ export function ToolsPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h2 className="text-3xl font-bold" style={{ color: '#3f3e3a' }}>도구 정의 관리</h2>
-              <p className="text-slate-500 mt-1">플랫폼 내 에이전트가 사용하는 외부 도구 및 API 엔드포인트를 구성합니다.</p>
+              <p className="text-corthex-text-secondary mt-1">플랫폼 내 에이전트가 사용하는 외부 도구 및 API 엔드포인트를 구성합니다.</p>
             </div>
             <button onClick={() => setShowCreateDialog(true)} className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all" style={{ backgroundColor: '#5a7247', boxShadow: '0 4px 14px rgba(90,114,71,0.2)' }}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v12m6-6H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
@@ -251,10 +251,10 @@ export function ToolsPage() {
           </div>
 
           {/* Filters & Search */}
-          <div className="bg-white p-4 rounded-xl border flex flex-wrap gap-4 items-center mb-6" style={{ borderColor: '#e5e7eb' }}>
+          <div className="bg-corthex-surface p-4 rounded-xl border flex flex-wrap gap-4 items-center mb-6" style={{ borderColor: '#e5e7eb' }}>
             <div className="flex-1 min-w-[240px]">
               <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -281,30 +281,30 @@ export function ToolsPage() {
           </div>
 
           {isLoading ? (
-            <div data-testid="loading-state" className="bg-white rounded-xl border p-8" style={{ borderColor: '#e5e7eb' }}>
+            <div data-testid="loading-state" className="bg-corthex-surface rounded-xl border p-8" style={{ borderColor: '#e5e7eb' }}>
               <div className="animate-pulse space-y-4">
                 <div className="h-8 rounded w-1/3" style={{ backgroundColor: '#eceee3' }} />
                 <div className="h-40 rounded w-full" style={{ backgroundColor: '#eceee3' }} />
               </div>
             </div>
           ) : allTools.length === 0 ? (
-            <div data-testid="empty-state" className="bg-white rounded-xl border p-12 text-center" style={{ borderColor: '#e5e7eb' }}>
+            <div data-testid="empty-state" className="bg-corthex-surface rounded-xl border p-12 text-center" style={{ borderColor: '#e5e7eb' }}>
               <h3 className="text-lg font-semibold mb-2" style={{ color: '#3f3e3a' }}>등록된 도구가 없습니다</h3>
-              <p className="text-sm text-slate-500">tool_definitions 테이블에 도구를 등록하세요.</p>
+              <p className="text-sm text-corthex-text-secondary">tool_definitions 테이블에 도구를 등록하세요.</p>
             </div>
           ) : (
             <>
               {/* Tools Table */}
-              <div data-testid="tool-catalog" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
+              <div data-testid="tool-catalog" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b" style={{ backgroundColor: '#f8f8f6', borderColor: '#e5e7eb' }}>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">도구명</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">카테고리</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">범위</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">상태</th>
-                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">관리</th>
+                        <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary uppercase tracking-wider">도구명</th>
+                        <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary uppercase tracking-wider">카테고리</th>
+                        <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary uppercase tracking-wider">범위</th>
+                        <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary uppercase tracking-wider">상태</th>
+                        <th className="px-6 py-4 text-xs font-bold text-corthex-text-secondary uppercase tracking-wider text-right">관리</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y" style={{ borderColor: '#f3f4f6' }}>
@@ -319,7 +319,7 @@ export function ToolsPage() {
                                 </div>
                                 <div>
                                   <p className="text-sm font-bold" style={{ color: '#3f3e3a' }}>{tool.name}</p>
-                                  <p className="text-xs text-slate-400">{tool.description || 'No description'}</p>
+                                  <p className="text-xs text-corthex-text-disabled">{tool.description || 'No description'}</p>
                                 </div>
                               </div>
                             </td>
@@ -336,17 +336,17 @@ export function ToolsPage() {
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-1.5">
                                 <span className={`w-2 h-2 rounded-full ${tool.registered ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                                <span className={`text-xs font-medium ${tool.registered ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                <span className={`text-xs font-medium ${tool.registered ? 'text-emerald-600' : 'text-corthex-text-disabled'}`}>
                                   {tool.registered ? 'Active' : 'Inactive'}
                                 </span>
                               </div>
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex justify-end gap-2">
-                                <button className="p-1.5 hover:bg-slate-200 rounded transition-colors text-slate-500" onClick={() => setEditingTool(tool)} data-testid={`edit-tool-${tool.name}`}>
+                                <button className="p-1.5 hover:bg-slate-200 rounded transition-colors text-corthex-text-secondary" onClick={() => setEditingTool(tool)} data-testid={`edit-tool-${tool.name}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
                                 </button>
-                                <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-slate-400 hover:text-red-500" onClick={() => setDeletingTool(tool)} data-testid={`delete-tool-${tool.name}`}>
+                                <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-corthex-text-disabled hover:text-red-500" onClick={() => setDeletingTool(tool)} data-testid={`delete-tool-${tool.name}`}>
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
                                 </button>
                               </div>
@@ -358,7 +358,7 @@ export function ToolsPage() {
                   </table>
                 </div>
                 <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#f8f8f6' }}>
-                  <p className="text-xs text-slate-500 font-medium">전체 {allTools.length}개 도구 중 {filteredTools.length} 표시</p>
+                  <p className="text-xs text-corthex-text-secondary font-medium">전체 {allTools.length}개 도구 중 {filteredTools.length} 표시</p>
                   <div className="flex items-center gap-1">
                     <button className="w-7 h-7 flex items-center justify-center text-white rounded-md text-xs font-bold" style={{ backgroundColor: '#5a7247' }}>1</button>
                   </div>
@@ -367,7 +367,7 @@ export function ToolsPage() {
 
               {/* Agent Permission Matrix */}
               {agents.length > 0 && (
-                <div data-testid="permission-matrix" className="mt-6 bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
+                <div data-testid="permission-matrix" className="mt-6 bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#e5e7eb' }}>
                   <div className="px-6 py-4 border-b" style={{ borderColor: '#e5e7eb' }}>
                     <h3 className="text-sm font-bold" style={{ color: '#3f3e3a' }}>Agent Permission Matrix</h3>
                   </div>
@@ -375,10 +375,10 @@ export function ToolsPage() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b" style={{ borderColor: '#e5e7eb' }}>
-                          <th className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 px-4 py-3 sticky left-0 z-10 bg-white min-w-[180px]">에이전트</th>
+                          <th className="text-left text-xs font-medium uppercase tracking-wider text-corthex-text-disabled px-4 py-3 sticky left-0 z-10 bg-corthex-surface min-w-[180px]">에이전트</th>
                           {filteredTools.map((tool) => (
                             <th key={tool.name} className="px-2 py-3 text-center min-w-[44px]">
-                              <span className="text-xs text-slate-400 [writing-mode:vertical-lr] transform -rotate-45 inline-block origin-bottom-left whitespace-nowrap font-mono">
+                              <span className="text-xs text-corthex-text-disabled [writing-mode:vertical-lr] transform -rotate-45 inline-block origin-bottom-left whitespace-nowrap font-mono">
                                 {tool.name.length > 12 ? tool.name.slice(0, 12) + '...' : tool.name}
                               </span>
                             </th>
@@ -396,10 +396,10 @@ export function ToolsPage() {
                               className={`border-b transition-colors ${isModified ? 'bg-amber-50' : 'hover:bg-corthex-bg'}`}
                               style={{ borderColor: '#f3f4f6' }}
                             >
-                              <td className="sticky left-0 z-10 bg-white px-4 py-3 whitespace-nowrap border-r" style={{ borderColor: '#e5e7eb' }}>
+                              <td className="sticky left-0 z-10 bg-corthex-surface px-4 py-3 whitespace-nowrap border-r" style={{ borderColor: '#e5e7eb' }}>
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium" style={{ color: '#3f3e3a' }}>{agent.name}</span>
-                                  <span className="text-xs text-slate-500">({agent.tier?.[0]?.toUpperCase() || '?'})</span>
+                                  <span className="text-xs text-corthex-text-secondary">({agent.tier?.[0]?.toUpperCase() || '?'})</span>
                                   {isModified && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#c4622d' }} />}
                                 </div>
                               </td>
@@ -441,11 +441,11 @@ export function ToolsPage() {
 
               {/* Sticky Bottom Save Bar */}
               {changeCount > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-t px-6 py-3" style={{ borderColor: '#e5e7eb' }} data-testid="save-bar">
+                <div className="fixed bottom-0 left-0 right-0 z-20 bg-corthex-surface/95 backdrop-blur-sm border-t px-6 py-3" style={{ borderColor: '#e5e7eb' }} data-testid="save-bar">
                   <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <span className="text-sm font-medium" style={{ color: '#c4622d' }}>변경사항 {changeCount}건</span>
                     <div className="flex items-center gap-3">
-                      <button onClick={handleCancel} className="bg-slate-100 hover:bg-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors" style={{ color: '#3f3e3a' }}>
+                      <button onClick={handleCancel} className="bg-corthex-elevated hover:bg-slate-200 rounded-lg px-4 py-2 text-sm font-medium transition-colors" style={{ color: '#3f3e3a' }}>
                         취소
                       </button>
                       <button onClick={handleSave} disabled={saving} className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
@@ -473,11 +473,11 @@ export function ToolsPage() {
       {/* Create Tool Dialog */}
       {showCreateDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowCreateDialog(false)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-corthex-surface rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold" style={{ color: '#3f3e3a' }}>새 도구 추가</h3>
-              <button onClick={() => setShowCreateDialog(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                <X className="w-5 h-5 text-slate-400" />
+              <button onClick={() => setShowCreateDialog(false)} className="p-1 hover:bg-corthex-elevated rounded-lg transition-colors">
+                <X className="w-5 h-5 text-corthex-text-disabled" />
               </button>
             </div>
             <form onSubmit={handleCreateTool} className="space-y-4">
@@ -518,7 +518,7 @@ export function ToolsPage() {
                 </select>
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowCreateDialog(false)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+                <button type="button" onClick={() => setShowCreateDialog(false)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-corthex-elevated transition-colors" style={{ color: '#3f3e3a' }}>
                   취소
                 </button>
                 <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
@@ -532,11 +532,11 @@ export function ToolsPage() {
       {/* Edit Tool Dialog */}
       {editingTool && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingTool(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-corthex-surface rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold" style={{ color: '#3f3e3a' }}>도구 수정</h3>
-              <button onClick={() => setEditingTool(null)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                <X className="w-5 h-5 text-slate-400" />
+              <button onClick={() => setEditingTool(null)} className="p-1 hover:bg-corthex-elevated rounded-lg transition-colors">
+                <X className="w-5 h-5 text-corthex-text-disabled" />
               </button>
             </div>
             <form onSubmit={handleEditTool} className="space-y-4">
@@ -562,7 +562,7 @@ export function ToolsPage() {
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setEditingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+                <button type="button" onClick={() => setEditingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-corthex-elevated transition-colors" style={{ color: '#3f3e3a' }}>
                   취소
                 </button>
                 <button type="submit" disabled={editMutation.isPending} className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50" style={{ backgroundColor: '#5a7247' }}>
@@ -577,13 +577,13 @@ export function ToolsPage() {
       {/* Delete Confirmation Dialog */}
       {deletingTool && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeletingTool(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-corthex-surface rounded-xl shadow-xl w-full max-w-sm mx-4 p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-2" style={{ color: '#3f3e3a' }}>도구 삭제</h3>
-            <p className="text-sm text-slate-500 mb-6">
+            <p className="text-sm text-corthex-text-secondary mb-6">
               <strong style={{ color: '#3f3e3a' }}>{deletingTool.name}</strong> 도구를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeletingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors" style={{ color: '#3f3e3a' }}>
+              <button onClick={() => setDeletingTool(null)} className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-corthex-elevated transition-colors" style={{ color: '#3f3e3a' }}>
                 취소
               </button>
               <button

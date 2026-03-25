@@ -27,7 +27,7 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
             default:
                 return {
                     icon: null,
-                    bgClass: 'bg-slate-100 text-slate-600'
+                    bgClass: 'bg-corthex-elevated text-corthex-text-secondary'
                 }
         }
     }
@@ -39,7 +39,7 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
             case '예약됨':
                 return 'bg-amber-100 text-amber-600'
             default:
-                return 'bg-slate-100 text-slate-600'
+                return 'bg-corthex-elevated text-corthex-text-secondary'
         }
     }
 
@@ -47,7 +47,7 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
     const sClass = getStatusConfig()
 
     return (
-        <article className="flex flex-col rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full">
+        <article className="flex flex-col rounded-xl bg-corthex-surface border border-corthex-border overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full">
             <div className="p-5 flex flex-col gap-4 h-full">
                 <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
@@ -61,13 +61,13 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
                         {status}
                     </div>
                 </div>
-                <p className="text-slate-800 text-sm leading-relaxed line-clamp-3">
+                <p className="text-corthex-text-primary text-sm leading-relaxed line-clamp-3">
                     {content}
                 </p>
                 {imageUrl ? (
-                    <div className="bg-slate-100 rounded-lg h-40 w-full bg-cover bg-center mt-auto" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
+                    <div className="bg-corthex-elevated rounded-lg h-40 w-full bg-cover bg-center mt-auto" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
                 ) : (
-                    <div className="bg-slate-100 rounded-lg h-40 w-full mt-auto flex items-center justify-center text-stone-500">
+                    <div className="bg-corthex-elevated rounded-lg h-40 w-full mt-auto flex items-center justify-center text-stone-500">
                         No Image
                     </div>
                 )}
@@ -84,7 +84,7 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
                         <Share2 className="w-[18px] h-[18px]" />
                         <span className="text-xs font-mono font-medium">{shares}</span>
                     </div>
-                    <button className="ml-auto text-stone-500 hover:text-slate-600">
+                    <button className="ml-auto text-stone-500 hover:text-corthex-text-secondary">
                         <MoreHorizontal className="w-[20px] h-[20px]" />
                     </button>
                 </div>

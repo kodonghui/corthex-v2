@@ -71,18 +71,18 @@ function MarketPreviewModal({
       <div
         role="dialog"
         aria-modal="true"
-        className="bg-slate-900 rounded-xl border border-slate-700 shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
+        className="bg-corthex-bg rounded-xl border border-corthex-border shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border">
           <div>
             <h2 className="text-lg font-semibold text-slate-50">{template.name}</h2>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-corthex-text-disabled mt-0.5">
               {depts.length}개 부서 · {totalAgents}명 에이전트 · {template.downloadCount}회 다운로드
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+          <button onClick={onClose} className="text-corthex-text-secondary hover:text-corthex-text-disabled">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -103,17 +103,17 @@ function MarketPreviewModal({
         {/* Content */}
         <div className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
           {template.description && (
-            <p className="text-sm text-slate-400">{template.description}</p>
+            <p className="text-sm text-corthex-text-disabled">{template.description}</p>
           )}
 
           {depts.map((dept) => (
-            <div key={dept.name} className="border border-slate-700 rounded-lg overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-800">
+            <div key={dept.name} className="border border-corthex-border rounded-lg overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-corthex-surface">
                 <span className="text-sm font-medium text-slate-50">{dept.name}</span>
                 {dept.description && (
-                  <span className="text-xs text-slate-500 truncate">— {dept.description}</span>
+                  <span className="text-xs text-corthex-text-secondary truncate">— {dept.description}</span>
                 )}
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-700 text-slate-400 ml-auto flex-shrink-0">
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-disabled ml-auto flex-shrink-0">
                   {dept.agents.length}명
                 </span>
               </div>
@@ -125,7 +125,7 @@ function MarketPreviewModal({
                       <div key={agent.name} className="flex items-center gap-3 px-4 py-2">
                         <span className="text-sm text-slate-50">{agent.name}</span>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.color}`}>{tier.label}</span>
-                        <span className="text-xs text-slate-400 ml-auto">{agent.modelName}</span>
+                        <span className="text-xs text-corthex-text-disabled ml-auto">{agent.modelName}</span>
                       </div>
                     )
                   })}
@@ -136,10 +136,10 @@ function MarketPreviewModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-corthex-border">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+            className="px-4 py-2 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled"
           >
             닫기
           </button>
@@ -166,7 +166,7 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-slate-800/50 border border-slate-700 hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
+      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-corthex-surface/50 border border-corthex-border hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
     >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-base font-semibold text-slate-50 group-hover:text-corthex-accent-hover transition-colors">
@@ -178,12 +178,12 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
               기본
             </span>
           )}
-          <span className="text-[10px] text-slate-500">{template.downloadCount} DL</span>
+          <span className="text-[10px] text-corthex-text-secondary">{template.downloadCount} DL</span>
         </div>
       </div>
 
       {template.description && (
-        <p className="text-sm text-slate-400 mb-3 line-clamp-2">{template.description}</p>
+        <p className="text-sm text-corthex-text-disabled mb-3 line-clamp-2">{template.description}</p>
       )}
 
       {/* Tags */}
@@ -195,12 +195,12 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
             </span>
           ))}
           {template.tags.length > 4 && (
-            <span className="text-[10px] px-1.5 py-0.5 text-slate-500">+{template.tags.length - 4}</span>
+            <span className="text-[10px] px-1.5 py-0.5 text-corthex-text-secondary">+{template.tags.length - 4}</span>
           )}
         </div>
       )}
 
-      <div className="flex items-center gap-4 text-xs text-slate-500">
+      <div className="flex items-center gap-4 text-xs text-corthex-text-secondary">
         <span>{depts.length}개 부서</span>
         <span>{totalAgents}명 에이전트</span>
       </div>
@@ -209,13 +209,13 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
         {depts.slice(0, 5).map((d) => (
           <span
             key={d.name}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-400"
+            className="text-[10px] px-2 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-disabled"
           >
             {d.name}
           </span>
         ))}
         {depts.length > 5 && (
-          <span className="text-[10px] px-2 py-0.5 text-slate-500">+{depts.length - 5}</span>
+          <span className="text-[10px] px-2 py-0.5 text-corthex-text-secondary">+{depts.length - 5}</span>
         )}
       </div>
     </button>
@@ -268,8 +268,8 @@ export function TemplateMarketPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">템플릿 마켓</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
-          <p className="text-sm text-slate-500 text-center py-8">사이드바에서 회사를 선택해주세요.</p>
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
+          <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
         </div>
       </div>
     )
@@ -279,7 +279,7 @@ export function TemplateMarketPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">템플릿 마켓</h1>
-        <div className="text-center text-slate-500 py-8">로딩 중...</div>
+        <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
       </div>
     )
   }
@@ -288,7 +288,7 @@ export function TemplateMarketPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">템플릿 마켓</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-red-500">마켓 데이터를 불러올 수 없습니다.</p>
             <button
@@ -307,7 +307,7 @@ export function TemplateMarketPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">템플릿 마켓</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-corthex-text-disabled mt-1">
           다른 회사가 공유한 조직 구조 템플릿을 찾아보고, 마음에 드는 것을 복제하여 사용할 수 있습니다.
         </p>
       </div>
@@ -319,13 +319,13 @@ export function TemplateMarketPage() {
           placeholder="템플릿 이름 검색..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 placeholder-slate-500 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
+          className="flex-1 px-3 py-2 text-sm rounded-lg bg-corthex-surface border border-corthex-border text-slate-50 placeholder-slate-500 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
         />
         {allTags.length > 0 && (
           <select
             value={selectedTag}
             onChange={(e) => setSelectedTag(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg bg-slate-800 border border-slate-600 text-slate-50 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
+            className="px-3 py-2 text-sm rounded-lg bg-corthex-surface border border-corthex-border text-slate-50 focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
           >
             <option value="">모든 태그</option>
             {allTags.map((tag) => (
@@ -336,13 +336,13 @@ export function TemplateMarketPage() {
       </div>
 
       {templates.length === 0 ? (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
           <div className="text-center py-12">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-corthex-text-secondary">
               {searchQuery || selectedTag ? '검색 결과가 없습니다.' : '공개된 템플릿이 아직 없습니다.'}
             </p>
             {!searchQuery && !selectedTag && (
-              <p className="text-xs text-slate-600 mt-2">
+              <p className="text-xs text-corthex-text-secondary mt-2">
                 여러 회사가 조직 구조 템플릿을 공개하면 여기에 표시됩니다.
               </p>
             )}

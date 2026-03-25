@@ -203,7 +203,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
           >
             ←
           </button>
-          <span className="font-medium text-sm text-slate-100 truncate">{displayName}</span>
+          <span className="font-medium text-sm text-corthex-text-primary truncate">{displayName}</span>
           <span className="text-xs text-stone-400 shrink-0">{participantCount}명</span>
         </div>
         {conversationDetail?.type === 'group' && (
@@ -269,8 +269,8 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                       <span className="text-xs font-medium text-blue-400">AI 보고서</span>
                     </div>
                   </div>
-                  <div className="px-3 py-2 bg-white">
-                    <p className="text-sm font-medium text-slate-100 truncate">{reportData.title}</p>
+                  <div className="px-3 py-2 bg-corthex-surface">
+                    <p className="text-sm font-medium text-corthex-text-primary truncate">{reportData.title}</p>
                     {reportData.summary && (
                       <p className="text-xs text-stone-400 mt-1 line-clamp-2">{reportData.summary}</p>
                     )}
@@ -298,7 +298,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
                   className={`px-3 py-2 rounded-lg text-sm ${
                     isMine
                       ? 'bg-blue-600 text-white rounded-br-sm'
-                      : 'bg-stone-100 text-slate-100 rounded-bl-sm'
+                      : 'bg-stone-100 text-corthex-text-primary rounded-bl-sm'
                   }`}
                 >
                   {msg.content}

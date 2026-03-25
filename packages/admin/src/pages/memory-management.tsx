@@ -103,7 +103,7 @@ export function MemoryManagementPage() {
         </div>
 
         {/* Flagged Observations */}
-        <div className="bg-white rounded-xl border shadow-sm mb-6 overflow-hidden" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border shadow-sm mb-6 overflow-hidden" style={{ borderColor: sand }}>
           <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
               <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
@@ -168,7 +168,7 @@ export function MemoryManagementPage() {
         </div>
 
         {/* Agent Memory Stats */}
-        <div className="bg-white rounded-xl border shadow-sm mb-6 overflow-hidden" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border shadow-sm mb-6 overflow-hidden" style={{ borderColor: sand }}>
           <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
               <Brain className="w-5 h-5" style={{ color: olive }} />
@@ -244,7 +244,7 @@ export function MemoryManagementPage() {
         </div>
 
         {/* Memory Settings */}
-        <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }}>
+        <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }}>
           <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
               <Settings className="w-5 h-5" style={{ color: olive }} />

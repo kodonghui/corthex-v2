@@ -124,7 +124,7 @@ export function PresetManager({
               {presets.length === 0 ? (
                 <div className="text-center py-10 px-5">
                   <p className="text-sm text-stone-400">저장된 프리셋이 없습니다</p>
-                  <p className="text-xs text-slate-600 mt-1">자주 사용하는 명령을 프리셋으로 저장하세요</p>
+                  <p className="text-xs text-corthex-text-secondary mt-1">자주 사용하는 명령을 프리셋으로 저장하세요</p>
                 </div>
               ) : (
                 presets.map((preset) => (
@@ -134,7 +134,7 @@ export function PresetManager({
                       className="px-5 py-3 border-b border-stone-200/50 hover:bg-stone-200/30 transition-colors group"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-200">{preset.name}</span>
+                        <span className="text-sm font-medium text-corthex-text-disabled">{preset.name}</span>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {/* Run */}
                           <button

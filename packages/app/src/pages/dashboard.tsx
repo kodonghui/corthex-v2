@@ -74,7 +74,7 @@ function KpiCard({
   trendLabel?: string
 }) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 group hover:bg-corthex-bg transition-colors">
+    <div className="bg-corthex-surface p-6 rounded-xl shadow-lg border border-corthex-border/10 group hover:bg-corthex-bg transition-colors">
       <div className="flex justify-between items-start mb-4">
         <span className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary">{label}</span>
         <span className="text-corthex-accent">{icon}</span>
@@ -122,7 +122,7 @@ function CostTrendChart({ usage, budget }: { usage: DashboardUsage | undefined; 
     : []
 
   return (
-    <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
+    <div className="lg:col-span-8 bg-corthex-surface p-8 rounded-xl shadow-lg flex flex-col">
       <div className="flex justify-between items-center mb-10">
         <div>
           <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep">Cost Trend</h3>
@@ -177,7 +177,7 @@ function DeptLoadChart({ budget }: { budget: DashboardBudget | undefined }) {
   }, [budget])
 
   return (
-    <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] flex flex-col">
+    <div className="lg:col-span-4 bg-corthex-surface p-8 rounded-xl shadow-lg flex flex-col">
       <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep mb-2">Departmental Load</h3>
       <p className="text-sm text-corthex-text-secondary mb-8">Cost per department</p>
       <div className="space-y-6 flex-1">
@@ -226,7 +226,7 @@ function TaskStatusDonut({ summary }: { summary: DashboardSummary }) {
   })
 
   return (
-    <div className="lg:col-span-4 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)]">
+    <div className="lg:col-span-4 bg-corthex-surface p-8 rounded-xl shadow-lg">
       <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep mb-8">Task Status</h3>
       <div className="flex items-center justify-center relative py-4">
         <svg className="w-48 h-48 transform -rotate-90">
@@ -268,7 +268,7 @@ function RecentTasksTable({ summary }: { summary: DashboardSummary }) {
   // We display summary-derived info since we don't have a separate recent-tasks endpoint
   const navigate = useNavigate()
   return (
-    <div className="lg:col-span-8 bg-white p-8 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] overflow-hidden">
+    <div className="lg:col-span-8 bg-corthex-surface p-8 rounded-xl shadow-lg overflow-hidden">
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-xl font-bold tracking-tight text-corthex-accent-deep">Recent Tasks</h3>
         <button
@@ -330,7 +330,7 @@ function DashboardSkeleton() {
       {/* KPI cards skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-corthex-border/10 p-6">
+          <div key={i} className="bg-corthex-surface rounded-xl border border-corthex-border/10 p-6">
             <div className="h-3 w-20 bg-corthex-border animate-pulse rounded mb-4" />
             <div className="h-8 w-16 bg-corthex-elevated animate-pulse rounded" />
           </div>
@@ -338,13 +338,13 @@ function DashboardSkeleton() {
       </div>
       {/* Charts skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
-        <div className="lg:col-span-4 bg-white rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
+        <div className="lg:col-span-8 bg-corthex-surface rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
+        <div className="lg:col-span-4 bg-corthex-surface rounded-xl border border-corthex-border/10 p-8 h-80 animate-pulse" />
       </div>
       {/* Bottom row skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 bg-white rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
-        <div className="lg:col-span-8 bg-white rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
+        <div className="lg:col-span-4 bg-corthex-surface rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
+        <div className="lg:col-span-8 bg-corthex-surface rounded-xl border border-corthex-border/10 p-8 h-72 animate-pulse" />
       </div>
     </div>
   )
@@ -496,7 +496,7 @@ export function DashboardPage() {
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => navigate('/command-center')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
+                className="bg-corthex-surface p-6 rounded-xl shadow-lg border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
                 <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <MessageSquare className="w-6 h-6" />
@@ -508,7 +508,7 @@ export function DashboardPage() {
               </button>
               <button
                 onClick={() => navigate('/workflows')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
+                className="bg-corthex-surface p-6 rounded-xl shadow-lg border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
                 <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <Workflow className="w-6 h-6" />
@@ -520,7 +520,7 @@ export function DashboardPage() {
               </button>
               <button
                 onClick={() => navigate('/reports')}
-                className="bg-white p-6 rounded-xl shadow-[0_20px_50px_rgba(40,54,24,0.06)] border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
+                className="bg-corthex-surface p-6 rounded-xl shadow-lg border border-corthex-border/10 hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group"
               >
                 <div className="p-3 rounded-xl bg-corthex-accent/10 text-corthex-accent">
                   <BarChart3 className="w-6 h-6" />

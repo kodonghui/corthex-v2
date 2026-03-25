@@ -182,7 +182,7 @@ export function NotesPanel() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-zinc-700">
+        <h3 className="text-sm font-medium text-corthex-text-primary">
           메모 ({notes.length})
         </h3>
         {!isEditing && !shareTarget && (
@@ -191,21 +191,21 @@ export function NotesPanel() {
       </div>
 
       {isEditing && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:sm:p-0">
+        <div className="fixed inset-0 z-50 bg-corthex-surface flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:sm:p-0">
           <div className="border border-zinc-200 rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
             <input
               type="text"
               placeholder="제목 (선택)"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full text-sm bg-transparent border-b border-zinc-200 pb-1 outline-none placeholder:text-zinc-400"
+              className="w-full text-sm bg-transparent border-b border-zinc-200 pb-1 outline-none placeholder:text-corthex-text-disabled"
             />
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               placeholder="마크다운으로 메모를 작성하세요..."
               rows={4}
-              className="w-full text-sm bg-transparent resize-none outline-none placeholder:text-zinc-400 flex-1 sm:flex-none"
+              className="w-full text-sm bg-transparent resize-none outline-none placeholder:text-corthex-text-disabled flex-1 sm:flex-none"
             />
             <div className="flex gap-2 justify-end shrink-0">
               <Button size="sm" variant="ghost" onClick={() => { setIsCreating(false); setEditingId(null) }}>
@@ -227,22 +227,22 @@ export function NotesPanel() {
       {shareTarget && (
         <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-zinc-700">공유 대상 관리</span>
+            <span className="text-sm font-medium text-corthex-text-primary">공유 대상 관리</span>
             <button
               onClick={() => setShareTarget(null)}
-              className="text-xs text-zinc-400 hover:text-zinc-600"
+              className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary"
             >
               닫기
             </button>
           </div>
           <div className="space-y-1 max-h-[200px] overflow-y-auto">
             {companyUsers.length === 0 && (
-              <p className="text-xs text-zinc-400">사용자 목록을 불러오는 중...</p>
+              <p className="text-xs text-corthex-text-disabled">사용자 목록을 불러오는 중...</p>
             )}
             {companyUsers.filter((u) => u.id !== currentUserId).map((user) => (
               <label
                 key={user.id}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-50 cursor-pointer text-sm min-h-[32px]"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-corthex-bg cursor-pointer text-sm min-h-[32px]"
               >
                 <input
                   type="checkbox"
@@ -251,7 +251,7 @@ export function NotesPanel() {
                   disabled={shareMutation.isPending || unshareMutation.isPending}
                   className="rounded border-zinc-300"
                 />
-                <span className="text-zinc-700">{user.name || user.email}</span>
+                <span className="text-corthex-text-primary">{user.name || user.email}</span>
               </label>
             ))}
           </div>
@@ -259,7 +259,7 @@ export function NotesPanel() {
       )}
 
       {notes.length === 0 && !isEditing && !shareTarget && (
-        <p className="text-xs text-zinc-400 py-2">아직 메모가 없습니다</p>
+        <p className="text-xs text-corthex-text-disabled py-2">아직 메모가 없습니다</p>
       )}
 
       {notes.map((note) => (
@@ -270,12 +270,12 @@ export function NotesPanel() {
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               {note.title && (
-                <p className="text-sm font-medium text-zinc-800 truncate">
+                <p className="text-sm font-medium text-corthex-text-primary truncate">
                   {note.title}
                 </p>
               )}
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-corthex-text-disabled">
                   {new Date(note.updatedAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </p>
                 {!note.isOwner && note.owner && (

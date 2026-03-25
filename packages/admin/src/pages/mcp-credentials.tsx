@@ -79,7 +79,7 @@ export function McpCredentialsPage() {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-slate-400 text-sm">회사를 선택해 주세요.</div>
+    return <div className="p-6 text-corthex-text-disabled text-sm">회사를 선택해 주세요.</div>
   }
 
   return (
@@ -88,7 +88,7 @@ export function McpCredentialsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white">MCP / 툴 API 키 관리</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-corthex-text-disabled mt-0.5">
             에이전트 툴 실행 시 사용하는 외부 API 키를 암호화 저장합니다. 값은 표시되지 않습니다. (FR-CM2)
           </p>
         </div>
@@ -102,26 +102,26 @@ export function McpCredentialsPage() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
+        <div className="bg-corthex-surface border border-corthex-border rounded-lg p-5">
           <h3 className="text-sm font-semibold text-white mb-4">
             {editKeyName ? '크리덴셜 값 변경' : '새 크리덴셜 등록'}
           </h3>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">Key Name *</label>
+              <label className="text-xs text-corthex-text-disabled">Key Name *</label>
               <input
                 required
                 disabled={!!editKeyName}
                 value={form.keyName}
                 onChange={e => setForm(f => ({ ...f, keyName: e.target.value }))}
                 placeholder="tistory_access_token"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent disabled:opacity-50 font-mono"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent disabled:opacity-50 font-mono"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-slate-400">
+              <label className="text-xs text-corthex-text-disabled">
                 Value *
-                <span className="text-slate-500 ml-1">— 저장 후 다시 표시되지 않습니다</span>
+                <span className="text-corthex-text-secondary ml-1">— 저장 후 다시 표시되지 않습니다</span>
               </label>
               <input
                 required
@@ -129,7 +129,7 @@ export function McpCredentialsPage() {
                 value={form.value}
                 onChange={e => setForm(f => ({ ...f, value: e.target.value }))}
                 placeholder="••••••••••••••••"
-                className="w-full bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
             <div className="col-span-2 flex items-center gap-3">
@@ -143,7 +143,7 @@ export function McpCredentialsPage() {
               <button
                 type="button"
                 onClick={() => { setShowForm(false); setEditKeyName(null); setForm(EMPTY_FORM) }}
-                className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-colors"
+                className="px-4 py-1.5 bg-corthex-elevated hover:bg-slate-600 text-white text-sm rounded transition-colors"
               >
                 취소
               </button>
@@ -160,7 +160,7 @@ export function McpCredentialsPage() {
         <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
           <p className="text-sm text-white mb-3">
             <span className="font-mono text-red-400">{confirmDelete}</span> 크리덴셜을 삭제하시겠습니까?
-            <span className="text-xs text-slate-400 ml-2">삭제 후 되돌릴 수 없습니다.</span>
+            <span className="text-xs text-corthex-text-disabled ml-2">삭제 후 되돌릴 수 없습니다.</span>
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -172,7 +172,7 @@ export function McpCredentialsPage() {
             </button>
             <button
               onClick={() => setConfirmDelete(null)}
-              className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-colors"
+              className="px-3 py-1 bg-corthex-elevated hover:bg-slate-600 text-white text-sm rounded transition-colors"
             >
               취소
             </button>
@@ -182,19 +182,19 @@ export function McpCredentialsPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-slate-400 text-sm">로딩 중...</div>
+        <div className="text-corthex-text-disabled text-sm">로딩 중...</div>
       ) : credentials.length === 0 ? (
-        <div className="text-center py-12 text-slate-400 text-sm">
+        <div className="text-center py-12 text-corthex-text-disabled text-sm">
           <p>등록된 크리덴셜이 없습니다.</p>
-          <p className="text-xs mt-1 text-slate-500">
+          <p className="text-xs mt-1 text-corthex-text-secondary">
             "크리덴셜 추가" 버튼으로 첫 번째 API 키를 등록하여 외부 툴을 활성화하세요.
           </p>
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+        <div className="bg-corthex-surface border border-corthex-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-slate-400 border-b border-slate-700 bg-slate-800/80">
+              <tr className="text-left text-xs text-corthex-text-disabled border-b border-corthex-border bg-corthex-surface/80">
                 <th className="px-4 py-3 font-medium">Key Name</th>
                 <th className="px-4 py-3 font-medium">Value</th>
                 <th className="px-4 py-3 font-medium">Last Updated</th>
@@ -203,15 +203,15 @@ export function McpCredentialsPage() {
             </thead>
             <tbody>
               {credentials.map(cred => (
-                <tr key={cred.id} className="border-b border-slate-700/50 hover:bg-slate-800/50 transition-colors">
+                <tr key={cred.id} className="border-b border-corthex-border/50 hover:bg-corthex-surface/50 transition-colors">
                   <td className="px-4 py-3">
                     <span className="font-mono text-sm text-white">{cred.keyName}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs text-slate-500 font-mono">••••••••••••••••</span>
+                    <span className="text-xs text-corthex-text-secondary font-mono">••••••••••••••••</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-corthex-text-disabled">
                       {new Date(cred.updatedAt).toLocaleDateString('ko-KR', {
                         year: 'numeric', month: '2-digit', day: '2-digit',
                         hour: '2-digit', minute: '2-digit',
@@ -222,7 +222,7 @@ export function McpCredentialsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(cred)}
-                        className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
+                        className="text-xs px-2 py-1 bg-corthex-elevated hover:bg-slate-600 text-white rounded transition-colors"
                       >
                         수정
                       </button>
@@ -238,8 +238,8 @@ export function McpCredentialsPage() {
               ))}
             </tbody>
           </table>
-          <div className="px-4 py-3 border-t border-slate-700 bg-slate-800/50">
-            <p className="text-xs text-slate-500">
+          <div className="px-4 py-3 border-t border-corthex-border bg-corthex-surface/50">
+            <p className="text-xs text-corthex-text-secondary">
               총 {credentials.length}개의 크리덴셜. 값은 AES-256-GCM으로 암호화 저장됩니다.
             </p>
           </div>

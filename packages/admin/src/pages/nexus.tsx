@@ -389,8 +389,8 @@ function NexusCanvas() {
     return (
       <div className="space-y-6" data-testid="nexus-page">
         <h1 className="text-xl font-semibold tracking-tight" style={{ color: ORGANIC.text, fontFamily: "'Noto Serif KR', serif" }}>NEXUS 조직도</h1>
-        <div className="bg-white border border-slate-200 rounded-xl">
-          <p className="text-sm text-slate-500 text-center py-8">사이드바에서 회사를 선택해주세요.</p>
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl">
+          <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
         </div>
       </div>
     )
@@ -402,7 +402,7 @@ function NexusCanvas() {
     return (
       <div className="space-y-6" data-testid="nexus-page">
         <h1 className="text-xl font-semibold tracking-tight" style={{ color: ORGANIC.text, fontFamily: "'Noto Serif KR', serif" }}>NEXUS 조직도</h1>
-        <div className="bg-white border border-slate-200 rounded-xl">
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl">
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-red-500">조직도를 불러올 수 없습니다.</p>
             <button onClick={() => refetch()} className="px-4 py-2 text-sm rounded-lg text-white transition-colors" style={{ backgroundColor: ORGANIC.primary }}>
@@ -422,7 +422,7 @@ function NexusCanvas() {
   return (
     <div className="flex h-screen w-full flex-col" style={{ fontFamily: "'Public Sans', sans-serif", color: ORGANIC.text }}>
       {/* Top Navigation Bar */}
-      <header className="flex items-center justify-between border-b border-slate-200 px-6 py-3 z-50" style={{ backgroundColor: ORGANIC.bg }}>
+      <header className="flex items-center justify-between border-b border-corthex-border px-6 py-3 z-50" style={{ backgroundColor: ORGANIC.bg }}>
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-3">
             <div className="p-1.5 rounded-lg text-white" style={{ backgroundColor: ORGANIC.primary }}>
@@ -441,7 +441,7 @@ function NexusCanvas() {
         </div>
         <div className="flex items-center gap-4">
           <div className="relative hidden sm:block">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
             <input
               className="border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64"
               style={{ backgroundColor: 'rgba(90,114,71,0.1)' }}
@@ -461,9 +461,9 @@ function NexusCanvas() {
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Sidebar Navigation */}
-        <aside className="w-20 lg:w-64 border-r border-slate-200 flex flex-col p-4 gap-2" style={{ backgroundColor: ORGANIC.bg }}>
+        <aside className="w-20 lg:w-64 border-r border-corthex-border flex flex-col p-4 gap-2" style={{ backgroundColor: ORGANIC.bg }}>
           <div className="mb-4 px-2 hidden lg:block">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Management</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-disabled">Management</h3>
           </div>
           <button className="flex items-center gap-3 p-3 rounded-xl transition-colors" style={{ ['--hover-bg' as string]: 'rgba(90,114,71,0.1)' }}>
             <LayoutDashboard className="w-5 h-5" />
@@ -495,8 +495,8 @@ function NexusCanvas() {
           {isEmpty ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center space-y-3">
-                <p className="text-sm text-slate-500">아직 조직이 구성되지 않았습니다.</p>
-                <p className="text-xs text-slate-400">부서와 에이전트를 먼저 추가해주세요.</p>
+                <p className="text-sm text-corthex-text-secondary">아직 조직이 구성되지 않았습니다.</p>
+                <p className="text-xs text-corthex-text-disabled">부서와 에이전트를 먼저 추가해주세요.</p>
               </div>
             </div>
           ) : (
@@ -554,13 +554,13 @@ function NexusCanvas() {
 
               {/* Floating Canvas Controls */}
               <div className="absolute bottom-6 left-6 z-30 flex gap-2">
-                <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
+                <button className="bg-corthex-surface p-2 rounded-lg shadow-md border border-corthex-border">
                   <ZoomIn className="w-5 h-5" />
                 </button>
-                <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
+                <button className="bg-corthex-surface p-2 rounded-lg shadow-md border border-corthex-border">
                   <ZoomOut className="w-5 h-5" />
                 </button>
-                <button className="bg-white p-2 rounded-lg shadow-md border border-slate-200">
+                <button className="bg-corthex-surface p-2 rounded-lg shadow-md border border-corthex-border">
                   <Crosshair className="w-5 h-5" />
                 </button>
               </div>
@@ -571,17 +571,17 @@ function NexusCanvas() {
         {/* Property Panel (Right Side) */}
         {selectedNodeId && data?.data && (
           <aside
-            className="w-[420px] border-l border-slate-200 z-30 shadow-2xl flex flex-col h-full"
+            className="w-[420px] border-l border-corthex-border z-30 shadow-2xl flex flex-col h-full"
             style={{ backgroundColor: ORGANIC.bg }}
           >
-            <div className="p-6 border-b border-slate-200">
+            <div className="p-6 border-b border-corthex-border">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>Agent Property Panel</h2>
-                <button className="text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setSelectedNodeId(null)}>
+                <button className="text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors" onClick={() => setSelectedNodeId(null)}>
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-sm text-slate-500 flex items-center gap-2">
+              <p className="text-sm text-corthex-text-secondary flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: ORGANIC.primary }}></span>
                 Editing: <span className="font-mono font-bold" style={{ color: ORGANIC.primary }}>
                   {selectedNodeId}
@@ -597,9 +597,9 @@ function NexusCanvas() {
               />
             </div>
             {/* Footer Action */}
-            <div className="p-6 border-t border-slate-200" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>
+            <div className="p-6 border-t border-corthex-border" style={{ backgroundColor: 'rgba(90,114,71,0.05)' }}>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs text-slate-500">Last sync: 2 mins ago</span>
+                <span className="text-xs text-corthex-text-secondary">Last sync: 2 mins ago</span>
                 <div className="flex gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -615,7 +615,7 @@ function NexusCanvas() {
                 <RefreshCw className="w-5 h-5" />
                 {saveMutation.isPending ? 'Syncing...' : 'Sync to Live Environment'}
               </button>
-              <p className="text-center mt-3 text-[10px] text-slate-400 font-mono">PATCH /api/admin/agents/{selectedNodeId}</p>
+              <p className="text-center mt-3 text-[10px] text-corthex-text-disabled font-mono">PATCH /api/admin/agents/{selectedNodeId}</p>
             </div>
           </aside>
         )}

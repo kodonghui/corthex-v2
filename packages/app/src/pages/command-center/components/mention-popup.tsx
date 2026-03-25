@@ -114,7 +114,7 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
                     {agent.name.charAt(0).toUpperCase()}
                   </span>
                   {/* Name */}
-                  <span className="text-sm text-slate-200 flex-1 text-left">{agent.name}</span>
+                  <span className="text-sm text-corthex-text-disabled flex-1 text-left">{agent.name}</span>
                   {/* Tier badge */}
                   {tierInfo && (
                     <span className={`text-xs px-1 py-0.5 rounded ${tierInfo.bg} ${tierInfo.text}`}>

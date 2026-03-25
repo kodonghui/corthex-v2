@@ -14,7 +14,7 @@ export interface ActivityLogItemProps {
 
 export function ActivityLogItem({ title, statusText, statusBadgeClass, agentName, description, time, timeAgo, icon, themeColorClass }: ActivityLogItemProps) {
     return (
-        <div className="flex gap-4 bg-white/80 border border-slate-200/60 rounded-xl p-4 hover:border-slate-300 transition-colors relative overflow-hidden group">
+        <div className="flex gap-4 bg-corthex-surface/80 border border-corthex-border/60 rounded-xl p-4 hover:border-corthex-border transition-colors relative overflow-hidden group">
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${themeColorClass}`}></div>
             <div className="flex items-start gap-4 w-full">
                 <div className="relative">
@@ -25,15 +25,15 @@ export function ActivityLogItem({ title, statusText, statusBadgeClass, agentName
                 </div>
                 <div className="flex flex-1 flex-col justify-center gap-1">
                     <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-slate-900 text-base font-semibold leading-tight">{title}</p>
+                        <p className="text-corthex-text-primary text-base font-semibold leading-tight">{title}</p>
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${statusBadgeClass}`}>
                             {statusText}
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/20">
+                        <span className="inline-flex items-center rounded-full bg-corthex-elevated px-2 py-0.5 text-xs font-medium text-corthex-text-secondary ring-1 ring-inset ring-slate-500/20">
                             {agentName}
                         </span>
                     </div>
-                    <p className="text-slate-600 text-sm font-normal leading-relaxed">{description}</p>
+                    <p className="text-corthex-text-secondary text-sm font-normal leading-relaxed">{description}</p>
                 </div>
                 <div className="flex flex-col items-end shrink-0 gap-1 text-right">
                     <p className="font-mono text-stone-400 text-sm font-medium tracking-tight">{time}</p>

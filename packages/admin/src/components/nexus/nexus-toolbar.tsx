@@ -65,11 +65,11 @@ export const NexusToolbar = memo(function NexusToolbar({
     }
   }, [exportOpen])
 
-  const menuItemClass = 'w-full text-left px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 transition-colors'
+  const menuItemClass = 'w-full text-left px-3 py-1.5 text-xs text-corthex-text-disabled hover:bg-corthex-elevated transition-colors'
 
   return (
     <div
-      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-slate-800/90 backdrop-blur border border-slate-700 rounded-lg px-3 py-2 flex gap-2 shadow-lg"
+      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-corthex-surface/90 backdrop-blur border border-corthex-border rounded-lg px-3 py-2 flex gap-2 shadow-lg"
       data-testid="nexus-toolbar"
     >
       {/* Edit mode toggle */}
@@ -78,7 +78,7 @@ export const NexusToolbar = memo(function NexusToolbar({
         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
           isEditMode
             ? 'bg-corthex-accent text-white hover:bg-corthex-accent-deep'
-            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600'
         }`}
         title={isEditMode ? '보기 모드로 전환' : '편집 모드로 전환'}
       >
@@ -90,7 +90,7 @@ export const NexusToolbar = memo(function NexusToolbar({
       {/* Auto layout */}
       <button
         onClick={onAutoLayout}
-        className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600 transition-colors"
         title="자동 정렬 (ELK)"
       >
         자동 정렬
@@ -103,7 +103,7 @@ export const NexusToolbar = memo(function NexusToolbar({
         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
           isDirty && !isSaving
             ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-            : 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+            : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
         }`}
         title="레이아웃 저장 (Ctrl+S)"
       >
@@ -118,7 +118,7 @@ export const NexusToolbar = memo(function NexusToolbar({
             onClick={onUndo}
             disabled={!canUndo}
             className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              canUndo ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+              canUndo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
             }`}
             title={undoLabel || '실행 취소 (Ctrl+Z)'}
           >
@@ -128,7 +128,7 @@ export const NexusToolbar = memo(function NexusToolbar({
             onClick={onRedo}
             disabled={!canRedo}
             className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              canRedo ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+              canRedo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
             }`}
             title={redoLabel || '다시 실행 (Ctrl+Shift+Z)'}
           >
@@ -147,7 +147,7 @@ export const NexusToolbar = memo(function NexusToolbar({
       {/* Fit view */}
       <button
         onClick={onFitView}
-        className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600 transition-colors"
         title="전체 보기"
       >
         전체 보기
@@ -162,8 +162,8 @@ export const NexusToolbar = memo(function NexusToolbar({
           disabled={isExporting}
           className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
             isExporting
-              ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              ? 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
+              : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600'
           }`}
           title="내보내기"
           data-testid="nexus-export-btn"
@@ -173,7 +173,7 @@ export const NexusToolbar = memo(function NexusToolbar({
 
         {exportOpen && (
           <div
-            className="absolute top-full right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden min-w-[140px]"
+            className="absolute top-full right-0 mt-1 bg-corthex-surface border border-corthex-border rounded-lg shadow-xl overflow-hidden min-w-[140px]"
             data-testid="nexus-export-menu"
           >
             <button className={menuItemClass} onClick={() => { setExportOpen(false); onExportPng() }}>
@@ -185,7 +185,7 @@ export const NexusToolbar = memo(function NexusToolbar({
             <button className={menuItemClass} onClick={() => { setExportOpen(false); onExportJson() }}>
               JSON 데이터
             </button>
-            <div className="border-t border-slate-700" />
+            <div className="border-t border-corthex-border" />
             <button className={menuItemClass} onClick={() => { setExportOpen(false); onPrint() }}>
               인쇄
             </button>

@@ -32,7 +32,7 @@ export function DebateInfo({ duration, participants, objective }: DebateInfoProp
                             <div className={`rounded-full size-8 flex flex-shrink-0 items-center justify-center ${p.iconBgClass}`}>
                                 {p.icon}
                             </div>
-                            <span className="text-sm text-slate-700">{p.name}</span>
+                            <span className="text-sm text-corthex-text-primary">{p.name}</span>
                         </div>
                     ))}
                 </div>
@@ -41,7 +41,7 @@ export function DebateInfo({ duration, participants, objective }: DebateInfoProp
             {/* Topic Details */}
             <div className="flex flex-col gap-2">
                 <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">Objective</span>
-                <p className="text-sm text-slate-600 leading-relaxed bg-slate-100/50 p-3 rounded-lg border border-slate-200/50">
+                <p className="text-sm text-corthex-text-secondary leading-relaxed bg-corthex-elevated/50 p-3 rounded-lg border border-corthex-border/50">
                     {objective}
                 </p>
             </div>

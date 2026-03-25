@@ -249,7 +249,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                   key={item.id}
                   data-testid={`sns-content-item-${item.id}`}
                   onClick={() => { setSelectedId(item.id); setView('detail') }}
-                  className="flex flex-col rounded-xl bg-white border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="flex flex-col rounded-xl bg-corthex-surface border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="p-5 flex flex-col gap-4 h-full">
                     {/* Top row: platform badge + date + status */}
@@ -277,7 +277,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                     )}
 
                     {/* Content body text */}
-                    <p className="text-slate-200 text-sm leading-relaxed line-clamp-3">
+                    <p className="text-corthex-text-disabled text-sm leading-relaxed line-clamp-3">
                       {item.body || item.title}
                     </p>
 
@@ -287,7 +287,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                       </div>
                     ) : (
-                      <div className="bg-stone-100 rounded-lg h-40 w-full flex items-center justify-center text-slate-600 text-sm mt-auto">
+                      <div className="bg-stone-100 rounded-lg h-40 w-full flex items-center justify-center text-corthex-text-secondary text-sm mt-auto">
                         이미지 없음
                       </div>
                     )}
@@ -328,7 +328,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
   if (view === 'create') {
     return (
       <div data-testid="sns-create-view" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200 mb-4">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-corthex-text-disabled mb-4">← 목록으로</button>
 
         {/* Mode Toggle */}
         <div className="flex gap-2 mb-4">
@@ -410,7 +410,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
   if (view === 'detail' && detail) {
     return (
       <div data-testid="sns-detail-view" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200 mb-4">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-corthex-text-disabled mb-4">← 목록으로</button>
 
         <StatusStepper status={detail.status} createdAt={detail.createdAt} reviewedAt={detail.reviewedAt} scheduledAt={detail.scheduledAt} publishedAt={detail.publishedAt} />
 
@@ -505,14 +505,14 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
               className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-4 py-2 text-sm disabled:opacity-50">
               {generateImage.isPending ? '생성 중...' : '생성'}
             </button>
-            <button onClick={() => { setShowImagePrompt(false); setImagePromptInput('') }} className="text-stone-500 text-sm px-3 py-2 hover:text-slate-200">취소</button>
+            <button onClick={() => { setShowImagePrompt(false); setImagePromptInput('') }} className="text-stone-500 text-sm px-3 py-2 hover:text-corthex-text-disabled">취소</button>
           </div>
         )}
 
         {/* A/B Test Section */}
         <div className="border-t border-stone-200 pt-4 mt-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-slate-200">A/B 테스트</h4>
+            <h4 className="text-sm font-semibold text-corthex-text-disabled">A/B 테스트</h4>
             <div className="flex gap-2">
               <button onClick={() => createVariant.mutate({ id: detail.id })} disabled={createVariant.isPending}
                 className="border border-purple-500/50 text-purple-400 rounded-lg px-3 py-1.5 text-xs disabled:opacity-50">
@@ -561,7 +561,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                   className="bg-stone-100/50 border border-stone-200 rounded-lg p-3 cursor-pointer hover:border-stone-300 flex justify-between items-center">
                   <div>
                     <span className="bg-purple-500/20 text-purple-400 text-xs px-1.5 py-0.5 rounded mr-2">변형</span>
-                    <span className="text-sm text-slate-200">{v.title}</span>
+                    <span className="text-sm text-corthex-text-disabled">{v.title}</span>
                   </div>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[v.status]}`}>{STATUS_LABELS[v.status]}</span>
                 </div>
@@ -579,7 +579,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
                     <div key={s.id} className={`flex items-center justify-between p-2 rounded-lg text-sm ${ab.winner?.id === s.id ? 'bg-emerald-500/10 border border-emerald-500/30' : ''}`}>
                       <div className="flex items-center gap-2">
                         {ab.winner?.id === s.id && <span className="text-xs text-emerald-400 font-bold">WINNER</span>}
-                        <span className="truncate max-w-[200px] text-slate-200">{s.title}</span>
+                        <span className="truncate max-w-[200px] text-corthex-text-disabled">{s.title}</span>
                       </div>
                       <div className="flex gap-3 text-xs text-stone-500">
                         {s.metrics ? (

@@ -8,7 +8,7 @@ export interface ToolCallCCProps {
 
 export function ToolCallCC({ toolName, status, duration }: ToolCallCCProps) {
     return (
-        <div className="flex items-center justify-between gap-4 rounded-xl bg-white border border-stone-200 p-3 mt-3">
+        <div className="flex items-center justify-between gap-4 rounded-xl bg-corthex-surface border border-stone-200 p-3 mt-3">
             <div className="flex items-center gap-3">
                 <div className="size-8 rounded bg-stone-100 flex items-center justify-center border border-stone-200">
                     <Wrench className="text-stone-500 w-4 h-4" />
@@ -18,7 +18,7 @@ export function ToolCallCC({ toolName, status, duration }: ToolCallCCProps) {
                     <div className="flex items-center gap-2 mt-0.5">
                         <span className={`flex size-2 rounded-full ${status === 'Complete' ? 'bg-emerald-500' : status === 'Failed' ? 'bg-red-500' : 'bg-amber-500'}`}></span>
                         <p className="text-stone-500 text-xs">{status}</p>
-                        <span className="text-slate-700">•</span>
+                        <span className="text-corthex-text-primary">•</span>
                         <p className="text-stone-500 text-xs font-mono">{duration}</p>
                     </div>
                 </div>

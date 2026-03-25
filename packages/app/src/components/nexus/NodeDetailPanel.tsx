@@ -52,21 +52,21 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
   }
 
   return (
-    <div className="w-72 border-l border-zinc-200 bg-zinc-50 p-4 overflow-y-auto">
+    <div className="w-72 border-l border-zinc-200 bg-corthex-bg p-4 overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold">노드 상세</h3>
-        <button onClick={onClose} className="text-xs text-zinc-400 hover:text-zinc-600">
+        <button onClick={onClose} className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary">
           닫기
         </button>
       </div>
 
       <div className="space-y-3 text-sm">
         <div>
-          <span className="text-xs text-zinc-500">타입</span>
+          <span className="text-xs text-corthex-text-secondary">타입</span>
           <p className="font-medium capitalize">{nodeType}</p>
         </div>
         <div>
-          <span className="text-xs text-zinc-500">이름</span>
+          <span className="text-xs text-corthex-text-secondary">이름</span>
           <p className="font-medium">{nodeData.label as string}</p>
         </div>
 
@@ -74,12 +74,12 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
           <>
             {nodeData.role && (
               <div>
-                <span className="text-xs text-zinc-500">역할</span>
+                <span className="text-xs text-corthex-text-secondary">역할</span>
                 <p>{nodeData.role as string}</p>
               </div>
             )}
             <div>
-              <span className="text-xs text-zinc-500">상태</span>
+              <span className="text-xs text-corthex-text-secondary">상태</span>
               <p>{nodeData.status as string}</p>
             </div>
             {(nodeData.isSecretary as boolean) && (
@@ -89,7 +89,7 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
             <hr className="border-zinc-200" />
 
             <div>
-              <label className="block text-xs text-zinc-500 mb-1">부서 이동</label>
+              <label className="block text-xs text-corthex-text-secondary mb-1">부서 이동</label>
               <Select
                 value={deptId}
                 onChange={(e) => setDeptId(e.target.value)}
@@ -111,8 +111,8 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
 
         {nodeType === 'department' && typeof nodeData.description === 'string' && (
           <div>
-            <span className="text-xs text-zinc-500">설명</span>
-            <p className="text-xs text-zinc-600">
+            <span className="text-xs text-corthex-text-secondary">설명</span>
+            <p className="text-xs text-corthex-text-secondary">
               {nodeData.description}
             </p>
           </div>
@@ -120,7 +120,7 @@ export function NodeDetailPanel({ selectedNode, onClose }: Props) {
 
         {nodeType === 'company' && typeof nodeData.slug === 'string' && (
           <div>
-            <span className="text-xs text-zinc-500">슬러그</span>
+            <span className="text-xs text-corthex-text-secondary">슬러그</span>
             <p>{nodeData.slug}</p>
           </div>
         )}

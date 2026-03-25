@@ -76,8 +76,8 @@ export function WorkflowListPanel({ onSelect }: Props) {
               onClick={() => setListFilter('mine')}
               className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
                 listFilter === 'mine'
-                  ? 'bg-zinc-700 text-white'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                  ? 'bg-corthex-elevated text-white'
+                  : 'text-corthex-text-disabled hover:text-corthex-text-disabled hover:bg-corthex-surface'
               }`}
             >
               내 워크플로우
@@ -86,8 +86,8 @@ export function WorkflowListPanel({ onSelect }: Props) {
               onClick={() => setListFilter('templates')}
               className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
                 listFilter === 'templates'
-                  ? 'bg-zinc-700 text-white'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                  ? 'bg-corthex-elevated text-white'
+                  : 'text-corthex-text-disabled hover:text-corthex-text-disabled hover:bg-corthex-surface'
               }`}
             >
               템플릿
@@ -107,7 +107,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
       {/* 생성 모달 */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-[90vw] max-w-96">
+          <div className="bg-corthex-bg border border-zinc-700 rounded-lg p-6 w-[90vw] max-w-96">
             <h4 className="text-sm font-semibold mb-3">새 워크플로우</h4>
             <input
               type="text"
@@ -115,14 +115,14 @@ export function WorkflowListPanel({ onSelect }: Props) {
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               placeholder="워크플로우 이름"
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-corthex-surface border border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
               autoFocus
               maxLength={200}
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => { setShowCreate(false); setNewName('') }}
-                className="px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-300"
+                className="px-3 py-1.5 text-sm text-corthex-text-disabled hover:text-corthex-text-disabled"
               >
                 취소
               </button>
@@ -140,7 +140,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
 
       {/* 워크플로우 목록 */}
       {workflows.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 text-zinc-500">
+        <div className="flex flex-col items-center justify-center h-48 text-corthex-text-secondary">
           <p className="text-sm">
             {listFilter === 'mine' ? '아직 워크플로우가 없습니다.' : '공유된 템플릿이 없습니다.'}
           </p>
@@ -154,7 +154,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
             <div
               key={wf.id}
               onClick={() => onSelect(wf.id)}
-              className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 cursor-pointer hover:border-zinc-500 transition-colors"
+              className="bg-corthex-surface border border-zinc-700 rounded-lg p-4 cursor-pointer hover:border-zinc-500 transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-semibold text-sm truncate flex-1">{wf.name}</h4>
@@ -168,16 +168,16 @@ export function WorkflowListPanel({ onSelect }: Props) {
                 </div>
               </div>
               {wf.description && (
-                <p className="text-sm text-zinc-400 line-clamp-2 mb-3">{wf.description}</p>
+                <p className="text-sm text-corthex-text-disabled line-clamp-2 mb-3">{wf.description}</p>
               )}
               <div className="flex items-center justify-between">
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-corthex-text-secondary">
                   {new Date(wf.createdAt).toLocaleDateString('ko-KR')}
                 </p>
                 <button
                   onClick={(e) => handleClone(e, wf.id)}
                   disabled={cloneMutation.isPending}
-                  className="px-2 py-0.5 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700 rounded transition-colors"
+                  className="px-2 py-0.5 text-xs text-corthex-text-disabled hover:text-corthex-text-disabled hover:bg-corthex-elevated rounded transition-colors"
                 >
                   복제
                 </button>

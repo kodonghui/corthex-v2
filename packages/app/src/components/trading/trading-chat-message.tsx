@@ -15,7 +15,7 @@ export function TradingChatMessage({ isUser, message, time }: TradingChatMessage
                     <User className="w-[18px] h-[18px]" />
                 </div>
                 <div className="flex-1 flex flex-col items-end">
-                    <div className="bg-corthex-accent/20 border border-corthex-accent/30 rounded-lg p-3 text-slate-100">
+                    <div className="bg-corthex-accent/20 border border-corthex-accent/30 rounded-lg p-3 text-corthex-text-primary">
                         {message}
                     </div>
                     <span className="text-[10px] text-stone-500 mt-1 mr-1">{time}</span>

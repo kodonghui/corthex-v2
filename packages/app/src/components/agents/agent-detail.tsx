@@ -43,7 +43,7 @@ export function AgentDetail({
                     </div>
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
-                            <h2 className="text-slate-100 text-3xl font-bold tracking-tight">{name}</h2>
+                            <h2 className="text-corthex-text-primary text-3xl font-bold tracking-tight">{name}</h2>
                             <TierBadge level={tier} />
                         </div>
                         <p className="text-stone-500 text-base font-mono">{department} · ID: {agentId}</p>
@@ -73,8 +73,8 @@ export function AgentDetail({
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
                 <div className="lg:col-span-2 flex flex-col gap-4">
-                    <h3 className="text-slate-100 font-bold text-lg mb-2">최근 활동</h3>
-                    <div className="bg-white/50 rounded-xl border border-stone-200 divide-y divide-slate-800">
+                    <h3 className="text-corthex-text-primary font-bold text-lg mb-2">최근 활동</h3>
+                    <div className="bg-corthex-surface/50 rounded-xl border border-stone-200 divide-y divide-slate-800">
                         {activities.map(act => (
                             <div key={act.id} className="p-4 flex items-center justify-between hover:bg-stone-100/50 transition-colors">
                                 <div className="flex items-center gap-4">
@@ -88,7 +88,7 @@ export function AgentDetail({
                                         </div>
                                     )}
                                     <div>
-                                        <p className="text-slate-100 font-medium text-sm">{act.title}</p>
+                                        <p className="text-corthex-text-primary font-medium text-sm">{act.title}</p>
                                         <p className="text-stone-500 text-xs font-mono mt-1">{act.detail}</p>
                                     </div>
                                 </div>

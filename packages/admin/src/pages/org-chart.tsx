@@ -51,7 +51,7 @@ const STATUS_CONFIG: Record<string, { color: string; pulse?: boolean; label: str
 const TIER_CONFIG: Record<string, { bg: string; label: string }> = {
   manager: { bg: 'bg-corthex-accent-deep text-corthex-accent-hover', label: 'Manager' },
   specialist: { bg: 'bg-cyan-900 text-cyan-300', label: 'Specialist' },
-  worker: { bg: 'bg-slate-700 text-slate-400', label: 'Worker' },
+  worker: { bg: 'bg-corthex-elevated text-corthex-text-disabled', label: 'Worker' },
 }
 
 // ============================================================
@@ -100,18 +100,18 @@ function AgentDetailPanel({
       {/* Backdrop */}
       <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
       {/* Panel */}
-      <div className="fixed right-0 top-0 z-50 h-full w-80 bg-slate-900 border-l border-slate-700 shadow-xl animate-slide-left overflow-y-auto" data-testid="agent-detail-panel">
+      <div className="fixed right-0 top-0 z-50 h-full w-80 bg-corthex-bg border-l border-corthex-border shadow-xl animate-slide-left overflow-y-auto" data-testid="agent-detail-panel">
         <div className="p-5 space-y-5">
           {/* Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-50">{agent.name}</h2>
-            <button onClick={onClose} className="text-slate-500 hover:text-slate-300 text-xl leading-none">&times;</button>
+            <button onClick={onClose} className="text-corthex-text-secondary hover:text-corthex-text-disabled text-xl leading-none">&times;</button>
           </div>
 
           {/* Status + Tier */}
           <div className="flex items-center gap-2">
             <span className={`text-[10px] px-1.5 py-0.5 rounded ${tier.bg}`}>{tier.label}</span>
-            <span className="flex items-center gap-1.5 text-xs text-slate-400">
+            <span className="flex items-center gap-1.5 text-xs text-corthex-text-disabled">
               <span className={`w-2 h-2 rounded-full ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
               {status.label}
             </span>
@@ -119,26 +119,26 @@ function AgentDetailPanel({
 
           {/* Model */}
           <div>
-            <p className="text-xs text-slate-500 mb-1">모델</p>
-            <p className="text-sm text-slate-300 font-mono">{agent.modelName}</p>
+            <p className="text-xs text-corthex-text-secondary mb-1">모델</p>
+            <p className="text-sm text-corthex-text-disabled font-mono">{agent.modelName}</p>
           </div>
 
           {/* Role */}
           {agent.role && (
             <div>
-              <p className="text-xs text-slate-500 mb-1">역할</p>
-              <p className="text-sm text-slate-300">{agent.role}</p>
+              <p className="text-xs text-corthex-text-secondary mb-1">역할</p>
+              <p className="text-sm text-corthex-text-disabled">{agent.role}</p>
             </div>
           )}
 
           {/* Department Move */}
           <div>
-            <p className="text-xs text-slate-500 mb-1">부서 이동</p>
+            <p className="text-xs text-corthex-text-secondary mb-1">부서 이동</p>
             <div className="flex gap-2">
               <select
                 value={moveDeptId}
                 onChange={(e) => setMoveDeptId(e.target.value)}
-                className="flex-1 px-2 py-1.5 text-sm border border-slate-600 rounded-lg bg-slate-800 text-slate-50 focus:ring-2 focus:ring-corthex-accent focus:outline-none"
+                className="flex-1 px-2 py-1.5 text-sm border border-corthex-border rounded-lg bg-corthex-surface text-slate-50 focus:ring-2 focus:ring-corthex-accent focus:outline-none"
               >
                 <option value="">미배속</option>
                 {departments.map((d) => (
@@ -166,18 +166,18 @@ function AgentDetailPanel({
           {/* Soul summary */}
           {soulSummary && (
             <div>
-              <p className="text-xs text-slate-500 mb-1">Soul</p>
-              <p className="text-xs text-slate-400 whitespace-pre-wrap bg-slate-800 rounded p-2">{soulSummary}</p>
+              <p className="text-xs text-corthex-text-secondary mb-1">Soul</p>
+              <p className="text-xs text-corthex-text-disabled whitespace-pre-wrap bg-corthex-surface rounded p-2">{soulSummary}</p>
             </div>
           )}
 
           {/* Tools */}
           {tools.length > 0 && (
             <div>
-              <p className="text-xs text-slate-500 mb-1">허용 도구 ({tools.length})</p>
+              <p className="text-xs text-corthex-text-secondary mb-1">허용 도구 ({tools.length})</p>
               <div className="flex flex-wrap gap-1">
                 {tools.map((tool) => (
-                  <span key={tool} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                  <span key={tool} className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-surface text-corthex-text-disabled">
                     {tool}
                   </span>
                 ))}
@@ -200,7 +200,7 @@ function AgentNode({ agent, onSelect }: { agent: OrgAgent; onSelect: (a: OrgAgen
   return (
     <button
       onClick={() => onSelect(agent)}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:border-corthex-accent focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 transition-colors cursor-pointer w-full text-left"
+      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-corthex-surface border border-corthex-border hover:border-corthex-accent focus:outline-none focus:ring-2 focus:ring-corthex-accent/40 transition-colors cursor-pointer w-full text-left"
       data-testid={`agent-node-${agent.id}`}
     >
       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${status.color} ${status.pulse ? 'animate-pulse' : ''}`} />
@@ -244,7 +244,7 @@ function DepartmentSection({ dept, onSelectAgent }: { dept: OrgDept; onSelectAge
       )}
       {expanded && dept.agents.length === 0 && (
         <div className="ml-6 md:ml-10 mt-2 border-l-2 border-corthex-accent-deep pl-4">
-          <p className="text-xs text-slate-500 py-2">에이전트 없음</p>
+          <p className="text-xs text-corthex-text-secondary py-2">에이전트 없음</p>
         </div>
       )}
     </div>
@@ -257,15 +257,15 @@ function DepartmentSection({ dept, onSelectAgent }: { dept: OrgDept; onSelectAge
 function OrgChartSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-32 bg-slate-800" />
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <Skeleton className="h-12 w-full mb-4 bg-slate-700" />
+      <Skeleton className="h-8 w-32 bg-corthex-surface" />
+      <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl p-6">
+        <Skeleton className="h-12 w-full mb-4 bg-corthex-elevated" />
         {[0, 1].map((d) => (
           <div key={d} className="ml-10 mb-4">
-            <Skeleton className="h-10 w-full mb-2 bg-slate-700" />
-            <div className="ml-10 space-y-1.5 border-l-2 border-slate-700 pl-4">
+            <Skeleton className="h-10 w-full mb-2 bg-corthex-elevated" />
+            <div className="ml-10 space-y-1.5 border-l-2 border-corthex-border pl-4">
               {[0, 1, 2].map((a) => (
-                <Skeleton key={a} className="h-9 w-full bg-slate-700" />
+                <Skeleton key={a} className="h-9 w-full bg-corthex-elevated" />
               ))}
             </div>
           </div>
@@ -303,8 +303,8 @@ export function OrgChartPage() {
     return (
       <div className="space-y-6" data-testid="org-chart-page">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직도</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
-          <p className="text-sm text-slate-500 text-center py-8">사이드바에서 회사를 선택해주세요.</p>
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
+          <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
         </div>
       </div>
     )
@@ -316,7 +316,7 @@ export function OrgChartPage() {
     return (
       <div className="space-y-6" data-testid="org-chart-page">
         <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직도</h1>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl">
+        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-red-500">조직도를 불러올 수 없습니다.</p>
             <button
@@ -339,9 +339,9 @@ export function OrgChartPage() {
     <div className="space-y-6" data-testid="org-chart-page">
       <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직도</h1>
 
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+      <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl p-6">
         {/* Company root node */}
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-100 text-slate-900 mb-4">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-corthex-elevated text-corthex-text-primary mb-4">
           <span className="w-8 h-8 rounded-lg bg-corthex-accent text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
             {org.company.name.charAt(0)}
           </span>
@@ -354,7 +354,7 @@ export function OrgChartPage() {
         {/* Empty state with template CTA */}
         {isEmpty && (
           <div className="text-center py-12 space-y-3">
-            <p className="text-sm text-slate-500">아직 조직이 구성되지 않았습니다.</p>
+            <p className="text-sm text-corthex-text-secondary">아직 조직이 구성되지 않았습니다.</p>
             <button
               onClick={() => navigate('/org-templates')}
               className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"

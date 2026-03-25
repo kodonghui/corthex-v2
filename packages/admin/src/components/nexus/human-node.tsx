@@ -4,7 +4,7 @@ import { Handle, Position } from '@xyflow/react'
 const ROLE_BADGE: Record<string, { bg: string; label: string }> = {
   ceo: { bg: 'bg-yellow-800 text-yellow-200', label: 'CEO' },
   admin: { bg: 'bg-purple-800 text-purple-200', label: 'Admin' },
-  user: { bg: 'bg-slate-700 text-slate-300', label: 'Staff' },
+  user: { bg: 'bg-corthex-elevated text-corthex-text-disabled', label: 'Staff' },
 }
 
 type HumanNodeData = {

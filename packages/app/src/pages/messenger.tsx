@@ -220,7 +220,7 @@ export function MessengerPage() {
         </aside>
 
         {/* RIGHT PANEL: Message Thread */}
-        <main className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden border border-corthex-border">
+        <main className="flex-1 flex flex-col bg-corthex-surface rounded-2xl shadow-sm overflow-hidden border border-corthex-border">
           {/* Thread Header */}
           <header className="h-20 flex items-center justify-between px-8 bg-corthex-elevated/50 backdrop-blur-md sticky top-0 z-10 border-b border-corthex-border">
             <div className="flex items-center gap-4">
@@ -250,7 +250,7 @@ export function MessengerPage() {
           </header>
 
           {/* Message Thread Content */}
-          <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white">
+          <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-corthex-surface">
             {DEMO_MESSAGES.map((msg) => {
               if (msg.own) {
                 return (
@@ -277,7 +277,7 @@ export function MessengerPage() {
                     <div className="w-9 h-9 opacity-0 shrink-0" />
                     <div className="space-y-1 w-full">
                       <div className="bg-corthex-elevated p-4 rounded-2xl border border-corthex-border flex items-center gap-4 hover:border-corthex-accent/30 transition-all cursor-pointer group">
-                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-corthex-accent group-hover:bg-corthex-accent group-hover:text-white transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-corthex-surface flex items-center justify-center text-corthex-accent group-hover:bg-corthex-accent group-hover:text-white transition-colors">
                           <FileText className="w-5 h-5" />
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -318,7 +318,7 @@ export function MessengerPage() {
 
           {/* Message Input Area */}
           <footer className="p-6 bg-corthex-elevated/30 border-t border-corthex-border">
-            <div className="max-w-4xl mx-auto flex items-end gap-3 bg-white border border-corthex-border p-2 rounded-2xl focus-within:ring-2 focus-within:ring-corthex-accent/10 transition-all">
+            <div className="max-w-4xl mx-auto flex items-end gap-3 bg-corthex-surface border border-corthex-border p-2 rounded-2xl focus-within:ring-2 focus-within:ring-corthex-accent/10 transition-all">
               <button className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all">
                 <Paperclip className="w-5 h-5" />
               </button>

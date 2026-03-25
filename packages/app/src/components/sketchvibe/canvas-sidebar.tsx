@@ -168,7 +168,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                 onClick={() => onLoad(s.id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-200 truncate flex-1">{s.name}</span>
+                  <span className="text-xs text-corthex-text-disabled truncate flex-1">{s.name}</span>
                   {confirmDelete === s.id ? (
                     <div className="flex gap-1">
                       <button
@@ -207,7 +207,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                           e.stopPropagation()
                           setConfirmDelete(s.id)
                         }}
-                        className="text-slate-600 hover:text-red-400 text-xs"
+                        className="text-corthex-text-secondary hover:text-red-400 text-xs"
                         title="삭제"
                       >
                         ×
@@ -241,7 +241,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="지식 검색..."
-                className="flex-1 px-2 py-1 text-[10px] bg-stone-100 border border-stone-200 rounded text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="flex-1 px-2 py-1 text-[10px] bg-stone-100 border border-stone-200 rounded text-corthex-text-disabled placeholder-slate-500 focus:outline-none focus:border-blue-500"
               />
               <button
                 onClick={handleSearch}
@@ -252,7 +252,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
               </button>
             </div>
             {searchMode && (
-              <div className="text-[9px] text-slate-600 mt-1">
+              <div className="text-[9px] text-corthex-text-secondary mt-1">
                 {searchMode === 'semantic' ? '의미 검색' : '키워드 검색'} — {searchResults.length}건
               </div>
             )}
@@ -269,7 +269,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                   onClick={() => handleSearchImport(r)}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs text-slate-200 truncate flex-1">{r.title}</span>
+                    <span className="text-xs text-corthex-text-disabled truncate flex-1">{r.title}</span>
                     <div className="flex items-center gap-1 shrink-0">
                       {r.score !== null && (
                         <span className="text-[9px] text-corthex-accent">{Math.round(r.score * 100)}%</span>
@@ -309,7 +309,7 @@ export function CanvasSidebar({ currentSketchId, onLoad, onNew, onLoadFromKnowle
                 onClick={() => handleKnowledgeImport(doc)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-200 truncate flex-1">{doc.title}</span>
+                  <span className="text-xs text-corthex-text-disabled truncate flex-1">{doc.title}</span>
                   <span className="text-[9px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
                     가져오기
                   </span>

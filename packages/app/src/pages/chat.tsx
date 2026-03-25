@@ -139,7 +139,7 @@ export function ChatPage() {
   return (
     <div data-testid="chat-page" className="h-screen overflow-hidden flex flex-col" style={{ fontFamily: "'Pretendard', sans-serif", backgroundColor: '#faf8f5', color: '#2d2d2d' }}>
       {/* BEGIN: Global Header */}
-      <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0">
+      <header className="h-16 border-b border-corthex-border bg-corthex-surface/80 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: '#5a7247' }}>C</div>
           <h1 className="text-xl font-bold tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX <span className="font-light" style={{ color: '#5a7247' }}>v2</span></h1>
@@ -158,11 +158,11 @@ export function ChatPage() {
 
       <main className="flex-1 flex overflow-hidden">
         {/* BEGIN: Left Sidebar (Session List) */}
-        <aside className={`w-72 border-r border-gray-200 flex flex-col overflow-hidden ${showChat ? 'hidden md:flex' : 'flex'}`} style={{ backgroundColor: '#f5f0eb' }}>
+        <aside className={`w-72 border-r border-corthex-border flex flex-col overflow-hidden ${showChat ? 'hidden md:flex' : 'flex'}`} style={{ backgroundColor: '#f5f0eb' }}>
           <div className="p-4">
             <button
               onClick={() => setShowAgentModal(true)}
-              className="w-full bg-white border border-gray-200 py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 font-medium"
+              className="w-full bg-corthex-surface border border-corthex-border py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 font-medium"
               style={{ color: '#5a7247' }}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -181,12 +181,12 @@ export function ChatPage() {
                   onClick={() => handleSessionSelect(session.id)}
                   className={`p-3 rounded-2xl cursor-pointer ${
                     isActive
-                      ? 'bg-white shadow-sm'
-                      : 'hover:bg-white/50 transition-colors'
+                      ? 'bg-corthex-surface shadow-sm'
+                      : 'hover:bg-corthex-surface/50 transition-colors'
                   }`}
                   style={isActive ? { borderLeft: '4px solid #5a7247' } : {}}
                 >
-                  <h3 className={`text-sm truncate ${isActive ? 'font-bold' : 'font-medium text-gray-700'}`}>
+                  <h3 className={`text-sm truncate ${isActive ? 'font-bold' : 'font-medium text-corthex-text-primary'}`}>
                     {session.title || 'Untitled Chat'}
                   </h3>
                   <p className="text-xs mt-1 truncate" style={{ color: '#6b6b6b' }}>
@@ -217,7 +217,7 @@ export function ChatPage() {
 
         {/* BEGIN: Right Sidebar (Agent Info) */}
         {selectedAgent && (
-          <aside className="w-80 border-l border-gray-200 bg-white flex-col hidden lg:flex">
+          <aside className="w-80 border-l border-corthex-border bg-corthex-surface flex-col hidden lg:flex">
             <div className="p-8 text-center space-y-4">
               <div className="relative inline-block">
                 <div className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto shadow-inner relative overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
@@ -236,7 +236,7 @@ export function ChatPage() {
               {/* Soul Summary */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold uppercase tracking-widest border-b border-gray-100 pb-2" style={{ color: '#6b6b6b' }}>Agent 'Soul'</h3>
-                <p className="text-sm leading-relaxed text-gray-600">
+                <p className="text-sm leading-relaxed text-corthex-text-secondary">
                   {selectedAgent.soul || 'No soul description configured for this agent.'}
                 </p>
               </div>

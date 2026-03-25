@@ -188,7 +188,7 @@ export function EmployeesPage() {
   if (!selectedCompanyId) {
     return (
       <div className="flex items-center justify-center h-64" data-testid="no-company">
-        <p className="text-sm text-slate-400">회사를 선택하세요</p>
+        <p className="text-sm text-corthex-text-disabled">회사를 선택하세요</p>
       </div>
     )
   }
@@ -202,8 +202,8 @@ export function EmployeesPage() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Employee Assignment</h2>
-                <p className="text-slate-500 dark:text-slate-400">{pagination ? `${pagination.total}명의 직원` : 'Drag and drop users to assign them to their specific departments.'}</p>
+                <h2 className="text-3xl font-black text-corthex-text-primary dark:text-white tracking-tight">Employee Assignment</h2>
+                <p className="text-corthex-text-secondary dark:text-corthex-text-disabled">{pagination ? `${pagination.total}명의 직원` : 'Drag and drop users to assign them to their specific departments.'}</p>
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -222,12 +222,12 @@ export function EmployeesPage() {
           {/* Search + Filters */}
           <div className="space-y-3" data-testid="filters">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
               <input
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Global search for employees, IDs, or logs..."
-                className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm transition-all"
+                className="w-full bg-corthex-elevated dark:bg-corthex-surface border-none rounded-xl pl-10 pr-4 py-2 text-sm transition-all"
                 style={{ outlineColor: olive }}
                 data-testid="search-input"
                 type="text"
@@ -286,8 +286,8 @@ export function EmployeesPage() {
           {/* Assignment Grid */}
           <div className="flex-1 flex gap-6 overflow-hidden">
             {/* Left Column: Unassigned Users */}
-            <div className="w-1/3 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div className="w-1/3 flex flex-col bg-corthex-surface dark:bg-corthex-bg rounded-xl border border-corthex-border dark:border-slate-800 shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-corthex-border dark:border-slate-800 flex items-center justify-between">
                 <h3 className="font-bold flex items-center gap-2">
                   <UserSearch className="w-5 h-5" style={{ color: olive }} />
                   Unassigned Users
@@ -295,24 +295,24 @@ export function EmployeesPage() {
                     {employees.filter((e) => e.departments.length === 0).length}
                   </span>
                 </h3>
-                <button className="text-slate-400 hover:text-slate-600"><Filter className="w-5 h-5" /></button>
+                <button className="text-corthex-text-disabled hover:text-corthex-text-secondary"><Filter className="w-5 h-5" /></button>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {isLoading ? (
                   <div className="p-5"><SkeletonTable rows={3} /></div>
                 ) : employees.filter((e) => e.departments.length === 0).length === 0 ? (
-                  <p className="text-sm text-center text-slate-400 py-4 italic">All employees assigned</p>
+                  <p className="text-sm text-center text-corthex-text-disabled py-4 italic">All employees assigned</p>
                 ) : (
                   employees.filter((e) => e.departments.length === 0).map((emp) => (
-                    <div key={emp.id} className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 cursor-move hover:shadow-md transition-all" style={{ borderColor: 'transparent' }} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
+                    <div key={emp.id} className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-corthex-bg dark:bg-corthex-surface/50 cursor-move hover:shadow-md transition-all" style={{ borderColor: 'transparent' }} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
                         {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold truncate">{emp.name}</p>
-                        <p className="text-xs text-slate-500">ID: @{emp.username}</p>
+                        <p className="text-xs text-corthex-text-secondary">ID: @{emp.username}</p>
                       </div>
-                      <GripVertical className="w-5 h-5 text-slate-300 group-hover:text-slate-600" />
+                      <GripVertical className="w-5 h-5 text-corthex-text-disabled group-hover:text-corthex-text-secondary" />
                     </div>
                   ))
                 )}
@@ -324,11 +324,11 @@ export function EmployeesPage() {
               {departments.map((dept) => {
                 const deptEmployees = employees.filter((e) => e.departments.some((d) => d.id === dept.id))
                 return (
-                  <div key={dept.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+                  <div key={dept.id} className="bg-corthex-surface dark:bg-corthex-bg rounded-xl border border-corthex-border dark:border-slate-800 shadow-sm flex flex-col">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-corthex-bg/50 dark:bg-corthex-surface/20">
                       <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white">{dept.name}</h4>
-                        <p className="text-xs text-slate-500">{deptEmployees.length} Members</p>
+                        <h4 className="font-bold text-corthex-text-primary dark:text-white">{dept.name}</h4>
+                        <p className="text-xs text-corthex-text-secondary">{deptEmployees.length} Members</p>
                       </div>
                       <button className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: oliveBg, color: olive }}>
                         <Plus className="w-4 h-4" />
@@ -336,23 +336,23 @@ export function EmployeesPage() {
                     </div>
                     <div className="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent transition-all rounded-b-xl" style={{}} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.2)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
                       {deptEmployees.map((emp) => (
-                        <div key={emp.id} className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                        <div key={emp.id} className="flex items-center justify-between p-2 bg-corthex-surface dark:bg-corthex-surface rounded-lg shadow-sm">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold" style={{ backgroundColor: oliveBg, color: olive }}>
                               {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
                             <span className="text-sm">{emp.name}</span>
                           </div>
-                          <button className="text-slate-400 hover:text-red-500">
+                          <button className="text-corthex-text-disabled hover:text-red-500">
                             <X className="w-4 h-4" />
                           </button>
                         </div>
                       ))}
                       {deptEmployees.length === 0 && (
-                        <p className="text-sm text-center text-slate-400 py-4 italic">No members assigned</p>
+                        <p className="text-sm text-center text-corthex-text-disabled py-4 italic">No members assigned</p>
                       )}
                       <div className="pt-2 text-center">
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Drop here to assign</p>
+                        <p className="text-[10px] text-corthex-text-disabled uppercase font-bold tracking-widest">Drop here to assign</p>
                       </div>
                     </div>
                   </div>
@@ -360,7 +360,7 @@ export function EmployeesPage() {
               })}
 
               {/* New Dept Placeholder */}
-              <button className="border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-slate-400 transition-all" style={{}} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)'; e.currentTarget.style.color = olive }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#94a3b8' }}>
+              <button className="border-2 border-dashed border-corthex-border dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-corthex-text-disabled transition-all" style={{}} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)'; e.currentTarget.style.color = olive }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#94a3b8' }}>
                 <PlusCircle className="w-8 h-8" />
                 <span className="text-sm font-bold mt-2">Create New Department</span>
               </button>
@@ -372,9 +372,9 @@ export function EmployeesPage() {
       {/* Invite Employee Modal */}
       {showInvite && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowInvite(false)} data-testid="invite-modal">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-900">직원 초대</h2>
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-corthex-border">
+              <h2 className="text-lg font-semibold text-corthex-text-primary">직원 초대</h2>
             </div>
             <form
               onSubmit={(e) => {
@@ -385,51 +385,51 @@ export function EmployeesPage() {
               className="px-6 py-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">아이디 *</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">아이디 *</label>
                 <input
                   value={inviteForm.username}
                   onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="사용자 아이디"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이름 *</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이름 *</label>
                 <input
                   value={inviteForm.name}
                   onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="직원 이름"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이메일 *</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이메일 *</label>
                 <input
                   type="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
                   placeholder="email@example.com"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">부서 배정</label>
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-50 border border-slate-200 rounded-lg p-2">
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">부서 배정</label>
+                <div className="max-h-40 overflow-y-auto space-y-1 bg-corthex-bg border border-corthex-border rounded-lg p-2">
                   {departments.length === 0 ? (
-                    <p className="text-xs text-slate-500 text-center py-2">등록된 부서가 없습니다</p>
+                    <p className="text-xs text-corthex-text-secondary text-center py-2">등록된 부서가 없습니다</p>
                   ) : departments.map((d) => (
-                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-100 cursor-pointer transition-colors">
+                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-elevated cursor-pointer transition-colors">
                       <input
                         type="checkbox"
                         checked={inviteForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, inviteForm.departmentIds, (ids) => setInviteForm({ ...inviteForm, departmentIds: ids }))}
-                        className="rounded border-slate-300"
+                        className="rounded border-corthex-border"
                         style={{ accentColor: olive }}
                       />
-                      <span className="text-sm text-slate-700">{d.name}</span>
+                      <span className="text-sm text-corthex-text-primary">{d.name}</span>
                     </label>
                   ))}
                 </div>
@@ -438,7 +438,7 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setShowInvite(false)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-corthex-elevated hover:bg-slate-200 text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
@@ -459,9 +459,9 @@ export function EmployeesPage() {
       {/* Edit Employee Modal */}
       {editTarget && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditTarget(null)} data-testid="edit-modal">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-900">직원 수정 &mdash; {editTarget.name}</h2>
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-corthex-border">
+              <h2 className="text-lg font-semibold text-corthex-text-primary">직원 수정 &mdash; {editTarget.name}</h2>
             </div>
             <form
               onSubmit={(e) => {
@@ -476,42 +476,42 @@ export function EmployeesPage() {
               className="px-6 py-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">아이디</label>
-                <input value={editTarget.username} disabled className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-500 cursor-not-allowed" />
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">아이디</label>
+                <input value={editTarget.username} disabled className="w-full bg-corthex-elevated border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary cursor-not-allowed" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이름</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이름</label>
                 <input
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">이메일</label>
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이메일</label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5">부서 배정</label>
-                <div className="max-h-40 overflow-y-auto space-y-1 bg-slate-50 border border-slate-200 rounded-lg p-2">
+                <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">부서 배정</label>
+                <div className="max-h-40 overflow-y-auto space-y-1 bg-corthex-bg border border-corthex-border rounded-lg p-2">
                   {departments.length === 0 ? (
-                    <p className="text-xs text-slate-500 text-center py-2">등록된 부서가 없습니다</p>
+                    <p className="text-xs text-corthex-text-secondary text-center py-2">등록된 부서가 없습니다</p>
                   ) : departments.map((d) => (
-                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-100 cursor-pointer transition-colors">
+                    <label key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-elevated cursor-pointer transition-colors">
                       <input
                         type="checkbox"
                         checked={editForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, editForm.departmentIds, (ids) => setEditForm({ ...editForm, departmentIds: ids }))}
-                        className="rounded border-slate-300"
+                        className="rounded border-corthex-border"
                         style={{ accentColor: olive }}
                       />
-                      <span className="text-sm text-slate-700">{d.name}</span>
+                      <span className="text-sm text-corthex-text-primary">{d.name}</span>
                     </label>
                   ))}
                 </div>
@@ -520,7 +520,7 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setEditTarget(null)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-corthex-elevated hover:bg-slate-200 text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
@@ -541,17 +541,17 @@ export function EmployeesPage() {
       {/* Temporary Password Modal */}
       {passwordModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setPasswordModal(null)} data-testid="password-modal">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-900">임시 비밀번호</h2>
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-corthex-border">
+              <h2 className="text-lg font-semibold text-corthex-text-primary">임시 비밀번호</h2>
             </div>
             <div className="px-6 py-5 space-y-4">
-              <p className="text-sm text-slate-600">{passwordModal.name}님의 임시 비밀번호입니다.</p>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+              <p className="text-sm text-corthex-text-secondary">{passwordModal.name}님의 임시 비밀번호입니다.</p>
+              <div className="bg-corthex-bg border border-corthex-border rounded-lg p-3 flex items-center justify-between">
                 <code className="text-lg font-mono tracking-wider select-all" style={{ color: olive }}>{passwordModal.password}</code>
                 <button
                   onClick={copyPassword}
-                  className="text-xs text-slate-500 hover:text-slate-900 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
+                  className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 rounded hover:bg-corthex-elevated transition-colors"
                 >
                   복사
                 </button>
@@ -560,7 +560,7 @@ export function EmployeesPage() {
                 <p className="text-xs text-amber-700">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-slate-200 flex justify-end">
+            <div className="px-6 py-4 border-t border-corthex-border flex justify-end">
               <button
                 onClick={() => setPasswordModal(null)}
                 className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"

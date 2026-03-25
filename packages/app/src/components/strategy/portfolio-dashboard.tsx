@@ -116,7 +116,7 @@ export function PortfolioDashboard() {
   if (isLoading) {
     return (
       <Card variant="bordered" className="p-4">
-        <p className="text-sm text-zinc-400">포트폴리오 로딩 중...</p>
+        <p className="text-sm text-corthex-text-disabled">포트폴리오 로딩 중...</p>
       </Card>
     )
   }
@@ -191,7 +191,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
     ? ((liveTotal - portfolio.initialCash) / portfolio.initialCash * 100)
     : 0
 
-  const returnColor = totalReturn > 0 ? 'text-emerald-500' : totalReturn < 0 ? 'text-red-500' : 'text-zinc-400'
+  const returnColor = totalReturn > 0 ? 'text-emerald-500' : totalReturn < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
   const returnSign = totalReturn > 0 ? '+' : ''
 
   return (
@@ -199,14 +199,14 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
       <div className="px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-zinc-900">{portfolio.name}</h3>
+            <h3 className="text-sm font-semibold text-corthex-text-primary">{portfolio.name}</h3>
             <Badge variant={portfolio.tradingMode === 'real' ? 'error' : 'info'}>
               {portfolio.tradingMode === 'real' ? '실거래' : '모의거래'}
             </Badge>
           </div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-xs text-zinc-400 hover:text-zinc-600"
+            className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary"
           >
             {expanded ? '접기' : '펼치기'}
           </button>
@@ -215,19 +215,19 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
         {/* Summary row */}
         <div className="grid grid-cols-4 gap-4 text-center">
           <div>
-            <p className="text-[10px] text-zinc-400 mb-0.5">현금</p>
-            <p className="text-sm font-mono font-medium text-zinc-900">{formatKRW(portfolio.cashBalance)}</p>
+            <p className="text-[10px] text-corthex-text-disabled mb-0.5">현금</p>
+            <p className="text-sm font-mono font-medium text-corthex-text-primary">{formatKRW(portfolio.cashBalance)}</p>
           </div>
           <div>
-            <p className="text-[10px] text-zinc-400 mb-0.5">보유종목</p>
-            <p className="text-sm font-mono font-medium text-zinc-900">{portfolio.holdings.length}종목</p>
+            <p className="text-[10px] text-corthex-text-disabled mb-0.5">보유종목</p>
+            <p className="text-sm font-mono font-medium text-corthex-text-primary">{portfolio.holdings.length}종목</p>
           </div>
           <div>
-            <p className="text-[10px] text-zinc-400 mb-0.5">총 평가</p>
-            <p className="text-sm font-mono font-medium text-zinc-900">{formatKRW(liveTotal)}</p>
+            <p className="text-[10px] text-corthex-text-disabled mb-0.5">총 평가</p>
+            <p className="text-sm font-mono font-medium text-corthex-text-primary">{formatKRW(liveTotal)}</p>
           </div>
           <div>
-            <p className="text-[10px] text-zinc-400 mb-0.5">수익률</p>
+            <p className="text-[10px] text-corthex-text-disabled mb-0.5">수익률</p>
             <p className={`text-sm font-mono font-medium ${returnColor}`}>{returnSign}{totalReturn.toFixed(2)}%</p>
           </div>
         </div>
@@ -237,7 +237,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
           <div className="mt-3 border-t border-zinc-100 pt-3">
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-zinc-400">
+                <tr className="text-corthex-text-disabled">
                   <th className="text-left font-normal pb-1">종목</th>
                   <th className="text-right font-normal pb-1">수량</th>
                   <th className="text-right font-normal pb-1">매입가</th>
@@ -253,21 +253,21 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
                   const holdingReturn = h.avgPrice > 0 ? ((currentPrice - h.avgPrice) / h.avgPrice * 100) : 0
                   const holdingValue = currentPrice * h.quantity
                   const weight = liveTotal > 0 ? (holdingValue / liveTotal * 100) : 0
-                  const hReturnColor = holdingReturn > 0 ? 'text-emerald-500' : holdingReturn < 0 ? 'text-red-500' : 'text-zinc-400'
+                  const hReturnColor = holdingReturn > 0 ? 'text-emerald-500' : holdingReturn < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
 
                   return (
                     <tr key={h.ticker} className="border-t border-zinc-50">
-                      <td className="py-1.5 text-zinc-700">
+                      <td className="py-1.5 text-corthex-text-primary">
                         <div>{h.name}</div>
-                        <div className="text-zinc-400 text-[10px]">{h.ticker}</div>
+                        <div className="text-corthex-text-disabled text-[10px]">{h.ticker}</div>
                       </td>
-                      <td className="py-1.5 text-right font-mono text-zinc-700">{h.quantity}</td>
-                      <td className="py-1.5 text-right font-mono text-zinc-700">{formatPrice(h.avgPrice)}</td>
-                      <td className="py-1.5 text-right font-mono text-zinc-700">{formatPrice(currentPrice)}</td>
+                      <td className="py-1.5 text-right font-mono text-corthex-text-primary">{h.quantity}</td>
+                      <td className="py-1.5 text-right font-mono text-corthex-text-primary">{formatPrice(h.avgPrice)}</td>
+                      <td className="py-1.5 text-right font-mono text-corthex-text-primary">{formatPrice(currentPrice)}</td>
                       <td className={`py-1.5 text-right font-mono ${hReturnColor}`}>
                         {holdingReturn > 0 ? '+' : ''}{holdingReturn.toFixed(2)}%
                       </td>
-                      <td className="py-1.5 text-right font-mono text-zinc-400">{weight.toFixed(1)}%</td>
+                      <td className="py-1.5 text-right font-mono text-corthex-text-disabled">{weight.toFixed(1)}%</td>
                     </tr>
                   )
                 })}
@@ -277,7 +277,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
         )}
 
         {expanded && portfolio.holdings.length === 0 && (
-          <p className="mt-3 text-xs text-zinc-400 text-center py-2 border-t border-zinc-100">
+          <p className="mt-3 text-xs text-corthex-text-disabled text-center py-2 border-t border-zinc-100">
             보유 종목이 없습니다
           </p>
         )}
@@ -306,18 +306,18 @@ function CreateModal({
     <Modal isOpen={show} onClose={onClose} title="포트폴리오 생성">
       <div className="space-y-4">
         <div>
-          <label className="text-xs font-medium text-zinc-600 mb-1 block">포트폴리오 이름</label>
+          <label className="text-xs font-medium text-corthex-text-secondary mb-1 block">포트폴리오 이름</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 한국 주식 포트폴리오" />
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-600 mb-1 block">초기 자금 (KRW)</label>
+          <label className="text-xs font-medium text-corthex-text-secondary mb-1 block">초기 자금 (KRW)</label>
           <Input type="number" value={cash} onChange={(e) => setCash(e.target.value)} placeholder="50000000" />
-          <p className="text-[10px] text-zinc-400 mt-1">
+          <p className="text-[10px] text-corthex-text-disabled mt-1">
             {!isNaN(parseInt(cash, 10)) && parseInt(cash, 10) > 0 ? formatKRW(parseInt(cash, 10)) + '원' : ''}
           </p>
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-600 mb-1 block">거래 모드</label>
+          <label className="text-xs font-medium text-corthex-text-secondary mb-1 block">거래 모드</label>
           <Select
             value={mode}
             onChange={(e) => setMode((e as React.ChangeEvent<HTMLSelectElement>).target.value as 'paper' | 'real')}

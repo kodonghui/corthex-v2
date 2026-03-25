@@ -111,7 +111,7 @@ function TierForm({
         <select
           value={modelPreference}
           onChange={(e) => setModelPreference(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-sm bg-corthex-surface border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {MODEL_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>

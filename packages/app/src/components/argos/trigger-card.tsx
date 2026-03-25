@@ -19,7 +19,7 @@ export function TriggerCard({
     agentName, agentIcon, triggerName, scheduleText, lastRunTime, lastRunStatus, nextRunTime, successRate, cost, isActive, onToggle
 }: TriggerCardProps) {
     return (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl p-6 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-1 h-full bg-corthex-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex justify-between items-start">
                 <div className="flex flex-col gap-1">
@@ -27,8 +27,8 @@ export function TriggerCard({
                         <div className="text-corthex-accent text-sm flex items-center justify-center">{agentIcon}</div>
                         <p className="font-mono text-stone-400 text-xs">Agent: {agentName}</p>
                     </div>
-                    <h4 className="text-lg font-bold text-slate-800">{triggerName}</h4>
-                    <p className="font-mono text-sm text-slate-600 flex items-center gap-1 mt-1">
+                    <h4 className="text-lg font-bold text-corthex-text-primary">{triggerName}</h4>
+                    <p className="font-mono text-sm text-corthex-text-secondary flex items-center gap-1 mt-1">
                         <Clock className="w-4 h-4" />
                         {scheduleText}
                     </p>
@@ -45,7 +45,7 @@ export function TriggerCard({
                             type="checkbox"
                         />
                         <div className={`block w-12 h-6 rounded-full transition-colors ${isActive ? 'bg-corthex-accent' : 'bg-slate-200'}`}></div>
-                        <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isActive ? 'transform translate-x-6' : ''}`}></div>
+                        <div className={`absolute left-1 top-1 bg-corthex-surface w-4 h-4 rounded-full transition-transform ${isActive ? 'transform translate-x-6' : ''}`}></div>
                     </label>
                 </div>
             </div>

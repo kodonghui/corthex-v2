@@ -13,14 +13,14 @@ export function SnsPlatformFilter({ platforms, onSelect }: SnsPlatformFilterProp
                     key={platform.id}
                     onClick={() => onSelect?.(platform.id)}
                     className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 text-sm leading-normal transition-colors border ${platform.active
-                            ? 'bg-slate-200 text-slate-900 font-bold border-slate-300'
-                            : 'bg-transparent text-slate-600 hover:bg-slate-100 font-medium border-slate-200'
+                            ? 'bg-slate-200 text-corthex-text-primary font-bold border-corthex-border'
+                            : 'bg-transparent text-corthex-text-secondary hover:bg-corthex-elevated font-medium border-corthex-border'
                         }`}
                 >
                     {platform.label}
                 </button>
             ))}
-            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-slate-600 hover:bg-slate-100 text-sm font-medium leading-normal border border-slate-200 transition-colors ml-auto">
+            <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-corthex-text-secondary hover:bg-corthex-elevated text-sm font-medium leading-normal border border-corthex-border transition-colors ml-auto">
                 <Filter className="w-[18px] h-[18px]" />
                 필터
             </button>

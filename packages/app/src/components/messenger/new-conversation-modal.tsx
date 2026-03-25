@@ -87,7 +87,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
         {/* 헤더 */}
         <div className="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
           <h3 className="font-medium text-sm text-slate-50">새 대화</h3>
-          <button onClick={onClose} className="text-stone-500 hover:text-slate-200 text-sm">✕</button>
+          <button onClick={onClose} className="text-stone-500 hover:text-corthex-text-disabled text-sm">✕</button>
         </div>
 
         {/* 모드 선택 */}
@@ -173,7 +173,7 @@ export function NewConversationModal({ onClose, onCreated }: Props) {
                   {u.name.charAt(0)}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate text-slate-100">{u.name}</p>
+                  <p className="font-medium truncate text-corthex-text-primary">{u.name}</p>
                   <p className="text-[10px] text-stone-400">{u.role}</p>
                 </div>
                 {isSelected && <span className="text-blue-400 text-sm">✓</span>}

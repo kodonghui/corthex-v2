@@ -44,7 +44,7 @@ function MobileStatsSummary() {
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-corthex-elevated via-corthex-elevated to-transparent pt-12 z-10 pointer-events-none">
-      <div className="bg-white rounded-xl shadow-lg border border-corthex-border p-4 pointer-events-auto">
+      <div className="bg-corthex-surface rounded-xl shadow-lg border border-corthex-border p-4 pointer-events-auto">
         <h3 className="text-xs font-semibold text-corthex-text-secondary uppercase tracking-wider mb-3">This Week</h3>
         <div className="flex justify-between items-center divide-x divide-corthex-border">
           <div className="flex flex-col items-center flex-1">
@@ -186,7 +186,7 @@ export function SnsPage() {
                 className={`rounded-full px-5 py-2.5 font-semibold transition-all text-sm ${
                   i === 0
                     ? 'bg-corthex-accent text-white shadow-sm'
-                    : 'border border-corthex-border text-corthex-text-secondary bg-white hover:bg-corthex-elevated'
+                    : 'border border-corthex-border text-corthex-text-secondary bg-corthex-surface hover:bg-corthex-elevated'
                 }`}
               >
                 {chip}
@@ -319,14 +319,14 @@ export function SnsPage() {
                     {post.tags && (
                       <div className="flex gap-2 mt-4">
                         {post.tags.map((tag) => (
-                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-white/40 rounded border border-corthex-border text-corthex-info">
+                          <span key={tag} className="text-xs font-mono py-1 px-2 bg-corthex-surface/40 rounded border border-corthex-border text-corthex-info">
                             {tag}
                           </span>
                         ))}
                       </div>
                     )}
                     {post.file && (
-                      <div className="flex items-center gap-4 p-4 bg-white/50 border border-corthex-border rounded-lg cursor-pointer hover:bg-white transition-colors mt-4">
+                      <div className="flex items-center gap-4 p-4 bg-corthex-surface/50 border border-corthex-border rounded-lg cursor-pointer hover:bg-corthex-surface transition-colors mt-4">
                         <div className="bg-red-600/10 p-3 rounded-lg">
                           <span className="text-red-600 text-xl">{'\u{1F4C4}'}</span>
                         </div>
@@ -340,7 +340,7 @@ export function SnsPage() {
                     {post.stats && (
                       <div className="grid grid-cols-2 gap-4 mt-4">
                         {post.stats.map((stat) => (
-                          <div key={stat.label} className="bg-white/60 p-5 rounded-xl border border-corthex-border">
+                          <div key={stat.label} className="bg-corthex-surface/60 p-5 rounded-xl border border-corthex-border">
                             <p className="text-[10px] uppercase tracking-tighter text-corthex-text-secondary font-bold mb-1">{stat.label}</p>
                             <p className="text-2xl font-mono font-bold" style={{ color: stat.color }}>{stat.value}</p>
                           </div>

@@ -153,7 +153,7 @@ export function PerformancePage() {
         {summaryLoading && !summary ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-corthex-border animate-pulse">
+              <div key={i} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-corthex-border animate-pulse">
                 <div className="h-4 w-24 bg-corthex-elevated rounded mb-4" />
                 <div className="h-8 w-16 bg-corthex-elevated rounded" />
               </div>
@@ -162,7 +162,7 @@ export function PerformancePage() {
         ) : summary ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="summary-cards">
             {/* Avg Response */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-corthex-border">
+            <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-corthex-border">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary font-mono">Avg Response</span>
                 <div className="bg-corthex-accent/10 p-1.5 rounded-lg">
@@ -178,7 +178,7 @@ export function PerformancePage() {
               <p className="text-[11px] text-corthex-text-secondary mt-1">평균 응답시간</p>
             </div>
             {/* Success Rate */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-corthex-border">
+            <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-corthex-border">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary font-mono">Success Rate</span>
                 <div className="bg-corthex-accent/10 p-1.5 rounded-lg">
@@ -194,7 +194,7 @@ export function PerformancePage() {
               <p className="text-[11px] text-corthex-text-secondary mt-1">전체 성공률</p>
             </div>
             {/* Throughput */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-corthex-border">
+            <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-corthex-border">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary font-mono">Throughput</span>
                 <div className="bg-corthex-accent/10 p-1.5 rounded-lg">
@@ -207,7 +207,7 @@ export function PerformancePage() {
               <p className="text-[11px] text-corthex-text-secondary mt-1">작업 처리량</p>
             </div>
             {/* Cost Efficiency */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-corthex-border">
+            <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-corthex-border">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary font-mono">Cost Efficiency</span>
                 <div className="bg-corthex-accent/10 p-1.5 rounded-lg">
@@ -304,7 +304,7 @@ export function PerformancePage() {
                 return (
                   <div key={agent.id} className="absolute group" style={{ bottom: pos.bottom, left: pos.left }}>
                     <div className="w-3 h-3 bg-corthex-accent rounded-full shadow-lg ring-4 ring-white transition-transform group-hover:scale-150 cursor-pointer" />
-                    <span className="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-white px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="absolute top-4 left-0 whitespace-nowrap text-[10px] font-bold bg-corthex-surface px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                       {agent.name}
                     </span>
                   </div>
@@ -316,7 +316,7 @@ export function PerformancePage() {
           </div>
 
           {/* Agent Leaderboard */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-corthex-border" data-testid="agent-performance-table">
+          <div className="bg-corthex-surface p-8 rounded-2xl shadow-sm border border-corthex-border" data-testid="agent-performance-table">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-lg text-corthex-text-primary">에이전트 리더보드 Agent Leaderboard</h3>
               <MoreHorizontal className="w-5 h-5 text-corthex-text-secondary" />
@@ -373,7 +373,7 @@ export function PerformancePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {suggestionsLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-corthex-border">
+                <div key={i} className="bg-corthex-surface rounded-xl p-6 shadow-sm border border-corthex-border">
                   <Skeleton className="h-4 w-40 mb-3" />
                   <Skeleton className="h-12 w-full" />
                 </div>
@@ -387,7 +387,7 @@ export function PerformancePage() {
                 const icons = [Lightbulb, Sparkles, History]
                 const SuggestionIcon = icons[idx % 3]
                 return (
-                  <div key={s.id} className="bg-white rounded-xl p-6 shadow-sm flex flex-col h-full cursor-pointer hover:shadow-md transition-shadow border border-corthex-border" onClick={() => setConfirmTarget(s)}>
+                  <div key={s.id} className="bg-corthex-surface rounded-xl p-6 shadow-sm flex flex-col h-full cursor-pointer hover:shadow-md transition-shadow border border-corthex-border" onClick={() => setConfirmTarget(s)}>
                     <div className="flex items-center gap-2 mb-4">
                       <SuggestionIcon className="w-5 h-5 text-corthex-accent" />
                       <h4 className="font-bold text-corthex-text-primary">{s.agentName}</h4>
@@ -409,7 +409,7 @@ export function PerformancePage() {
       {selectedAgentId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="agent-detail-modal">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedAgentId(null)} />
-          <div className="relative bg-white border border-corthex-border rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+          <div className="relative bg-corthex-surface border border-corthex-border rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto shadow-2xl">
             {detailLoading || !detail ? (
               <div className="p-5 space-y-4">
                 <Skeleton className="h-6 w-48" />

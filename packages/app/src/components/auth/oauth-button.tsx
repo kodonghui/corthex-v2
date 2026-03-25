@@ -8,7 +8,7 @@ export interface OAuthButtonProps {
 export function OAuthButton({ provider, onClick }: OAuthButtonProps) {
     return (
         <button
-            className="w-full h-11 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium rounded-lg transition-colors flex items-center justify-center gap-3"
+            className="w-full h-11 bg-corthex-surface border border-corthex-border hover:bg-corthex-bg text-corthex-text-primary font-medium rounded-lg transition-colors flex items-center justify-center gap-3"
             type="button"
             onClick={onClick}
         >

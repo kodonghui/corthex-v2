@@ -217,7 +217,7 @@ export function FilesPage() {
         {/* Search Bar */}
         <div className="w-full">
           <label
-            className="flex items-center w-full h-12 bg-white border rounded-xl overflow-hidden transition-shadow"
+            className="flex items-center w-full h-12 bg-corthex-surface border rounded-xl overflow-hidden transition-shadow"
             style={{ borderColor: '#e5e1d3' }}
           >
             <svg className="w-5 h-5 ml-4" style={{ color: '#756e5a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
@@ -319,7 +319,7 @@ export function FilesPage() {
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col rounded-2xl border bg-white p-4 transition-all group cursor-pointer relative overflow-hidden"
+                  className="flex flex-col rounded-2xl border bg-corthex-surface p-4 transition-all group cursor-pointer relative overflow-hidden"
                   style={{ borderColor: '#e5e1d3', backgroundColor: '#f5f0e8' }}
                   data-testid={`file-grid-${file.id}`}
                 >
@@ -371,7 +371,7 @@ export function FilesPage() {
               return (
                 <div
                   key={file.id}
-                  className="flex items-center gap-3 p-3 rounded-2xl border bg-white transition-all group cursor-pointer"
+                  className="flex items-center gap-3 p-3 rounded-2xl border bg-corthex-surface transition-all group cursor-pointer"
                   style={{ borderColor: '#e5e1d3', backgroundColor: '#f5f0e8' }}
                   data-testid={`file-row-${file.id}`}
                 >

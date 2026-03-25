@@ -157,8 +157,8 @@ export function HomePage() {
                     </span>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-semibold text-slate-200">{job.agentName}</span>
-                    <span className="text-xs text-slate-600 mx-2">—</span>
+                    <span className="text-xs font-semibold text-corthex-text-disabled">{job.agentName}</span>
+                    <span className="text-xs text-corthex-text-secondary mx-2">—</span>
                     <span className="text-xs text-stone-500 truncate">{job.instruction}</span>
                   </div>
                 </div>
@@ -212,14 +212,14 @@ export function HomePage() {
                       >
                         <div className="flex items-center gap-2.5 mb-2">
                           <div className="w-8 h-8 rounded-xl bg-stone-200/30 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <svg className="w-4 h-4 text-corthex-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                           </div>
                           <span className="text-sm font-medium text-stone-400 truncate">{a.name}</span>
                         </div>
-                        <p className="text-xs text-slate-600 truncate">{a.role}</p>
-                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-stone-200/30 text-slate-600">
+                        <p className="text-xs text-corthex-text-secondary truncate">{a.role}</p>
+                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-stone-200/30 text-corthex-text-secondary">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> 오프라인
                         </span>
                       </div>
@@ -256,7 +256,7 @@ export function HomePage() {
                           <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.text}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} /> {cfg.label}
                           </span>
-                          <span className="text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="text-xs text-corthex-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
                             채팅 →
                           </span>
                         </div>
@@ -276,12 +276,12 @@ export function HomePage() {
           ) : (
             <div className="rounded-2xl bg-stone-100/30 border border-stone-200/40 p-12 text-center backdrop-blur-sm">
               <div className="w-14 h-14 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-7 h-7 text-corthex-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
                 </svg>
               </div>
               <p className="text-sm text-stone-500 font-medium">아직 배정된 에이전트가 없습니다</p>
-              <p className="text-xs text-slate-600 mt-1">관리자에게 문의하세요.</p>
+              <p className="text-xs text-corthex-text-secondary mt-1">관리자에게 문의하세요.</p>
             </div>
           )}
         </div>
@@ -408,7 +408,7 @@ function RecentNotifications() {
               <span className={`text-sm truncate flex-1 ${n.isRead ? 'text-stone-500' : 'text-white font-medium'}`}>
                 {n.title}
               </span>
-              <span className="text-xs text-slate-600 font-mono flex-shrink-0">
+              <span className="text-xs text-corthex-text-secondary font-mono flex-shrink-0">
                 {new Date(n.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>

@@ -35,7 +35,7 @@ function StatsCard({
   color: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-corthex-border/60 p-5 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] transition-shadow">
+    <div className="bg-corthex-surface rounded-xl border border-corthex-border/60 p-5 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] transition-shadow">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-corthex-text-secondary">{label}</span>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
@@ -85,7 +85,7 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="bg-white p-5 rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group w-full"
+      className="bg-corthex-surface p-5 rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] hover:shadow-[0_4px_20px_rgba(40,54,24,0.08)] hover:bg-corthex-bg transition-all text-left flex items-start gap-4 group w-full"
     >
       <div className="p-2.5 rounded-xl bg-corthex-accent/10 text-corthex-accent group-hover:bg-corthex-accent/15 transition-colors">
         {icon}
@@ -164,7 +164,7 @@ export function HubDashboard() {
         {summaryLoading ? (
           <div data-testid="hub-stats-skeleton" className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-corthex-border/60 p-5">
+              <div key={i} className="bg-corthex-surface rounded-xl border border-corthex-border/60 p-5">
                 <div className="h-3 w-16 bg-corthex-border animate-pulse rounded mb-3" />
                 <div className="h-8 w-12 bg-corthex-elevated animate-pulse rounded" />
               </div>
@@ -201,7 +201,7 @@ export function HubDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Activity Feed */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] p-6">
+          <div className="lg:col-span-2 bg-corthex-surface rounded-xl border border-corthex-border/60 shadow-[0_2px_12px_rgba(40,54,24,0.04)] p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-corthex-accent-deep">Recent Activity</h2>
               <button

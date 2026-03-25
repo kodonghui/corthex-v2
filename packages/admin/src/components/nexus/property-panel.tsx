@@ -99,27 +99,27 @@ export function PropertyPanel({ selectedNodeId, orgData, onClose, onSelectNode }
 
   if (!panelContent) {
     return (
-      <div className="w-80 bg-slate-900 border-l border-slate-700 h-full p-4" data-testid="property-panel">
+      <div className="w-80 bg-corthex-bg border-l border-corthex-border h-full p-4" data-testid="property-panel">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-xs text-slate-500">속성</span>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 text-sm">✕</button>
+          <span className="text-xs text-corthex-text-secondary">속성</span>
+          <button onClick={onClose} className="text-corthex-text-secondary hover:text-corthex-text-disabled text-sm">✕</button>
         </div>
-        <p className="text-xs text-slate-600">선택한 노드의 데이터를 찾을 수 없습니다.</p>
+        <p className="text-xs text-corthex-text-secondary">선택한 노드의 데이터를 찾을 수 없습니다.</p>
       </div>
     )
   }
 
   return (
     <div
-      className="w-80 bg-slate-900 border-l border-slate-700 h-full overflow-y-auto flex-shrink-0"
+      className="w-80 bg-corthex-bg border-l border-corthex-border h-full overflow-y-auto flex-shrink-0"
       data-testid="property-panel"
     >
       {/* Panel header with close */}
-      <div className="sticky top-0 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between z-10">
-        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">{panelTitle}</span>
+      <div className="sticky top-0 bg-corthex-bg border-b border-slate-800 px-4 py-3 flex items-center justify-between z-10">
+        <span className="text-xs font-medium text-corthex-text-disabled uppercase tracking-wide">{panelTitle}</span>
         <button
           onClick={onClose}
-          className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+          className="text-corthex-text-secondary hover:text-corthex-text-disabled text-sm transition-colors"
           aria-label="패널 닫기"
           data-testid="panel-close-btn"
         >

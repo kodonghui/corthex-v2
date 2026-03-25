@@ -106,10 +106,10 @@ export function CredentialsPage() {
       {/* BEGIN: Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-auto" style={{ backgroundColor: '#f8faf7' }}>
         {/* BEGIN: Header Section */}
-        <header className="bg-white border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: '#dce8d5' }}>
+        <header className="bg-corthex-surface border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: '#dce8d5' }}>
           <div>
             <h2 data-testid="credentials-title" className="text-2xl font-bold" style={{ color: '#263222' }}>CLI 인증 관리</h2>
-            <p className="text-sm text-gray-500 mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
+            <p className="text-sm text-corthex-text-secondary mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
           </div>
           <button
             data-testid="credentials-cli-add-btn"
@@ -125,13 +125,13 @@ export function CredentialsPage() {
 
         <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
           {/* BEGIN: Info Card */}
-          <section data-testid="credentials-guide-banner" className="bg-white rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: '#dce8d5' }}>
+          <section data-testid="credentials-guide-banner" className="bg-corthex-surface rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: '#dce8d5' }}>
             <div className="p-3 rounded-full" style={{ backgroundColor: '#edf3e9' }}>
               <svg className="w-6 h-6" style={{ color: '#4a6741' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
             </div>
             <div>
               <h3 className="font-semibold" style={{ color: '#263222' }}>보안 정책 안내</h3>
-              <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+              <p className="text-sm text-corthex-text-secondary mt-1 leading-relaxed">
                 모든 CLI 인증 토큰은 <span className="font-bold" style={{ color: '#3d5435' }}>AES-256</span> 알고리즘을 사용하여 강력하게 암호화되어 저장됩니다.
                 토큰은 생성 시 단 한 번만 노출되며, 이후에는 관리자도 값을 확인할 수 없습니다. 유출이 의심되는 경우 즉시 삭제하고 재발급하시기 바랍니다.
               </p>
@@ -140,7 +140,7 @@ export function CredentialsPage() {
           {/* END: Info Card */}
 
           {/* BEGIN: User Selection */}
-          <section data-testid="credentials-user-list" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+          <section data-testid="credentials-user-list" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
             <div className="px-6 py-4 border-b" style={{ borderColor: '#edf3e9' }}>
               <h3 className="text-sm font-semibold" style={{ color: '#263222' }}>직원 선택</h3>
             </div>
@@ -157,7 +157,7 @@ export function CredentialsPage() {
                   className={`px-4 py-2 rounded-lg text-sm transition-colors ${
                     selectedUserId === u.id
                       ? 'font-semibold text-white'
-                      : 'text-gray-600 hover:bg-corthex-elevated'
+                      : 'text-corthex-text-secondary hover:bg-corthex-elevated'
                   }`}
                   style={selectedUserId === u.id ? { backgroundColor: '#4a6741' } : {}}
                 >
@@ -168,13 +168,13 @@ export function CredentialsPage() {
           </section>
 
           {!selectedUserId ? (
-            <div data-testid="credentials-no-selection" className="bg-white rounded-xl border p-8 text-center" style={{ borderColor: '#dce8d5', color: '#83935d' }}>
+            <div data-testid="credentials-no-selection" className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: '#dce8d5', color: '#83935d' }}>
               좌측에서 직원을 선택하세요
             </div>
           ) : (
             <>
               {/* BEGIN: CLI Credentials Table Section */}
-              <section data-testid="credentials-cli-section" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+              <section data-testid="credentials-cli-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
                 <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
                   <h3 data-testid="credentials-cli-title" className="font-semibold" style={{ color: '#263222' }}>
                     CLI OAuth 토큰 — {selectedUser?.name}
@@ -216,7 +216,7 @@ export function CredentialsPage() {
                         placeholder="예: CI/CD Pipeline A"
                         required
                       />
-                      <p className="text-xs text-gray-400 mt-1">토큰의 용도를 구분하기 위한 이름입니다.</p>
+                      <p className="text-xs text-corthex-text-disabled mt-1">토큰의 용도를 구분하기 위한 이름입니다.</p>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold mb-2" style={{ color: '#31422b' }}>토큰 문자열 (비밀값)</label>
@@ -238,7 +238,7 @@ export function CredentialsPage() {
                         data-testid="credentials-cli-cancel"
                         type="button"
                         onClick={() => setShowAddToken(false)}
-                        className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                        className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium text-corthex-text-secondary hover:bg-corthex-bg transition-colors"
                         style={{ borderColor: '#dce8d5' }}
                       >
                         취소
@@ -280,17 +280,17 @@ export function CredentialsPage() {
                           <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-corthex-bg transition-colors">
                             <td className="px-6 py-4">
                               <div className="font-medium" style={{ color: '#263222' }}>{selectedUser?.username || c.userId}</div>
-                              <div className="text-xs text-gray-500">{selectedUser?.name}</div>
+                              <div className="text-xs text-corthex-text-secondary">{selectedUser?.name}</div>
                             </td>
-                            <td data-testid={`credentials-cli-token-label-${c.id}`} className="px-6 py-4 text-gray-600">{c.label}</td>
-                            <td className="px-6 py-4 text-gray-600">{new Date(c.createdAt).toLocaleString('ko')}</td>
+                            <td data-testid={`credentials-cli-token-label-${c.id}`} className="px-6 py-4 text-corthex-text-secondary">{c.label}</td>
+                            <td className="px-6 py-4 text-corthex-text-secondary">{new Date(c.createdAt).toLocaleString('ko')}</td>
                             <td className="px-6 py-4">
                               <span
                                 data-testid={`credentials-cli-token-status-${c.id}`}
                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   c.isActive
                                     ? 'bg-green-100 text-green-800'
-                                    : 'bg-gray-100 text-gray-800'
+                                    : 'bg-corthex-elevated text-corthex-text-primary'
                                 }`}
                               >
                                 {c.isActive ? '활성' : '비활성'}
@@ -317,7 +317,7 @@ export function CredentialsPage() {
                     </table>
                   </div>
                 )}
-                <div className="px-6 py-4 bg-white border-t flex items-center justify-between text-xs text-gray-500" style={{ borderColor: '#edf3e9' }}>
+                <div className="px-6 py-4 bg-corthex-surface border-t flex items-center justify-between text-xs text-corthex-text-secondary" style={{ borderColor: '#edf3e9' }}>
                   <span>총 {creds.length}개의 인증 토큰이 검색되었습니다.</span>
                   <div className="flex gap-2">
                     <button className="p-1 px-2 border rounded hover:bg-corthex-bg disabled:opacity-50" style={{ borderColor: '#dce8d5' }} disabled>이전</button>
@@ -328,7 +328,7 @@ export function CredentialsPage() {
               {/* END: CLI Credentials Table Section */}
 
               {/* BEGIN: API Keys Section */}
-              <section data-testid="credentials-api-section" className="bg-white rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
+              <section data-testid="credentials-api-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: '#dce8d5' }}>
                 <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#edf3e9' }}>
                   <h3 data-testid="credentials-api-title" className="font-semibold" style={{ color: '#263222' }}>외부 API 키</h3>
                   <button
@@ -417,7 +417,7 @@ export function CredentialsPage() {
                         data-testid="credentials-api-cancel"
                         type="button"
                         onClick={() => setShowAddApiKey(false)}
-                        className="px-3 py-1.5 text-sm text-gray-500"
+                        className="px-3 py-1.5 text-sm text-corthex-text-secondary"
                       >
                         취소
                       </button>
@@ -456,7 +456,7 @@ export function CredentialsPage() {
                               {k.label || '(라벨 없음)'}
                             </p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-corthex-text-secondary mt-0.5">
                             등록: {new Date(k.createdAt).toLocaleDateString('ko')}
                           </p>
                         </div>

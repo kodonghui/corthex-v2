@@ -36,7 +36,7 @@ export function ChatBubble({ type, sender, content, isProcessing = false }: Chat
                     </div>
                 )}
 
-                <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-slate-200 w-full shadow-sm">
+                <div className="text-[15px] font-normal leading-relaxed rounded-2xl rounded-bl-sm px-5 py-3.5 bg-stone-100 text-corthex-text-disabled w-full shadow-sm">
                     {content}
                 </div>
             </div>

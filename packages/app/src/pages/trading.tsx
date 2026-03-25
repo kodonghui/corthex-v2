@@ -131,7 +131,7 @@ export function TradingPage() {
                     onClick={() => setSelectedChartType(ct)}
                     className={`px-3 py-1 text-xs transition-colors ${
                       selectedChartType === ct
-                        ? 'font-bold bg-white rounded-md shadow-sm'
+                        ? 'font-bold bg-corthex-surface rounded-md shadow-sm'
                         : 'font-medium text-corthex-text-secondary'
                     }`}
                   >
@@ -171,7 +171,7 @@ export function TradingPage() {
                   { label: 'L', value: '65,400.10' },
                   { label: 'C', value: '67,432.50' },
                 ].map((d) => (
-                  <div key={d.label} className="bg-white/80 backdrop-blur-md px-3 py-1.5 rounded text-[10px] font-mono shadow-sm border border-white">
+                  <div key={d.label} className="bg-corthex-surface/80 backdrop-blur-md px-3 py-1.5 rounded text-[10px] font-mono shadow-sm border border-white">
                     {d.label}: {d.value}
                   </div>
                 ))}
@@ -221,7 +221,7 @@ export function TradingPage() {
                   <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">수량 Amount</label>
                   <div className="relative">
                     <input
-                      className="w-full bg-white border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      className="w-full bg-corthex-surface border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
                       type="text"
                       defaultValue="0.10"
                     />
@@ -232,7 +232,7 @@ export function TradingPage() {
                   <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">가격 Price</label>
                   <div className="relative">
                     <input
-                      className="w-full bg-white border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
+                      className="w-full bg-corthex-surface border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
                       type="text"
                       defaultValue="67,432.50"
                     />

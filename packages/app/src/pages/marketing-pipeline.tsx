@@ -235,7 +235,7 @@ export function MarketingPipelinePage() {
         <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
           파이프라인 구조
         </h2>
-        <div className="rounded-xl border border-sand-200 bg-white">
+        <div className="rounded-xl border border-sand-200 bg-corthex-surface">
           {presetLoading ? (
             <div className="p-8 text-center text-stone-400">
               <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />
@@ -255,19 +255,19 @@ export function MarketingPipelinePage() {
       {/* Pipeline info */}
       {preset && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-lg border border-sand-200 bg-white p-3">
+          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
             <p className="text-xs text-stone-500">단계</p>
             <p className="text-lg font-semibold text-stone-800">{preset.stages.length}단계</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-white p-3">
+          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
             <p className="text-xs text-stone-500">게시 플랫폼</p>
             <p className="text-lg font-semibold text-stone-800">{preset.platforms.length}개</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-white p-3">
+          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
             <p className="text-xs text-stone-500">버전</p>
             <p className="text-lg font-semibold text-stone-800">{preset.version}</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-white p-3">
+          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
             <p className="text-xs text-stone-500">최근 실행</p>
             <p className="text-lg font-semibold text-stone-800">{executions.length}건</p>
           </div>
@@ -279,7 +279,7 @@ export function MarketingPipelinePage() {
         <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
           실행 이력
         </h2>
-        <div className="rounded-xl border border-sand-200 bg-white overflow-hidden">
+        <div className="rounded-xl border border-sand-200 bg-corthex-surface overflow-hidden">
           {execLoading ? (
             <div className="p-8 text-center text-stone-400">
               <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />

@@ -18,12 +18,12 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
     <div className="space-y-4" data-testid="company-panel">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-sm font-bold text-slate-200">
+        <div className="w-10 h-10 rounded-lg bg-corthex-elevated flex items-center justify-center text-sm font-bold text-corthex-text-disabled">
           {initials}
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">{company.name}</h3>
-          <p className="text-[10px] text-slate-500">{company.slug}</p>
+          <h3 className="text-sm font-semibold text-corthex-text-primary">{company.name}</h3>
+          <p className="text-[10px] text-corthex-text-secondary">{company.slug}</p>
         </div>
       </div>
 
@@ -40,17 +40,17 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
 
       {/* Department list */}
       <div>
-        <label className="text-xs text-slate-500 uppercase tracking-wide">부서 목록</label>
+        <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">부서 목록</label>
         <div className="mt-2 space-y-1.5">
           {departments.map((d) => (
             <div key={d.id} className="flex items-center gap-2 px-2 py-1.5">
               <span className="w-1.5 h-1.5 rounded bg-corthex-accent" />
-              <span className="text-xs text-slate-300 truncate flex-1">{d.name}</span>
+              <span className="text-xs text-corthex-text-disabled truncate flex-1">{d.name}</span>
               <Badge variant="default">{d.agents.length}</Badge>
             </div>
           ))}
           {departments.length === 0 && (
-            <p className="text-xs text-slate-600 py-2">부서 없음</p>
+            <p className="text-xs text-corthex-text-secondary py-2">부서 없음</p>
           )}
         </div>
       </div>
@@ -74,9 +74,9 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-slate-800/50 rounded-lg px-3 py-2 text-center">
-      <p className="text-lg font-bold text-slate-100">{value}</p>
-      <p className="text-[10px] text-slate-500">{label}</p>
+    <div className="bg-corthex-surface/50 rounded-lg px-3 py-2 text-center">
+      <p className="text-lg font-bold text-corthex-text-primary">{value}</p>
+      <p className="text-[10px] text-corthex-text-secondary">{label}</p>
     </div>
   )
 }

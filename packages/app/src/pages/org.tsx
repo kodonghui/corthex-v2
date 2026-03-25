@@ -110,7 +110,7 @@ function AgentDetailPanel({ agent, onClose }: { agent: OrgAgent; onClose: () => 
           <div>
             <p className="text-[10px] text-corthex-text-secondary font-medium uppercase tracking-wider">SOUL</p>
             {soulText ? (
-              <div className="bg-white/50 border border-corthex-border rounded-lg p-3 mt-1">
+              <div className="bg-corthex-surface/50 border border-corthex-border rounded-lg p-3 mt-1">
                 <p className="text-xs text-corthex-text-secondary leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap">{soulText}</p>
               </div>
             ) : (

@@ -10,8 +10,8 @@ type CompanyNodeData = {
 export const CompanyNode = memo(function CompanyNode({ data, selected }: { data: CompanyNodeData; selected?: boolean }) {
   return (
     <div
-      className={`px-5 py-3 rounded-xl bg-slate-100 text-slate-900 border-2 shadow-lg min-w-[280px] ${
-        selected ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover/50' : 'border-slate-300'
+      className={`px-5 py-3 rounded-xl bg-corthex-elevated text-corthex-text-primary border-2 shadow-lg min-w-[280px] ${
+        selected ? 'border-corthex-accent-hover ring-2 ring-corthex-accent-hover/50' : 'border-corthex-border'
       }`}
       data-testid="nexus-company-node"
     >
@@ -21,7 +21,7 @@ export const CompanyNode = memo(function CompanyNode({ data, selected }: { data:
         </span>
         <div>
           <div className="text-sm font-bold">{data.name}</div>
-          <div className="text-[11px] text-slate-500">
+          <div className="text-[11px] text-corthex-text-secondary">
             {data.deptCount}개 부서 · {data.agentCount}명 에이전트
           </div>
         </div>

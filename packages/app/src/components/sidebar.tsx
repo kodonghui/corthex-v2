@@ -97,7 +97,7 @@ function SwitchToAdminButton({ collapsed }: { collapsed?: boolean }) {
     <button
       onClick={handleSwitch}
       disabled={switching}
-      className={`flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-corthex-sidebar-text bg-white/10 hover:bg-white/15 ${collapsed ? 'justify-center' : ''}`}
+      className={`flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors text-corthex-sidebar-text bg-corthex-surface/10 hover:bg-corthex-surface/15 ${collapsed ? 'justify-center' : ''}`}
       title={collapsed ? (switching ? '전환 중...' : '관리자 콘솔') : undefined}
     >
       <span>⇄</span>
@@ -196,7 +196,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
       {/* User Context */}
       <div className="p-3 border-t border-white/10 shrink-0 space-y-2">
         <SwitchToAdminButton collapsed={collapsed} />
-        <div className={`flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors ${collapsed ? 'justify-center' : ''}`}>
+        <div className={`flex items-center gap-3 p-2 rounded-lg hover:bg-corthex-surface/10 transition-colors ${collapsed ? 'justify-center' : ''}`}>
           <div className="w-8 h-8 rounded-full bg-corthex-accent text-white flex items-center justify-center text-xs font-medium shrink-0">
             {user?.name?.charAt(0) || '?'}
           </div>

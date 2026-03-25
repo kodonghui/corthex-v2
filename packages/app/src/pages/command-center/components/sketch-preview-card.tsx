@@ -75,7 +75,7 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
   return (
     <div data-testid={`sketch-preview-${commandId}`} className="bg-stone-100/50 border border-stone-200 rounded-xl overflow-hidden mt-2">
       {/* Mini canvas preview */}
-      <div className="h-48 bg-white/50 relative">
+      <div className="h-48 bg-corthex-surface/50 relative">
         {nodes.length > 0 ? (
           <ReactFlow
             nodes={nodes}

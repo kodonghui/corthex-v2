@@ -89,7 +89,7 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
   if (view === 'create') {
     return (
       <div data-testid="sns-cardnews-create" className="max-w-2xl space-y-4">
-        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-slate-200">← 목록으로</button>
+        <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-corthex-text-disabled">← 목록으로</button>
         <h3 className="text-base font-semibold text-slate-50">카드뉴스 시리즈 만들기</h3>
 
         <div className="flex gap-2 mb-4">
@@ -228,7 +228,7 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>{STATUS_LABELS[item.status]}</span>
                   <span className="text-[10px] text-stone-500">{totalCards}장</span>
                 </div>
-                <h4 className="text-sm font-medium text-slate-100 truncate">{item.title}</h4>
+                <h4 className="text-sm font-medium text-corthex-text-primary truncate">{item.title}</h4>
                 <p className="text-xs text-stone-400 mt-0.5">{new Date(item.createdAt).toLocaleDateString('ko')}</p>
               </div>
             </div>

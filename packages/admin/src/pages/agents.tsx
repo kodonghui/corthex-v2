@@ -70,7 +70,7 @@ const STATUS_COLORS: Record<string, string> = {
 const TIER_BADGE: Record<string, string> = {
   manager: 'bg-amber-100 text-amber-800 border-amber-200',
   specialist: 'bg-corthex-accent-deep/10 text-corthex-accent-deep border-corthex-accent-deep/20',
-  worker: 'bg-slate-100 text-slate-800 border-slate-200',
+  worker: 'bg-corthex-elevated text-corthex-text-primary border-corthex-border',
 }
 
 type CreateForm = {
@@ -295,9 +295,9 @@ export function AgentsPage() {
   return (
     <div data-testid="agents-page" className="h-screen overflow-hidden flex" style={{ backgroundColor: '#f7f8f4', fontFamily: "'Inter', sans-serif", color: '#363d2a' }}>
       {/* BEGIN: Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-corthex-surface">
         {/* BEGIN: Header */}
-        <header className="h-16 border-b flex items-center justify-between px-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10" style={{ borderColor: '#dce1cd' }}>
+        <header className="h-16 border-b flex items-center justify-between px-8 bg-corthex-surface/80 backdrop-blur-sm sticky top-0 z-10" style={{ borderColor: '#dce1cd' }}>
           <h1 className="text-lg font-bold" style={{ color: '#4e5938' }}>Agent Management</h1>
           <div className="flex items-center gap-4">
             <button
@@ -325,7 +325,7 @@ export function AgentsPage() {
                   data-testid="agents-search-input"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-sm rounded-lg focus:ring-corthex-accent focus:border-corthex-accent bg-white"
+                  className="w-full pl-9 pr-4 py-2 text-sm rounded-lg focus:ring-corthex-accent focus:border-corthex-accent bg-corthex-surface"
                   style={{ borderColor: '#dce1cd' }}
                   placeholder="Search agents..."
                   type="text"
@@ -336,7 +336,7 @@ export function AgentsPage() {
               {isLoading ? (
                 <div data-testid="agents-loading" className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white p-4 rounded-xl border animate-pulse" style={{ borderColor: '#dce1cd' }}>
+                    <div key={i} className="bg-corthex-surface p-4 rounded-xl border animate-pulse" style={{ borderColor: '#dce1cd' }}>
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full" style={{ backgroundColor: '#eceee3' }} />
                         <div className="flex-1 space-y-2">
@@ -364,7 +364,7 @@ export function AgentsPage() {
                       key={a.id}
                       data-testid={`agents-row-${a.id}`}
                       onClick={() => openDetail(a)}
-                      className={`bg-white p-4 rounded-xl shadow-sm cursor-pointer transition-all group ${
+                      className={`bg-corthex-surface p-4 rounded-xl shadow-sm cursor-pointer transition-all group ${
                         isSelected
                           ? 'border-2'
                           : 'border hover:border-corthex-border'
@@ -387,7 +387,7 @@ export function AgentsPage() {
                           <h3 data-testid={`agents-name-${a.id}`} className="text-sm font-bold truncate" style={{ color: '#363d2a' }}>
                             {a.name}
                             {a.isSystem && <span data-testid={`agents-system-badge-${a.id}`} className="ml-1 text-[10px] text-amber-600">[SYS]</span>}
-                            {!a.isActive && <span data-testid={`agents-inactive-badge-${a.id}`} className="ml-1 text-[10px] text-slate-400">[OFF]</span>}
+                            {!a.isActive && <span data-testid={`agents-inactive-badge-${a.id}`} className="ml-1 text-[10px] text-corthex-text-disabled">[OFF]</span>}
                           </h3>
                           <p className="text-xs truncate mb-2" style={{ color: '#83935d' }}>{a.role || 'No role'}</p>
                           <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded border ${tierBadge}`}>
@@ -407,7 +407,7 @@ export function AgentsPage() {
           {selectedAgent ? (
             <section className="flex-1 flex flex-col min-w-0 overflow-hidden" data-testid="agents-detail-panel">
               {/* Editor Tabs/Header */}
-              <div className="flex items-center justify-between px-8 py-4 border-b bg-white" style={{ borderColor: '#eceee3' }}>
+              <div className="flex items-center justify-between px-8 py-4 border-b bg-corthex-surface" style={{ borderColor: '#eceee3' }}>
                 <div className="flex items-center gap-6">
                   <button
                     data-testid="agents-tab-soul"
@@ -462,9 +462,9 @@ export function AgentsPage() {
               <div className="flex-1 flex overflow-hidden">
                 {/* Editor Section */}
                 {detailTab === 'soul' && (
-                  <div className="flex-1 flex flex-col p-6 bg-white overflow-hidden">
+                  <div className="flex-1 flex flex-col p-6 bg-corthex-surface overflow-hidden">
                     <div className="flex-1 flex flex-col rounded-xl border overflow-hidden shadow-inner" style={{ borderColor: '#dce1cd', backgroundColor: '#f7f8f4' }}>
-                      <div className="flex items-center justify-between px-4 py-2 border-b bg-white/50" style={{ borderColor: '#dce1cd' }}>
+                      <div className="flex items-center justify-between px-4 py-2 border-b bg-corthex-surface/50" style={{ borderColor: '#dce1cd' }}>
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded-full bg-red-400/20 border border-red-400/50" />
                           <span className="w-3 h-3 rounded-full bg-amber-400/20 border border-amber-400/50" />
@@ -500,7 +500,7 @@ export function AgentsPage() {
                 )}
 
                 {detailTab === 'config' && (
-                  <div className="flex-1 overflow-y-auto p-6 bg-white">
+                  <div className="flex-1 overflow-y-auto p-6 bg-corthex-surface">
                     {/* Settings Panel matching Stitch HTML structure */}
                     <div className="max-w-lg space-y-8">
                       {/* Core Identity */}
@@ -567,7 +567,7 @@ export function AgentsPage() {
                                 onChange={(e) => handleCacheToggle(e.target.checked)}
                                 className="sr-only peer"
                               />
-                              <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-corthex-accent" style={{ backgroundColor: editForm.enableSemanticCache ? '#667447' : '#dce1cd' }} />
+                              <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-corthex-accent" style={{ backgroundColor: editForm.enableSemanticCache ? '#667447' : '#dce1cd' }} />
                             </div>
                           </label>
                         </div>
@@ -602,7 +602,7 @@ export function AgentsPage() {
                 )}
 
                 {detailTab === 'memory' && (
-                  <div className="flex-1 overflow-y-auto p-6 bg-white">
+                  <div className="flex-1 overflow-y-auto p-6 bg-corthex-surface">
                     <div className="text-center py-16" style={{ color: '#a3b182' }}>
                       <p className="text-sm">Memory snapshots will appear here</p>
                     </div>
@@ -611,7 +611,7 @@ export function AgentsPage() {
               </div>
             </section>
           ) : (
-            <section className="flex-1 flex items-center justify-center bg-white">
+            <section className="flex-1 flex items-center justify-center bg-corthex-surface">
               <p className="text-sm" style={{ color: '#a3b182' }}>Select an agent from the list</p>
             </section>
           )}
@@ -622,10 +622,10 @@ export function AgentsPage() {
       {/* Deactivate Modal */}
       {deactivateTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border" style={{ borderColor: '#dce1cd' }}>
+          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border" style={{ borderColor: '#dce1cd' }}>
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#eceee3', backgroundColor: '#f7f8f4' }}>
               <h3 className="text-lg font-bold" style={{ color: '#363d2a' }}>에이전트 비활성화</h3>
-              <button onClick={() => setDeactivateTarget(null)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setDeactivateTarget(null)} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
               </button>
             </div>
@@ -668,10 +668,10 @@ export function AgentsPage() {
       {/* Create Agent Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border max-h-[80vh] flex flex-col" style={{ borderColor: '#dce1cd' }}>
+          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border max-h-[80vh] flex flex-col" style={{ borderColor: '#dce1cd' }}>
             <div className="px-6 py-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: '#eceee3', backgroundColor: '#f7f8f4' }}>
               <h3 className="text-lg font-bold" style={{ color: '#363d2a' }}>New Agent Template</h3>
-              <button onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
               </button>
             </div>
@@ -736,7 +736,7 @@ export function AgentsPage() {
       {/* Cache Disable Confirmation Modal */}
       {showCacheDisableModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-6 border" style={{ borderColor: '#dce1cd' }}>
+          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-sm mx-4 p-6 border" style={{ borderColor: '#dce1cd' }}>
             <h3 className="text-lg font-bold mb-3" style={{ color: '#363d2a' }}>Semantic Cache 비활성화</h3>
             <p className="text-sm mb-4" style={{ color: '#4e5938' }}>캐시를 비활성화하면 응답 속도가 느려질 수 있습니다.</p>
             <div className="flex gap-3">

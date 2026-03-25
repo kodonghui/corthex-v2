@@ -129,7 +129,7 @@ export function SessionPanel({
   }
 
   return (
-    <div data-testid="session-panel" className="w-72 flex flex-col border-r border-stone-200 bg-white shrink-0 h-full">
+    <div data-testid="session-panel" className="w-72 flex flex-col border-r border-stone-200 bg-corthex-surface shrink-0 h-full">
       {/* 새 대화 버튼 */}
       <div className="px-3 py-3 border-b border-stone-200 shrink-0">
         <button
@@ -199,7 +199,7 @@ export function SessionPanel({
                               className="w-full bg-stone-200 border border-blue-500 rounded px-2 py-0.5 text-sm text-white outline-none"
                             />
                           ) : (
-                            <p className="text-sm text-slate-200 truncate">{session.title}</p>
+                            <p className="text-sm text-corthex-text-disabled truncate">{session.title}</p>
                           )}
                           <p className="text-xs text-stone-400">{time}</p>
                         </div>
@@ -239,7 +239,7 @@ export function SessionPanel({
       {deleteTargetId && (
         <div data-testid="delete-dialog" className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
           <div className="bg-stone-100 border border-stone-200 rounded-xl p-5 max-w-sm mx-4">
-            <h4 className="text-sm font-semibold text-slate-100 mb-2">대화 삭제</h4>
+            <h4 className="text-sm font-semibold text-corthex-text-primary mb-2">대화 삭제</h4>
             <p className="text-xs text-stone-500 mb-4">이 대화를 삭제하면 모든 메시지, 도구 호출, 위임이 함께 삭제됩니다.</p>
             <div className="flex justify-end gap-2">
               <button

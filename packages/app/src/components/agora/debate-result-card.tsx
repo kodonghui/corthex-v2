@@ -46,7 +46,7 @@ export function DebateResultCard({ debateId, topic, result }: DebateResultCardPr
       </div>
 
       {/* Topic */}
-      <p className="text-xs font-medium text-slate-100">{topic}</p>
+      <p className="text-xs font-medium text-corthex-text-primary">{topic}</p>
 
       {/* Summary */}
       <p className="text-xs text-stone-500 leading-relaxed">{result.summary}</p>
