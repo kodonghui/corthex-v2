@@ -10,6 +10,7 @@ COPY packages/admin/package.json ./packages/admin/
 COPY packages/server/package.json ./packages/server/
 COPY packages/e2e/package.json ./packages/e2e/
 COPY packages/landing/package.json ./packages/landing/
+COPY packages/office/package.json ./packages/office/
 
 RUN bun install --frozen-lockfile
 
