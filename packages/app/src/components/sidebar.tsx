@@ -136,7 +136,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
           {!collapsed && (
             <div className="flex flex-col">
               <span className="font-bold tracking-widest text-sm leading-tight text-white">CORTHEX</span>
-              <span className="text-[10px] text-corthex-sidebar-text font-mono uppercase tracking-wider">Management Platform</span>
+              <span className="text-[0.625rem] text-corthex-sidebar-text font-mono uppercase tracking-wider">Management Platform</span>
             </div>
           )}
         </div>
@@ -147,7 +147,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
         {navSections.map((section, si) => (
           <div key={si} className="flex flex-col gap-1">
             {section.label && !collapsed && (
-              <span className="px-3 text-[11px] font-mono text-corthex-sidebar-text uppercase tracking-widest mb-1">
+              <span className="px-3 text-[0.6875rem] font-mono text-corthex-sidebar-text uppercase tracking-widest mb-1">
                 {section.label}
               </span>
             )}
@@ -174,7 +174,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
                 <item.icon className="w-5 h-5 shrink-0" />
                 {!collapsed && <span>{item.label}</span>}
                 {!collapsed && item.to === '/notifications' && unreadCount > 0 && (
-                  <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                  <span className="ml-auto px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[0.625rem] font-bold leading-none">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -188,7 +188,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
       {onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
-          className="hidden lg:flex items-center justify-center h-8 mx-2 mb-2 rounded-lg text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active transition-colors"
+          className="hidden lg:flex items-center justify-center h-11 min-h-[44px] mx-2 mb-2 rounded-lg text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active transition-colors"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
@@ -219,7 +219,7 @@ export function Sidebar({ onNavClick, collapsed, onToggleCollapse }: {
           )}
         </div>
         {!collapsed && (
-          <div className="px-2 text-[10px] text-corthex-sidebar-text/50 font-mono">
+          <div className="px-2 text-[0.625rem] text-corthex-sidebar-text/50 font-mono">
             #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
           </div>
         )}

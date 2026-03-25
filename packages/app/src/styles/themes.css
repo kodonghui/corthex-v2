@@ -129,7 +129,7 @@
 [data-theme="corporate"] {
   /* Accent — promax trust blue */
   --color-corthex-accent: #2563EB;
-  --color-corthex-accent-hover: #60A5FA;      /* Fix 2: was #3B82F6 (collided with --info) */
+  --color-corthex-accent-hover: #4F8FE6;      /* was #60A5FA (2.54:1) → #4F8FE6 (~3.2:1 large text): was #3B82F6 (collided with --info) */
   --color-corthex-accent-deep: #1D4ED8;
   --color-corthex-accent-muted: #2563EB19;    /* Fix 4: was rgba(37,99,235,0.10) */
 

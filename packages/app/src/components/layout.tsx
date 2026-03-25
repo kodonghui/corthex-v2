@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './sidebar'
 import { useAuthStore } from '../stores/auth-store'
@@ -90,10 +90,27 @@ export function Layout() {
     setClosing(false)
   }, [location.pathname])
 
+  const sidebarDialogRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (!sidebarOpen) return
+    // Focus trap: move focus into sidebar on open
+    const dialog = sidebarDialogRef.current
+    if (dialog) {
+      const firstFocusable = dialog.querySelector<HTMLElement>('a, button, [tabindex]')
+      firstFocusable?.focus()
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeSidebar()
+      // Trap Tab within dialog
+      if (e.key === 'Tab' && dialog) {
+        const focusable = dialog.querySelectorAll<HTMLElement>('a, button, input, [tabindex]:not([tabindex="-1"])')
+        if (focusable.length === 0) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
@@ -147,7 +164,7 @@ export function Layout() {
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-corthex-surface"><span className="sr-only">새 알림 있음</span></span>
               )}
             </button>
             <div className="w-7 h-7 rounded-full bg-corthex-accent text-white flex items-center justify-center text-xs font-medium">
@@ -189,7 +206,7 @@ export function Layout() {
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-corthex-accent border-2 border-corthex-surface"><span className="sr-only">새 알림 있음</span></span>
               )}
             </button>
           </div>
@@ -203,7 +220,7 @@ export function Layout() {
 
       {/* Mobile sidebar overlay */}
       {(sidebarOpen || closing) && (
-        <div className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true">
+        <div ref={sidebarDialogRef} className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true" aria-label="메인 네비게이션">
           <div
             className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
             onClick={closeSidebar}
