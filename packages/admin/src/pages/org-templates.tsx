@@ -266,12 +266,12 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
         </h3>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           {template.isBuiltin && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-corthex-accent-deep text-corthex-accent-hover">
+            <span className="text-[10px] px-1.5 py-0.5 bg-corthex-accent-muted text-corthex-accent border border-corthex-border font-mono uppercase tracking-widest">
               기본
             </span>
           )}
           {template.isPublished && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-900 text-emerald-400">
+            <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono uppercase tracking-widest">
               공개
             </span>
           )}
@@ -291,7 +291,7 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
         {depts.map((d) => (
           <span
             key={d.name}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-disabled"
+            className="text-[10px] px-1.5 py-0.5 bg-corthex-elevated text-corthex-text-disabled border border-corthex-border font-mono"
           >
             {d.name}
           </span>
@@ -382,8 +382,8 @@ export function OrgTemplatesPage() {
   if (!selectedCompanyId) {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
+        <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">조직 템플릿</h1>
+        <div className="bg-corthex-surface border border-corthex-border">
           <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
         </div>
       </div>
@@ -393,7 +393,7 @@ export function OrgTemplatesPage() {
   if (isLoading) {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
+        <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">조직 템플릿</h1>
         <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
       </div>
     )
@@ -402,13 +402,13 @@ export function OrgTemplatesPage() {
   if (isError) {
     return (
       <div className="space-y-6" data-testid="org-templates-page">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-50">조직 템플릿</h1>
-        <div className="bg-corthex-surface/50 border border-corthex-border rounded-xl">
+        <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">조직 템플릿</h1>
+        <div className="bg-corthex-surface border border-corthex-border">
           <div className="text-center py-8 space-y-3">
             <p className="text-sm text-red-500">템플릿을 불러올 수 없습니다.</p>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2 text-sm rounded-lg bg-corthex-accent text-white hover:bg-corthex-accent transition-colors"
+              className="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover transition-colors"
             >
               다시 시도
             </button>
