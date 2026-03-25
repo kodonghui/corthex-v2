@@ -121,7 +121,7 @@ function PreviewModal({
           {depts.map((dept) => (
             <div key={dept.name} className="border border-corthex-border rounded-lg overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 bg-corthex-surface">
-                <span className="text-sm font-medium text-slate-50">{dept.name}</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-corthex-text-primary">{dept.name}</span>
                 {dept.description && (
                   <span className="text-xs text-corthex-text-secondary truncate">— {dept.description}</span>
                 )}
@@ -257,11 +257,11 @@ function TemplateCard({ template, onClick }: { template: OrgTemplate; onClick: (
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-xl p-5 transition-all cursor-pointer group bg-corthex-surface/50 border border-corthex-border hover:border-corthex-accent hover:shadow-lg hover:shadow-corthex-accent-deep/10 focus:outline-none focus:ring-2 focus:ring-corthex-accent/40"
+      className="text-left p-5 transition-all cursor-pointer group bg-corthex-surface border border-corthex-border hover:border-corthex-border-strong focus:outline-none focus:ring-2 focus:ring-corthex-accent/30"
       data-testid={`template-card-${template.id}`}
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-base font-semibold text-slate-50 group-hover:text-corthex-accent-hover transition-colors">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-primary group-hover:text-corthex-accent transition-colors">
           {template.name}
         </h3>
         <div className="flex items-center gap-1.5 flex-shrink-0">
