@@ -13,6 +13,7 @@ import {
   Bot, Zap, CheckCircle, DollarSign, Timer, Database,
   TrendingUp, TrendingDown, Plus, XCircle, ArrowRight,
   MessageSquare, Workflow, BarChart3, Calendar,
+  Building2, MoreVertical, ChevronLeft, ChevronRight, Terminal,
 } from 'lucide-react'
 import type {
   LLMProviderName,
@@ -22,6 +23,7 @@ import type {
   DashboardBudget,
   QuickAction,
   DashboardSatisfaction,
+  Agent,
 } from '@corthex/shared'
 
 // === Constants ===
@@ -355,10 +357,46 @@ function DashboardSkeleton() {
 export function DashboardPage() {
   const navigate = useNavigate()
   const [usageDays, setUsageDays] = useState(7)
-  const { isConnected } = useWsStore()
+  const { isConnected, addListener, removeListener } = useWsStore()
 
   // WebSocket real-time updates
   useDashboardWs()
+
+  // Live event stream — populated from WS channel events
+  const [wsEvents, setWsEvents] = useState<Array<{ time: string; type: 'INFO' | 'OKAY' | 'WARN' | 'FAIL'; message: string }>>([])
+
+  useEffect(() => {
+    const handleAgentStatus = (data: unknown) => {
+      const d = data as { agentName?: string; status?: string } | null
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false })
+      const type: 'INFO' | 'OKAY' | 'WARN' | 'FAIL' =
+        d?.status === 'error' ? 'FAIL' : d?.status === 'working' ? 'INFO' : 'OKAY'
+      const message =
+        d?.status === 'error'
+          ? `Agent ${d?.agentName ?? '?'} reported an error.`
+          : d?.status === 'working'
+            ? `Agent ${d?.agentName ?? '?'} started a new task.`
+            : `Agent ${d?.agentName ?? '?'} status updated.`
+      setWsEvents(prev => [{ time, type, message }, ...prev].slice(0, 30))
+    }
+    const handleCost = () => {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false })
+      setWsEvents(prev => [{ time, type: 'INFO' as const, message: 'Cost metrics updated.' }, ...prev].slice(0, 30))
+    }
+    const handleCommand = (data: unknown) => {
+      const d = data as { action?: string } | null
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false })
+      setWsEvents(prev => [{ time, type: 'OKAY' as const, message: `Command ${d?.action ?? 'executed'} completed.` }, ...prev].slice(0, 30))
+    }
+    addListener('agent-status', handleAgentStatus)
+    addListener('cost', handleCost)
+    addListener('command', handleCommand)
+    return () => {
+      removeListener('agent-status', handleAgentStatus)
+      removeListener('cost', handleCost)
+      removeListener('command', handleCommand)
+    }
+  }, [addListener, removeListener])
 
   const { data: summaryRes, isLoading: summaryLoading, error: summaryError } = useQuery({
     queryKey: ['dashboard-summary'],
@@ -376,9 +414,15 @@ export function DashboardPage() {
     queryFn: () => api.get<{ data: DashboardBudget }>('/workspace/dashboard/budget'),
   })
 
+  const { data: agentsRes } = useQuery({
+    queryKey: ['dashboard-agents'],
+    queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
+  })
+
   const summary = summaryRes?.data
   const usage = usageRes?.data
   const budget = budgetRes?.data
+  const agents = agentsRes?.data ?? []
 
   const isLoading = summaryLoading || usageLoading || budgetLoading
 
@@ -401,31 +445,49 @@ export function DashboardPage() {
     { label: '30d', value: 30 },
   ]
 
+  // Stat card derived values
+  const activeAgents = summary?.agents.active ?? 0
+  const deptCount = budget?.byDepartment?.length ?? 0
+  const pendingJobs = summary
+    ? Math.max(0, summary.tasks.total - summary.tasks.completed - summary.tasks.inProgress - summary.tasks.failed)
+    : 0
+  const mtdCost = budget?.currentMonthSpendUsd ?? 0
+
+  // System Health Matrix — semantic mappings
+  const cpuLoad = budgetPercent
+  const memoryLoad = summary && summary.tasks.total > 0
+    ? (summary.tasks.completed / summary.tasks.total) * 100
+    : 0
+  const nexusLoad = summary && summary.agents.total > 0
+    ? (summary.agents.active / summary.agents.total) * 100
+    : 0
+
+  // Active units table — online/working agents
+  const activeAgentsList = agents
+    .filter(a => a.status === 'online' || a.status === 'working')
+    .slice(0, 5)
+
+  const eventTypeColor: Record<string, string> = {
+    INFO: 'text-blue-400',
+    OKAY: 'text-green-500',
+    WARN: 'text-yellow-500',
+    FAIL: 'text-red-500',
+  }
+
   return (
     <div data-testid="dashboard-page" className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased">
-      <div className="p-8 max-w-[1440px] mx-auto space-y-10">
-        {/* SECTION 1: PAGE HEADER */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tighter text-corthex-accent-deep">Analytics Overview</h1>
-            <p className="text-corthex-text-secondary font-medium">Real-time performance metrics and resource allocation.</p>
+      <div className="p-8 max-w-[1440px] mx-auto space-y-8">
+
+        {/* SECTION 1: WELCOME HEADER */}
+        <section>
+          <h1 className="text-3xl font-bold text-corthex-text-primary mb-1">Welcome, Commander</h1>
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse shadow-[0_0_8px_#22C55E]' : 'bg-red-500'}`} />
+            <p className="text-[10px] font-mono tracking-widest uppercase text-green-500">
+              {isConnected ? 'SYSTEM: NOMINAL' : 'SYSTEM: OFFLINE'}
+            </p>
           </div>
-          <div className="inline-flex p-1 bg-corthex-bg rounded-xl">
-            {usageDayOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setUsageDays(opt.value)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                  usageDays === opt.value
-                    ? 'bg-corthex-border text-corthex-text-primary shadow-sm font-semibold'
-                    : 'text-corthex-text-secondary hover:text-corthex-text-primary'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </header>
+        </section>
 
         {isLoading && !summary ? (
           <DashboardSkeleton />
@@ -436,57 +498,248 @@ export function DashboardPage() {
           </div>
         ) : summary ? (
           <>
-            {/* SECTION 2: KPI CARDS ROW */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-              <KpiCard
-                label="Total Agents"
-                value={String(summary.agents.total)}
-                icon={<Bot className="w-5 h-5" />}
-                trend={summary.agents.active > 0 ? 'up' : 'neutral'}
-                trendLabel={`${summary.agents.active} active`}
-              />
-              <KpiCard
-                label="Active Tasks"
-                value={String(summary.tasks.inProgress)}
-                icon={<Zap className="w-5 h-5" />}
-                trend={summary.tasks.inProgress > 0 ? 'up' : 'neutral'}
-                trendLabel={`${summary.tasks.total} total`}
-              />
-              <KpiCard
-                label="Completion Rate"
-                value={`${completionRate}%`}
-                icon={<CheckCircle className="w-5 h-5" />}
-                trend={Number(completionRate) >= 90 ? 'up' : 'down'}
-                trendLabel={`${summary.tasks.completed} done`}
-              />
-              <KpiCard
-                label="Today's Cost"
-                value={`$${todayCost.toFixed(2)}`}
-                icon={<DollarSign className="w-5 h-5" />}
-              />
-              <KpiCard
-                label="Budget Used"
-                value={`${budgetPercent.toFixed(0)}%`}
-                icon={<Timer className="w-5 h-5" />}
-                trend={budgetPercent > 80 ? 'down' : 'up'}
-                trendLabel={budgetPercent > 80 ? 'Near limit' : 'On track'}
-              />
-              <KpiCard
-                label="Error Agents"
-                value={String(summary.agents.error)}
-                icon={<Database className="w-5 h-5" />}
-                trend={summary.agents.error > 0 ? 'down' : 'up'}
-                trendLabel={summary.agents.error > 0 ? 'Needs attention' : 'All clear'}
-              />
+            {/* SECTION 2: STAT CARDS GRID (4-col) */}
+            <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Active Agents */}
+              <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <Bot className="w-6 h-6 text-corthex-accent" />
+                  <span className="bg-green-500/10 text-green-500 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
+                </div>
+                <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
+                  {String(activeAgents).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] font-bold tracking-widest uppercase text-corthex-text-secondary/60">Active Agents</div>
+              </div>
+              {/* Departments */}
+              <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <Building2 className="w-6 h-6 text-corthex-accent" />
+                  <span className="bg-corthex-border/30 text-corthex-text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">STABLE</span>
+                </div>
+                <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
+                  {String(deptCount).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] font-bold tracking-widest uppercase text-corthex-text-secondary/60">Departments</div>
+              </div>
+              {/* Pending Jobs */}
+              <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <Timer className="w-6 h-6 text-corthex-accent" />
+                  <span className="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-yellow-500/20">
+                    {summary.tasks.inProgress > 0 ? `${summary.tasks.inProgress} ACTIVE` : 'IDLE'}
+                  </span>
+                </div>
+                <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
+                  {String(pendingJobs).padStart(3, '0')}
+                </div>
+                <div className="text-[10px] font-bold tracking-widest uppercase text-corthex-text-secondary/60">Pending Jobs</div>
+              </div>
+              {/* Total Costs */}
+              <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <DollarSign className="w-6 h-6 text-corthex-accent" />
+                  <span className="bg-corthex-border/30 text-corthex-text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">MTD</span>
+                </div>
+                <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
+                  ${mtdCost.toFixed(0)}
+                </div>
+                <div className="text-[10px] font-bold tracking-widest uppercase text-corthex-text-secondary/60">Total Costs</div>
+              </div>
             </section>
 
-            {/* SECTION 3 & 4: COST CHART & DEPT LOAD */}
+            {/* SECTION 3: MAIN GRID (2/3 + 1/3) */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Active Units Table (2/3) */}
+              <div className="lg:col-span-2 bg-corthex-surface border border-corthex-border/40 rounded-lg overflow-hidden flex flex-col">
+                <div className="p-5 border-b border-corthex-border/40 flex justify-between items-center">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Active Units</h3>
+                  <button
+                    onClick={() => navigate('/agents')}
+                    className="text-[10px] font-bold text-corthex-accent hover:text-corthex-accent/80 uppercase tracking-wider"
+                  >
+                    View Full Roster
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-corthex-border/10">
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-corthex-text-secondary/60 font-bold">Unit ID</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-corthex-text-secondary/60 font-bold">Status</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-corthex-text-secondary/60 font-bold">Tier</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-corthex-text-secondary/60 font-bold text-right">Ops</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-corthex-border/10">
+                      {activeAgentsList.length > 0 ? activeAgentsList.map((agent) => (
+                        <tr key={agent.id} className="hover:bg-corthex-elevated/50 transition-colors group">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded bg-corthex-accent/10 flex items-center justify-center">
+                                <Bot className="w-4 h-4 text-corthex-accent" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-corthex-text-primary">{agent.name}</p>
+                                <p className="text-[10px] font-mono text-corthex-text-secondary/60">{agent.id.slice(0, 12).toUpperCase()}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                agent.status === 'working' ? 'bg-corthex-accent' :
+                                agent.status === 'online' ? 'bg-green-500' :
+                                agent.status === 'error' ? 'bg-red-500' : 'bg-corthex-border'
+                              }`} />
+                              <span className="text-sm text-corthex-text-primary capitalize">{agent.status}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-[10px] font-mono uppercase text-corthex-text-secondary/60">
+                              {agent.tier} T{agent.tierLevel}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => navigate(`/agents/${agent.id}`)}
+                              className="text-corthex-text-secondary/40 hover:text-corthex-accent transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-sm text-corthex-text-secondary">
+                            No active agents
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-auto p-4 border-t border-corthex-border/10 flex justify-center">
+                  <div className="flex gap-2">
+                    <button className="w-8 h-8 flex items-center justify-center rounded border border-corthex-border/40 text-corthex-text-secondary/40 hover:bg-corthex-elevated transition-all">
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded border border-corthex-accent bg-corthex-accent/10 text-corthex-accent text-xs font-bold">1</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded border border-corthex-border/40 text-corthex-text-secondary/60 hover:bg-corthex-elevated text-xs transition-all">2</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded border border-corthex-border/40 text-corthex-text-secondary/40 hover:bg-corthex-elevated transition-all">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Event Stream (1/3) */}
+              <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg flex flex-col h-[400px]">
+                <div className="p-5 border-b border-corthex-border/40 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Live Event Stream</h3>
+                </div>
+                <div className="flex-1 p-4 overflow-y-auto font-mono text-[11px] space-y-3">
+                  {wsEvents.length > 0 ? wsEvents.map((ev, i) => (
+                    <div key={i} className="flex gap-3">
+                      <span className="text-corthex-text-secondary/40 shrink-0">[{ev.time}]</span>
+                      <span className={`font-bold shrink-0 ${eventTypeColor[ev.type]}`}>{ev.type}:</span>
+                      <span className="text-corthex-text-secondary">{ev.message}</span>
+                    </div>
+                  )) : (
+                    <div className="text-corthex-text-secondary/40">
+                      Waiting for events...
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 bg-corthex-bg/50 border-t border-corthex-border/40">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-corthex-elevated rounded border border-corthex-border/40">
+                    <Terminal className="w-4 h-4 text-corthex-text-secondary/40" />
+                    <span className="text-[10px] font-mono text-corthex-text-secondary/40">Waiting for input...</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* SECTION 4: SYSTEM HEALTH MATRIX */}
+            <section className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-6">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary mb-6">System Health Matrix</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* CPU — Budget utilization */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold uppercase text-corthex-text-secondary">Central Processing Unit</span>
+                    <span className="text-xs font-mono text-corthex-text-primary">{cpuLoad.toFixed(1)}%</span>
+                  </div>
+                  <div className="relative h-2 bg-corthex-elevated rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-corthex-accent to-corthex-accent/70"
+                      style={{ width: `${Math.min(cpuLoad, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center pt-1">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className={`w-1 h-3 ${i <= Math.ceil(cpuLoad / 20) ? 'bg-corthex-accent' : 'bg-corthex-border/40'}`} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-mono text-corthex-text-secondary/60">BUDGET</span>
+                  </div>
+                </div>
+                {/* Memory — Task completion ratio */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold uppercase text-corthex-text-secondary">Neural Memory Banks</span>
+                    <span className="text-xs font-mono text-corthex-text-primary">{memoryLoad.toFixed(1)}%</span>
+                  </div>
+                  <div className="relative h-2 bg-corthex-elevated rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
+                      style={{ width: `${Math.min(memoryLoad, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center pt-1">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className={`w-1 h-3 ${i <= Math.ceil(memoryLoad / 20) ? 'bg-blue-500' : 'bg-corthex-border/40'}`} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-mono text-corthex-text-secondary/60">{summary.tasks.completed} DONE</span>
+                  </div>
+                </div>
+                {/* Network — Agent active ratio */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold uppercase text-corthex-text-secondary">NEXUS Throughput</span>
+                    <span className="text-xs font-mono text-corthex-text-primary">{nexusLoad.toFixed(1)}%</span>
+                  </div>
+                  <div className="relative h-2 bg-corthex-elevated rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-green-400"
+                      style={{ width: `${Math.min(nexusLoad, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center pt-1">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className={`w-1 h-3 ${i <= Math.ceil(nexusLoad / 20) ? 'bg-green-500' : 'bg-corthex-border/40'}`} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-mono text-corthex-text-secondary/60">
+                      {summary.agents.active}/{summary.agents.total} AGENTS
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* SECTION 5: COST TREND + DEPT LOAD */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <CostTrendChart usage={usage} budget={budget} />
               <DeptLoadChart budget={budget} />
             </div>
 
-            {/* SECTION 5 & 6: DONUT & TABLE */}
+            {/* SECTION 6: TASK STATUS DONUT + RECENT TASKS */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <TaskStatusDonut summary={summary} />
               <RecentTasksTable summary={summary} />

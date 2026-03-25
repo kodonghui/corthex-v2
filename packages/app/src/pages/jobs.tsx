@@ -17,12 +17,15 @@
 // POST   /workspace/jobs/chain
 // DELETE /workspace/jobs/chain/:chainId
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { toast } from '@corthex/ui'
-import { Plus, Moon, Repeat, Target, Trash2, MoreVertical, Search, Calendar, Filter } from 'lucide-react'
+import {
+  Plus, Moon, Repeat, Target, Trash2, MoreVertical, Search,
+  Download, ChevronRight, FilterX,
+} from 'lucide-react'
 import { useWsStore } from '../stores/ws-store'
 import { useAuthStore } from '../stores/auth-store'
 
@@ -101,6 +104,29 @@ const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 const inputClass = 'w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-secondary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent'
 const selectClass = 'w-full bg-corthex-surface border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent appearance-none'
 
+function getDuration(job: NightJob): string {
+  if (!job.startedAt) return '--:--'
+  const end = job.completedAt ? new Date(job.completedAt) : new Date()
+  const ms = end.getTime() - new Date(job.startedAt).getTime()
+  const mins = Math.floor(ms / 60000)
+  const secs = Math.floor((ms % 60000) / 1000)
+  return `${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`
+}
+
+function shortId(id: string): string {
+  return id.replace(/-/g, '').slice(0, 8).toUpperCase()
+}
+
+function getStatusBadge(status: string): { bg: string; color: string; border: string; dot: string } {
+  switch (status) {
+    case 'processing': return { bg: 'rgba(59,130,246,0.1)', color: '#60a5fa', border: 'rgba(59,130,246,0.25)', dot: '#60a5fa' }
+    case 'completed':  return { bg: 'rgba(34,197,94,0.1)',  color: '#4ade80', border: 'rgba(34,197,94,0.25)',  dot: '#4ade80' }
+    case 'failed':     return { bg: 'rgba(239,68,68,0.1)',  color: '#f87171', border: 'rgba(239,68,68,0.25)',  dot: '#f87171' }
+    case 'blocked':    return { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)', dot: '#fbbf24' }
+    default:           return { bg: 'rgba(120,113,108,0.12)', color: 'var(--color-corthex-text-secondary)', border: 'rgba(120,113,108,0.2)', dot: 'rgba(120,113,108,0.6)' }
+  }
+}
+
 export function JobsPage() {
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<TabKey>('oneTime')
@@ -111,6 +137,7 @@ export function JobsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  const [agentFilter, setAgentFilter] = useState('')
 
   // Modal state
   const [modalType, setModalType] = useState<'oneTime' | 'schedule' | 'trigger'>('oneTime')
@@ -257,6 +284,7 @@ export function JobsPage() {
   const jobs = allJobs.filter(j => {
     if (sq && !j.instruction.toLowerCase().includes(sq) && !j.agentName.toLowerCase().includes(sq)) return false
     if (statusFilter && j.status !== statusFilter) return false
+    if (agentFilter && j.agentId !== agentFilter) return false
     if (typeFilter && typeFilter !== 'oneTime') return false
     return true
   })
@@ -350,239 +378,713 @@ export function JobsPage() {
   const isPending = queueJob.isPending || createSchedule.isPending || updateSchedule.isPending || createTrigger.isPending || updateTrigger.isPending || createChain.isPending
   const isTabLoading = activeTab === 'oneTime' ? jobsLoading : activeTab === 'schedule' ? schedulesLoading : triggersLoading
 
+  // ─── Render ──────────────────────────────────────────────────────────────────
+
+  const thStyle: React.CSSProperties = {
+    padding: '12px 20px',
+    fontSize: '10px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    color: 'var(--color-corthex-text-secondary)',
+    background: 'var(--color-corthex-elevated)',
+    borderBottom: '1px solid var(--color-corthex-border)',
+    whiteSpace: 'nowrap',
+  }
+  const tdStyle: React.CSSProperties = {
+    padding: '14px 20px',
+    fontSize: '13px',
+    color: 'var(--color-corthex-text-primary)',
+    borderBottom: '1px solid var(--color-corthex-border)',
+    verticalAlign: 'middle',
+  }
+
+  const totalCount = activeTab === 'oneTime' ? jobs.length : activeTab === 'schedule' ? schedules.length : triggers.length
+
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-corthex-bg text-corthex-text-primary" data-testid="jobs-page">
+    <div
+      className="flex-1 flex flex-col overflow-y-auto"
+      style={{ background: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
+      data-testid="jobs-page"
+    >
 
-        {/* Header Section */}
-        <header className="px-8 pt-8 pb-0">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-            <div className="space-y-1">
-              <h1 className="text-4xl font-black tracking-tight text-corthex-text-primary">
-                작업 관리 <span className="text-corthex-accent opacity-90">Jobs</span>
-              </h1>
-              <p className="text-corthex-text-secondary text-lg">에이전트 작업을 모니터링하고 관리합니다</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-secondary group-focus-within:text-corthex-accent transition-colors" />
-                <input
-                  className="pl-12 pr-4 py-3 bg-corthex-surface border border-corthex-border rounded-xl focus:ring-2 focus:ring-corthex-accent/20 focus:border-corthex-accent outline-none min-w-[300px] text-sm transition-all shadow-sm"
-                  placeholder="작업 이름 또는 에이전트 검색..."
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <button
-                onClick={() => { setModalType(activeTab === 'trigger' ? 'trigger' : activeTab === 'schedule' ? 'schedule' : 'oneTime'); setShowModal(true) }}
-                className="flex items-center gap-2 px-5 py-3 bg-corthex-accent text-white rounded-xl hover:bg-corthex-accent-deep transition-colors text-sm font-semibold"
-                data-testid="create-job-btn"
-              >
-                <Plus className="w-5 h-5" />
-                <span>작업 생성</span>
-              </button>
-            </div>
-          </div>
-        </header>
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="px-8 pt-8 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <nav className="flex items-center gap-1.5 text-xs mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+            <span className="hover:opacity-70 cursor-pointer" style={{ color: 'var(--color-corthex-accent)' }}>System</span>
+            <ChevronRight className="w-3 h-3" />
+            <span style={{ color: 'var(--color-corthex-text-primary)' }}>Jobs Manager</span>
+          </nav>
+          <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: 'var(--color-corthex-text-primary)' }}>
+            Jobs Manager{' '}
+            <span className="font-mono text-lg ml-2" style={{ color: 'var(--color-corthex-accent)' }}>
+              [{String(totalCount).padStart(2, '0')}]
+            </span>
+          </h1>
+        </div>
+        <div className="flex gap-3">
+          <button
+            className="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-semibold transition-all hover:opacity-80"
+            style={{
+              background: 'var(--color-corthex-elevated)',
+              border: '1px solid var(--color-corthex-border)',
+              color: 'var(--color-corthex-text-primary)',
+            }}
+          >
+            <Download className="w-4 h-4" />
+            Export Logs
+          </button>
+          <button
+            onClick={() => { setModalType(activeTab === 'trigger' ? 'trigger' : activeTab === 'schedule' ? 'schedule' : 'oneTime'); setShowModal(true) }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded text-sm font-black transition-all active:scale-95"
+            style={{
+              background: 'var(--color-corthex-accent)',
+              color: 'white',
+              boxShadow: '0 0 15px color-mix(in srgb, var(--color-corthex-accent) 30%, transparent)',
+            }}
+            data-testid="create-job-btn"
+          >
+            <Plus className="w-4 h-4" />
+            Create Job
+          </button>
+        </div>
+      </div>
 
-        {/* Tab Bar */}
-        <div className="px-8">
-          <div className="relative flex border-b border-corthex-border/30 mb-8 overflow-x-auto" data-testid="jobs-tabs">
-            {tabs.map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`px-8 py-4 text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === tab.key
-                    ? 'font-bold text-corthex-accent border-b-2 border-corthex-accent'
-                    : 'text-corthex-text-secondary hover:text-corthex-accent'
-                }`}
-                data-testid={`jobs-tab-${tab.key}`}
-              >
-                {tab.icon} {tab.label}
-                {tab.count > 0 && (
-                  <span className="font-mono text-[10px] ml-1 opacity-70">({tab.count})</span>
-                )}
-              </button>
-            ))}
+      {/* ── Stats Grid ─────────────────────────────────────────────────── */}
+      <div className="px-8 grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: '완료된 작업', value: allJobs.filter(j => j.status === 'completed').length },
+          { label: '실행 중', value: allJobs.filter(j => j.status === 'processing').length },
+          { label: '활성 스케줄', value: allSchedules.filter(s => s.isActive).length },
+          { label: '오류 알림', value: allJobs.filter(j => j.status === 'failed').length, accent: true },
+        ].map(card => (
+          <div
+            key={card.label}
+            className="p-4 rounded-lg"
+            style={{
+              background: card.accent ? 'color-mix(in srgb, var(--color-corthex-accent) 8%, transparent)' : 'var(--color-corthex-elevated)',
+              border: `1px solid ${card.accent ? 'color-mix(in srgb, var(--color-corthex-accent) 25%, transparent)' : 'var(--color-corthex-border)'}`,
+            }}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+              {card.label}
+            </p>
+            <p className="text-2xl font-mono font-bold" style={{ color: card.accent ? 'var(--color-corthex-accent)' : 'var(--color-corthex-text-primary)' }}>
+              {String(card.value).padStart(2, '0')}
+            </p>
           </div>
+        ))}
+      </div>
+
+      {/* ── Tab Bar ────────────────────────────────────────────────────── */}
+      <div className="px-8" style={{ borderBottom: '1px solid var(--color-corthex-border)' }}>
+        <div className="flex" data-testid="jobs-tabs">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors whitespace-nowrap"
+              style={{
+                color: activeTab === tab.key ? 'var(--color-corthex-accent)' : 'var(--color-corthex-text-secondary)',
+                borderBottom: activeTab === tab.key ? '2px solid var(--color-corthex-accent)' : '2px solid transparent',
+                fontWeight: activeTab === tab.key ? 700 : 400,
+              }}
+              data-testid={`jobs-tab-${tab.key}`}
+            >
+              {tab.icon}
+              {tab.label}
+              {tab.count > 0 && (
+                <span className="font-mono text-[10px] opacity-70">({tab.count})</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Filter Bar ─────────────────────────────────────────────────── */}
+      <div
+        className="px-8 py-3 flex flex-wrap items-center gap-4"
+        style={{
+          background: 'color-mix(in srgb, var(--color-corthex-elevated) 60%, transparent)',
+          borderBottom: '1px solid var(--color-corthex-border)',
+        }}
+      >
+        {/* Search */}
+        <div className="relative flex-1 min-w-[260px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Job ID, 제목, 에이전트 검색..."
+            className="w-full pl-10 pr-4 py-2 rounded text-sm outline-none transition-all"
+            style={{
+              background: 'color-mix(in srgb, var(--color-corthex-bg) 60%, transparent)',
+              border: '1px solid var(--color-corthex-border)',
+              color: 'var(--color-corthex-text-primary)',
+            }}
+          />
         </div>
 
-        {/* Job Cards List */}
-        <div className="px-8 pb-8 space-y-4">
-          {isTabLoading && (
-            <div className="flex justify-center py-12" data-testid="jobs-loading">
-              <div className="h-6 w-6 border-2 border-corthex-accent border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
+        {/* Agent filter */}
+        {agentList.length > 0 && (
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-corthex-text-secondary)' }}>Agent</label>
+            <select
+              value={agentFilter}
+              onChange={e => setAgentFilter(e.target.value)}
+              className="rounded px-3 py-2 text-xs outline-none"
+              style={{
+                background: 'var(--color-corthex-elevated)',
+                border: '1px solid var(--color-corthex-border)',
+                color: 'var(--color-corthex-text-primary)',
+              }}
+            >
+              <option value="">All Agents</option>
+              {agentList.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+        )}
 
-          {/* One-time jobs tab */}
-          {!isTabLoading && activeTab === 'oneTime' && jobs.length === 0 && (
-            <div className="text-center py-16" data-testid="jobs-empty">
-              <p className="text-sm text-corthex-text-secondary">등록된 일회성 작업이 없습니다</p>
-            </div>
-          )}
+        {/* Status filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-corthex-text-secondary)' }}>Status</label>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="rounded px-3 py-2 text-xs outline-none"
+            style={{
+              background: 'var(--color-corthex-elevated)',
+              border: '1px solid var(--color-corthex-border)',
+              color: 'var(--color-corthex-text-primary)',
+            }}
+          >
+            <option value="">All Status</option>
+            <option value="queued">대기</option>
+            <option value="processing">진행 중</option>
+            <option value="completed">완료</option>
+            <option value="failed">실패</option>
+          </select>
+        </div>
 
-          {!isTabLoading && activeTab === 'oneTime' && jobs.map(job => {
-            const status = STATUS_STYLES[job.status] || { label: job.status, dotClass: 'bg-corthex-text-secondary', textClass: 'text-corthex-text-secondary' }
-            const progress = jobProgress[job.id]
-            return (
+        {/* Clear filters */}
+        {(searchQuery || statusFilter || agentFilter) && (
+          <button
+            onClick={() => { setSearchQuery(''); setStatusFilter(''); setAgentFilter('') }}
+            className="p-2 rounded transition-opacity hover:opacity-70"
+            style={{
+              background: 'var(--color-corthex-elevated)',
+              border: '1px solid var(--color-corthex-border)',
+              color: 'var(--color-corthex-text-secondary)',
+            }}
+          >
+            <FilterX className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* ── Table Content ──────────────────────────────────────────────── */}
+      <div className="px-8 py-6 flex-1">
+
+        {/* Loading */}
+        {isTabLoading && (
+          <div className="flex justify-center py-16" data-testid="jobs-loading">
+            <div className="h-6 w-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--color-corthex-accent)', borderTopColor: 'transparent' }} />
+          </div>
+        )}
+
+        {/* ── One-time Jobs Table ──────────────────────────────────────── */}
+        {!isTabLoading && activeTab === 'oneTime' && (
+          <>
+            {jobs.length === 0 ? (
+              <div className="text-center py-16" data-testid="jobs-empty">
+                <Moon className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>등록된 일회성 작업이 없습니다</p>
+              </div>
+            ) : (
               <div
-                key={job.id}
-                className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated cursor-pointer"
-                onClick={() => {
-                  setExpandedJob(expandedJob === job.id ? null : job.id)
-                  if (!job.isRead && (job.status === 'completed' || job.status === 'failed')) markRead.mutate(job.id)
-                }}
-                data-testid={`job-card-${job.id}`}
+                className="rounded-lg overflow-hidden"
+                style={{ border: '1px solid var(--color-corthex-border)', background: 'var(--color-corthex-surface)' }}
               >
-                <div className="flex items-center gap-4 min-w-[280px]">
-                  <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20">
-                    {activeTab === 'oneTime' ? <Moon className="w-5 h-5 text-corthex-accent" /> : <Repeat className="w-5 h-5 text-corthex-accent" />}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-corthex-text-primary">{job.agentName}</h3>
-                    <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{job.instruction}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center gap-2 px-8">
-                  <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${
-                    job.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                    job.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    job.status === 'failed' ? 'bg-red-100 text-red-700' :
-                    job.status === 'blocked' ? 'bg-amber-700/10 text-amber-700' :
-                    'bg-corthex-elevated text-corthex-text-secondary'
-                  }`}>{status.label}</span>
-                  {job.status === 'processing' && progress && (
-                    <div className="flex items-center gap-3">
-                      <div className="bg-corthex-border h-2 rounded-full w-48 overflow-hidden">
-                        <div className="bg-corthex-accent h-full rounded-full transition-all" style={{ width: `${progress.progress}%` }} />
-                      </div>
-                      <span className="font-mono text-xs font-bold text-corthex-accent">{progress.progress}%</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-12 text-right">
-                  <div className="font-mono">
-                    <p className="text-[11px] font-medium text-corthex-text-secondary">
-                      {job.completedAt ? new Date(job.completedAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) :
-                       job.scheduledFor ? `예약: ${new Date(job.scheduledFor).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}` :
-                       new Date(job.createdAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    <p className="text-[9px] text-corthex-text-secondary uppercase tracking-tighter">TIMESTAMP</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {job.status === 'queued' && (
-                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: job.id, type: 'job' }) }} className="p-1.5 text-corthex-text-secondary hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                    )}
-                    <button className="p-1.5 text-corthex-text-secondary transition-colors" onClick={(e) => e.stopPropagation()}><MoreVertical className="w-4 h-4" /></button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr>
+                        <th style={thStyle}>ID</th>
+                        <th style={thStyle}>Title</th>
+                        <th style={thStyle}>Assigned Agent</th>
+                        <th style={thStyle}>Status</th>
+                        <th style={thStyle}>Created</th>
+                        <th style={thStyle}>Duration</th>
+                        <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jobs.map(job => {
+                        const badge = getStatusBadge(job.status)
+                        const statusLabel = STATUS_STYLES[job.status]?.label || job.status
+                        const progress = jobProgress[job.id]
+                        const isExpanded = expandedJob === job.id
+                        const createdLabel = job.completedAt
+                          ? new Date(job.completedAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+                          : job.scheduledFor
+                          ? `예약: ${new Date(job.scheduledFor).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`
+                          : new Date(job.createdAt).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+                        return (
+                          <Fragment key={job.id}>
+                            <tr
+                              className="cursor-pointer transition-colors"
+                              style={{ background: isExpanded ? 'color-mix(in srgb, var(--color-corthex-accent) 4%, transparent)' : 'transparent' }}
+                              onMouseEnter={e => (e.currentTarget.style.background = 'color-mix(in srgb, var(--color-corthex-elevated) 60%, transparent)')}
+                              onMouseLeave={e => (e.currentTarget.style.background = isExpanded ? 'color-mix(in srgb, var(--color-corthex-accent) 4%, transparent)' : 'transparent')}
+                              onClick={() => {
+                                setExpandedJob(isExpanded ? null : job.id)
+                                if (!job.isRead && (job.status === 'completed' || job.status === 'failed')) markRead.mutate(job.id)
+                              }}
+                              data-testid={`job-card-${job.id}`}
+                            >
+                              {/* ID */}
+                              <td style={tdStyle}>
+                                <span className="font-mono text-xs font-bold" style={{ color: 'var(--color-corthex-accent)' }}>
+                                  {shortId(job.id)}
+                                </span>
+                              </td>
 
-          {/* Expanded job detail inline */}
-          {activeTab === 'oneTime' && expandedJob && jobs.find(j => j.id === expandedJob) && (() => {
-            const job = jobs.find(j => j.id === expandedJob)!
-            return (job.result || job.error || (job.status === 'completed' && job.resultData)) ? (
-              <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 -mt-2 ml-14">
-                {job.result && <div className="text-xs text-corthex-text-secondary bg-corthex-elevated rounded-lg p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">{job.result}</div>}
-                {job.error && <div className="text-xs text-red-600 bg-red-50 rounded-lg p-3">{job.error}</div>}
-                {job.status === 'completed' && job.resultData && (
-                  <div className="mt-2 flex gap-2">
-                    {job.resultData.sessionId && <Link to={`/chat?session=${job.resultData.sessionId}`} className="text-xs font-medium text-corthex-accent hover:underline">결과 보기</Link>}
-                    {job.resultData.reportId && <Link to={`/reports/${job.resultData.reportId}`} className="text-xs font-medium text-corthex-accent hover:underline">보고서 보기</Link>}
-                  </div>
-                )}
-              </div>
-            ) : null
-          })()}
+                              {/* Title */}
+                              <td style={tdStyle}>
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-sm font-semibold" style={{ color: 'var(--color-corthex-text-primary)' }}>
+                                    {job.instruction.length > 45 ? job.instruction.slice(0, 45) + '…' : job.instruction}
+                                  </span>
+                                  {job.chainId && (
+                                    <span className="text-[10px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                                      Chain Job
+                                    </span>
+                                  )}
+                                  {job.retryCount > 0 && (
+                                    <span className="text-[10px]" style={{ color: '#fbbf24' }}>
+                                      재시도 {job.retryCount}/{job.maxRetries}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
 
-          {/* Schedules tab */}
-          {!isTabLoading && activeTab === 'schedule' && schedules.length === 0 && (
-            <div className="text-center py-16" data-testid="schedules-empty"><p className="text-sm text-corthex-text-secondary">등록된 반복 스케줄이 없습니다</p></div>
-          )}
-          {!isTabLoading && activeTab === 'schedule' && schedules.map(s => (
-            <div key={s.id} className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated" data-testid={`schedule-item-${s.id}`}>
-              <div className="flex items-center gap-4 min-w-[280px]">
-                <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20"><Repeat className="w-5 h-5 text-corthex-accent" /></div>
-                <div>
-                  <h3 className="font-bold text-corthex-text-primary">{s.agentName}</h3>
-                  <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{s.instruction}</p>
+                              {/* Agent */}
+                              <td style={tdStyle}>
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                                    style={{
+                                      background: 'color-mix(in srgb, var(--color-corthex-accent) 15%, transparent)',
+                                      border: '1px solid color-mix(in srgb, var(--color-corthex-accent) 25%, transparent)',
+                                      color: 'var(--color-corthex-accent)',
+                                    }}
+                                  >
+                                    {job.agentName.slice(0, 1).toUpperCase()}
+                                  </div>
+                                  <span className="text-xs" style={{ color: 'var(--color-corthex-text-primary)' }}>{job.agentName}</span>
+                                </div>
+                              </td>
+
+                              {/* Status */}
+                              <td style={tdStyle}>
+                                <div className="flex flex-col gap-1.5">
+                                  <span
+                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold"
+                                    style={{
+                                      background: badge.bg,
+                                      color: badge.color,
+                                      border: `1px solid ${badge.border}`,
+                                    }}
+                                  >
+                                    <span
+                                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                      style={{
+                                        background: badge.dot,
+                                        animation: job.status === 'processing' ? 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' : undefined,
+                                      }}
+                                    />
+                                    {statusLabel}
+                                  </span>
+                                  {job.status === 'processing' && progress && (
+                                    <div className="flex items-center gap-2">
+                                      <div
+                                        className="h-1.5 rounded-full overflow-hidden"
+                                        style={{ background: 'var(--color-corthex-border)', width: '80px' }}
+                                      >
+                                        <div
+                                          className="h-full rounded-full transition-all"
+                                          style={{ width: `${progress.progress}%`, background: 'var(--color-corthex-accent)' }}
+                                        />
+                                      </div>
+                                      <span className="font-mono text-[10px] font-bold" style={{ color: 'var(--color-corthex-accent)' }}>
+                                        {progress.progress}%
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Created */}
+                              <td style={tdStyle}>
+                                <span className="font-mono text-[11px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                                  {createdLabel}
+                                </span>
+                              </td>
+
+                              {/* Duration */}
+                              <td style={tdStyle}>
+                                <span className="text-xs" style={{ color: 'var(--color-corthex-text-primary)' }}>
+                                  {getDuration(job)}
+                                </span>
+                              </td>
+
+                              {/* Actions */}
+                              <td style={{ ...tdStyle, textAlign: 'right' }}>
+                                <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                                  {job.status === 'queued' && (
+                                    <button
+                                      onClick={() => setDeleteTarget({ id: job.id, type: 'job' })}
+                                      className="p-1.5 rounded transition-opacity hover:opacity-100 opacity-40"
+                                      style={{ color: '#f87171' }}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                  {job.chainId && job.status === 'queued' && (
+                                    <button
+                                      onClick={() => setDeleteTarget({ id: job.chainId!, type: 'chain' })}
+                                      className="px-2 py-1 rounded text-[10px] font-medium transition-opacity hover:opacity-80"
+                                      style={{ color: '#fbbf24', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}
+                                    >
+                                      체인취소
+                                    </button>
+                                  )}
+                                  <button
+                                    className="p-1.5 rounded transition-opacity hover:opacity-80 opacity-40"
+                                    style={{ color: 'var(--color-corthex-text-secondary)' }}
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+
+                            {/* Expanded Detail Row */}
+                            {isExpanded && (job.result || job.error || (job.status === 'completed' && job.resultData)) && (
+                              <tr style={{ background: 'color-mix(in srgb, var(--color-corthex-accent) 3%, transparent)' }}>
+                                <td colSpan={7} style={{ padding: '0 20px 16px 20px', borderBottom: '1px solid var(--color-corthex-border)' }}>
+                                  <div className="pl-4" style={{ borderLeft: '2px solid var(--color-corthex-accent)' }}>
+                                    {job.result && (
+                                      <div
+                                        className="text-xs rounded-lg p-3 max-h-40 overflow-y-auto whitespace-pre-wrap"
+                                        style={{ background: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)' }}
+                                      >
+                                        {job.result}
+                                      </div>
+                                    )}
+                                    {job.error && (
+                                      <div
+                                        className="text-xs rounded-lg p-3"
+                                        style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}
+                                      >
+                                        {job.error}
+                                      </div>
+                                    )}
+                                    {job.status === 'completed' && job.resultData && (
+                                      <div className="mt-2 flex gap-3">
+                                        {job.resultData.sessionId && (
+                                          <Link to={`/chat?session=${job.resultData.sessionId}`} className="text-xs font-medium hover:underline" style={{ color: 'var(--color-corthex-accent)' }}>
+                                            결과 보기 →
+                                          </Link>
+                                        )}
+                                        {job.resultData.reportId && (
+                                          <Link to={`/reports/${job.resultData.reportId}`} className="text-xs font-medium hover:underline" style={{ color: 'var(--color-corthex-accent)' }}>
+                                            보고서 보기 →
+                                          </Link>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table footer */}
+                <div
+                  className="px-5 py-3 flex items-center justify-between"
+                  style={{
+                    background: 'var(--color-corthex-elevated)',
+                    borderTop: '1px solid var(--color-corthex-border)',
+                  }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                    Showing {jobs.length} of {allJobs.length} records
+                  </p>
                 </div>
               </div>
-              <div className="px-8">
-                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-corthex-elevated text-corthex-text-secondary'}`}>
-                  {s.isActive ? 'ACTIVE' : 'PAUSED'}
-                </span>
-              </div>
-              <div className="font-mono text-right">
-                <p className="text-[11px] font-medium text-corthex-text-secondary">{s.description}</p>
-                {s.nextRunAt && <p className="text-[9px] text-corthex-text-secondary">다음: {new Date(s.nextRunAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
-              </div>
-              <div className="flex items-center gap-2 ml-4">
-                <button onClick={() => openEditSchedule(s)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors">편집</button>
-                <button onClick={() => toggleSchedule.mutate(s.id)} className={`text-xs ${s.isActive ? 'text-amber-700' : 'text-corthex-accent'}`}>{s.isActive ? '중지' : '시작'}</button>
-                <button onClick={() => setDeleteTarget({ id: s.id, type: 'schedule' })} className="text-xs text-red-600 hover:text-red-700">삭제</button>
-              </div>
-            </div>
-          ))}
+            )}
+          </>
+        )}
 
-          {/* Triggers tab */}
-          {!isTabLoading && activeTab === 'trigger' && triggers.length === 0 && (
-            <div className="text-center py-16" data-testid="triggers-empty"><p className="text-sm text-corthex-text-secondary">등록된 이벤트 트리거가 없습니다</p></div>
-          )}
-          {!isTabLoading && activeTab === 'trigger' && triggers.map(t => (
-            <div key={t.id} className="bg-corthex-elevated border border-corthex-border rounded-xl p-5 flex flex-wrap lg:flex-nowrap items-center justify-between transition-all hover:bg-corthex-elevated" data-testid={`trigger-item-${t.id}`}>
-              <div className="flex items-center gap-4 min-w-[280px]">
-                <div className="w-10 h-10 rounded-full bg-corthex-accent/10 flex items-center justify-center border border-corthex-accent/20"><Target className="w-5 h-5 text-corthex-accent" /></div>
-                <div>
-                  <h3 className="font-bold text-corthex-text-primary">{t.agentName}</h3>
-                  <p className="text-xs text-corthex-text-secondary mt-0.5 line-clamp-1 max-w-[300px]">{t.instruction}</p>
+        {/* ── Schedules Table ──────────────────────────────────────────── */}
+        {!isTabLoading && activeTab === 'schedule' && (
+          <>
+            {schedules.length === 0 ? (
+              <div className="text-center py-16" data-testid="schedules-empty">
+                <Repeat className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>등록된 반복 스케줄이 없습니다</p>
+              </div>
+            ) : (
+              <div
+                className="rounded-lg overflow-hidden"
+                style={{ border: '1px solid var(--color-corthex-border)', background: 'var(--color-corthex-surface)' }}
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr>
+                        <th style={thStyle}>Agent</th>
+                        <th style={thStyle}>Description</th>
+                        <th style={thStyle}>Schedule</th>
+                        <th style={thStyle}>Next Run</th>
+                        <th style={thStyle}>Status</th>
+                        <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {schedules.map(s => {
+                        const activeBadge = getStatusBadge(s.isActive ? 'completed' : 'queued')
+                        return (
+                          <tr
+                            key={s.id}
+                            className="transition-colors"
+                            onMouseEnter={e => (e.currentTarget.style.background = 'color-mix(in srgb, var(--color-corthex-elevated) 60%, transparent)')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                            data-testid={`schedule-item-${s.id}`}
+                          >
+                            <td style={tdStyle}>
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                                  style={{
+                                    background: 'color-mix(in srgb, var(--color-corthex-accent) 15%, transparent)',
+                                    border: '1px solid color-mix(in srgb, var(--color-corthex-accent) 25%, transparent)',
+                                    color: 'var(--color-corthex-accent)',
+                                  }}
+                                >
+                                  {s.agentName.slice(0, 1).toUpperCase()}
+                                </div>
+                                <span className="text-xs">{s.agentName}</span>
+                              </div>
+                            </td>
+                            <td style={tdStyle}>
+                              <span className="text-sm" style={{ color: 'var(--color-corthex-text-primary)' }}>
+                                {s.instruction.length > 40 ? s.instruction.slice(0, 40) + '…' : s.instruction}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span className="font-mono text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                                {s.description || s.cronExpression}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span className="font-mono text-[11px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                                {s.nextRunAt
+                                  ? new Date(s.nextRunAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                  : '--'}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold"
+                                style={{ background: activeBadge.bg, color: activeBadge.color, border: `1px solid ${activeBadge.border}` }}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeBadge.dot }} />
+                                {s.isActive ? 'ACTIVE' : 'PAUSED'}
+                              </span>
+                            </td>
+                            <td style={{ ...tdStyle, textAlign: 'right' }}>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => openEditSchedule(s)}
+                                  className="text-xs hover:opacity-80 transition-opacity"
+                                  style={{ color: 'var(--color-corthex-text-secondary)' }}
+                                >
+                                  편집
+                                </button>
+                                <button
+                                  onClick={() => toggleSchedule.mutate(s.id)}
+                                  className="text-xs font-medium hover:opacity-80 transition-opacity"
+                                  style={{ color: s.isActive ? '#fbbf24' : 'var(--color-corthex-accent)' }}
+                                >
+                                  {s.isActive ? '중지' : '시작'}
+                                </button>
+                                <button
+                                  onClick={() => setDeleteTarget({ id: s.id, type: 'schedule' })}
+                                  className="text-xs hover:opacity-80 transition-opacity"
+                                  style={{ color: '#f87171' }}
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div
+                  className="px-5 py-3"
+                  style={{ background: 'var(--color-corthex-elevated)', borderTop: '1px solid var(--color-corthex-border)' }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                    {schedules.length} schedules
+                  </p>
                 </div>
               </div>
-              <div className="px-8">
-                <span className={`rounded-full px-4 py-1 text-[10px] font-black tracking-wider uppercase ${t.isActive ? 'bg-green-100 text-green-700' : 'bg-corthex-elevated text-corthex-text-secondary'}`}>
-                  {t.isActive ? 'ACTIVE' : 'PAUSED'}
-                </span>
-              </div>
-              <div className="font-mono text-right">
-                <p className="text-[11px] font-medium text-corthex-text-secondary">{TRIGGER_TYPE_LABELS[t.triggerType] || t.triggerType}</p>
-                {t.lastTriggeredAt && <p className="text-[9px] text-corthex-text-secondary">마지막: {new Date(t.lastTriggeredAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>}
-              </div>
-              <div className="flex items-center gap-2 ml-4">
-                <button onClick={() => openEditTrigger(t)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors">편집</button>
-                <button onClick={() => toggleTrigger.mutate(t.id)} className={`text-xs ${t.isActive ? 'text-amber-700' : 'text-corthex-accent'}`}>{t.isActive ? '중지' : '다시 감시'}</button>
-                <button onClick={() => setDeleteTarget({ id: t.id, type: 'trigger' })} className="text-xs text-red-600 hover:text-red-700">삭제</button>
-              </div>
-            </div>
-          ))}
-        </div>
+            )}
+          </>
+        )}
 
-        {/* Summary Bar */}
-        <div className="fixed bottom-8 left-[280px] right-8 max-w-[1440px] mx-auto z-40 pointer-events-none">
-          <div className="bg-corthex-elevated/90 backdrop-blur-xl border border-corthex-border/30 rounded-2xl shadow-2xl p-2 flex flex-wrap md:flex-nowrap gap-2 items-stretch pointer-events-auto">
-            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">완료된 작업</span>
-              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'completed').length}건</p>
-            </div>
-            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">실행 중</span>
-              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{jobs.filter(j => j.status === 'processing').length}건</p>
-            </div>
-            <div className="bg-corthex-surface p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">활성 스케줄</span>
-              <p className="font-mono text-2xl font-black text-corthex-accent mt-1">{schedules.filter(s => s.isActive).length}건</p>
-            </div>
-            <div className="bg-corthex-accent p-4 rounded-xl flex-1 min-w-[150px] shadow-sm flex flex-col justify-between">
-              <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">오류 알림</span>
-              <p className="font-mono text-2xl font-black text-white mt-1">{jobs.filter(j => j.status === 'failed').length}건</p>
-            </div>
-          </div>
-        </div>
+        {/* ── Triggers Table ───────────────────────────────────────────── */}
+        {!isTabLoading && activeTab === 'trigger' && (
+          <>
+            {triggers.length === 0 ? (
+              <div className="text-center py-16" data-testid="triggers-empty">
+                <Target className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>등록된 이벤트 트리거가 없습니다</p>
+              </div>
+            ) : (
+              <div
+                className="rounded-lg overflow-hidden"
+                style={{ border: '1px solid var(--color-corthex-border)', background: 'var(--color-corthex-surface)' }}
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr>
+                        <th style={thStyle}>Agent</th>
+                        <th style={thStyle}>Description</th>
+                        <th style={thStyle}>Trigger Type</th>
+                        <th style={thStyle}>Last Triggered</th>
+                        <th style={thStyle}>Status</th>
+                        <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {triggers.map(t => {
+                        const activeBadge = getStatusBadge(t.isActive ? 'completed' : 'queued')
+                        return (
+                          <tr
+                            key={t.id}
+                            className="transition-colors"
+                            onMouseEnter={e => (e.currentTarget.style.background = 'color-mix(in srgb, var(--color-corthex-elevated) 60%, transparent)')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                            data-testid={`trigger-item-${t.id}`}
+                          >
+                            <td style={tdStyle}>
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                                  style={{
+                                    background: 'color-mix(in srgb, var(--color-corthex-accent) 15%, transparent)',
+                                    border: '1px solid color-mix(in srgb, var(--color-corthex-accent) 25%, transparent)',
+                                    color: 'var(--color-corthex-accent)',
+                                  }}
+                                >
+                                  {t.agentName.slice(0, 1).toUpperCase()}
+                                </div>
+                                <span className="text-xs">{t.agentName}</span>
+                              </div>
+                            </td>
+                            <td style={tdStyle}>
+                              <span className="text-sm" style={{ color: 'var(--color-corthex-text-primary)' }}>
+                                {t.instruction.length > 40 ? t.instruction.slice(0, 40) + '…' : t.instruction}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span
+                                className="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide"
+                                style={{
+                                  background: 'color-mix(in srgb, var(--color-corthex-accent) 8%, transparent)',
+                                  color: 'var(--color-corthex-accent)',
+                                  border: '1px solid color-mix(in srgb, var(--color-corthex-accent) 20%, transparent)',
+                                }}
+                              >
+                                {TRIGGER_TYPE_LABELS[t.triggerType] || t.triggerType}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span className="font-mono text-[11px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                                {t.lastTriggeredAt
+                                  ? new Date(t.lastTriggeredAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                  : '없음'}
+                              </span>
+                            </td>
+                            <td style={tdStyle}>
+                              <span
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold"
+                                style={{ background: activeBadge.bg, color: activeBadge.color, border: `1px solid ${activeBadge.border}` }}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeBadge.dot }} />
+                                {t.isActive ? 'WATCHING' : 'PAUSED'}
+                              </span>
+                            </td>
+                            <td style={{ ...tdStyle, textAlign: 'right' }}>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => openEditTrigger(t)}
+                                  className="text-xs hover:opacity-80 transition-opacity"
+                                  style={{ color: 'var(--color-corthex-text-secondary)' }}
+                                >
+                                  편집
+                                </button>
+                                <button
+                                  onClick={() => toggleTrigger.mutate(t.id)}
+                                  className="text-xs font-medium hover:opacity-80 transition-opacity"
+                                  style={{ color: t.isActive ? '#fbbf24' : 'var(--color-corthex-accent)' }}
+                                >
+                                  {t.isActive ? '중지' : '다시 감시'}
+                                </button>
+                                <button
+                                  onClick={() => setDeleteTarget({ id: t.id, type: 'trigger' })}
+                                  className="text-xs hover:opacity-80 transition-opacity"
+                                  style={{ color: '#f87171' }}
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div
+                  className="px-5 py-3"
+                  style={{ background: 'var(--color-corthex-elevated)', borderTop: '1px solid var(--color-corthex-border)' }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-text-secondary)' }}>
+                    {triggers.length} triggers
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {/* Create/Edit Modal */}
+      {/* ── Create/Edit Modal ──────────────────────────────────────────── */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => closeModal()}>
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()} data-testid="job-modal">
@@ -722,7 +1224,7 @@ export function JobsPage() {
         </div>
       )}
 
-      {/* Delete confirmation modal */}
+      {/* ── Delete Confirm Modal ───────────────────────────────────────── */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96" data-testid="delete-confirm-modal">

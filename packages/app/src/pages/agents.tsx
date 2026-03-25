@@ -39,6 +39,9 @@ import {
   SlidersHorizontal,
   Paintbrush,
   Database,
+  Search,
+  ChevronDown,
+  MoreVertical,
 } from 'lucide-react'
 import { BigFiveSliderGroup } from '../components/agents/big-five-slider-group'
 import type { PersonalityTraits } from '@corthex/shared'
@@ -114,8 +117,8 @@ const tierLabels: Record<string, string> = {
 }
 
 const tierBadgeStyles: Record<string, { bg: string; text: string }> = {
-  manager: { bg: 'bg-corthex-elevated', text: 'text-corthex-accent-deep' },
-  specialist: { bg: 'bg-corthex-elevated', text: 'text-corthex-accent' },
+  manager: { bg: 'bg-corthex-accent-muted', text: 'text-corthex-accent' },
+  specialist: { bg: 'bg-corthex-elevated', text: 'text-corthex-text-secondary' },
   worker: { bg: 'bg-corthex-elevated', text: 'text-corthex-text-secondary' },
 }
 
@@ -777,15 +780,18 @@ export function AgentsPage() {
     return a.name.toLowerCase().includes(q) || (a.nameEn?.toLowerCase().includes(q)) || (a.role?.toLowerCase().includes(q))
   })
 
+  const activeCount = agents.filter((a) => a.status === 'online' || a.status === 'working').length
+
   if (isLoading) {
     return (
-      <div data-testid="agents-page" className="flex-1 p-8 space-y-6 bg-corthex-bg">
-        <Skeleton className="h-10 w-64" />
-        <div className="flex gap-8">
-          <div className="w-[380px] space-y-2">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
-          </div>
-          <Skeleton className="flex-1 h-96 rounded-[2rem]" />
+      <div data-testid="agents-page" className="flex-1 p-8 bg-corthex-bg">
+        <div className="flex justify-between items-end mb-8">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-36" />
+        </div>
+        <Skeleton className="h-16 w-full rounded-xl mb-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
         </div>
       </div>
     )
@@ -794,132 +800,171 @@ export function AgentsPage() {
   if (isError) {
     return (
       <div data-testid="agents-page" className="flex-1 p-8 bg-corthex-bg">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-600">에이전트 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-red-600 hover:opacity-70 underline mt-2">다시 시도</button>
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl p-6 text-center">
+          <p className="text-sm text-red-500">에이전트 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary underline mt-2">다시 시도</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="agents-page" className="flex-1 bg-corthex-bg overflow-hidden">
-      <div className="p-8 max-w-[1440px] mx-auto h-full">
-        <div className="flex gap-8 h-[calc(100vh-64px)]">
-          {/* LEFT PANEL: Agent List */}
-          <aside className="w-[380px] flex flex-col gap-6 flex-shrink-0">
-            <header className="flex flex-col gap-4">
-              <div className="flex justify-between items-start">
-                <h1 className="text-2xl font-bold tracking-tight text-corthex-text-primary">
-                  에이전트 관리 <span className="text-corthex-text-secondary font-normal ml-1">Agents</span>
-                </h1>
-              </div>
+    <div data-testid="agents-page" className="flex-1 bg-corthex-bg min-h-screen">
+      <div className="p-8 max-w-[1440px] mx-auto">
+
+        {/* Page Header */}
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-corthex-text-primary tracking-tight mb-1">
+              Agents Ecosystem
+            </h1>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 text-xs font-mono text-corthex-accent bg-corthex-accent-muted px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                <span className="w-1.5 h-1.5 bg-corthex-accent rounded-full animate-pulse" />
+                {activeCount} Active
+              </span>
+              <span className="text-xs text-corthex-text-secondary font-medium">
+                Total: {agents.length}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="bg-corthex-accent hover:bg-corthex-accent-hover active:scale-[0.98] transition-all text-corthex-text-on-accent px-5 py-2.5 rounded-lg font-bold flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            에이전트 생성
+          </button>
+        </div>
+
+        {/* Filter Bar */}
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
+          <div className="relative flex-1 min-w-48">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-corthex-text-disabled pointer-events-none" />
+            <input
+              type="text"
+              placeholder="에이전트 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs rounded py-1.5 pl-9 pr-4 focus:outline-none focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent placeholder:text-corthex-text-disabled"
+            />
+          </div>
+          <div className="h-6 w-px bg-corthex-border" />
+          <div className="relative">
+            <select
+              value={filterDept}
+              onChange={(e) => setFilterDept(e.target.value)}
+              className="bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs rounded py-1.5 pl-3 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent"
+            >
+              {filterDeptOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none text-corthex-text-disabled" />
+          </div>
+          <div className="flex items-center gap-1">
+            {(['active', 'all', 'inactive'] as const).map((f) => (
               <button
-                onClick={() => setCreateOpen(true)}
-                className="w-full flex items-center justify-center gap-2 bg-corthex-accent hover:bg-corthex-accent-deep text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-sm active:scale-95"
+                key={f}
+                onClick={() => setFilterActive(f)}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  filterActive === f
+                    ? 'bg-corthex-accent text-corthex-text-on-accent'
+                    : 'text-corthex-text-secondary hover:text-corthex-text-primary'
+                }`}
               >
-                <Plus className="w-4 h-4" />
-                <span>새 에이전트 생성</span>
+                {f === 'active' ? '활성' : f === 'all' ? '전체' : '비활성'}
               </button>
-              <div className="relative">
-                <Bot className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-corthex-text-secondary" />
-                <input
-                  className="w-full bg-corthex-elevated border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-corthex-accent placeholder:text-corthex-text-secondary text-corthex-text-primary"
-                  placeholder="에이전트 검색..."
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {(['active', 'all', 'inactive'] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilterActive(f)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                      filterActive === f
-                        ? 'bg-corthex-accent text-white'
-                        : 'bg-corthex-border text-corthex-text-secondary hover:bg-corthex-border-strong'
-                    }`}
-                  >
-                    {f === 'active' ? '활성' : f === 'all' ? '전체' : '비활성'}
-                  </button>
-                ))}
-              </div>
-            </header>
+            ))}
+          </div>
+        </div>
 
-            {/* Agent List */}
-            <div className="flex-1 overflow-y-auto pr-2 space-y-2">
-              {filteredAgents.length === 0 && (
-                <EmptyState title="에이전트가 없습니다" description="첫 에이전트를 생성하여 AI 조직을 구성하세요" />
-              )}
-              {filteredAgents.map((agent) => {
-                const deptName = agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'
-                const status = statusConfig[agent.status] || statusConfig.offline
-                const isSelected = selectedAgent?.id === agent.id
+        {/* Agent Card Grid */}
+        {filteredAgents.length === 0 ? (
+          <EmptyState title="에이전트가 없습니다" description="첫 에이전트를 생성하여 AI 조직을 구성하세요" />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAgents.map((agent) => {
+              const deptName = agent.departmentId ? deptMap.get(agent.departmentId) || '부서' : '미배속'
+              const status = statusConfig[agent.status] || statusConfig.offline
+              const tierBadge = tierBadgeStyles[agent.tier] || tierBadgeStyles.worker
+              const isSelected = selectedAgent?.id === agent.id
 
-                return (
-                  <div
-                    key={agent.id}
-                    data-testid={`agent-row-${agent.id}`}
-                    onClick={() => setSelectedAgent(isSelected ? null : agent)}
-                    className={`p-4 rounded-xl cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-corthex-border border-l-4 border-corthex-accent shadow-sm'
-                        : 'bg-corthex-elevated hover:bg-corthex-elevated'
-                    } ${!agent.isActive ? 'opacity-50' : ''}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-corthex-accent-deep text-white flex items-center justify-center font-bold text-sm">
+              return (
+                <div
+                  key={agent.id}
+                  data-testid={`agent-row-${agent.id}`}
+                  onClick={() => setSelectedAgent(isSelected ? null : agent)}
+                  className={`bg-corthex-surface border rounded-xl p-5 transition-all group flex flex-col cursor-pointer ${
+                    isSelected
+                      ? 'border-corthex-accent'
+                      : 'border-corthex-border hover:border-corthex-accent-deep'
+                  } ${!agent.isActive ? 'opacity-50' : ''}`}
+                >
+                  {/* Avatar row + Tier Badge */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="relative">
+                      <div className="w-14 h-14 rounded-lg bg-corthex-elevated border border-corthex-border flex items-center justify-center font-bold text-corthex-accent-deep text-lg">
                         {getInitials(agent.name, agent.nameEn)}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-center">
-                          <h3 className={`${isSelected ? 'font-bold' : 'font-medium'} text-corthex-text-primary truncate`}>
-                            {agent.name}
-                            {agent.nameEn && <span className="text-[10px] text-corthex-text-secondary ml-1">{agent.nameEn}</span>}
-                          </h3>
-                          <span className={`flex h-2 w-2 rounded-full ${status.dot}`} />
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-corthex-text-secondary mt-0.5">
-                          <span className="font-medium">{deptName}</span>
-                          <span className="w-1 h-1 rounded-full bg-corthex-border" />
-                          <span className="font-mono">{agent.tier === 'manager' ? 'T1' : agent.tier === 'specialist' ? 'T2' : 'T3'}</span>
-                          <span className="w-1 h-1 rounded-full bg-corthex-border" />
-                          <span>{status.labelKo}</span>
-                        </div>
-                      </div>
+                      <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-corthex-surface ${status.dot}`} />
                     </div>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-corthex-border ${tierBadge.bg} ${tierBadge.text}`}>
+                      {tierLabels[agent.tier] || agent.tier}
+                    </span>
                   </div>
-                )
-              })}
-            </div>
-          </aside>
 
-          {/* RIGHT PANEL: Agent Details */}
-          <main className="flex-1 bg-corthex-elevated rounded-[2rem] p-8 overflow-y-auto flex flex-col">
-            {selectedAgent ? (
-              <AgentDetailPanel
-                agent={selectedAgent}
-                deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || '부서' : '미배속'}
-                departments={departmentsList}
-                users={usersList}
-                onEdit={handleEdit}
-                onDelete={() => setDeleteAgent(selectedAgent)}
-                onSoulSave={handleSoulSave}
-                isUpdating={updateMutation.isPending}
-              />
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center space-y-3">
-                  <Bot className="w-16 h-16 text-corthex-border mx-auto" />
-                  <p className="text-corthex-text-secondary font-medium">에이전트를 선택하세요</p>
-                  <p className="text-corthex-text-secondary text-sm">좌측 목록에서 에이전트를 클릭하면 상세 정보가 표시됩니다</p>
+                  {/* Name + Department */}
+                  <div className="mb-6 flex-1">
+                    <h3 className="text-lg font-bold text-corthex-text-primary group-hover:text-corthex-accent transition-colors leading-snug">
+                      {agent.name}
+                    </h3>
+                    <p className="text-xs text-corthex-text-secondary font-medium uppercase tracking-widest mt-0.5">
+                      {agent.role || agent.nameEn || deptName}
+                    </p>
+                    {agent.role && (
+                      <p className="text-xs text-corthex-text-disabled mt-0.5">{deptName}</p>
+                    )}
+                  </div>
+
+                  {/* Footer: status + last updated + more button */}
+                  <div className="mt-auto pt-4 border-t border-corthex-border flex justify-between items-center">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] uppercase font-bold text-corthex-text-disabled tracking-widest leading-none">
+                        {status.labelKo}
+                      </span>
+                      <span className="text-xs font-mono text-corthex-text-primary">
+                        {agent.updatedAt
+                          ? new Date(agent.updatedAt).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })
+                          : '—'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteAgent(agent) }}
+                      className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center hover:bg-corthex-elevated transition-colors text-corthex-text-secondary"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </main>
-        </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Detail Panel — shown below grid when agent is selected */}
+        {selectedAgent && (
+          <div className="mt-8 bg-corthex-elevated rounded-2xl border border-corthex-border p-8">
+            <AgentDetailPanel
+              agent={selectedAgent}
+              deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || '부서' : '미배속'}
+              departments={departmentsList}
+              users={usersList}
+              onEdit={handleEdit}
+              onDelete={() => setDeleteAgent(selectedAgent)}
+              onSoulSave={handleSoulSave}
+              isUpdating={updateMutation.isPending}
+            />
+          </div>
+        )}
       </div>
 
       {/* Create Modal */}
