@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #22D3EE;
-  --color-primary-hover: #67E8F9;
-  --color-surface: #0F172A;
-  --color-surface-alt: #1E293B;
-  --color-border-dark: #334155;
+  --color-primary: #CA8A04;
+  --color-primary-hover: #EAB308;
+  --color-surface: #1C1917;
+  --color-surface-alt: #292524;
+  --color-border-dark: #44403C;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #020617;
+  font-family: 'DM Sans', 'Inter', sans-serif;
+  background-color: #0C0A09;
   color: #f8fafc;
   min-height: 100vh;
   margin: 0;
