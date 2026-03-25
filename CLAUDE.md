@@ -34,6 +34,9 @@
 - **각 Step의 모든 요구사항을 충족한 후 다음 Step으로 넘어가라.** PARTIAL 상태로 다음 Phase 진행 금지.
 - **Coverage Gate가 있으면 100% 달성 후 진행.** "대부분 했으니 다음으로" 금지.
 - **사용자가 "빨리해"라고 해도 Step 스킵은 안 됨.** 속도는 병렬 실행으로 올려라, Step 제거로 올리지 마라.
+- **Step 0 (Auto-Scan)은 모든 패키지를 빠짐없이 스캔해야 한다.** `ls packages/` 결과 전부 확인. 라우트 수는 코드에서 직접 세라 (추측 금지).
+- **"완료" 보고 전에 Gate를 반드시 실행해라.** Coverage Gate = grep/count로 실제 확인. "다 한 것 같다"는 완료가 아니다.
+- **프로젝트 상태 언급 시 코드를 직접 읽어서 확인.** 메모리나 추측으로 "없다/있다" 말하지 마라. (2026-03-25 office 패키지 "없다" 오답 사건)
 
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.
