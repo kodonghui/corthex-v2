@@ -57,9 +57,9 @@ type Comment = {
 }
 
 const STATUS_STYLES: Record<string, { label: string; bgClass: string; textClass: string }> = {
-  draft: { label: 'Draft', bgClass: 'bg-corthex-elevated', textClass: 'text-corthex-text-secondary' },
-  submitted: { label: 'Submitted', bgClass: 'bg-amber-100', textClass: 'text-amber-700' },
-  reviewed: { label: 'Reviewed', bgClass: 'bg-green-100', textClass: 'text-green-700' },
+  draft: { label: 'Draft', bgClass: 'bg-corthex-elevated border border-corthex-border', textClass: 'text-corthex-text-secondary' },
+  submitted: { label: 'Submitted', bgClass: 'bg-corthex-accent/10 border border-corthex-accent/30', textClass: 'text-corthex-accent' },
+  reviewed: { label: 'Reviewed', bgClass: 'bg-corthex-success/10 border border-corthex-success/30', textClass: 'text-corthex-success' },
 }
 
 // === Main Page ===
@@ -320,74 +320,133 @@ export function ReportsPage() {
   return (
     <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }} data-testid="reports-page">
       <div className="flex h-full overflow-hidden">
-        {/* Main Content Area */}
-          {/* Dashboard Content */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Report List Column */}
-            <div className="w-1/3 border-r border-corthex-border flex flex-col overflow-hidden bg-corthex-elevated/50">
-              <div className="p-4 flex gap-2 overflow-x-auto shrink-0 border-b border-corthex-border">
-                {filterTabs.map(tab => (
-                  <button
-                    key={tab.value}
-                    onClick={() => setActiveTab(tab.value)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                      activeTab === tab.value
-                        ? 'text-white'
-                        : 'bg-corthex-surface border border-corthex-border text-corthex-text-secondary'
-                    }`}
-                    style={activeTab === tab.value ? { backgroundColor: accentColor } : {}}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+        {/* Filter Sidebar */}
+        <aside className="w-52 border-r border-corthex-border flex flex-col gap-6 p-4 shrink-0 overflow-y-auto bg-corthex-elevated/30">
+          <section>
+            <label className="block text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest mb-3">Report Type</label>
+            <div className="space-y-2">
+              {filterTabs.map(tab => (
+                <label key={tab.value} className="flex items-center gap-3 group cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={activeTab === tab.value}
+                    onChange={() => setActiveTab(tab.value)}
+                    className="rounded border-corthex-border bg-corthex-elevated text-corthex-accent"
+                  />
+                  <span className="text-sm text-corthex-text-secondary group-hover:text-corthex-accent transition-colors">{tab.label}</span>
+                </label>
+              ))}
+            </div>
+          </section>
+          <section>
+            <label className="block text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest mb-3">Search</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search reports..."
+              className="w-full bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs px-3 py-2 rounded focus:border-corthex-accent outline-none"
+            />
+          </section>
+          <section className="pt-6 border-t border-corthex-border/50">
+            <div className="bg-corthex-accent/5 border border-corthex-accent/20 rounded p-4">
+              <h4 className="text-[10px] font-black text-corthex-accent uppercase tracking-widest mb-2">Statistics</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-corthex-text-secondary">Total</span>
+                  <span className="text-corthex-accent font-mono">{reportList.length}</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-corthex-text-secondary">Reviewed</span>
+                  <span className="text-corthex-accent font-mono">{reportList.filter(r => r.status === 'reviewed').length}</span>
+                </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            </div>
+          </section>
+        </aside>
+
+        {/* Center: Table Area */}
+        <div className="flex-1 flex flex-col overflow-hidden border-r border-corthex-border">
+          <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-corthex-border bg-corthex-surface/50">
+            <h1 className="text-xl font-black tracking-tight text-corthex-text-primary flex items-center gap-3">
+              Active Reports
+              <span className="bg-corthex-accent/10 text-corthex-accent text-[10px] px-2 py-0.5 rounded border border-corthex-accent/30 font-mono">{filteredReports.length}</span>
+            </h1>
+            <button
+              onClick={() => setView('create')}
+              className="text-sm font-bold px-5 py-2.5 rounded text-white flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+              style={{ backgroundColor: accentColor }}
+              data-testid="new-report-btn"
+            >
+              + New Report
+            </button>
+          </div>
+          <div className="flex-1 overflow-auto bg-corthex-bg/20">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 bg-corthex-elevated/80 backdrop-blur-md z-10">
+                <tr className="text-[10px] font-black text-corthex-text-secondary uppercase tracking-widest border-b border-corthex-border">
+                  <th className="px-6 py-4">Title</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Author</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-corthex-border/50">
                 {isLoading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="p-4 bg-corthex-surface rounded-xl h-24 animate-pulse border border-corthex-border" />
-                  ))
+                  <tr><td colSpan={5} className="px-6 py-10 text-center text-corthex-text-secondary text-sm animate-pulse">Loading...</td></tr>
                 ) : filteredReports.length === 0 ? (
-                  <div className="text-center py-16 text-sm text-corthex-text-secondary" data-testid="reports-empty">
-                    보고서가 없습니다
-                  </div>
+                  <tr><td colSpan={5} className="px-6 py-10 text-center text-corthex-text-secondary text-sm" data-testid="reports-empty">보고서가 없습니다</td></tr>
                 ) : (
-                  filteredReports.map((r) => {
+                  filteredReports.map(r => {
                     const isSelected = selectedReport === r.id
                     const style = STATUS_STYLES[r.status] || STATUS_STYLES.draft
                     return (
-                      <div
+                      <tr
                         key={r.id}
                         onClick={() => handleOpenDetail(r.id)}
-                        className={`p-4 bg-corthex-surface rounded-xl transition-all cursor-pointer shadow-sm ${
-                          isSelected
-                            ? 'border-2 ring-1'
-                            : 'border border-corthex-border hover:border-stone-400'
-                        }`}
-                        style={isSelected ? { borderColor: accentColor, boxShadow: `0 0 0 1px ${accentColor}1a` } : {}}
+                        className={`hover:bg-corthex-elevated/40 transition-colors cursor-pointer ${isSelected ? 'bg-corthex-accent/5' : ''}`}
                         data-testid={`report-item-${r.id}`}
                       >
-                        <div className="flex justify-between items-start mb-2">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bgClass} ${style.textClass}`}>
-                            {style.label}
-                          </span>
-                          <span className="text-[10px] text-corthex-text-secondary font-medium">
-                            {new Date(r.submittedAt || r.updatedAt).toLocaleDateString('ko-KR')}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-corthex-text-primary mb-1 leading-tight">{r.title}</h3>
-                        <div className="flex items-center gap-2 text-xs text-corthex-text-secondary">
-                          <Wrench className="w-4 h-4" />
-                          <span>Agent: {r.authorName}</span>
-                        </div>
-                      </div>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className={`font-bold transition-colors ${isSelected ? 'text-corthex-accent' : 'text-corthex-text-primary'}`}>{r.title}</span>
+                            <span className="text-[10px] text-corthex-text-disabled font-mono">{r.id.slice(0, 12)}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${style.bgClass} ${style.textClass}`}>{style.label}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <Wrench className="w-4 h-4 text-corthex-text-disabled" />
+                            <span className="text-sm text-corthex-text-secondary">{r.authorName}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-xs text-corthex-text-secondary">{new Date(r.submittedAt || r.updatedAt).toLocaleDateString('en-US')}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {r.status !== 'draft' && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedReport(r.id); setShowShareModal(true) }}
+                              className="text-corthex-text-disabled hover:text-corthex-accent transition-colors"
+                            >
+                              <Share2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
                     )
                   })
                 )}
-              </div>
-            </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            {/* Report Detail Viewer */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-corthex-surface">
+        {/* Right: Report Detail Viewer */}
+        <div className="w-[440px] shrink-0 flex flex-col overflow-hidden bg-corthex-surface">
               {!selectedReport || !report ? (
                 <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
                   보고서를 선택하세요
@@ -584,8 +643,7 @@ export function ReportsPage() {
                   </div>
                 </>
               )}
-            </div>
-          </div>
+        </div>
       </div>
 
       {/* ConfirmDialog: CEO 보고 */}

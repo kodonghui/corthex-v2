@@ -245,7 +245,7 @@ export function TiersPage() {
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-4 w-96" />
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-xl" />
+          <Skeleton key={i} className="h-32 w-full rounded-xl" />
         ))}
       </div>
     )
@@ -255,9 +255,9 @@ export function TiersPage() {
   if (isError) {
     return (
       <div data-testid="tiers-page" className="flex-1 p-8 bg-corthex-bg">
-        <div className="bg-red-600/10 border border-red-600/20 rounded-xl p-6 text-center">
-          <p className="text-sm text-red-600">계층 목록을 불러올 수 없습니다</p>
-          <button onClick={() => refetch()} className="text-xs text-red-600 hover:opacity-70 underline mt-2">
+        <div className="bg-corthex-error/10 border border-corthex-error/20 rounded-xl p-6 text-center">
+          <p className="text-sm text-corthex-error">계층 목록을 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-corthex-error hover:opacity-70 underline mt-2">
             다시 시도
           </button>
         </div>
@@ -265,30 +265,23 @@ export function TiersPage() {
     )
   }
 
-  const getTierBadge = (index: number) => {
-    const style = TIER_BADGE_STYLES[Math.min(index, 2)]
-    return style
-  }
-
   return (
     <div data-testid="tiers-page" className="flex-1 bg-corthex-bg overflow-y-auto">
-      <div className="p-8 max-w-[1440px] mx-auto min-h-screen">
-        {/* HEADER SECTION */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div className="space-y-2">
-            <h1 className="text-[2.75rem] font-extrabold tracking-tighter leading-tight text-corthex-text-primary">
-              계급 관리 <span className="text-corthex-text-secondary font-medium">Tier Management</span>
-            </h1>
-            <p className="text-lg text-corthex-text-secondary font-medium">에이전트 계층 구조를 정의하고 관리합니다</p>
+      <div className="p-8 max-w-4xl mx-auto min-h-screen">
+        {/* HEADER */}
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 text-corthex-text-primary">Tiers Hierarchy</h1>
+            <p className="text-corthex-text-secondary text-sm">Define and manage hierarchical permission structures and model assignments for agents.</p>
           </div>
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-corthex-accent hover:bg-corthex-accent-deep text-white px-6 h-11 rounded-lg flex items-center gap-2 transition-all shadow-sm active:scale-95"
+            className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all active:scale-95"
           >
             <Plus className="w-5 h-5" />
-            <span className="font-semibold">계급 생성 Create Tier</span>
+            <span>Create Tier</span>
           </button>
-        </header>
+        </div>
 
         {/* Empty state */}
         {tiers.length === 0 && (
@@ -298,109 +291,133 @@ export function TiersPage() {
           />
         )}
 
-        {/* MAIN TABLE SECTION */}
+        {/* VERTICAL TIER STACK */}
         {tiers.length > 0 && (
-          <div className="bg-corthex-elevated rounded-xl overflow-hidden shadow-sm border border-corthex-border/50">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-corthex-border/50">
-                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">계급명 Tier Name</th>
-                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary text-center">레벨 Level</th>
-                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">최대 도구 Max Tools</th>
-                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">AI 모델 Model</th>
-                    <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary text-right">작업 Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-corthex-border/30">
-                  {tiers.map((tier, index) => {
-                    const badge = getTierBadge(index)
-                    const levelColor = TIER_LEVEL_COLORS[Math.min(index, TIER_LEVEL_COLORS.length - 1)]
-                    return (
-                      <tr key={tier.id} data-testid={`tier-row-${tier.id}`} className="hover:bg-corthex-elevated transition-colors group">
-                        <td className="px-6 py-5 relative">
-                          <div className="absolute left-0 top-1/4 bottom-1/4 w-1 rounded-r-full" style={{ backgroundColor: levelColor }} />
-                          <div className="flex flex-col">
-                            <span className="font-bold text-corthex-text-primary">{tier.name}</span>
-                            {tier.description && <span className="text-xs text-corthex-text-secondary">{tier.description}</span>}
+          <div className="flex flex-col items-center">
+            {tiers.map((tier, index) => {
+              const levelColor = TIER_LEVEL_COLORS[Math.min(index, TIER_LEVEL_COLORS.length - 1)]
+              return (
+                <div key={tier.id} className="w-full" data-testid={`tier-row-${tier.id}`}>
+                  {/* Tier Card */}
+                  <div className="bg-corthex-surface border border-corthex-border rounded-xl p-6 transition-all duration-200 hover:border-corthex-accent/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: levelColor }} />
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-5">
+                        {/* Level badge */}
+                        <div className="bg-corthex-elevated border border-corthex-border rounded-lg p-3 text-center min-w-[64px]" style={{ backgroundColor: index === 0 ? `${levelColor}19` : undefined, borderColor: index === 0 ? `${levelColor}33` : undefined }}>
+                          <div className="text-[10px] font-mono font-bold uppercase tracking-widest" style={{ color: index === 0 ? levelColor : undefined, opacity: index === 0 ? 1 : 0.6 }}>LEVEL</div>
+                          <div className="text-2xl font-mono font-bold text-corthex-text-primary">L{tier.tierLevel}</div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h2 className="text-xl font-bold text-corthex-text-primary">{tier.name}</h2>
+                            {index === 0 && (
+                              <span className="bg-corthex-success/10 text-corthex-success text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-corthex-success/20">Active Authority</span>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-6 py-5 text-center">
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: `${levelColor}15`, color: levelColor }}>
-                            <Shield className="w-3.5 h-3.5" />
-                            <span className="font-mono font-bold">{tier.tierLevel}</span>
+                          <div className="flex items-center gap-4 mb-2">
+                            <div className="flex items-center gap-1.5 px-2 py-1 bg-corthex-elevated rounded border border-corthex-border">
+                              <Brain className="w-3 h-3 text-corthex-accent" />
+                              <span className="text-xs font-mono font-medium text-corthex-text-secondary">{getModelLabel(tier.modelPreference)}</span>
+                            </div>
+                            {tier.description && (
+                              <span className="text-xs text-corthex-text-secondary">{tier.description}</span>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-6 py-5">
-                          {tier.maxTools === 0 ? (
-                            <span className="font-mono text-corthex-text-secondary">Unlimited</span>
-                          ) : (
-                            <span className="font-mono text-corthex-text-secondary">{tier.maxTools} tools</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-5">
-                          <span className="px-3 py-1 bg-corthex-border text-corthex-text-primary rounded-full text-xs font-semibold">
-                            {getModelShortLabel(tier.modelPreference)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <div className="flex justify-end gap-4">
-                            <button
-                              onClick={() => handleMoveUp(index)}
-                              disabled={index === 0 || reorderMutation.isPending}
-                              className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep disabled:opacity-30 transition-colors"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              onClick={() => handleMoveDown(index)}
-                              disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                              className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep disabled:opacity-30 transition-colors"
-                            >
-                              ▼
-                            </button>
-                            <button
-                              onClick={() => setEditTier(tier)}
-                              className="text-xs font-bold text-corthex-text-secondary hover:text-corthex-accent transition-colors"
-                            >
-                              수정 Edit
-                            </button>
-                            <button
-                              onClick={() => setDeleteTier(tier)}
-                              className="text-xs font-bold text-red-600 hover:opacity-70 transition-colors"
-                            >
-                              삭제 Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                      </div>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleMoveUp(index)}
+                          disabled={index === 0 || reorderMutation.isPending}
+                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
+                          title="Move up"
+                        >▲</button>
+                        <button
+                          onClick={() => handleMoveDown(index)}
+                          disabled={index === tiers.length - 1 || reorderMutation.isPending}
+                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
+                          title="Move down"
+                        >▼</button>
+                        <button
+                          onClick={() => setEditTier(tier)}
+                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary"
+                          title="Edit"
+                        >
+                          <Shield className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTier(tier)}
+                          className="p-2 hover:bg-corthex-error/10 rounded transition-colors text-corthex-text-secondary hover:text-corthex-error"
+                          title="Delete"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                        </button>
+                      </div>
+                    </div>
+                    {/* Metrics row */}
+                    <div className="mt-4 pt-4 border-t border-corthex-border/30 grid grid-cols-3 gap-6">
+                      <div>
+                        <div className="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-1 font-mono">MAX TOOLS</div>
+                        <div className="text-sm font-mono font-bold text-corthex-text-primary">
+                          {tier.maxTools === 0 ? 'Unlimited' : `${tier.maxTools} tools`}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-1 font-mono">AI MODEL</div>
+                        <div className="text-sm font-mono font-bold text-corthex-text-primary">{getModelShortLabel(tier.modelPreference)}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-1 font-mono">TIER LEVEL</div>
+                        <div className="text-sm font-mono font-bold" style={{ color: levelColor }}>Level {tier.tierLevel}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Flow connector */}
+                  {index < tiers.length - 1 && (
+                    <div className="flex flex-col items-center">
+                      <div className="w-0.5 h-10" style={{ background: `linear-gradient(to bottom, ${levelColor}, transparent)` }} />
+                      <svg className="w-4 h-4 text-corthex-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l-6-6h12l-6 6z" /></svg>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            {/* Add Tier Placeholder */}
+            <div
+              onClick={() => setCreateOpen(true)}
+              className="mt-6 w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-corthex-border rounded-xl group hover:border-corthex-accent/40 transition-colors cursor-pointer"
+            >
+              <div className="w-12 h-12 rounded-full bg-corthex-elevated flex items-center justify-center mb-4 group-hover:bg-corthex-accent/10 transition-colors">
+                <Plus className="w-5 h-5 text-corthex-text-disabled group-hover:text-corthex-accent" />
+              </div>
+              <h3 className="text-sm font-bold text-corthex-text-secondary group-hover:text-corthex-text-primary">Append Hierarchy Level</h3>
+              <p className="text-xs text-corthex-text-disabled mt-1">L{tiers.length + 1} Custom Operations</p>
             </div>
           </div>
         )}
 
         {/* SUMMARY SECTION */}
         <footer className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between group hover:bg-corthex-elevated transition-colors">
+          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">총 계급 수 Total Tiers</p>
-              <p className="text-2xl font-black text-corthex-accent">{tiers.length}개</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Total Tiers</p>
+              <p className="text-2xl font-black text-corthex-accent">{tiers.length}</p>
             </div>
             <GitBranch className="w-9 h-9 text-corthex-border" />
           </div>
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between group hover:bg-corthex-elevated transition-colors">
+          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">총 도구 할당 Total Tools</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Total Tools</p>
               <p className="text-2xl font-black text-corthex-accent">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0)}</p>
             </div>
             <Users className="w-9 h-9 text-corthex-border" />
           </div>
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between group hover:bg-corthex-elevated transition-colors">
+          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">평균 모델 수준</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Avg Model</p>
               <p className="text-2xl font-black text-corthex-accent font-mono">
                 {tiers.length > 0 ? getModelShortLabel(tiers[Math.floor(tiers.length / 2)]?.modelPreference || '') : '--'}
               </p>

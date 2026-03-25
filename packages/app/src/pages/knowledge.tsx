@@ -26,6 +26,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { Badge, SkeletonTable, EmptyState, Modal, ConfirmDialog, toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../components/markdown-renderer'
+import { FileText, Code2, FileType2, GitBranch } from 'lucide-react'
 
 // === Types ===
 
@@ -103,10 +104,31 @@ const sandBg = 'var(--color-corthex-bg)'
 const borderColor = 'var(--color-corthex-border)'
 
 const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
-  markdown: 'bg-blue-100 text-blue-700',
+  markdown: 'bg-blue-500/10 text-blue-400',
   text: 'bg-corthex-elevated text-corthex-text-secondary',
-  html: 'bg-orange-100 text-orange-700',
-  mermaid: 'bg-purple-100 text-purple-700',
+  html: 'bg-orange-500/10 text-orange-400',
+  mermaid: 'bg-purple-500/10 text-purple-400',
+}
+
+const CONTENT_TYPE_ICON_BG: Record<ContentType, string> = {
+  markdown: 'bg-blue-500/10 border-blue-500/20',
+  text: 'bg-corthex-elevated border-corthex-border',
+  html: 'bg-orange-500/10 border-orange-500/20',
+  mermaid: 'bg-purple-500/10 border-purple-500/20',
+}
+
+const CONTENT_TYPE_ICON_COLOR: Record<ContentType, string> = {
+  markdown: 'text-blue-400',
+  text: 'text-corthex-text-secondary',
+  html: 'text-orange-400',
+  mermaid: 'text-purple-400',
+}
+
+const CONTENT_TYPE_BADGE_STYLE: Record<ContentType, string> = {
+  markdown: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  text: 'bg-corthex-elevated text-corthex-text-secondary border-corthex-border',
+  html: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  mermaid: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
 }
 
 const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
@@ -441,14 +463,14 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
           {/* Document list with drop zone */}
           <div
-            className={`flex-1 overflow-y-auto p-4 space-y-4 relative transition-colors ${dragOver ? 'bg-green-50' : ''}`}
+            className={`flex-1 overflow-y-auto p-4 relative transition-colors ${dragOver ? 'bg-corthex-accent/5' : ''}`}
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
             {dragOver && (
-              <div className="absolute inset-4 border-2 border-dashed rounded-xl flex flex-col items-center justify-center z-10 pointer-events-none" style={{ borderColor: oliveColor, backgroundColor: `${oliveColor}1a` }}>
+              <div className="absolute inset-4 border-2 border-dashed flex flex-col items-center justify-center z-10 pointer-events-none" style={{ borderColor: oliveColor, backgroundColor: `${oliveColor}1a` }}>
                 <span className="text-sm font-medium" style={{ color: oliveColor }}>파일을 놓으세요</span>
               </div>
             )}
@@ -462,39 +484,49 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
                 <button onClick={() => setShowCreateModal(true)} className="text-white rounded-lg px-4 py-2 text-sm font-bold transition-colors" style={{ backgroundColor: oliveColor }}>문서 만들기</button>
               </div>
             ) : (
-              items.map(doc => {
-                const isActive = detailDoc?.id === doc.id
-                return (
-                  <div
-                    key={doc.id}
-                    onClick={() => setDetailDoc(doc)}
-                    className={`bg-corthex-surface p-4 rounded-2xl shadow-sm cursor-pointer transition-all ${
-                      isActive ? 'ring-4' : 'border border-transparent hover:shadow-md'
-                    }`}
-                    style={isActive ? { borderColor: oliveColor, borderWidth: '2px', borderStyle: 'solid', ['--tw-ring-color' as string]: `${oliveColor}14` } : { borderColor: 'transparent' }}
-                    data-testid={`doc-row-${doc.id}`}
-                  >
-                    <h4 className={`font-bold mb-1 ${isActive ? 'text-corthex-text-primary' : 'text-corthex-text-primary'}`}>{doc.title}</h4>
-                    <div className="flex gap-2 mb-2">
-                      {doc.tags.slice(0, 2).map(tag => (
-                        <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight rounded" style={{ backgroundColor: sandBg, color: oliveColor }}>
-                          {tag}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {items.map(doc => {
+                  const isActive = detailDoc?.id === doc.id
+                  const iconBg = CONTENT_TYPE_ICON_BG[doc.contentType] ?? 'bg-corthex-elevated border-corthex-border'
+                  const iconColor = CONTENT_TYPE_ICON_COLOR[doc.contentType] ?? 'text-corthex-text-secondary'
+                  const badgeStyle = CONTENT_TYPE_BADGE_STYLE[doc.contentType] ?? 'bg-corthex-elevated text-corthex-text-secondary border-corthex-border'
+                  return (
+                    <div
+                      key={doc.id}
+                      onClick={() => setDetailDoc(doc)}
+                      className={`group bg-corthex-surface border p-5 cursor-pointer transition-all flex flex-col relative overflow-hidden ${isActive ? 'border-corthex-accent' : 'border-corthex-border hover:border-corthex-accent/40'}`}
+                      data-testid={`doc-row-${doc.id}`}
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className={`w-12 h-12 rounded flex items-center justify-center border ${iconBg} group-hover:scale-110 transition-transform`}>
+                          {doc.contentType === 'markdown' && <FileText className={`w-5 h-5 ${iconColor}`} />}
+                          {doc.contentType === 'text' && <FileType2 className={`w-5 h-5 ${iconColor}`} />}
+                          {doc.contentType === 'html' && <Code2 className={`w-5 h-5 ${iconColor}`} />}
+                          {doc.contentType === 'mermaid' && <GitBranch className={`w-5 h-5 ${iconColor}`} />}
+                        </div>
+                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${badgeStyle}`}>
+                          {doc.contentType.toUpperCase()}
                         </span>
-                      ))}
+                      </div>
+                      <h4 className="font-bold text-base mb-2 text-corthex-text-primary group-hover:text-corthex-accent transition-colors line-clamp-1">{doc.title}</h4>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {doc.tags.slice(0, 2).map(tag => (
+                          <span key={tag} className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-corthex-elevated text-corthex-text-secondary border border-corthex-border">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
+                        <p className="text-xs text-corthex-text-secondary line-clamp-1 mb-2">{(doc as Record<string, string>).highlight}</p>
+                      )}
+                      <div className="mt-auto pt-4 border-t border-corthex-border flex justify-between items-center text-[11px]">
+                        <span className="font-mono text-corthex-text-disabled">MOD: {new Date(doc.updatedAt).toLocaleDateString('en-US', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/\//g, '.')}</span>
+                        <span className="font-mono text-corthex-accent/70">{doc.updatedBy || doc.createdBy || '—'}</span>
+                      </div>
                     </div>
-                    {doc.content && (
-                      <p className="text-xs text-corthex-text-secondary line-clamp-2 leading-relaxed">{doc.content.slice(0, 150)}</p>
-                    )}
-                    {isSearchActive && 'highlight' in doc && typeof (doc as Record<string, unknown>).highlight === 'string' && (
-                      <p className="text-xs text-corthex-text-secondary line-clamp-1 mt-1">{(doc as Record<string, string>).highlight}</p>
-                    )}
-                    <div className="mt-3 text-[10px] text-corthex-text-secondary flex items-center justify-between">
-                      <span>Edited {formatRelative(doc.updatedAt)}</span>
-                      <span>By {doc.updatedBy || doc.createdBy || 'Unknown'}</span>
-                    </div>
-                  </div>
-                )
-              })
+                  )
+                })}
+              </div>
             )}
           </div>
 

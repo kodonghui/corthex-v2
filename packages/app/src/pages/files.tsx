@@ -157,8 +157,7 @@ export function FilesPage() {
 
   return (
     <div
-      className="min-h-screen font-sans"
-      style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)', fontFamily: "'Inter', sans-serif" }}
+      className="min-h-screen bg-corthex-bg text-corthex-text-primary"
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -167,230 +166,197 @@ export function FilesPage() {
     >
       {/* Drag overlay */}
       {dragOver && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center" style={{ backgroundColor: 'rgba(96,108,56,0.06)', border: '2px dashed rgba(96,108,56,0.4)' }}>
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-corthex-accent/5 border-2 border-dashed border-corthex-accent/40">
           <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            <p className="text-lg font-bold mb-1" style={{ color: 'var(--color-corthex-text-primary)' }}>Drag and drop files here</p>
-            <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>or click to browse from your computer</p>
+            <svg className="w-16 h-16 mx-auto mb-4 text-corthex-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            <p className="text-lg font-bold mb-1 text-corthex-text-primary">Drop files to secure</p>
+            <p className="text-sm text-corthex-text-secondary">Files will be encrypted on upload</p>
           </div>
         </div>
       )}
 
-      <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-6">
-        {/* Page Title */}
-        <div className="flex items-center justify-between" data-testid="files-header">
-          <h1 className="text-3xl font-bold leading-tight" style={{ fontFamily: "'Inter', sans-serif", color: 'var(--color-corthex-text-primary)' }}>Files</h1>
+      <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6">
+        {/* Page Header */}
+        <div className="flex items-end justify-between" data-testid="files-header">
           <div>
+            <h2 className="text-3xl font-black text-corthex-text-primary tracking-tight mb-1 uppercase">
+              {user?.name ? `${user.name}'s Drive` : 'Project Drive'}
+            </h2>
+            <p className="text-corthex-text-secondary text-sm">Quantum-resistant encrypted storage. Restricted access protocol active.</p>
+          </div>
+          <div className="flex gap-3">
             <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="flex cursor-pointer items-center justify-center rounded-xl text-sm font-bold h-9 px-5 transition-colors disabled:opacity-50 hover:opacity-90"
-              style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
+              className="flex items-center gap-2 px-4 py-2 bg-corthex-surface border border-corthex-accent/30 text-corthex-accent rounded text-xs font-bold hover:bg-corthex-accent hover:text-corthex-bg transition-all disabled:opacity-50"
               aria-label="파일 업로드"
               data-testid="upload-button"
             >
-              <svg className="w-[18px] h-[18px] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-              {isUploading ? '업로드 중...' : '업로드'}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              {isUploading ? 'Uploading...' : 'Upload File'}
             </button>
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2" data-testid="files-filters">
-          {FILTER_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setFilter(opt.value)}
-              className="flex h-8 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors"
-              style={filter === opt.value
-                ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }
-                : { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)', border: '1px solid #e5e1d3' }
-              }
-              data-testid={`filter-${opt.value}`}
+        {/* Toolbar: filters + search + sort + view */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2" data-testid="files-filters">
+            {FILTER_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setFilter(opt.value)}
+                className={`px-3 py-1.5 text-xs font-bold rounded border transition-colors ${
+                  filter === opt.value
+                    ? 'bg-corthex-accent text-corthex-bg border-corthex-accent'
+                    : 'bg-corthex-elevated text-corthex-text-secondary border-corthex-border hover:border-corthex-accent/50'
+                }`}
+                data-testid={`filter-${opt.value}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+              <input
+                className="bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs py-2 pl-9 pr-4 rounded w-56 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent transition-all placeholder:text-corthex-text-disabled"
+                placeholder="Search encrypted files..."
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                data-testid="file-search"
+              />
+            </div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as 'date' | 'name' | 'size')}
+              className="bg-transparent border-none text-xs font-semibold text-corthex-accent cursor-pointer focus:ring-0"
             >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Bar */}
-        <div className="w-full">
-          <label
-            className="flex items-center w-full h-12 bg-corthex-surface border rounded-xl overflow-hidden transition-shadow"
-            style={{ borderColor: 'var(--color-corthex-border)' }}
-          >
-            <svg className="w-5 h-5 ml-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
-            <input
-              className="w-full bg-transparent border-none text-sm px-3 focus:outline-none focus:ring-0 placeholder:text-stone-400"
-              style={{ color: 'var(--color-corthex-text-primary)' }}
-              placeholder="Search files, formats, or uploaders..."
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              data-testid="file-search"
-            />
-          </label>
-        </div>
-
-        {/* Sort + View toggle */}
-        <div className="flex justify-between items-center">
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value as 'date' | 'name' | 'size')}
-            className="bg-transparent border-none text-sm font-medium transition-colors cursor-pointer p-0 focus:ring-0"
-            style={{ color: 'var(--color-corthex-text-secondary)' }}
-          >
-            <option value="date">최근 생성일순</option>
-            <option value="name">이름순</option>
-            <option value="size">크기순</option>
-          </select>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setViewMode('list')}
-              className="p-1.5 rounded-lg transition-colors"
-              style={viewMode === 'list'
-                ? { color: 'var(--color-corthex-accent)', backgroundColor: 'rgba(96,108,56,0.1)' }
-                : { color: 'var(--color-corthex-text-secondary)' }
-              }
-              aria-label="리스트 보기"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className="p-1.5 rounded-lg transition-colors"
-              style={viewMode === 'grid'
-                ? { color: 'var(--color-corthex-accent)', backgroundColor: 'rgba(96,108,56,0.1)' }
-                : { color: 'var(--color-corthex-text-secondary)' }
-              }
-              aria-label="그리드 보기"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            </button>
+              <option value="date">Date Modified</option>
+              <option value="name">Name</option>
+              <option value="size">File Size</option>
+            </select>
+            <div className="flex items-center gap-1 bg-corthex-elevated rounded p-1 border border-corthex-border">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded transition-colors ${viewMode === 'grid' ? 'bg-corthex-border text-corthex-accent' : 'text-corthex-text-disabled hover:text-corthex-text-secondary'}`}
+                aria-label="그리드 보기"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded transition-colors ${viewMode === 'list' ? 'bg-corthex-border text-corthex-accent' : 'text-corthex-text-disabled hover:text-corthex-text-secondary'}`}
+                aria-label="리스트 보기"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Drop zone */}
-        <div
-          className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-12 cursor-pointer transition-colors"
-          style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'rgba(242,240,233,0.5)' }}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <svg className="w-10 h-10" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-          <div className="text-center">
-            <p className="text-lg font-bold mb-1" style={{ color: 'var(--color-corthex-text-primary)' }}>Drag and drop files here</p>
-            <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>or click to browse from your computer</p>
-          </div>
-        </div>
-
-        {/* File List / Grid */}
+        {/* File Grid / List */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-loading">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)', border: '1px solid #e5e1d3' }} />
+              <div key={i} className="h-32 animate-pulse bg-corthex-elevated border border-corthex-border rounded" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           search || filter !== 'all' ? (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="files-empty-search">
-              <svg className="w-10 h-10 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
-              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>검색 결과가 없습니다</h3>
-              <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>필터를 변경하거나 검색어를 수정해보세요</p>
+              <svg className="w-10 h-10 mb-4 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
+              <h3 className="text-base font-medium mb-2 text-corthex-text-secondary">No results found</h3>
+              <p className="text-sm text-corthex-text-disabled">Try adjusting filters or search query</p>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
-              <svg className="w-16 h-16 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>파일이 없습니다</h3>
-              <p className="text-sm mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>파일을 업로드하면 여기에 표시됩니다</p>
-              <button
+            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="files-empty">
+              {/* Dropzone CTA */}
+              <div
+                className="group border-2 border-dashed border-corthex-border rounded flex flex-col items-center justify-center p-12 w-full max-w-md hover:border-corthex-accent transition-colors cursor-pointer bg-corthex-elevated/10"
                 onClick={() => fileInputRef.current?.click()}
-                className="rounded-xl px-4 py-2 text-sm font-bold transition-colors hover:opacity-90"
-                style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
               >
-                파일 업로드
-              </button>
+                <svg className="w-8 h-8 text-corthex-text-disabled group-hover:text-corthex-accent mb-3 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                <p className="text-[10px] font-bold text-corthex-text-disabled group-hover:text-corthex-accent uppercase tracking-widest">Drop files to secure</p>
+              </div>
             </div>
           )
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="files-grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-testid="files-grid">
             {filtered.map(file => {
               const { emoji, bgColor, dotColor } = getFileIcon(file.mimeType)
               return (
                 <div
                   key={file.id}
-                  className="flex flex-col rounded-2xl border bg-corthex-surface p-4 transition-all group cursor-pointer relative overflow-hidden"
-                  style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)' }}
+                  className="group relative bg-corthex-elevated border border-corthex-border p-5 hover:border-corthex-accent/50 transition-all"
                   data-testid={`file-grid-${file.id}`}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold"
-                      style={{ backgroundColor: bgColor, color: dotColor }}
+                  <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <a
+                      href={`/api/workspace/files/${file.id}/download`}
+                      download
+                      className="p-1 text-corthex-text-secondary hover:text-corthex-accent transition-colors"
+                      title="다운로드"
+                      aria-label={`다운로드: ${file.filename}`}
+                      onClick={e => e.stopPropagation()}
                     >
-                      {emoji}
-                    </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <a
-                        href={`/api/workspace/files/${file.id}/download`}
-                        download
-                        className="p-1 rounded-lg transition-colors hover:opacity-70"
-                        style={{ color: 'var(--color-corthex-text-secondary)' }}
-                        title="다운로드"
-                        aria-label={`다운로드: ${file.filename}`}
-                        onClick={e => e.stopPropagation()}
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                    </a>
+                    {file.userId === user?.id && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteTarget(file) }}
+                        className="p-1 text-corthex-text-secondary hover:text-corthex-error transition-colors"
+                        title="삭제"
+                        aria-label={`삭제: ${file.filename}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-                      </a>
-                      {file.userId === user?.id && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(file) }}
-                          className="p-1 rounded-lg transition-colors hover:opacity-70"
-                          style={{ color: '#ef4444' }}
-                          title="삭제"
-                          aria-label={`삭제: ${file.filename}`}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-                        </button>
-                      )}
-                    </div>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                      </button>
+                    )}
                   </div>
-                  <h3 className="font-medium text-sm truncate mb-1" style={{ color: 'var(--color-corthex-text-primary)' }} title={file.filename}>{file.filename}</h3>
-                  <div className="flex items-center justify-between text-xs mt-auto pt-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>
-                    <span className="font-mono tabular-nums">{formatBytes(file.sizeBytes)}</span>
-                    <span>{new Date(file.createdAt).toLocaleDateString('ko-KR')}</span>
+                  <div className="mb-6">
+                    <div className="text-4xl font-black font-mono mb-1" style={{ color: dotColor }}>{emoji}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-corthex-text-primary group-hover:text-corthex-accent transition-colors truncate">{file.filename}</h3>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">{formatBytes(file.sizeBytes)}</span>
+                      <span className="text-[10px] font-mono text-corthex-text-disabled">{new Date(file.createdAt).toLocaleDateString('ko-KR')}</span>
+                    </div>
                   </div>
                 </div>
               )
             })}
+            {/* Dropzone card */}
+            <div
+              className="group border-2 border-dashed border-corthex-border flex flex-col items-center justify-center p-8 hover:border-corthex-accent transition-colors cursor-pointer bg-corthex-elevated/10"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <svg className="w-7 h-7 text-corthex-text-disabled group-hover:text-corthex-accent text-3xl mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+              <p className="text-[10px] font-bold text-corthex-text-disabled group-hover:text-corthex-accent uppercase tracking-widest">Drop files to secure</p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-2" data-testid="files-list">
-            {filtered.map(file => {
+          <div className="border border-corthex-border overflow-hidden" data-testid="files-list">
+            {filtered.map((file, idx) => {
               const { emoji, bgColor, dotColor } = getFileIcon(file.mimeType)
               return (
                 <div
                   key={file.id}
-                  className="flex items-center gap-3 p-3 rounded-2xl border bg-corthex-surface transition-all group cursor-pointer"
-                  style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)' }}
+                  className={`flex items-center gap-4 px-5 py-4 group hover:bg-corthex-elevated/50 transition-colors ${idx > 0 ? 'border-t border-corthex-border/50' : ''}`}
                   data-testid={`file-row-${file.id}`}
                 >
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold"
-                    style={{ backgroundColor: bgColor, color: dotColor }}
-                  >
-                    {emoji}
-                  </div>
+                  <div className="text-2xl font-mono font-black shrink-0" style={{ color: dotColor }}>{emoji}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate transition-colors" style={{ color: 'var(--color-corthex-text-primary)' }}>{file.filename}</p>
-                    <p className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatBytes(file.sizeBytes)} &middot; {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
+                    <p className="text-sm font-bold truncate text-corthex-text-primary group-hover:text-corthex-accent transition-colors">{file.filename}</p>
+                    <p className="text-[10px] font-mono text-corthex-text-disabled uppercase">{formatBytes(file.sizeBytes)} · {new Date(file.createdAt).toLocaleDateString('ko-KR')}</p>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <a
                       href={`/api/workspace/files/${file.id}/download`}
                       download
-                      className="p-2 rounded-lg transition-colors hover:opacity-70"
-                      style={{ color: 'var(--color-corthex-text-secondary)' }}
+                      className="p-1.5 text-corthex-text-secondary hover:text-corthex-accent transition-colors"
                       title="다운로드"
                       aria-label={`다운로드: ${file.filename}`}
                     >
@@ -399,8 +365,7 @@ export function FilesPage() {
                     {file.userId === user?.id && (
                       <button
                         onClick={() => setDeleteTarget(file)}
-                        className="p-2 rounded-lg transition-colors hover:opacity-70"
-                        style={{ color: '#ef4444' }}
+                        className="p-1.5 text-corthex-text-secondary hover:text-corthex-error transition-colors"
                         title="삭제"
                         aria-label={`삭제: ${file.filename}`}
                       >
@@ -414,18 +379,34 @@ export function FilesPage() {
           </div>
         )}
 
-        {/* Storage summary */}
-        {files.length > 0 && (
-          <div className="flex items-center gap-4 px-1">
-            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{files.length}개 파일</span>
-            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>&middot;</span>
-            <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>총 {formatBytes(totalSize)}</span>
-            <div className="flex-1 max-w-[200px] h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-border)' }}>
-              <div className="h-full rounded-full" style={{ width: `${storagePercent}%`, backgroundColor: 'var(--color-corthex-accent)' }} />
-            </div>
-            <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{storagePercent}%</span>
+        {/* Storage summary / Bottom context bar */}
+        <div className="mt-8 pt-6 border-t border-corthex-border flex flex-wrap gap-8">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Files</span>
+            <span className="text-sm font-bold text-corthex-accent font-mono">{files.length}</span>
           </div>
-        )}
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Total Size</span>
+            <span className="text-sm font-bold text-corthex-text-primary">{formatBytes(totalSize)}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Storage</span>
+            <div className="flex items-center gap-2">
+              <div className="w-24 h-1.5 bg-corthex-border rounded-full overflow-hidden">
+                <div className="bg-corthex-accent h-full" style={{ width: `${storagePercent}%` }} />
+              </div>
+              <span className="text-sm font-bold text-corthex-text-primary font-mono">{storagePercent}%</span>
+            </div>
+          </div>
+          <div className="flex-1" />
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Encryption</span>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-corthex-success animate-pulse" />
+              <span className="text-sm font-bold text-corthex-text-primary">AES-256 Active</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Delete Confirmation */}

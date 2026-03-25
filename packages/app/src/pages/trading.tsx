@@ -187,19 +187,36 @@ export function TradingPage() {
           </section>
 
           {/* RIGHT PANEL */}
-          <aside className="w-full lg:w-[300px] flex flex-col gap-6">
+          <aside className="w-full lg:w-[300px] bg-corthex-elevated border border-corthex-border rounded-xl p-6 flex flex-col gap-6 overflow-y-auto">
+            {/* P&L Summary Card */}
+            <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 relative overflow-hidden">
+              <div className="relative z-10">
+                <h4 className="text-[10px] font-mono text-corthex-text-disabled tracking-[0.2em] mb-4 uppercase">Financial Metrics</h4>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-corthex-text-secondary font-mono">NET PROFIT</p>
+                    <p className="text-3xl font-black font-mono text-corthex-accent">+12.42%</p>
+                  </div>
+                  <div className="pt-4 border-t border-corthex-border">
+                    <p className="text-xs text-corthex-text-secondary font-mono">TOTAL EQUITY</p>
+                    <p className="text-xl font-black font-mono text-corthex-text-primary">$125,847.30</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Order Panel */}
-            <div className="bg-corthex-elevated rounded-xl p-5 shadow-sm space-y-6 border border-corthex-border">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary">주문 Order</h2>
                 <Info className="w-4 h-4 text-corthex-text-secondary" />
               </div>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-corthex-elevated rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-corthex-bg rounded-lg">
                 <button
                   onClick={() => setOrderSide('buy')}
                   className={`py-2 text-sm rounded-lg transition-colors ${
                     orderSide === 'buy'
-                      ? 'font-bold bg-corthex-accent text-white shadow-md'
+                      ? 'font-bold bg-corthex-accent text-corthex-bg shadow-md'
                       : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
                   }`}
                 >
@@ -209,74 +226,87 @@ export function TradingPage() {
                   onClick={() => setOrderSide('sell')}
                   className={`py-2 text-sm rounded-lg transition-colors ${
                     orderSide === 'sell'
-                      ? 'font-bold bg-red-600 text-white shadow-md'
+                      ? 'font-bold bg-corthex-error text-white shadow-md'
                       : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
                   }`}
                 >
                   매도 Sell
                 </button>
               </div>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">수량 Amount</label>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary mb-1 block">수량 Amount</label>
                   <div className="relative">
-                    <input
-                      className="w-full bg-corthex-surface border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
-                      type="text"
-                      defaultValue="0.10"
-                    />
-                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-corthex-text-secondary">BTC</span>
+                    <input className="w-full bg-corthex-bg border border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2 px-3 rounded-lg text-corthex-text-primary" type="text" defaultValue="0.10" />
+                    <span className="absolute right-3 top-2 text-[10px] font-bold text-corthex-text-secondary">BTC</span>
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary ml-1">가격 Price</label>
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-corthex-text-secondary mb-1 block">가격 Price</label>
                   <div className="relative">
-                    <input
-                      className="w-full bg-corthex-surface border-b border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2.5 px-3 rounded-t-lg"
-                      type="text"
-                      defaultValue="67,432.50"
-                    />
-                    <span className="absolute right-3 top-2.5 text-[10px] font-bold text-corthex-text-secondary">USD</span>
+                    <input className="w-full bg-corthex-bg border border-corthex-border focus:border-corthex-accent focus:ring-0 transition-all font-mono text-sm py-2 px-3 rounded-lg text-corthex-text-primary" type="text" defaultValue="67,432.50" />
+                    <span className="absolute right-3 top-2 text-[10px] font-bold text-corthex-text-secondary">USD</span>
                   </div>
                 </div>
               </div>
-              <div className="py-4 border-t border-corthex-border">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-xs text-corthex-text-secondary">예상 비용 Estimated Cost</span>
-                  <span className="font-mono font-bold">$6,743.25</span>
+              <div className="pt-3 border-t border-corthex-border">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs text-corthex-text-secondary">Estimated Cost</span>
+                  <span className="font-mono font-bold text-corthex-text-primary text-sm">$6,743.25</span>
                 </div>
                 <button
                   onClick={() => toast.info('이 기능은 준비 중입니다')}
-                  className="w-full bg-corthex-accent hover:brightness-110 text-white font-bold py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-corthex-accent/20"
+                  className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg font-bold py-3 rounded-lg transition-all active:scale-95"
                 >
                   주문 실행 Execute
                 </button>
               </div>
             </div>
 
-            {/* Portfolio Summary */}
-            <div className="bg-corthex-elevated rounded-xl p-5 shadow-sm space-y-5 border border-corthex-border">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary">포트폴리오 Portfolio</h2>
-              <div className="space-y-1">
-                <p className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-wider">Total Value</p>
-                <h3 className="text-2xl font-mono font-black text-corthex-text-primary">$125,847.30</h3>
-                <p className="text-xs font-mono text-corthex-accent font-medium">일간 손익 Daily P&L: +$2,341.50 (+1.89%)</p>
+            {/* Active Strategies */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary">Active Strategies</h3>
+                <TrendingUp className="w-4 h-4 text-corthex-text-disabled" />
               </div>
-              <div className="space-y-3 pt-4 border-t border-corthex-border">
-                {PORTFOLIO.map((p) => (
-                  <div key={p.name}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-                        <span className="text-xs font-medium">{p.name}</span>
-                      </div>
-                      <span className="text-xs font-mono font-bold">{p.pct}%</span>
+              <div className="space-y-3">
+                {[
+                  { name: 'Alpha-7 Arbitrage', roi: '+22.4%', risk: 'LOW RISK', pct: 85 },
+                  { name: 'Beta-V Momentum', roi: '+8.1%', risk: 'MID RISK', pct: 42 },
+                  { name: 'Delta-2 Sentiment', roi: '-0.2%', risk: 'HIGH RISK', pct: 12 },
+                ].map((s) => (
+                  <div key={s.name} className="bg-corthex-bg border border-corthex-border rounded-lg p-3 hover:border-corthex-accent/50 transition-all cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-xs font-bold text-corthex-text-primary font-mono">{s.name}</span>
+                      <BarChart3 className="w-3 h-3 text-corthex-accent" />
                     </div>
-                    <div className="w-full bg-corthex-elevated h-1.5 rounded-full overflow-hidden mt-1">
-                      <div className="h-full rounded-full" style={{ width: `${p.pct}%`, backgroundColor: p.color }} />
+                    <div className="w-full bg-corthex-elevated h-1 rounded-full overflow-hidden mb-2">
+                      <div className="bg-corthex-accent h-full" style={{ width: `${s.pct}%` }} />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-mono text-corthex-text-disabled">
+                      <span>ROI: {s.roi}</span>
+                      <span>{s.risk}</span>
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Signal Feed */}
+            <div className="pt-4 border-t border-corthex-border">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-2 h-2 rounded-full bg-corthex-error animate-ping" />
+                <h4 className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-widest">Global Signal Feed</h4>
+              </div>
+              <div className="space-y-3">
+                <div className="text-[10px] font-mono border-l-2 border-corthex-accent pl-3">
+                  <p className="text-corthex-text-secondary">WHALE ALERT: 5,000 BTC transfer detected</p>
+                  <p className="text-corthex-text-disabled">02m ago · SECTOR: MACRO</p>
+                </div>
+                <div className="text-[10px] font-mono border-l-2 border-corthex-border pl-3">
+                  <p className="text-corthex-text-secondary">FED RESERVE: Rate maintenance confirmed</p>
+                  <p className="text-corthex-text-disabled">14m ago · SECTOR: FIAT</p>
+                </div>
               </div>
             </div>
           </aside>
