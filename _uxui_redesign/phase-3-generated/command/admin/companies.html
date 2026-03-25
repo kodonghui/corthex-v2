@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CA8A04",
+                        background: "#0C0A09",
+                        surface: "#1C1917",
+                        border: "#292524",
+                        muted: "#A8A29E"
+                    },
+                    fontFamily: {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0C0A09;
+            color: #F5F5F4;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-black">
+<!-- Top Navigation Bar (Shared Component Logic) -->
+<nav class="flex justify-between items-center px-6 h-16 w-full sticky top-0 z-50 bg-[#0C0A09] border-b border-[#292524] font-['DM_Sans'] tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-yellow-600 tracking-tighter">CORTHEX</span>
+<div class="hidden md:flex items-center gap-6 text-sm">
+<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Dashboard</a>
+<a class="text-yellow-600 font-bold border-b-2 border-yellow-600 py-5" href="#">Companies</a>
+<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Users</a>
+<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Agents</a>
+<a class="text-[#A8A29E] hover:text-yellow-500 transition-colors" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#A8A29E] text-lg">search</span>
+<input class="bg-[#1C1917] border border-[#292524] rounded px-10 py-1.5 text-sm focus:ring-1 focus:ring-yellow-600 focus:border-yellow-600 outline-none w-64" placeholder="Search companies..." type="text"/>
+</div>
+<button class="bg-yellow-600 hover:bg-yellow-500 text-black text-xs font-bold px-4 py-2 rounded transition-colors uppercase tracking-wider">
+                Create company
+            </button>
+<div class="flex items-center gap-2 ml-2 border-l border-[#292524] pl-4">
+<span class="material-symbols-outlined text-[#A8A29E] cursor-pointer hover:text-yellow-500 transition-colors">notifications</span>
+<span class="material-symbols-outlined text-[#A8A29E] cursor-pointer hover:text-yellow-500 transition-colors">settings</span>
+<img alt="Admin Profile" class="w-8 h-8 rounded-full border border-[#292524] ml-2" data-alt="professional portrait of a tech executive in a dark modern office setting with cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW8_2D1ABzIR8b1w_9-IWaFIsHuUdWeBoCyls3EtZj6VUSX5O391kSrbt-p--oJw3q3ZMICc_vWiGC-rqng1IblJMu7hXOFSJf4ZYD9IKpv4WQBiSSpsZZ8nm0G3ryAqZvRyBAOes9mp14JOMFFnqxidCHdHtVxvrphoSd1AckXYCmJy8KOfna0qIU1YDyQV_cky9mtlLvvzLE3tx2yf9YoV8OFaHizrnbxNMa6z4Mbf0wU1tuG7AFRYPmPyZ3G-JLvJ3zUGl3DsBv"/>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<!-- Header & Stats -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-3xl font-black tracking-tight text-white mb-2">Company Directory</h1>
+<p class="text-[#A8A29E] text-sm">Manage and monitor active organization instances across the CORTHEX network.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-[#1C1917] border border-[#292524] p-4 rounded min-w-[140px]">
+<p class="text-[10px] uppercase tracking-widest text-[#A8A29E] mb-1">Total Active</p>
+<p class="text-2xl font-bold text-yellow-600">1,284</p>
+</div>
+<div class="bg-[#1C1917] border border-[#292524] p-4 rounded min-w-[140px]">
+<p class="text-[10px] uppercase tracking-widest text-[#A8A29E] mb-1">New this month</p>
+<p class="text-2xl font-bold text-yellow-600">+42</p>
+</div>
+</div>
+</header>
+<!-- Main Content: Bento Grid of Companies -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Company Card 1 -->
+<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-yellow-600/5 blur-[80px] pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Nebula Systems</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+</div>
+</div>
+<button class="text-[#A8A29E] hover:text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
+<span class="text-white font-medium">842</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
+<span class="text-white font-medium">12</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
+<span class="text-xs text-[#A8A29E]">Created Oct 12, 2023</span>
+</div>
+<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Company Card 2 -->
+<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">database</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Quantum Logic</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-[#A8A29E] border border-white/10 uppercase">Professional</span>
+</div>
+</div>
+<button class="text-[#A8A29E] hover:text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
+<span class="text-white font-medium">156</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
+<span class="text-white font-medium">4</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
+<span class="text-xs text-[#A8A29E]">Created Nov 05, 2023</span>
+</div>
+<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Company Card 3 -->
+<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Aegis Security</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+</div>
+</div>
+<button class="text-[#A8A29E] hover:text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
+<span class="text-white font-medium">2,410</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
+<span class="text-white font-medium">38</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
+<span class="text-xs text-[#A8A29E]">Created Jan 18, 2024</span>
+</div>
+<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Company Card 4 -->
+<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">language</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Global Node</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-[#A8A29E] border border-white/10 uppercase">Free</span>
+</div>
+</div>
+<button class="text-[#A8A29E] hover:text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
+<span class="text-white font-medium">12</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
+<span class="text-white font-medium">1</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
+<span class="text-xs text-[#A8A29E]">Created Feb 02, 2024</span>
+</div>
+<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Company Card 5 -->
+<div class="group bg-[#1C1917] border border-[#292524] rounded-lg p-6 hover:border-yellow-600/50 transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-black border border-[#292524] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h3 class="font-bold text-lg text-white group-hover:text-yellow-500 transition-colors">Synth Logic</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-600/10 text-yellow-600 border border-yellow-600/20 uppercase">Enterprise</span>
+</div>
+</div>
+<button class="text-[#A8A29E] hover:text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">Active Users</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">group</span>
+<span class="text-white font-medium">520</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-[#A8A29E] uppercase tracking-tighter">AI Agents</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-yellow-600">smart_toy</span>
+<span class="text-white font-medium">18</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#292524] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-[#A8A29E]">calendar_today</span>
+<span class="text-xs text-[#A8A29E]">Created Mar 10, 2024</span>
+</div>
+<span class="material-symbols-outlined text-sm text-yellow-600 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Empty State / Add New Placeholder -->
+<div class="border-2 border-dashed border-[#292524] rounded-lg p-6 flex flex-col items-center justify-center text-center group hover:border-yellow-600/50 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full border border-[#292524] flex items-center justify-center mb-4 group-hover:bg-yellow-600/10 transition-colors">
+<span class="material-symbols-outlined text-[#A8A29E] group-hover:text-yellow-600">add</span>
+</div>
+<h3 class="font-bold text-white group-hover:text-yellow-600 transition-colors">Provision New Instance</h3>
+<p class="text-xs text-[#A8A29E] mt-1">Configure workspace parameters</p>
+</div>
+</div>
+<!-- Pagination / Footer Actions -->
+<footer class="mt-12 flex items-center justify-between py-6 border-t border-[#292524]">
+<p class="text-xs text-[#A8A29E]">Showing <span class="text-white font-bold">5</span> of <span class="text-white font-bold">1,284</span> companies</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-yellow-600 text-black font-bold text-xs">1</button>
+<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">2</button>
+<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">3</button>
+<button class="w-8 h-8 rounded border border-[#292524] flex items-center justify-center text-[#A8A29E] hover:bg-white/5">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</footer>
+</main>
+</body></html>

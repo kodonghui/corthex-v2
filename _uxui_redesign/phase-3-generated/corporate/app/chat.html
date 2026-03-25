@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX AI - Enterprise Workspace</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Source+Sans+3:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#2563EB',
+                            50: '#EFF6FF',
+                            100: '#DBEAFE',
+                            200: '#BFDBFE',
+                            600: '#2563EB',
+                            700: '#1D4ED8',
+                        },
+                        slate: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            300: '#CBD5E1',
+                            400: '#94A3B8',
+                            500: '#64748B',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Lexend", "sans-serif"],
+                        "body": ["Source Sans 3", "sans-serif"],
+                        "label": ["Source Sans 3", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: #F8FAFC;
+        }
+        h1, h2, h3, h4, .font-lexend {
+            font-family: 'Lexend', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-hidden">
+<!-- TopNavBar Execution -->
+<nav class="flex justify-between items-center px-6 py-3 w-full h-16 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900 font-lexend text-slate-900 dark:text-slate-100 docked full-width border-b border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-600 dark:text-blue-400 tracking-tight">CORTHEX AI</span>
+<div class="hidden md:flex items-center space-x-6 text-sm">
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 pb-1 px-1" href="#">Workspace</a>
+<a class="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors px-1" href="#">Models</a>
+<a class="text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors px-1" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-blue-600/20 outline-none" placeholder="Search knowledge base..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 ml-2">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="Professional headshot of a corporate executive in a blue suit with a clean office background and soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpsBQGjSE3HPkRFaWVqnfLTW7rnOI3C5jSkvB6iggK1u_7qFPiXcZaOzpzPBB5_Udm0MNHM_JuBK8SCM9GGUeQpuT4AWg2gSMUWCZFmdPcG_qRvuM5x6PQfv_3GZkOCj5V0hT9bhOnf4CuEcdbecWhtWE23YdDZJocmB2_-gvAl67e-Om1vBUwSq41F-55aZyyuMxYEBxYetKlgLZi7HcLmYt2uIPS-8htWOQve1V9gjUudmvfKKN4DgSdLmqniQF8TiyzWqCVuiO0"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- SideNavBar Execution -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 pt-20 pb-6 bg-slate-50 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 font-lexend text-sm z-40 transition-all duration-200 ease-in-out">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="bg-blue-600 h-8 w-8 rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h3 class="font-black text-blue-600 text-sm tracking-wide">Enterprise AI</h3>
+<p class="text-[10px] text-slate-400 uppercase font-bold">V2.4 Active</p>
+</div>
+</div>
+<button class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 font-medium transition-colors shadow-sm shadow-blue-200">
+<span class="material-symbols-outlined text-lg">add</span>
+                    New Chat
+                </button>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold border-r-4 border-blue-600 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Workspace
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">chat</span>
+                    Chat History
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">database</span>
+                    Knowledge Base
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+                    Model Settings
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+                    Team
+                </a>
+</nav>
+<div class="px-3 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+                    Account
+                </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<main class="flex-1 md:ml-64 flex flex-col bg-slate-50 relative">
+<!-- Chat Header -->
+<header class="h-14 flex items-center justify-between px-8 bg-white/50 backdrop-blur-md border-b border-slate-200 z-10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<h2 class="font-lexend font-semibold text-slate-800">Q4 Financial Analysis Report</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-xs font-lexend font-medium text-slate-500 border border-slate-200 px-3 py-1 rounded-full hover:bg-slate-50 transition-colors">
+                        Share Session
+                    </button>
+<button class="text-xs font-lexend font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                        Export PDF
+                    </button>
+</div>
+</header>
+<!-- Message Container -->
+<section class="flex-1 overflow-y-auto px-6 py-8 custom-scrollbar">
+<div class="max-w-4xl mx-auto space-y-8">
+<!-- AI Message -->
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-100 mt-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-lexend font-bold text-sm text-slate-900">CORTHEX Agent</span>
+<span class="text-[10px] text-slate-400 font-medium bg-slate-100 px-1.5 py-0.5 rounded">GPT-4o PRO</span>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl rounded-tl-none p-5 shadow-sm text-slate-700 leading-relaxed max-w-2xl">
+<p>Hello. I've finished analyzing the Q4 financial statements provided in your knowledge base. Based on the data, there is a <span class="text-blue-600 font-semibold">12.4% increase</span> in year-over-year operational efficiency.</p>
+<p class="mt-4">Would you like me to generate a comparative table against the previous three quarters, or should we focus on the specific cost-reduction drivers in the logistics sector?</p>
+<!-- Suggested Actions Grid -->
+<div class="mt-6 grid grid-cols-2 gap-3">
+<button class="text-left p-3 rounded-lg border border-slate-100 bg-slate-50 hover:border-blue-200 hover:bg-blue-50 transition-all group">
+<p class="text-xs font-bold text-slate-800 group-hover:text-blue-700">Generate Table</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Q1-Q4 Comparative View</p>
+</button>
+<button class="text-left p-3 rounded-lg border border-slate-100 bg-slate-50 hover:border-blue-200 hover:bg-blue-50 transition-all group">
+<p class="text-xs font-bold text-slate-800 group-hover:text-blue-700">Logistics Deep-dive</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Analyze cost drivers</p>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-3 mt-2 px-1">
+<button class="text-slate-400 hover:text-blue-600 transition-colors">
+<span class="material-symbols-outlined text-[18px]">thumb_up</span>
+</button>
+<button class="text-slate-400 hover:text-blue-600 transition-colors">
+<span class="material-symbols-outlined text-[18px]">thumb_down</span>
+</button>
+<button class="text-slate-400 hover:text-blue-600 transition-colors">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+<span class="text-[10px] text-slate-400 ml-auto">Just now</span>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-start gap-4 flex-row-reverse">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-white mt-1 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Professional headshot of a corporate executive in a blue suit with a clean office background and soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmzh3ISWM7MZc75iGV7kBHYd_LCO1IodLV-9lSnx5l4rPHD_DkJvqJPBWPlqzLGuZ3gM6BU7XctztISwuZtkov4x4CmEmYg162byxdMOg26EXULYIL3IowNQF52_j8lUmkq7ESawScF--RJGGfF0IBqtz-WCMGxij0h9vYhcspSvSSTSDAzz80Q-_Z-tS6y5x8qv4DanuwmJEZm_FWDwAW0Sm8Qpx1Ba3216MmNS4UCSXbnJnVDiBUkNdgXuzduOPEKNBFfxM7nSPA"/>
+</div>
+<div class="flex-1 flex flex-col items-end">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="text-[10px] text-slate-400 mr-1">10:42 AM</span>
+<span class="font-lexend font-bold text-sm text-slate-900">You</span>
+</div>
+<div class="bg-blue-600 text-white rounded-xl rounded-tr-none p-4 shadow-md shadow-blue-100 max-w-lg">
+<p class="text-sm leading-relaxed">Let's proceed with the Logistics Deep-dive. Specifically, I'm interested in the last mile delivery overheads in the European region. Please compare these against our North American benchmarks.</p>
+</div>
+</div>
+</div>
+<!-- AI Message (Processing State) -->
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-100 mt-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="font-lexend font-bold text-sm text-slate-900">CORTHEX Agent</span>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl rounded-tl-none p-5 shadow-sm text-slate-700 max-w-2xl">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+<div class="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+<span class="text-xs font-medium text-blue-700">Accessing Knowledge Base: 'Global Logistics 2023-24'</span>
+</div>
+<div class="space-y-2">
+<div class="h-2 bg-slate-100 rounded-full w-full"></div>
+<div class="h-2 bg-slate-100 rounded-full w-[90%]"></div>
+<div class="h-2 bg-slate-100 rounded-full w-[40%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Message Input Area -->
+<footer class="p-6 bg-white border-t border-slate-200">
+<div class="max-w-4xl mx-auto">
+<!-- Context bar -->
+<div class="flex items-center gap-4 mb-3 px-1">
+<div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">attach_file</span>
+                            Q4_Report_Draft.pdf
+                            <button class="hover:text-red-500 transition-colors ml-1">
+<span class="material-symbols-outlined text-[12px]">close</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">database</span>
+                            Enterprise_Logistics_DB
+                            <button class="hover:text-red-500 transition-colors ml-1">
+<span class="material-symbols-outlined text-[12px]">close</span>
+</button>
+</div>
+</div>
+<!-- Input Field Wrapper -->
+<div class="relative group">
+<div class="absolute inset-0 bg-blue-600/5 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+<div class="relative bg-white border border-slate-200 rounded-xl shadow-sm group-focus-within:border-blue-500 group-focus-within:ring-4 group-focus-within:ring-blue-500/10 transition-all">
+<textarea class="w-full px-5 pt-4 pb-14 bg-transparent border-none focus:ring-0 text-sm text-slate-800 placeholder-slate-400 resize-none min-h-[100px] font-body" placeholder="Type your message to CORTHEX AI..."></textarea>
+<!-- Input Actions -->
+<div class="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-1 pointer-events-auto">
+<button class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">language</span>
+</button>
+<div class="h-4 w-px bg-slate-200 mx-1"></div>
+<button class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="pointer-events-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 font-lexend text-sm font-semibold transition-all shadow-md shadow-blue-100 active:scale-95">
+<span>Send</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Meta Info -->
+<p class="text-center text-[10px] text-slate-400 mt-3 font-medium tracking-tight">
+                        CORTHEX AI may produce inaccurate information about people, places, or facts. <a class="underline hover:text-slate-600" href="#">Review Privacy Policy</a>
+</p>
+</div>
+</footer>
+</main>
+<!-- Right Utility Bar (Contextual) -->
+<aside class="hidden xl:flex flex-col w-72 border-l border-slate-200 bg-white">
+<div class="p-6 border-b border-slate-100">
+<h3 class="font-lexend font-bold text-slate-900 text-sm">Context &amp; Assets</h3>
+<p class="text-xs text-slate-500 mt-1">Real-time data sources for this thread</p>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+<!-- Data Source Card -->
+<div class="space-y-3">
+<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Datasets</h4>
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-600 bg-blue-100 p-1.5 rounded text-sm">auto_graph</span>
+<div>
+<p class="text-xs font-bold text-slate-800">Market_Benchmarks_v2</p>
+<p class="text-[10px] text-slate-500">Last updated: 2h ago</p>
+</div>
+</div>
+</div>
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-purple-600 bg-purple-100 p-1.5 rounded text-sm">account_balance</span>
+<div>
+<p class="text-xs font-bold text-slate-800">ERP_Sync_Global</p>
+<p class="text-[10px] text-slate-500">Live connection active</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Analysis Shortcuts -->
+<div class="space-y-3">
+<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Actions</h4>
+<button class="w-full flex items-center justify-between p-2.5 text-xs text-slate-600 hover:bg-slate-50 rounded border border-transparent hover:border-slate-200 transition-all">
+<span>Summarize Key Risks</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-2.5 text-xs text-slate-600 hover:bg-slate-50 rounded border border-transparent hover:border-slate-200 transition-all">
+<span>Check for Discrepancies</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-2.5 text-xs text-slate-600 hover:bg-slate-50 rounded border border-transparent hover:border-slate-200 transition-all">
+<span>Generate Board Summary</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+<!-- Session Progress -->
+<div class="p-4 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl text-white shadow-lg shadow-blue-100">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Token Usage</span>
+<span class="material-symbols-outlined text-sm opacity-80">info</span>
+</div>
+<div class="h-1.5 bg-white/20 rounded-full mb-3">
+<div class="h-full bg-white rounded-full w-[65%]"></div>
+</div>
+<p class="text-[11px] leading-tight opacity-90">6,420 / 10,000 tokens used in this context window.</p>
+</div>
+</div>
+<div class="p-6 border-t border-slate-100 bg-slate-50">
+<button class="w-full py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded hover:bg-slate-50 transition-colors uppercase tracking-widest">
+                    Clear History
+                </button>
+</div>
+</aside>
+</div>
+</body></html>

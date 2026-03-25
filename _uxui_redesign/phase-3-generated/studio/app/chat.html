@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Studio - Chat Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#0891B2",
+                            light: "#ECFEFF",
+                            dark: "#164E63"
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Work Sans"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-[#ECFEFF] text-slate-900 antialiased overflow-hidden">
+<!-- TopNavBar Integration -->
+<header class="bg-cyan-50/80 dark:bg-slate-900/80 backdrop-blur-md text-cyan-600 dark:text-cyan-400 font-['Work_Sans'] antialiased fixed top-0 w-full border-b border-cyan-100 dark:border-slate-800 shadow-sm flex justify-between items-center px-6 h-16 w-full z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-cyan-700 dark:text-cyan-400">CORTHEX Studio</span>
+<nav class="hidden md:flex items-center gap-6 h-16">
+<a class="text-slate-600 dark:text-slate-400 hover:text-cyan-500 h-full flex items-center px-1" href="#">Dashboard</a>
+<a class="text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 font-semibold h-full flex items-center px-1" href="#">Projects</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-cyan-500 h-full flex items-center px-1" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-cyan-100/50 dark:hover:bg-slate-800 transition-colors active:scale-95 duration-200 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-cyan-100">
+<span class="text-sm font-medium">Profile</span>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-cyan-200" data-alt="Professional headshot of a creative director in a minimalist studio setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu1329I-kczsAh3RHAN70aIeN67hYp2xUiDJ05iA-_LJJPToXGM3hCG5iuOPn4-9x73tXYsFByAZxvr5hcX0zlhBgC-zkiC_3uTugCxHIWoiMFOxhMuOsPf320KgALmzesXFwqdKdjz6hofuvBaCuDoWm_FTn3w1IGUMYoeHnGQTLk5XttNWBkGe5Oim19F_SAkVzJ3LIVs9aUXrZrgBQsGVYt_DvSzrsSWTIEsfr8PDJq-ezTQg6sjcvBva_bkXU-JwIoGulNfBhC"/>
+</div>
+</div>
+</header>
+<div class="flex h-screen pt-16">
+<!-- SideNavBar Integration -->
+<aside class="bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 font-['Work_Sans'] text-sm h-full w-64 border-r border-cyan-50 dark:border-slate-800 shadow-none hidden lg:flex flex-col p-4 space-y-2">
+<div class="mb-6 px-2">
+<h2 class="text-lg font-black text-cyan-700 dark:text-cyan-400 leading-tight">CORTHEX</h2>
+<p class="text-xs text-slate-400 uppercase tracking-widest">AI Workspace</p>
+</div>
+<button class="w-full bg-cyan-600 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 mb-6 hover:bg-cyan-700 transition-all active:translate-x-1">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Chat
+            </button>
+<div class="space-y-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded-lg font-medium active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                    Projects
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+                    Assets
+                </a>
+</div>
+<div class="pt-4 border-t border-cyan-50 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                    Support
+                </a>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-[#ECFEFF] relative overflow-hidden">
+<!-- Chat Content Container -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Message Thread -->
+<div class="flex-1 flex flex-col h-full">
+<!-- Chat Scroll Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth">
+<!-- Date Separator -->
+<div class="flex items-center gap-4 py-2">
+<div class="flex-1 h-px bg-cyan-200/50"></div>
+<span class="text-[10px] font-bold tracking-widest text-cyan-600/60 uppercase">Today, Oct 24</span>
+<div class="flex-1 h-px bg-cyan-200/50"></div>
+</div>
+<!-- Agent Message -->
+<div class="flex gap-4 max-w-3xl">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-white border border-cyan-100 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-cyan-600 text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="space-y-1">
+<div class="bg-white px-4 py-3 rounded-xl rounded-tl-none shadow-sm border border-cyan-100 text-slate-700 leading-relaxed">
+                                    Welcome back to CORTHEX Studio. I've analyzed your latest project assets. Would you like to start with the data visualization or the architectural review?
+                                </div>
+<span class="text-[10px] text-slate-400 ml-1">09:41 AM</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 max-w-3xl ml-auto flex-row-reverse">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-white text-lg">person</span>
+</div>
+<div class="space-y-1 items-end flex flex-col">
+<div class="bg-cyan-600 px-4 py-3 rounded-xl rounded-tr-none shadow-sm text-white leading-relaxed">
+                                    Let's start with the architectural review. Can you highlight any potential bottlenecks in the current system design?
+                                </div>
+<span class="text-[10px] text-slate-400 mr-1">09:42 AM</span>
+</div>
+</div>
+<!-- Agent Message with Bento Asset -->
+<div class="flex gap-4 max-w-3xl">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-white border border-cyan-100 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-cyan-600 text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="space-y-4">
+<div class="bg-white px-4 py-3 rounded-xl rounded-tl-none shadow-sm border border-cyan-100 text-slate-700 leading-relaxed">
+                                    Understood. Based on the "Project Phoenix" schema, I've identified three critical paths that might cause latency issues. Here is the visual breakdown:
+                                </div>
+<!-- Analysis Card (Bento Style) -->
+<div class="grid grid-cols-2 gap-3 w-full max-w-md">
+<div class="col-span-2 h-40 rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover" data-alt="Sophisticated 3D architectural blueprint of a digital system with cyan glowing lines and data nodes on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1stofb-hdhGT7q0d3YSVUqvfFxRuB0qhW7izCV9DV3SlLolEH8SL07C3yaZT0FeH_muOkz6W54tB6EsXJi0-jPf2wlj4QvPdG5ncG8F3k4JH-3xTuZrLJF88LG7fkhVOBG_TSOdHDKoO17nVzJ4ZPBE9h0y0eSauDx1T2Zn-KVjXi2gATRCKiODKn6p18ZSH4UqSRjQJFHzB7zdF7TCARIURZ8AZ4pm1SZVSS9kfDViEMHsoin5uiKVunMxrQfpL6weA4KcvuAfol"/>
+<div class="absolute inset-0 bg-gradient-to-t from-cyan-900/60 to-transparent flex items-end p-4">
+<span class="text-white text-xs font-semibold">System Topology v2.4</span>
+</div>
+</div>
+<div class="bg-white p-3 rounded-xl border border-cyan-100 shadow-sm flex flex-col justify-between">
+<span class="text-[10px] font-bold text-cyan-600 uppercase">Latency</span>
+<span class="text-xl font-bold text-slate-800">142ms</span>
+</div>
+<div class="bg-cyan-50 p-3 rounded-xl border border-cyan-100 shadow-sm flex flex-col justify-between">
+<span class="text-[10px] font-bold text-cyan-600 uppercase">Risk Level</span>
+<span class="text-xl font-bold text-cyan-700">Moderate</span>
+</div>
+</div>
+<span class="text-[10px] text-slate-400 ml-1">09:43 AM</span>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-6 bg-white/40 backdrop-blur-sm border-t border-cyan-100">
+<div class="max-w-4xl mx-auto relative">
+<div class="bg-white rounded-2xl shadow-lg border border-cyan-200 p-2 flex items-end gap-2 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
+<button class="p-2 text-slate-400 hover:text-cyan-600 transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 py-2 text-slate-700 resize-none max-h-32 placeholder:text-slate-400" placeholder="Type your message to CORTHEX..." rows="1"></textarea>
+<div class="flex items-center gap-1 mb-1 mr-1">
+<button class="p-2 text-slate-400 hover:text-cyan-600 transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="bg-cyan-600 hover:bg-cyan-700 text-white p-2 rounded-xl transition-all shadow-md active:scale-95">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<p class="text-[10px] text-center text-slate-400 mt-3 font-medium tracking-tight">
+                                CORTHEX can make mistakes. Check important info.
+                            </p>
+</div>
+</div>
+</div>
+<!-- Agent Profile Sidebar (Contextual) -->
+<aside class="hidden xl:flex w-80 bg-white border-l border-cyan-50 flex-col overflow-y-auto">
+<div class="p-8 text-center border-b border-cyan-50">
+<div class="relative inline-block mb-4">
+<div class="w-20 h-20 rounded-2xl bg-cyan-50 flex items-center justify-center border-2 border-cyan-100 shadow-inner">
+<span class="material-symbols-outlined text-cyan-600 text-4xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
+</div>
+<h3 class="text-lg font-bold text-slate-800">CORTHEX Alpha</h3>
+<p class="text-xs text-green-600 font-semibold uppercase tracking-wider">Online &amp; Processing</p>
+</div>
+<div class="p-6 space-y-6">
+<section>
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4">Capabilities</h4>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-3 rounded-xl bg-cyan-50/50 border border-cyan-50">
+<span class="material-symbols-outlined text-cyan-600 text-sm">architecture</span>
+<span class="text-xs font-medium text-slate-700">System Architecture</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl bg-cyan-50/50 border border-cyan-50">
+<span class="material-symbols-outlined text-cyan-600 text-sm">database</span>
+<span class="text-xs font-medium text-slate-700">Data Engineering</span>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-xl bg-cyan-50/50 border border-cyan-50">
+<span class="material-symbols-outlined text-cyan-600 text-sm">monitoring</span>
+<span class="text-xs font-medium text-slate-700">Predictive Analytics</span>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4">Current Session</h4>
+<div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] text-slate-500">Token Usage</span>
+<span class="text-[10px] font-bold text-cyan-600">42%</span>
+</div>
+<div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+<div class="bg-cyan-500 h-full w-[42%]"></div>
+</div>
+</div>
+</section>
+</div>
+<div class="mt-auto p-6">
+<button class="w-full border-2 border-cyan-100 text-cyan-700 py-2.5 rounded-xl text-xs font-bold hover:bg-cyan-50 transition-colors">
+                            VIEW PROJECT ASSETS
+                        </button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

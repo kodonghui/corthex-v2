@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Command - AI Agents Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#CA8A04",
+              border: "#292524",
+              surface: "#1C1917",
+              background: "#0C0A09",
+            },
+            fontFamily: {
+              "headline": ["DM Sans", "sans-serif"],
+              "body": ["DM Sans", "sans-serif"],
+              "label": ["DM Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        body {
+            background-color: #0C0A09;
+            color: #E7E5E4;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .hud-border {
+            border: 1px solid #292524;
+        }
+        .gold-glow {
+            box-shadow: 0 0 15px rgba(202, 138, 4, 0.15);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0C0A09;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #292524;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #CA8A04;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden h-screen flex">
+<!-- SideNavBar (Execution from JSON) -->
+<aside class="flex flex-col w-64 h-full pt-4 bg-[#0C0A09] dark:bg-[#0C0A09] border-r border-[#292524] font-['DM_Sans'] text-sm font-medium z-40 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-yellow-600 rounded flex items-center justify-center text-black">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-yellow-600 leading-none">CORTHEX</h1>
+<p class="text-[10px] text-stone-500 uppercase tracking-widest mt-1">Enterprise HUD</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-yellow-600 bg-stone-900/50 border-r-2 border-yellow-600 font-bold transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span>AI Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span>Companies</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span>Logs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">vpn_key</span>
+<span>API Keys</span>
+</a>
+</nav>
+<div class="px-3 py-4 space-y-1 border-t border-[#292524]">
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- TopNavBar (Execution from JSON) -->
+<header class="flex justify-between items-center w-full px-6 h-16 bg-[#0C0A09] dark:bg-[#0C0A09] border-b border-[#292524] font-['DM_Sans'] antialiased tracking-tight z-50">
+<div class="flex items-center gap-8 flex-1">
+<div class="text-xl font-bold tracking-tighter text-yellow-600 dark:text-yellow-600 md:hidden">
+                    CORTHEX Command
+                </div>
+<div class="max-w-md w-full relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-lg">search</span>
+<input class="w-full bg-stone-900/50 border border-stone-800 rounded px-10 py-1.5 text-sm focus:outline-none focus:border-yellow-600/50 transition-colors placeholder:text-stone-600" placeholder="Global search agents, companies, or logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4 border-r border-[#292524] pr-4">
+<button class="p-2 text-stone-400 hover:bg-stone-800/50 hover:text-yellow-500 transition-colors rounded">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-stone-400 hover:bg-stone-800/50 hover:text-yellow-500 transition-colors rounded">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 text-stone-400 hover:bg-stone-800/50 hover:text-yellow-500 transition-colors rounded">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<button class="bg-yellow-600 text-black px-4 py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-yellow-500 active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Deploy Agent
+                </button>
+<div class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-stone-700">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a professional male administrator in a dark studio setting with soft rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIoZ4fyuGa6I7phYK_VEq0dM3-VqiO6HzhFBjJHQ56LPE4Qq_4daJTyOx90AM88rdl__w7YOO8WtMH-2Cquj5gC-6Ysq6PEPy04c0TWSC30ipqGO7QjoV-nYLZxqiUeODN5Cku_uFO-k0vmpnOyEy3niIsz0-HpCMGEyqX5YB8T8PCPPwFllThyhytPJQnlrOv5RL9ULri5ouK5RmU5t2CU6RWFLclpP0UnimZoKUVcua6I4fv6zscGl90a8DKS5mDtfItDEoWxqmM"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Page Header & Metrics -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 text-yellow-600 mb-1">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-xs font-bold tracking-[0.2em] uppercase">System Monitor</span>
+</div>
+<h2 class="text-3xl font-black tracking-tight text-white">AI Agents</h2>
+</div>
+<div class="flex gap-4">
+<div class="bg-stone-900 border border-stone-800 px-6 py-3 min-w-[160px] relative overflow-hidden">
+<div class="absolute top-0 right-0 p-1 opacity-10">
+<span class="material-symbols-outlined text-4xl">groups</span>
+</div>
+<p class="text-[10px] text-stone-500 uppercase tracking-widest mb-1">Total Agents</p>
+<p class="text-2xl font-bold text-white tracking-tighter">1,242</p>
+</div>
+<div class="bg-stone-900 border border-stone-800 px-6 py-3 min-w-[160px] relative overflow-hidden border-l-yellow-600/50 border-l-2">
+<div class="absolute top-0 right-0 p-1 opacity-10">
+<span class="material-symbols-outlined text-4xl text-yellow-600">bolt</span>
+</div>
+<p class="text-[10px] text-stone-500 uppercase tracking-widest mb-1">Active Now</p>
+<div class="flex items-center gap-2">
+<p class="text-2xl font-bold text-yellow-600 tracking-tighter">432</p>
+<span class="flex h-2 w-2 rounded-full bg-yellow-600 animate-pulse"></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Controls -->
+<div class="bg-[#1C1917] border border-[#292524] p-4 flex flex-wrap gap-4 items-center">
+<div class="flex-1 min-w-[240px] relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
+<input class="w-full bg-stone-950 border border-stone-800 rounded px-10 py-2 text-sm focus:outline-none focus:border-yellow-600/50 text-stone-300" placeholder="Filter by agent name..." type="text"/>
+</div>
+<div class="flex gap-2 flex-wrap">
+<select class="bg-stone-950 border border-stone-800 text-stone-400 text-xs px-3 py-2 rounded focus:ring-0 focus:border-yellow-600/50 appearance-none min-w-[120px]">
+<option>All Companies</option>
+<option>Aetheria Tech</option>
+<option>Nova Dynamics</option>
+<option>Hyperion Corp</option>
+</select>
+<select class="bg-stone-950 border border-stone-800 text-stone-400 text-xs px-3 py-2 rounded focus:ring-0 focus:border-yellow-600/50 appearance-none min-w-[120px]">
+<option>All Departments</option>
+<option>Legal</option>
+<option>Engineering</option>
+<option>Customer Support</option>
+<option>Research</option>
+</select>
+<select class="bg-stone-950 border border-stone-800 text-stone-400 text-xs px-3 py-2 rounded focus:ring-0 focus:border-yellow-600/50 appearance-none min-w-[120px]">
+<option>All Models</option>
+<option>GPT-4o</option>
+<option>Claude 3.5 Sonnet</option>
+<option>Llama 3 70B</option>
+<option>Mistral Large</option>
+</select>
+<select class="bg-stone-950 border border-stone-800 text-stone-400 text-xs px-3 py-2 rounded focus:ring-0 focus:border-yellow-600/50 appearance-none min-w-[100px]">
+<option>All Status</option>
+<option>Online</option>
+<option>Busy</option>
+<option>Standby</option>
+<option>Offline</option>
+</select>
+</div>
+<button class="flex items-center gap-2 text-stone-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider ml-auto">
+<span class="material-symbols-outlined text-base">refresh</span>
+                    Reset
+                </button>
+</div>
+<!-- Data-Dense Table Container -->
+<div class="bg-[#1C1917] border border-[#292524] overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-stone-900/50 border-b border-[#292524]">
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Agent Name</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Company / Dept</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">AI Model</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Status</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest text-right">MTD Cost</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-800/50">
+<!-- Agent Row 1 -->
+<tr class="hover:bg-stone-900/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-stone-800 flex items-center justify-center border border-stone-700">
+<img alt="Agent Icon" class="w-full h-full object-cover" data-alt="Abstract 3D render of a futuristic robot head with glowing gold circuitry lines on dark matte background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhkjBDCfC07BMDydOPZ6RZ8OuTAiQTkbFZ4E3cPSFPs5eKEzMR_8XF0wRH0wNTV9ZQGlqCABAZgw0RjPPz7Wy_T-SM-DjKkWHWFPAM0xYpQcp5ezujzL9uEeyge0zjJuhz3oPtC-tA-K950MoWkxEUUXs1NmYzBBLvOu03HjZBY0JcaLIG5GIrbpIeCwxSctQdDf_DUV-0x5zi6uIvLr8Hj2zyOMV1U-KtVI8kAu7Svr_jSSH0pzTJUWvqgRAbQOpzM_yCy9AtiRjx"/>
+</div>
+<div>
+<p class="text-sm font-bold text-white group-hover:text-yellow-600 transition-colors">Sentinel-Alpha</p>
+<p class="text-[10px] text-stone-500 font-mono tracking-tighter">ID: CTX-0092-A</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs">
+<p class="text-stone-300 font-medium">Aetheria Tech</p>
+<p class="text-stone-500">Legal Compliance</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-[10px] text-stone-400 font-mono">GPT-4o</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<span class="text-xs text-stone-300">Online</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-white">$4,281.40</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-bold uppercase tracking-wider transition-all border border-stone-700">View Logs</button>
+<button class="px-3 py-1 bg-yellow-600/10 hover:bg-yellow-600 text-yellow-600 hover:text-black text-[10px] font-bold uppercase tracking-wider transition-all border border-yellow-600/50">Manage</button>
+</div>
+</td>
+</tr>
+<!-- Agent Row 2 -->
+<tr class="hover:bg-stone-900/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-stone-800 flex items-center justify-center border border-stone-700">
+<img alt="Agent Icon" class="w-full h-full object-cover" data-alt="High-tech sleek android hand reaching towards a glowing yellow light sphere in dark cybernetic void" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeqwoj4Nqzb_jocWQOOmP9zPZ82vU-_Oo2hr3C7j-qRUJaSOvTT5BarVZffxzfCcNfka0vr6l3H8vHkR_HzN_CVM-2DMZSGuezam7lC9BvPmpfyf6wm2CNRMeWZTXWdF39oXhjnX8u2m71p1xVBjTq1XNakUj20OSmBJCc0GFgk46FQ6oefi0z4ANYBvuXMvC7uqswUHOfj4qJuZmTgNdXFALKUrOjJSaFUErcozUJt9F7vihlrgBetshOmSrqPVPUGuH3S0DXCWDT"/>
+</div>
+<div>
+<p class="text-sm font-bold text-white group-hover:text-yellow-600 transition-colors">Nexus-Advisor</p>
+<p class="text-[10px] text-stone-500 font-mono tracking-tighter">ID: CTX-1142-X</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs">
+<p class="text-stone-300 font-medium">Nova Dynamics</p>
+<p class="text-stone-500">Global Logistics</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-[10px] text-stone-400 font-mono">Claude 3.5 Sonnet</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></span>
+<span class="text-xs text-stone-300">Busy</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-white">$12,940.12</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-bold uppercase tracking-wider transition-all border border-stone-700">View Logs</button>
+<button class="px-3 py-1 bg-yellow-600/10 hover:bg-yellow-600 text-yellow-600 hover:text-black text-[10px] font-bold uppercase tracking-wider transition-all border border-yellow-600/50">Manage</button>
+</div>
+</td>
+</tr>
+<!-- Agent Row 3 -->
+<tr class="hover:bg-stone-900/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-stone-800 flex items-center justify-center border border-stone-700">
+<img alt="Agent Icon" class="w-full h-full object-cover" data-alt="Microscopic view of golden neural network fibers glowing against a deep obsidian black background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK8cITgJTY_uVwZv3dtR56Aeux_ryxA-c9j8WXEmhxhELZro2W4VVwBscdS-4QPEMksLB5sG5DwQjQslkCIoWDKPVbcQI6PwLa9CBm4ruvMEwudUr3iR3LParlkpcy5CMYC6rwELfTxUsG3PvyF2R1WFdJTqaPs0VnIG3XwgnUxP9tc9SMLG4Q0Pt6jjuQyIHs53um7zxKfgiFhaiRpw60Q56T0D-YlH_kumeZO92bdZJRuO4nL9P9DzlDeGYOfyqctsT3xEPldVCk"/>
+</div>
+<div>
+<p class="text-sm font-bold text-white group-hover:text-yellow-600 transition-colors">Hyper-Analyst</p>
+<p class="text-[10px] text-stone-500 font-mono tracking-tighter">ID: CTX-9901-Z</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs">
+<p class="text-stone-300 font-medium">Hyperion Corp</p>
+<p class="text-stone-500">R&amp;D Lab</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-[10px] text-stone-400 font-mono">Mistral Large</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-stone-600 shadow-none"></span>
+<span class="text-xs text-stone-500">Standby</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-white">$1,105.00</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-bold uppercase tracking-wider transition-all border border-stone-700">View Logs</button>
+<button class="px-3 py-1 bg-yellow-600/10 hover:bg-yellow-600 text-yellow-600 hover:text-black text-[10px] font-bold uppercase tracking-wider transition-all border border-yellow-600/50">Manage</button>
+</div>
+</td>
+</tr>
+<!-- Agent Row 4 -->
+<tr class="hover:bg-stone-900/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-stone-800 flex items-center justify-center border border-stone-700">
+<img alt="Agent Icon" class="w-full h-full object-cover" data-alt="Fragmented digital portrait of an entity composed of golden binary code particles dissolving into dark smoke" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClSvN6XhnmDyoUOssC2gjJtDFV9CbXBHLjaWJB7vmx5py5O05nCUriOJnACeyY9O2R5MlA5Wy_8mwNV6Gq93VZZ3YUcd6Agt3u_KNzccSS279kfjR-gSqHC4v3JaLyFGZJSYFj3toDEp04fiwRCiaDndq1RMUH9VX76oT8e1uZ2th8IrPOCOPsMgLoLHHZH6OXi-TSHQMyj3SaSPPfajpYYJ1pGN51aeUV1bx70iEGK0hgyIrgKEOPtE9rDlM6KrXp6i_Njnlc8LjL"/>
+</div>
+<div>
+<p class="text-sm font-bold text-white group-hover:text-yellow-600 transition-colors">Vortex-Support</p>
+<p class="text-[10px] text-stone-500 font-mono tracking-tighter">ID: CTX-0442-B</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs">
+<p class="text-stone-300 font-medium">Aetheria Tech</p>
+<p class="text-stone-500">Customer Ops</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-[10px] text-stone-400 font-mono">GPT-4o</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-red-500/50 shadow-none"></span>
+<span class="text-xs text-stone-600 italic">Offline</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<p class="text-sm font-bold text-white">$842.21</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-bold uppercase tracking-wider transition-all border border-stone-700">View Logs</button>
+<button class="px-3 py-1 bg-yellow-600/10 hover:bg-yellow-600 text-yellow-600 hover:text-black text-[10px] font-bold uppercase tracking-wider transition-all border border-yellow-600/50">Manage</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer info -->
+<div class="bg-stone-900/80 px-6 py-3 border-t border-[#292524] flex items-center justify-between">
+<p class="text-[10px] text-stone-500 uppercase tracking-widest">Displaying 25 of 1,242 nodes</p>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:text-yellow-600 transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex gap-1 px-2">
+<span class="w-6 h-6 flex items-center justify-center text-[10px] font-bold bg-yellow-600 text-black rounded-sm">1</span>
+<span class="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-stone-500 hover:bg-stone-800 rounded-sm cursor-pointer">2</span>
+<span class="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-stone-500 hover:bg-stone-800 rounded-sm cursor-pointer">3</span>
+</div>
+<button class="p-1 hover:text-yellow-600 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dashboard Sub-widgets -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface hud-border p-4 relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl">analytics</span>
+</div>
+<h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">Model Distribution</h3>
+<div class="space-y-3">
+<div>
+<div class="flex justify-between text-[10px] mb-1">
+<span class="text-stone-300">GPT-4o</span>
+<span class="text-yellow-600">42%</span>
+</div>
+<div class="w-full bg-stone-900 h-1">
+<div class="bg-yellow-600 h-1 w-[42%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] mb-1">
+<span class="text-stone-300">Claude 3.5</span>
+<span class="text-yellow-600">35%</span>
+</div>
+<div class="w-full bg-stone-900 h-1">
+<div class="bg-yellow-600 h-1 w-[35%] opacity-70"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] mb-1">
+<span class="text-stone-300">Llama 3</span>
+<span class="text-yellow-600">23%</span>
+</div>
+<div class="w-full bg-stone-900 h-1">
+<div class="bg-yellow-600 h-1 w-[23%] opacity-40"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface hud-border p-4 md:col-span-2 relative">
+<h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4 flex items-center justify-between">
+                        System Load (24h)
+                        <span class="text-[10px] text-stone-500 font-normal">Active Instances x Compute Density</span>
+</h3>
+<div class="flex items-end justify-between h-24 gap-1">
+<!-- Mock chart bars -->
+<div class="bg-stone-800 w-full h-1/4 rounded-t-sm"></div>
+<div class="bg-stone-800 w-full h-1/3 rounded-t-sm"></div>
+<div class="bg-stone-800 w-full h-1/2 rounded-t-sm"></div>
+<div class="bg-stone-700 w-full h-3/4 rounded-t-sm"></div>
+<div class="bg-yellow-600/50 w-full h-full rounded-t-sm"></div>
+<div class="bg-yellow-600 w-full h-5/6 rounded-t-sm"></div>
+<div class="bg-yellow-600 w-full h-2/3 rounded-t-sm"></div>
+<div class="bg-stone-800 w-full h-1/2 rounded-t-sm"></div>
+<div class="bg-stone-800 w-full h-1/3 rounded-t-sm"></div>
+<div class="bg-stone-800 w-full h-2/3 rounded-t-sm"></div>
+<div class="bg-yellow-600/30 w-full h-3/4 rounded-t-sm"></div>
+<div class="bg-yellow-600/80 w-full h-5/6 rounded-t-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only execution) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0C0A09] border-t border-[#292524] flex items-center justify-around z-50">
+<button class="flex flex-col items-center gap-1 text-stone-500">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] uppercase font-bold">Dash</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-yellow-600">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="text-[10px] uppercase font-bold">Agents</span>
+</button>
+<div class="-mt-8">
+<button class="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center text-black shadow-lg shadow-yellow-600/20">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-stone-500">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] uppercase font-bold">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-stone-500">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] uppercase font-bold">Sys</span>
+</button>
+</div>
+</body></html>

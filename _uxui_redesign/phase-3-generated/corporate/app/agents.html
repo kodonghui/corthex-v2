@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=800, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#eceef0",
+              "on-primary": "#ffffff",
+              "tertiary": "#943700",
+              "on-tertiary": "#ffffff",
+              "tertiary-fixed": "#ffdbcd",
+              "tertiary-container": "#bc4800",
+              "primary-fixed": "#dbe1ff",
+              "on-secondary-fixed-variant": "#31447b",
+              "error-container": "#ffdad6",
+              "on-error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#7d2d00",
+              "tertiary-fixed-dim": "#ffb596",
+              "surface-container-low": "#f2f4f6",
+              "outline-variant": "#c3c6d7",
+              "secondary-fixed": "#dbe1ff",
+              "error": "#ba1a1a",
+              "outline": "#737686",
+              "surface-variant": "#e0e3e5",
+              "on-secondary-fixed": "#00174b",
+              "secondary": "#495c95",
+              "primary-container": "#2563eb",
+              "primary": "#004ac6",
+              "inverse-primary": "#b4c5ff",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-container": "#394c84",
+              "inverse-on-surface": "#eff1f3",
+              "secondary-container": "#acbfff",
+              "on-surface-variant": "#434655",
+              "surface-dim": "#d8dadc",
+              "on-tertiary-fixed": "#360f00",
+              "on-tertiary-container": "#ffede6",
+              "on-error": "#ffffff",
+              "surface-tint": "#0053db",
+              "surface": "#f7f9fb",
+              "on-primary-fixed-variant": "#003ea8",
+              "background": "#f7f9fb",
+              "on-secondary": "#ffffff",
+              "surface-container-highest": "#e0e3e5",
+              "primary-fixed-dim": "#b4c5ff",
+              "on-primary-fixed": "#00174b",
+              "secondary-fixed-dim": "#b4c5ff",
+              "surface-container-high": "#e6e8ea",
+              "on-background": "#191c1e",
+              "on-surface": "#191c1e",
+              "on-primary-container": "#eeefff",
+              "inverse-surface": "#2d3133",
+              "surface-bright": "#f7f9fb"
+            },
+            fontFamily: {
+              "headline": ["Lexend"],
+              "body": ["Lexend"],
+              "label": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Lexend', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-slate-50 border-r border-slate-200 flex flex-col p-4 font-['Lexend'] text-sm tracking-wide">
+<div class="mb-8 px-4">
+<h1 class="text-lg font-extrabold text-slate-900">Executive Architect</h1>
+<p class="text-xs text-slate-500 font-medium">Precision Authority</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-blue-600 rounded-lg font-semibold shadow-sm active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+                Agents
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+                Deployments
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+                Security
+            </a>
+</nav>
+<div class="mt-auto border-t border-slate-200 pt-4 space-y-1">
+<button class="w-full mb-4 bg-gradient-to-br from-primary to-primary-container text-white py-3 rounded-xl font-semibold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Agent
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 left-64 z-50 bg-white/80 backdrop-blur-md h-16 px-8 flex items-center justify-between border-b border-slate-200/50 font-['Lexend'] antialiased">
+<div class="flex items-center gap-8 flex-1">
+<span class="text-xl font-bold tracking-tight text-blue-600">CORTHEX Agents Hub</span>
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" data-icon="search">search</span>
+<input class="w-full bg-slate-100 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search operational agents..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-slate-200 overflow-hidden ml-2 border border-slate-300">
+<img alt="User profile avatar" class="h-full w-full object-cover" data-alt="professional portrait of a senior system architect in a clean white studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLcHLaAuDFBc2OdaNfNeBp5JAjnZ-8o55CiWDe_bDdJJjeVYmh6qyf-SIZjZSj9tBnT8lwJFepfXHujAPhGUubl8Y2qMC8J-ynLpTSp92JkZSzihg1zC_Tofua4lsV95dO5eW2h39e58f4uVKgZGk8f2HHj4C-iXizv_XD1TGkoOAZEytWrlL-d7LkJCcWjEY9f2Yh_akH1evB0NTOz2bIuo5QUE9FSYo6d2Gf4d-yQFDKFkR8XBBgIQIBefOyWmEZ7hZw5zRNsBRk"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-24 px-8 pb-12">
+<!-- Header Section with Tonal Layering -->
+<div class="mb-10 flex items-end justify-between">
+<div>
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight mb-2">Agent Fleet Overview</h2>
+<p class="text-on-surface-variant max-w-lg">Monitoring 24 active neural agents across 4 primary operational sectors. System integrity remains at 99.8% nominal capacity.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-high px-5 py-2.5 rounded-xl text-on-surface font-medium text-sm flex items-center gap-2 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        Filters
+                    </button>
+<button class="bg-surface-container-high px-5 py-2.5 rounded-xl text-on-surface font-medium text-sm flex items-center gap-2 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- Stats Section (Bento Style) -->
+<div class="grid grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent hover:border-primary/10 transition-all group">
+<div class="flex items-center justify-between mb-4">
+<span class="p-2 bg-blue-50 text-blue-600 rounded-lg material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="text-emerald-600 text-xs font-bold tracking-widest uppercase">+12.4%</span>
+</div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Fleet Efficiency</p>
+<p class="text-2xl font-bold text-on-surface">94.2%</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="p-2 bg-purple-50 text-purple-600 rounded-lg material-symbols-outlined" data-icon="memory">memory</span>
+<span class="text-slate-400 text-xs font-bold tracking-widest uppercase">Nominal</span>
+</div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Compute Load</p>
+<p class="text-2xl font-bold text-on-surface">6.4 TFlops</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="p-2 bg-orange-50 text-orange-600 rounded-lg material-symbols-outlined" data-icon="shield_check">shield</span>
+<span class="text-emerald-600 text-xs font-bold tracking-widest uppercase">Verified</span>
+</div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Security Score</p>
+<p class="text-2xl font-bold text-on-surface">A+</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center justify-between mb-4">
+<span class="p-2 bg-slate-50 text-slate-600 rounded-lg material-symbols-outlined" data-icon="update">update</span>
+<span class="text-slate-400 text-xs font-bold tracking-widest uppercase">Live</span>
+</div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Runtime</p>
+<p class="text-2xl font-bold text-on-surface">842h 12m</p>
+</div>
+</div>
+<!-- Agent Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Agent Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all group border border-transparent hover:border-blue-100 flex flex-col">
+<div class="flex items-start justify-between mb-4">
+<div class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+<img alt="Neural Agent A1" class="h-full w-full object-cover" data-alt="vibrant abstract 3d digital artwork showing floating crystal structures and glowing nodes representing a neural intelligence" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-ZcugHGPO1V0E1tnmHWPaxBKCP0IpdaagSd1hRhuQfo11jG_MKeQrx5sr9LnoJHRiDua7mhorp42T_KutbaEy5HMoDicQbmGYC7MlhuJr8nXxtj16l4ICBlVRtZi1zjaTtYJX4cop44AMHZIjjP6_BUdqDyLVLTzp1gerJSAKBmjDSj-HkNqYr3qPCXHSH58rMKoEWGLcGOESllCAMdsClOirqNBgqlAqkX2pz47ouFMFPlqgsFWw_smGeBfLezZX-xiJsDKkFKt0"/>
+</div>
+<span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">Active</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Aether-01</h3>
+<p class="text-xs font-medium text-slate-500 mb-6">Deep Learning Research</p>
+<div class="mt-auto space-y-4">
+<div>
+<div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+<span>Efficiency</span>
+<span>98%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-600 rounded-full" style="width: 98%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex -space-x-2">
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[8px] font-bold">JD</div>
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[8px] font-bold">MK</div>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">
+                                Details
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Agent Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all group border border-transparent hover:border-blue-100 flex flex-col">
+<div class="flex items-start justify-between mb-4">
+<div class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+<img alt="Neural Agent B2" class="h-full w-full object-cover" data-alt="minimalist 3d graphic of a glass sphere filled with moving light particles and geometric shapes on a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9T6py4-s5skn7vycEGZgZgyXEEILFBPBnr_iLPJq4dK2dPOD9Bf0mAoNnoAR5neEPoXMkmqPWhOfFQ2swwf3gf6hoMptlRHpjr9NuMeBu-Owbz7oYCYrcmDlobQFLLDOu0ZEnjLEs-2aXLHo8PETLmkTQ9Fkjr1wKHi422EpaX6Sln_t8OqKpDqUg_JUcUyTXPNntH3ZW2gAGoXMhQvC17oXRbo3nKGkV7w1M-9ituu9SDw3A2IYSbWMLh3r0-v_JDUbCV_jAFa78"/>
+</div>
+<span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">Processing</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Cipher-9</h3>
+<p class="text-xs font-medium text-slate-500 mb-6">Security &amp; Encryption</p>
+<div class="mt-auto space-y-4">
+<div>
+<div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+<span>Efficiency</span>
+<span>82%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-orange-500 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex -space-x-2">
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-400 flex items-center justify-center text-[8px] font-bold">SR</div>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">
+                                Details
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Agent Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all group border border-transparent hover:border-blue-100 flex flex-col">
+<div class="flex items-start justify-between mb-4">
+<div class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+<img alt="Neural Agent C3" class="h-full w-full object-cover" data-alt="modern 3d rendering of a topographic grid landscape made of liquid metal glowing with soft neon accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3GJE9U0ntLvsjXva-3Wj4TAwuW2swudbUqXcQt1_ATbXvFY1aX4BiUzb6IE10hlwVWIPrJF1Oe-WxIANkBycEfo_O6HFv1zcjvn366_GcOLXfuCmvX4v6guWPTcZUDrYTFPpQGmvBxYAn9TcBd69VLbHqGNQP-q03Pi4N5dcRpbGc-tLvj4TBfT9KLexHWCB7A8xJD9lvucuCCLEN-PZyAJVbZC6j9AlvNBMKvsUFE2ljy9h7CaRHJpjwRYIBeNE2b74HWa7sJTCl"/>
+</div>
+<span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">Active</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Vector-G</h3>
+<p class="text-xs font-medium text-slate-500 mb-6">Asset Logistics</p>
+<div class="mt-auto space-y-4">
+<div>
+<div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+<span>Efficiency</span>
+<span>91%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-600 rounded-full" style="width: 91%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex -space-x-2">
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[8px] font-bold">TA</div>
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[8px] font-bold">LP</div>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">
+                                Details
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Agent Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all group border border-transparent hover:border-blue-100 flex flex-col">
+<div class="flex items-start justify-between mb-4">
+<div class="h-14 w-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+<img alt="Neural Agent D4" class="h-full w-full object-cover" data-alt="abstract illustration of digital fiber optic lines forming a complex wave pattern with cinematic lighting and soft bokeh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEQukr4ljhYNr0gqYOR5HYU91qDzrb6MMHNFgrpQ5R4oZn_UKccT1Mz5D-VQaF4rGULH0dyYeJ6z7kMd9ySTjQ5X6-YP21NOeRnru1CdzKQ8p-FKXYJq0uW2zTww6V0zCVBAb5wWVxrI6RlZobKXviOesSN-HG3gLgqqoqZ6O4f1ge20lmkOkmkUKa6fjfhRwTtqcvziHbcuYngaoivHiZR5qMrSsmTGalT8nxrB86DqgEFWPK3HuMlfurNJstxVdPoaepoN-VBIVb"/>
+</div>
+<span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">Standby</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors">Origin-K</h3>
+<p class="text-xs font-medium text-slate-500 mb-6">Database Management</p>
+<div class="mt-auto space-y-4">
+<div>
+<div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+<span>Efficiency</span>
+<span>0%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-slate-300 rounded-full" style="width: 0%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex -space-x-2">
+<div class="h-6 w-6 rounded-full border-2 border-white bg-slate-500 flex items-center justify-center text-white text-[8px] font-bold">+1</div>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">
+                                Details
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State/Add New Card (Asymmetric Design Element) -->
+<div class="bg-slate-100/50 rounded-xl p-5 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center group hover:border-primary/40 transition-all cursor-pointer">
+<div class="p-3 bg-white rounded-full shadow-sm text-slate-400 group-hover:text-primary group-hover:shadow-md transition-all mb-3">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</div>
+<span class="text-sm font-bold text-slate-500 group-hover:text-slate-700">Deploy New Agent</span>
+<span class="text-[10px] text-slate-400 mt-1">Ready for initialization</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

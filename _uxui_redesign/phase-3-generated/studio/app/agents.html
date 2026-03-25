@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Studio - Agents Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-tint": "#006780",
+            "surface-dim": "#ccddde",
+            "tertiary-container": "#a86516",
+            "on-tertiary-fixed": "#2d1600",
+            "surface": "#ebfdfe",
+            "surface-container": "#dff1f2",
+            "tertiary-fixed": "#ffdcbf",
+            "on-primary-container": "#fafdff",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#d4e6e7",
+            "tertiary": "#894e00",
+            "on-surface-variant": "#3e484d",
+            "outline-variant": "#bdc8ce",
+            "secondary-fixed-dim": "#a8ccdb",
+            "surface-container-highest": "#d4e6e7",
+            "secondary-fixed": "#c3e8f8",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed-variant": "#284b58",
+            "error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#ffb873",
+            "outline": "#6e797e",
+            "inverse-surface": "#233334",
+            "surface-bright": "#ebfdfe",
+            "on-primary-fixed-variant": "#004e61",
+            "on-secondary-fixed": "#001f28",
+            "secondary": "#406370",
+            "primary-container": "#007f9d",
+            "error": "#ba1a1a",
+            "secondary-container": "#c3e8f8",
+            "on-surface": "#0e1e1f",
+            "primary-fixed": "#b7eaff",
+            "surface-container-lowest": "#ffffff",
+            "background": "#ebfdfe",
+            "surface-container-low": "#e5f7f8",
+            "on-tertiary-container": "#fffbff",
+            "on-background": "#0e1e1f",
+            "on-secondary": "#ffffff",
+            "surface-container-high": "#daeced",
+            "on-tertiary-fixed-variant": "#6a3b00",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#6cd3f7",
+            "on-primary-fixed": "#001f28",
+            "inverse-on-surface": "#e2f4f5",
+            "primary": "#00647c",
+            "inverse-primary": "#6cd3f7",
+            "on-secondary-container": "#466977"
+          },
+          fontFamily: {
+            "headline": ["Work Sans"],
+            "body": ["Work Sans"],
+            "label": ["Work Sans"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Work Sans', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+    }
+    .gradient-primary {
+      background: linear-gradient(135deg, #00647c 0%, #007f9d 100%);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-[#ebfdfe]/70 backdrop-blur-xl shadow-[0_32px_32px_-4px_rgba(14,30,31,0.06)] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#00647c]">CORTHEX Studio</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-['Work_Sans'] text-sm font-medium tracking-tight text-[#3e484d] hover:bg-[#e5f7f8] transition-colors px-3 py-2 rounded-lg" href="#">Dashboard</a>
+<a class="font-['Work_Sans'] text-sm font-medium tracking-tight text-[#3e484d] hover:bg-[#e5f7f8] transition-colors px-3 py-2 rounded-lg" href="#">Projects</a>
+<a class="font-['Work_Sans'] text-sm font-medium tracking-tight text-[#00647c] border-b-2 border-[#00647c] px-3 py-2" href="#">Agents</a>
+<a class="font-['Work_Sans'] text-sm font-medium tracking-tight text-[#3e484d] hover:bg-[#e5f7f8] transition-colors px-3 py-2 rounded-lg" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-[#e5f7f8] transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#00647c]">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-[#e5f7f8] transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#00647c]">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User profile" data-alt="high-quality studio portrait of a professional man with a neutral expression and soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz3WpvPIZfCdMbPGO4DAl5YXEfJLoSX0FFK93unMac-GPLqfE2A4gmVMD30EJwFmjZtH5yucdVc8HopjqyS_d00yoOlqxeiyQzTfblBqP304IHIn-Jm8RwxNoz8wOVGWIcS8aaA4D9zy2RFR1X3BIAqmosf0E6VO3KsLCMlSlGq9wGXAQDX-j9qbly7U6J88B-3raOJlyzVF-oFP11M_1bFJpxyyeY3Ns5fO4xtGmRTBWK7riy3gY1OO7eXkNI4O_5nAeP80KdDl8L"/>
+</div>
+</div>
+</header>
+<!-- Sidebar Shell -->
+<aside class="fixed left-0 h-full w-64 z-40 bg-[#e5f7f8] flex flex-col h-screen p-4 pt-20 hidden lg:flex">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-white shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-[#00647c] leading-none">CORTHEX</h2>
+<p class="text-[10px] uppercase tracking-widest text-outline font-bold">AI Workspace</p>
+</div>
+</div>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#3e484d] hover:bg-white/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-semibold text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#3e484d] hover:bg-white/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-semibold text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white text-[#00647c] shadow-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-semibold text-sm">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#3e484d] hover:bg-white/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-semibold text-sm">Assets</span>
+</a>
+</div>
+<div class="mt-8 px-2">
+<button class="w-full py-3 gradient-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all">
+        Create New Agent
+      </button>
+</div>
+<div class="mt-auto space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#3e484d] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-semibold text-sm">Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#3e484d] hover:bg-white/50 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-semibold text-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 px-6 pb-12 min-h-screen">
+<!-- Header Section -->
+<div class="max-w-7xl mx-auto mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-4xl font-extrabold text-on-background tracking-tight mb-2">Agent Fleet</h1>
+<p class="text-on-surface-variant max-w-md">Orchestrate your specialized AI workforce. Manage permissions, monitor performance, and deploy intelligence across your workspace.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low p-1.5 rounded-2xl">
+<div class="px-4 py-2 bg-surface-container-lowest rounded-xl shadow-sm flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="text-xs font-bold text-on-surface-variant">24 Online</span>
+</div>
+<div class="px-4 py-2 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-amber-500"></div>
+<span class="text-xs font-bold text-on-surface-variant">3 Busy</span>
+</div>
+<div class="px-4 py-2 flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="text-xs font-bold text-on-surface-variant">8 Offline</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Toolbar Section -->
+<div class="max-w-7xl mx-auto mb-8">
+<div class="flex flex-wrap items-center gap-4">
+<!-- Modern Minimalist Search -->
+<div class="relative flex-grow max-w-md group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant" placeholder="Search agents by name or role..." type="text"/>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-primary transition-all duration-300 group-focus-within:w-full"></div>
+</div>
+<button class="flex items-center gap-2 px-4 py-3 bg-surface-container-high text-primary font-bold text-sm rounded-xl hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+          Filters
+        </button>
+<div class="h-8 w-[1px] bg-outline-variant/30 hidden md:block"></div>
+<div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+<span class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-full cursor-pointer">All Agents</span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant transition-colors">Marketing</span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant transition-colors">Security</span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant transition-colors">Logic</span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant transition-colors">Creative</span>
+</div>
+</div>
+</div>
+<!-- Agent Cards Grid (Bento Style) -->
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Agent Card 1 -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 transition-all duration-300 hover:shadow-[0_32px_32px_-4px_rgba(14,30,31,0.06)] flex flex-col h-full border border-transparent hover:border-primary/10">
+<div class="flex justify-between items-start mb-6">
+<div class="relative">
+<div class="w-14 h-14 rounded-2xl overflow-hidden">
+<img alt="Agent Avatar" data-alt="abstract glowing geometric 3D shape representing artificial intelligence intelligence in shades of cyan and white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-0GHzJugXwOsljCNGEVWfYveUg_18aeRrDZlpw4Gh4Vk9EpWw7S_37nKjNTg42hc2EpmcD4Iw-wJhfktme6sPyL777TVwOIfWbORxuJsrsuRLZbLROk0ASn34jrEQEpvwnO_78GnaW4e-Lp85CnHMkCog-W7LkXvOa4cOx4nEGXQfohcuzjFAhBgyKyn3GBNibYNZVij9CMfsAx6CbbQrYrdZT-QvGmr_x5mJFoz4WaKwUtO62ya908rnqY_Lq3P46yaOsLugVarb"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white"></div>
+</div>
+<button class="text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-bold text-on-surface mb-1">Aura-7</h3>
+<span class="text-xs font-black uppercase tracking-wider text-primary px-2 py-1 bg-primary/5 rounded-md">Marketing</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-on-surface-variant">Efficiency</span>
+<span class="text-xs font-bold text-on-surface">98.2%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[98%]"></div>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline-variant">Last Active</span>
+<span class="text-xs font-bold text-on-surface">Just now</span>
+</div>
+<button class="p-2 rounded-xl bg-surface-container-high group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Agent Card 2 -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 transition-all duration-300 hover:shadow-[0_32px_32px_-4px_rgba(14,30,31,0.06)] flex flex-col h-full border border-transparent hover:border-primary/10">
+<div class="flex justify-between items-start mb-6">
+<div class="relative">
+<div class="w-14 h-14 rounded-2xl overflow-hidden">
+<img alt="Agent Avatar" data-alt="high-tech microchip processor with blue neon light paths and futuristic digital details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCowWT8ckJk_WoPflKiJgcAQTYAyyVxT2aTY-1wcsiMdJyZg882e8HwM5S9O7xg5Q0Ih4lgYj9KSsb9Vc2QIRP1uyVi8IgxBDUOP1LOPh_DVjZKsbztIyuZqfBxEJp43G7H7SyKwkoha2U8x7r75VTWZ9WM3XBZqBQ8TwFrZOFr-rit3b6HWf3EpRrXi63Vu9JtO3nlWkPvY4onp0sDa9BEflsiGd5is2D5DllpL8SYZvNBcbFjTWRFoJcO4WDmJhAqbW1oSffHeAWE"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-amber-500 border-4 border-white"></div>
+</div>
+<button class="text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-bold text-on-surface mb-1">Sentinel-X</h3>
+<span class="text-xs font-black uppercase tracking-wider text-primary px-2 py-1 bg-primary/5 rounded-md">Security</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-on-surface-variant">Threat Mitigation</span>
+<span class="text-xs font-bold text-on-surface">100%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[100%]"></div>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline-variant">Last Active</span>
+<span class="text-xs font-bold text-on-surface">2m ago</span>
+</div>
+<button class="p-2 rounded-xl bg-surface-container-high group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Agent Card 3 (Asymmetric Highlight) -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 transition-all duration-300 hover:shadow-[0_32px_32px_-4px_rgba(14,30,31,0.06)] flex flex-col h-full border border-transparent hover:border-primary/10">
+<div class="flex justify-between items-start mb-6">
+<div class="relative">
+<div class="w-14 h-14 rounded-2xl overflow-hidden">
+<img alt="Agent Avatar" data-alt="swirling liquid metal silver and blue waves in high definition with crystalline reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYmbu7AMk8o24zkdMcLdRtavh9Mg_nH82L0mygZfTJagM2qfqUUJj3RSRN-2s3Zln8f090YjbcDpPNADifgICKe3rPeq6gcl6BafDmW6QfqHm_rTIwclxXgRE9_vTMgPJXlAbFVGkzz8xj7OKjgrgtxKHLVZw5DxTEvhjm6_arqc2LXnun4ZNZYOVEmKUqd-Ir56y0Afgwug_XIip1a75GWakQb0AHOfmqvGjJMHbCQ1ecNb4-iKxvQfQtUjo7D5zqX5KH6GHOuDwN"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white"></div>
+</div>
+<button class="text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-bold text-on-surface mb-1">LogicEngine</h3>
+<span class="text-xs font-black uppercase tracking-wider text-primary px-2 py-1 bg-primary/5 rounded-md">Logic</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-on-surface-variant">Calculation Velocity</span>
+<span class="text-xs font-bold text-on-surface">89.4%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[89%]"></div>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline-variant">Last Active</span>
+<span class="text-xs font-bold text-on-surface">14m ago</span>
+</div>
+<button class="p-2 rounded-xl bg-surface-container-high group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Agent Card 4 -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 transition-all duration-300 hover:shadow-[0_32px_32px_-4px_rgba(14,30,31,0.06)] flex flex-col h-full border border-transparent hover:border-primary/10">
+<div class="flex justify-between items-start mb-6">
+<div class="relative">
+<div class="w-14 h-14 rounded-2xl overflow-hidden">
+<img alt="Agent Avatar" data-alt="minimalist 3D rendered neural network structure with thin connected lines and soft blue glowing points" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeTpi7sVTi1JRIU-hEByoBp4g13B4jCjJ9gnnBDqKcdWS1GyuyME06NnTXp4Mv6nkSR1e0uvNqBC2zLjX7BEFgXvMO5aiJCa76T-GqUrulPuzClP9oF1YdBuLk72i0VDRQLcRblzvQbGDBUrEEaiaZxASHDVInHoDGsT7qACawLMHACzYOePCbUnN5PfUv8SnZfvBgG9tV1T_J3tH-pR9cdumomM_jzqka7i12YYulqnm3DnGNishqrQbWW0eF98FR6_n3qXnjndRX"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-outline-variant border-4 border-white"></div>
+</div>
+<button class="text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-bold text-on-surface mb-1">Muse-40</h3>
+<span class="text-xs font-black uppercase tracking-wider text-primary px-2 py-1 bg-primary/5 rounded-md">Creative</span>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-on-surface-variant">Novelty Score</span>
+<span class="text-xs font-bold text-on-surface">94.1%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[94%]"></div>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-outline-variant">Last Active</span>
+<span class="text-xs font-bold text-on-surface">Yesterday</span>
+</div>
+<button class="p-2 rounded-xl bg-surface-container-high group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- New Agent Placeholder Card -->
+<div class="flex flex-col items-center justify-center border-2 border-dashed border-outline-variant rounded-3xl p-6 hover:bg-surface-container-low transition-colors group cursor-pointer h-full">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-outline-variant group-hover:text-primary transition-colors mb-4">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<span class="text-sm font-bold text-on-surface-variant group-hover:text-primary transition-colors text-center">Deploy a specialized<br/>new Agent</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell (Mobile Only) -->
+<footer class="md:hidden fixed bottom-0 w-full z-50 bg-[#ebfdfe]/70 backdrop-blur-xl flex items-center justify-between px-6 h-16 w-full">
+<a class="flex flex-col items-center gap-1 text-[#3e484d]" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#3e484d]" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-[10px] font-bold">Projects</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#00647c]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="text-[10px] font-bold">Agents</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#3e484d]" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px] font-bold">Assets</span>
+</a>
+</footer>
+</body></html>
