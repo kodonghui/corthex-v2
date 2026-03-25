@@ -2,57 +2,43 @@
 @import "./ui/theme.css";
 @import "./styles/themes.css";
 
-/* CORTHEX 디자인 토큰 v6.0 — Default = Command Theme (Dark) */
+/* CORTHEX 디자인 토큰 v6.1
+   Fix 9: @theme now holds ONLY shared/layout tokens.
+   Command-specific color tokens moved to [data-theme="command"] in themes.css.
+   All [data-theme] blocks in themes.css own their color tokens exclusively.
+   ─────────────────────────────────────────────────── */
 @theme {
-  /* Accent — promax gold (command default) */
-  --color-corthex-accent: #CA8A04;
-  --color-corthex-accent-hover: #EAB308;
-  --color-corthex-accent-deep: #A16207;
-  --color-corthex-accent-muted: rgba(202, 138, 4, 0.10);
-
-  /* Semantic */
-  --color-corthex-success: #22C55E;
-  --color-corthex-warning: #EAB308;
-  --color-corthex-error: #EF4444;
-  --color-corthex-info: #3B82F6;
-  --color-corthex-handoff: #A78BFA;
-
-  /* Surface — near-black (command default) */
-  --color-corthex-bg: #0C0A09;
-  --color-corthex-surface: #1C1917;
-  --color-corthex-elevated: #292524;
-  --color-corthex-border: #44403C;
-  --color-corthex-border-strong: #57534E;
-  --color-corthex-nexus-bg: #0A0908;
-
-  /* Text */
-  --color-corthex-text-primary: #FAFAF9;
-  --color-corthex-text-secondary: #A8A29E;
-  --color-corthex-text-disabled: #57534E;
-  --color-corthex-text-on-accent: #0C0A09;
-
-  /* Sidebar */
-  --color-corthex-sidebar-bg: #0C0A09;
-  --color-corthex-sidebar-border: #1C1917;
-  --color-corthex-sidebar-text: #A8A29E;
-  --color-corthex-sidebar-text-active: #FAFAF9;
-  --color-corthex-sidebar-hover: rgba(202, 138, 4, 0.10);
-  --color-corthex-sidebar-active: rgba(202, 138, 4, 0.15);
-  --color-corthex-sidebar-brand: #CA8A04;
-
-  /* Typography */
+  /* Typography — shared across all themes */
   --font-heading: 'DM Sans', 'Inter', sans-serif;
   --font-body: 'DM Sans', 'Inter', sans-serif;
   --font-ui: 'Inter', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Layout */
+  /* Typography scale — Fix 8: --text-xs through --text-4xl with line-heights */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
+  /* Layout — shared across all themes */
   --sidebar-width: 280px;
   --sidebar-collapsed: 64px;
   --topbar-height: 56px;
   --content-max: 1160px;
 
-  /* Animations */
+  /* Animations — shared across all themes */
   --animate-slide-in: slide-in 200ms ease-out;
   --animate-slide-up: slide-up 200ms ease-out;
   --animate-cursor-blink: cursor-blink 1s step-end infinite;
