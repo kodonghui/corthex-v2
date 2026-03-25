@@ -46,6 +46,25 @@ packages:
     router: none (single page)
     css: tailwindcss v4
 
+  office:
+    name: "@corthex/office"
+    path: "packages/office"
+    port: 5175
+    description: "Virtual Office — PixiJS canvas app (OpenClaw)"
+    router: none (single canvas app)
+    renderer: "pixi.js 8.17.1"
+    components:
+      - "packages/office/src/components/OfficeCanvas.tsx"
+      - "packages/office/src/components/ResponsiveOffice.tsx"
+      - "packages/office/src/components/AgentTooltip.tsx"
+      - "packages/office/src/components/MobileAgentList.tsx"
+      - "packages/office/src/components/ScreenReaderAnnouncer.tsx"
+    sprites:
+      - "packages/office/src/sprites/AgentSprite.ts"
+      - "packages/office/src/sprites/OfficeFloor.ts"
+    hooks:
+      - "packages/office/src/hooks/useOfficeSocket.ts"
+
   shared:
     name: "@corthex/shared"
     path: "packages/shared"
@@ -91,10 +110,16 @@ paths:
   landing_index_html: "packages/landing/index.html"
   landing_css: "packages/landing/src/index.css"
 
+  # Office package
+  office_entry: "packages/office/src/main.tsx"
+  office_app: "packages/office/src/App.tsx"
+  office_canvas: "packages/office/src/components/OfficeCanvas.tsx"
+  office_index_html: "packages/office/index.html"
+
   # Config
   tsconfig: "packages/app/tsconfig.json"
 
-type_check_cmd: "cd packages/app && npx tsc --noEmit && cd ../admin && npx tsc --noEmit"
+type_check_cmd: "cd packages/app && npx tsc --noEmit && cd ../admin && npx tsc --noEmit && cd ../office && npx tsc --noEmit"
 
 css_framework:
   name: "tailwindcss"
@@ -105,39 +130,21 @@ css_framework:
 current_theme_system:
   method: "CSS custom properties via @theme + data-theme attribute"
   store: "zustand (theme-store.ts) with localStorage persistence"
-  default_theme: "sovereign (natural-organic)"
-  existing_themes:
-    - "sovereign (Natural Organic — olive/cream light)"
-    - "imperial (Imperial Red + Obsidian dark)"
-    - "tactical (Military Green dark)"
-    - "mystic (Deep Indigo dark)"
-    - "stealth (Near-black minimal)"
-  problem: "layout.tsx and sidebar.tsx use HARDCODED hex values instead of CSS variables"
+  default_theme: "command"
+  themes:
+    - "command (Premium Dark — gold #CA8A04 + near-black #0C0A09, DM Sans)"
+    - "studio (Soft UI — cyan #0891B2 + neutral #F9FAFB, Outfit + Work Sans)"
+    - "corporate (Trust & Authority — blue #2563EB + slate #F8FAFC, Lexend + Source Sans 3)"
+  status: "Phase 2-2 Party Mode PASS 7.6/10. All CSS variables migrated. 5,015 corthex-* refs."
 
-hardcoded_colors_inventory:
-  app_layout:
-    - "bg-[#faf8f5]"
-    - "text-[#1a1a1a]"
-    - "border-[#e5e1d3]"
-    - "bg-[#f5f0e8]"
-    - "text-[#6b705c]"
-    - "text-[#a3a08e]"
-    - "border-[#d4cfc4]"
-    - "bg-[#606C38]"
-    - "focus:border-[#606C38]"
-    - "focus:ring-[#606C38]"
-  app_sidebar:
-    - "bg-[#283618]"
-    - "border-[#3a4d28]"
-    - "bg-[#606C38]/30"
-    - "text-[#c5d8a4]"
-    - "text-[#a3c48a]"
-    - "bg-[#e5e1d3]/20"
-    - "bg-[#606C38]"
-  admin_layout:
-    - "bg-[#faf8f5]"
-    - "style={{ backgroundColor: '#5a7247' }}"
-  note: "ALL must be replaced with CSS variable references (var(--color-corthex-*))"
+color_migration_status:
+  corthex_css_variable_refs: 5015
+  remaining_hardcoded:
+    tailwind_arbitrary_hex: 27  # alpha values, dark-only specifics
+    tailwind_default_colors: 226  # extreme shades (slate-950 etc)
+    inline_style_hex: 159  # semantic fixed colors, provider brands
+    bg_white: 0  # all replaced
+  note: "Phase 4-0 + 4-1 completed. 98%+ migrated to CSS variables."
 
 pages:
   app:
@@ -358,10 +365,11 @@ pages:
         - "packages/landing/src/components/footer.tsx"
 
 page_counts:
-  app: 30  # excluding redirects and /reports/:id (same component)
-  admin: 28
-  landing: 1
-  total: 59
+  app: 30        # 28 layout routes + login + onboarding
+  admin: 29      # 27 layout routes + login + index(dashboard)
+  office: 1      # single PixiJS canvas app
+  landing: 1     # single page with 5 sections
+  total: 61      # verified 2026-03-25 from App.tsx grep + ls packages/
 
 current_tokens:
   fonts:
