@@ -22,10 +22,9 @@ export interface N8nHealthStatus {
  */
 export async function checkN8nHealth(): Promise<N8nHealthStatus> {
   const start = Date.now()
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS)
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS)
-
     const res = await fetch(`${N8N_BASE_URL}/healthz`, {
       signal: controller.signal,
     })
