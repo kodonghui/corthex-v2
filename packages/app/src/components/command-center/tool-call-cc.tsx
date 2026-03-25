@@ -14,7 +14,7 @@ export function ToolCallCC({ toolName, status, duration }: ToolCallCCProps) {
                     <Wrench className="text-stone-500 w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                    <p className="text-sm font-bold text-slate-50 font-mono">Tool Call: {toolName}</p>
+                    <p className="text-sm font-bold text-corthex-text-secondary font-mono">Tool Call: {toolName}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                         <span className={`flex size-2 rounded-full ${status === 'Complete' ? 'bg-emerald-500' : status === 'Failed' ? 'bg-red-500' : 'bg-amber-500'}`}></span>
                         <p className="text-stone-500 text-xs">{status}</p>
@@ -23,7 +23,7 @@ export function ToolCallCC({ toolName, status, duration }: ToolCallCCProps) {
                     </div>
                 </div>
             </div>
-            <button className="text-stone-500 hover:text-slate-50 transition-colors">
+            <button className="text-stone-500 hover:text-corthex-text-secondary transition-colors">
                 <Code className="w-4 h-4" />
             </button>
         </div>

@@ -20,9 +20,9 @@ export function KnowledgeDetailHeader({ title, version, author, lastModified, ta
                         <h2 className="text-lg font-bold text-corthex-text-primary leading-tight">{title}</h2>
                         <div className="flex items-center gap-2 text-xs text-stone-500 mt-1">
                             <span>버전 {version}</span>
-                            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                            <span className="w-1 h-1 rounded-full bg-corthex-elevated"></span>
                             <span>작성자: {author}</span>
-                            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                            <span className="w-1 h-1 rounded-full bg-corthex-elevated"></span>
                             <span>마지막 수정: {lastModified}</span>
                         </div>
                     </div>

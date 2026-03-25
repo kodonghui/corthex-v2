@@ -21,7 +21,7 @@ export function TrackerActiveJobs({ jobs = [
                 <h3 className="text-sm font-bold text-corthex-text-primary uppercase tracking-wider font-display">Active Jobs</h3>
             </div>
 
-            <div className="divide-y divide-slate-800">
+            <div className="divide-y divide-corthex-border">
                 {jobs.map(job => (
                     <div key={job.id} className="p-4 hover:bg-stone-100/50 transition-colors cursor-pointer">
                         <div className="flex items-start justify-between">

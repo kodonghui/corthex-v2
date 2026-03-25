@@ -26,8 +26,8 @@ const statusColors: Record<string, string> = {
   online: 'bg-emerald-500',
   working: 'bg-amber-500 animate-pulse',
   error: 'bg-red-500',
-  offline: 'bg-slate-600',
-  inactive: 'bg-slate-600',
+  offline: 'bg-corthex-elevated',
+  inactive: 'bg-corthex-elevated',
 }
 
 const statusLabels: Record<string, string> = {
@@ -155,10 +155,10 @@ export function AgentPickerPanel({
   return (
     <div
       data-testid="agent-picker-panel"
-      className="w-full md:w-72 flex flex-col border-r border-zinc-200 bg-corthex-bg shrink-0 h-full"
+      className="w-full md:w-72 flex flex-col border-r border-corthex-border bg-corthex-bg shrink-0 h-full"
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-zinc-200 shrink-0">
+      <div className="px-4 py-3 border-b border-corthex-border shrink-0">
         <h2 className="text-sm font-semibold text-corthex-text-primary">
           에이전트 선택
         </h2>
@@ -176,7 +176,7 @@ export function AgentPickerPanel({
           onChange={(e) => setSearch(e.target.value)}
           placeholder="이름, 역할, 부서 검색..."
           disabled={searchDisabled}
-          className="w-full bg-corthex-elevated border border-zinc-200 focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder-zinc-400 disabled:opacity-40 transition-colors"
+          className="w-full bg-corthex-elevated border border-corthex-border focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder-zinc-400 disabled:opacity-40 transition-colors"
         />
       </div>
 
@@ -217,7 +217,7 @@ export function AgentPickerPanel({
                   const isSelected = agent.id === selectedAgentId
                   const initial = agent.name.charAt(0)
                   const statusColor =
-                    statusColors[agent.status] ?? 'bg-slate-600'
+                    statusColors[agent.status] ?? 'bg-corthex-elevated'
                   const statusLabel =
                     statusLabels[agent.status] ?? agent.status
 
@@ -234,10 +234,10 @@ export function AgentPickerPanel({
                       } ${isOffline ? 'opacity-40 cursor-not-allowed' : ''}`}
                     >
                       {/* Avatar */}
-                      <span className="w-9 h-9 rounded-full bg-zinc-200 flex items-center justify-center text-sm font-bold text-corthex-text-secondary shrink-0 relative">
+                      <span className="w-9 h-9 rounded-full bg-corthex-surface flex items-center justify-center text-sm font-bold text-corthex-text-secondary shrink-0 relative">
                         {initial}
                         <span
-                          className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-50 ${statusColor}`}
+                          className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-corthex-border ${statusColor}`}
                           title={statusLabel}
                         />
                       </span>
@@ -267,7 +267,7 @@ export function AgentPickerPanel({
       </div>
 
       {/* Footer: agent count */}
-      <div className="px-4 py-2 border-t border-zinc-200 shrink-0">
+      <div className="px-4 py-2 border-t border-corthex-border shrink-0">
         <p className="text-[10px] text-corthex-text-disabled">
           {totalAgents}개 에이전트 · {departments.length}개 부서
         </p>

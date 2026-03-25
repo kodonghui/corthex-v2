@@ -83,7 +83,7 @@ const statusColors: Record<string, string> = {
   online: 'bg-emerald-500',
   working: 'bg-amber-500 animate-pulse',
   error: 'bg-red-500',
-  offline: 'bg-slate-600',
+  offline: 'bg-corthex-elevated',
 }
 
 const statusLabels: Record<string, string> = {
@@ -398,7 +398,7 @@ export function ChatArea({
         {onBack && (
           <button
             onClick={onBack}
-            className="mt-4 px-4 py-2 text-sm bg-corthex-accent text-slate-950 rounded-lg font-medium hover:bg-corthex-accent-hover transition-colors"
+            className="mt-4 px-4 py-2 text-sm bg-corthex-accent text-corthex-text-secondary rounded-lg font-medium hover:bg-corthex-accent-hover transition-colors"
           >
             새 대화 시작
           </button>
@@ -515,7 +515,7 @@ export function ChatArea({
                         ? 'bg-red-500/20 text-red-400'
                         : del.status === 'processing'
                           ? 'bg-corthex-accent/20 text-corthex-accent'
-                          : 'bg-slate-600 text-stone-500'
+                          : 'bg-corthex-elevated text-stone-500'
                   }`}
                 >
                   {del.status === 'completed' ? '완료' : del.status === 'failed' ? '실패' : del.status === 'processing' ? '처리중' : '대기'}
@@ -677,7 +677,7 @@ export function ChatArea({
                               href={`/api/workspace/files/${att.id}/download`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-200 hover:bg-slate-600 text-xs text-stone-600 transition-colors"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-200 hover:bg-corthex-elevated text-xs text-stone-600 transition-colors"
                             >
                               {att.mimeType.startsWith('image/') ? (
                                 <img
@@ -738,9 +738,9 @@ export function ChatArea({
                   )}
                   {!streamingText && toolCalls.length > 0 && toolCalls.every(t => t.status === 'done') && (
                     <div className="flex items-center gap-1 py-1 px-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-corthex-surface animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-corthex-surface animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-corthex-surface animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   )}
                 </div>
@@ -900,7 +900,7 @@ export function ChatArea({
                   data-testid="chat-send-btn"
                   onClick={handleSend}
                   disabled={!input.trim() || sendMessage.isPending}
-                  className="flex items-center justify-center bg-corthex-accent text-slate-950 rounded-full w-10 h-10 shrink-0 hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="flex items-center justify-center bg-corthex-accent text-corthex-text-secondary rounded-full w-10 h-10 shrink-0 hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
                   aria-label="메시지 전송"
                 >
                   <Send className="w-5 h-5 ml-0.5" />

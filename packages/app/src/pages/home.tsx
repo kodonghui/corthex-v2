@@ -54,7 +54,7 @@ const STATUS_CONFIG: Record<string, { dot: string; bg: string; text: string; lab
   online: { dot: 'bg-emerald-400 animate-pulse', bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: '활성' },
   working: { dot: 'bg-blue-400 animate-pulse', bg: 'bg-blue-500/10', text: 'text-blue-400', label: '작업중' },
   error: { dot: 'bg-red-400', bg: 'bg-red-500/10', text: 'text-red-400', label: '오류' },
-  offline: { dot: 'bg-slate-500', bg: 'bg-slate-500/10', text: 'text-stone-400', label: '오프라인' },
+  offline: { dot: 'bg-corthex-surface', bg: 'bg-corthex-surface/10', text: 'text-stone-400', label: '오프라인' },
 }
 
 export function HomePage() {
@@ -144,7 +144,7 @@ export function HomePage() {
                 </button>
               </div>
             </div>
-            <div className="divide-y divide-slate-700/30">
+            <div className="divide-y divide-corthex-border/30">
               {notifications.jobs.slice(0, 5).map((job) => (
                 <div key={job.id} className="px-6 py-3.5 flex items-start gap-3 hover:bg-stone-100/30 transition-colors">
                   {job.status === 'completed' ? (
@@ -220,7 +220,7 @@ export function HomePage() {
                         </div>
                         <p className="text-xs text-corthex-text-secondary truncate">{a.role}</p>
                         <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-stone-200/30 text-corthex-text-secondary">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> 오프라인
+                          <span className="w-1.5 h-1.5 rounded-full bg-corthex-elevated" /> 오프라인
                         </span>
                       </div>
                     )
@@ -397,7 +397,7 @@ function RecentNotifications() {
         </button>
       </div>
       <div className="rounded-2xl bg-stone-100/40 border border-stone-200/50 overflow-hidden backdrop-blur-sm">
-        <div className="divide-y divide-slate-700/30">
+        <div className="divide-y divide-corthex-border/30">
           {items.map((n) => (
             <div
               key={n.id}

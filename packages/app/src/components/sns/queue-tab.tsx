@@ -88,7 +88,7 @@ export function QueueTab() {
               className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 statusFilter === s.value
                   ? 'bg-blue-600/20 text-blue-400 border-blue-500/50'
-                  : 'border-stone-300 text-stone-500 hover:border-slate-500'
+                  : 'border-stone-300 text-stone-500 hover:border-corthex-border'
               }`}>
               {s.label}
             </button>

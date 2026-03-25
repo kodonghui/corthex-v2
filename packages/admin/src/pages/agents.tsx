@@ -65,7 +65,7 @@ const STATUS_COLORS: Record<string, string> = {
   online: 'bg-green-500',
   working: 'bg-corthex-accent animate-pulse',
   error: 'bg-red-400',
-  offline: 'bg-slate-300',
+  offline: 'bg-corthex-surface',
 }
 
 const TIER_BADGE: Record<string, string> = {

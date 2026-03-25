@@ -14,7 +14,7 @@ export function Toolbar({ title = "NEXUS", subtitle = "Global Operations Network
                     <Network className="text-corthex-accent w-5 h-5" />
                     <h1 className="text-sm font-bold tracking-wide text-corthex-text-primary">{title}</h1>
                 </div>
-                <div className="w-px h-4 bg-slate-300 mx-2"></div>
+                <div className="w-px h-4 bg-corthex-surface mx-2"></div>
                 <span className="text-xs text-stone-400 font-medium">{subtitle}</span>
             </div>
 
@@ -35,7 +35,7 @@ export function Toolbar({ title = "NEXUS", subtitle = "Global Operations Network
                     <span className="text-xs font-medium text-stone-400">편집 모드</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                         <input className="sr-only peer" type="checkbox" />
-                        <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-corthex-accent"></div>
+                        <div className="w-9 h-5 bg-corthex-surface peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-corthex-accent"></div>
                     </label>
                 </div>
 

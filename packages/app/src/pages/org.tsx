@@ -41,13 +41,13 @@ const STATUS_CONFIG: Record<string, { dot: string; shadow?: string; pulse?: bool
   online: { dot: 'bg-emerald-500', shadow: 'shadow-[0_0_6px_rgba(16,185,129,0.4)]', label: '온라인', textColor: 'text-emerald-400' },
   working: { dot: 'bg-blue-500', shadow: 'shadow-[0_0_6px_rgba(59,130,246,0.4)]', pulse: true, label: '작업 중', textColor: 'text-blue-400' },
   error: { dot: 'bg-red-500', shadow: 'shadow-[0_0_6px_rgba(239,68,68,0.4)]', label: '오류', textColor: 'text-red-400' },
-  offline: { dot: 'bg-slate-500', label: '오프라인', textColor: 'text-corthex-text-secondary' },
+  offline: { dot: 'bg-corthex-surface', label: '오프라인', textColor: 'text-corthex-text-secondary' },
 }
 
 const TIER_CONFIG: Record<string, { classes: string; label: string }> = {
   manager: { classes: 'bg-corthex-accent/15 text-corthex-accent', label: 'Manager' },
   specialist: { classes: 'bg-blue-500/15 text-blue-400', label: 'Specialist' },
-  worker: { classes: 'bg-slate-500/15 text-corthex-text-secondary', label: 'Worker' },
+  worker: { classes: 'bg-corthex-surface/15 text-corthex-text-secondary', label: 'Worker' },
 }
 
 const TIER_ORDER: Record<string, number> = { manager: 0, specialist: 1, worker: 2 }

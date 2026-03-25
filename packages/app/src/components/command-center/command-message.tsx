@@ -16,7 +16,7 @@ export function CommandMessage({ sender, time, icon, iconBgClass, children }: Co
             </div>
             <div className="flex-1">
                 <div className="text-xs text-stone-500 mb-1 flex items-center gap-2">
-                    <span className="font-semibold text-slate-50">{sender}</span>
+                    <span className="font-semibold text-corthex-text-secondary">{sender}</span>
                     <span>{time}</span>
                 </div>
                 {children}

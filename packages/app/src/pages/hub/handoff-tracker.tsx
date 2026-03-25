@@ -38,7 +38,7 @@ function HandoffTimelineEntry({
 }) {
   const [expanded, setExpanded] = useState(false)
   const status = STATUS_CONFIG[entry.status] || STATUS_CONFIG.pending
-  const dotColor = STATUS_DOT_COLORS[entry.status] || 'bg-slate-400'
+  const dotColor = STATUS_DOT_COLORS[entry.status] || 'bg-corthex-surface'
   const StatusIcon = status.icon
   const isAnimated = entry.status === 'delegating'
 

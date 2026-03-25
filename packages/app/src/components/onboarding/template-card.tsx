@@ -13,7 +13,7 @@ export interface TemplateCardProps {
 }
 
 export function TemplateCard({ title, recommended, selected, features, onClick }: TemplateCardProps) {
-    const borderClass = selected ? 'border-2 border-corthex-accent' : 'border border-stone-200 hover:border-slate-400';
+    const borderClass = selected ? 'border-2 border-corthex-accent' : 'border border-stone-200 hover:border-corthex-border';
     const shadowClass = selected ? 'shadow-[0_0_15px_rgba(34,211,238,0.1)]' : '';
     const bgColor = selected ? 'bg-stone-100' : 'bg-corthex-surface';
 

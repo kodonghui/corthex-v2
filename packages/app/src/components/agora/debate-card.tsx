@@ -13,7 +13,7 @@ export function DebateCard({ title, participants, icon, iconBgClass, active }: D
         ? 'bg-corthex-accent/10 border-l-corthex-accent cursor-pointer'
         : 'hover:bg-corthex-accent/5 cursor-pointer border-l-transparent transition-colors';
 
-    const dotClass = active ? 'bg-emerald-500' : 'bg-slate-500';
+    const dotClass = active ? 'bg-emerald-500' : 'bg-corthex-surface';
 
     return (
         <div className={`flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between border-l-4 ${containerClass}`}>

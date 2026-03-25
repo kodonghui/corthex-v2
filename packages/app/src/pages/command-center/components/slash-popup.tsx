@@ -35,7 +35,7 @@ const ICON_BG: Record<string, string> = {
   summary: 'bg-violet-500/20 text-violet-400',
   broadcast: 'bg-corthex-accent/20 text-corthex-accent',
   chain: 'bg-orange-500/20 text-orange-400',
-  tools: 'bg-slate-500/20 text-stone-500',
+  tools: 'bg-corthex-surface/20 text-stone-500',
   sketch: 'bg-pink-500/20 text-pink-400',
 }
 
@@ -138,7 +138,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
           <>
             <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-400">기본 명령어</p>
             {filteredCommands.map((cmd, idx) => {
-              const bg = ICON_BG[cmd.icon] || 'bg-slate-500/20 text-stone-500'
+              const bg = ICON_BG[cmd.icon] || 'bg-corthex-surface/20 text-stone-500'
               return (
                 <button
                   key={cmd.cmd}

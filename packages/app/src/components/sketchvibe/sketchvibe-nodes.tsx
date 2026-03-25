@@ -121,15 +121,15 @@ export function SystemNode({ id, data, selected }: NodeProps) {
   return (
     <div
       className={`px-4 py-3 rounded-md bg-stone-100 shadow-md border-2 min-w-[140px] text-center ${
-        selected ? 'border-slate-400 ring-2 ring-slate-300' : 'border-stone-300'
+        selected ? 'border-corthex-border ring-2 ring-corthex-border' : 'border-stone-300'
       }`}
     >
-      <Handle type="target" position={Position.Top} className="!bg-slate-400" />
-      <Handle type="target" position={Position.Left} className="!bg-slate-400" />
+      <Handle type="target" position={Position.Top} className="!bg-corthex-surface" />
+      <Handle type="target" position={Position.Left} className="!bg-corthex-surface" />
       <div className="text-[10px] text-stone-400 font-medium mb-1">SYSTEM</div>
       <EditableLabel value={label} onChange={onChange} className="text-sm font-bold text-corthex-text-disabled" />
-      <Handle type="source" position={Position.Bottom} className="!bg-slate-400" />
-      <Handle type="source" position={Position.Right} className="!bg-slate-400" />
+      <Handle type="source" position={Position.Bottom} className="!bg-corthex-surface" />
+      <Handle type="source" position={Position.Right} className="!bg-corthex-surface" />
     </div>
   )
 }
@@ -264,7 +264,7 @@ export const NODE_PALETTE: { type: SvNodeType; label: string; color: string; ico
   { type: 'start', label: '시작', color: 'bg-emerald-500', icon: '▶' },
   { type: 'end', label: '종료', color: 'bg-red-500', icon: '■' },
   { type: 'agent', label: '에이전트', color: 'bg-blue-500', icon: '🤖' },
-  { type: 'system', label: '시스템', color: 'bg-slate-500', icon: '⚙' },
+  { type: 'system', label: '시스템', color: 'bg-corthex-surface', icon: '⚙' },
   { type: 'api', label: 'API', color: 'bg-orange-500', icon: '🔗' },
   { type: 'decide', label: '결정분기', color: 'bg-yellow-500', icon: '◇' },
   { type: 'db', label: '데이터베이스', color: 'bg-purple-500', icon: '🗄' },

@@ -7,7 +7,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; dotColor: st
   online: { label: '온라인', color: 'text-emerald-400', dotColor: 'bg-emerald-400' },
   working: { label: '작업 중', color: 'text-amber-400', dotColor: 'bg-amber-400' },
   error: { label: '오류', color: 'text-red-400', dotColor: 'bg-red-400' },
-  offline: { label: '오프라인', color: 'text-stone-500', dotColor: 'bg-slate-500' },
+  offline: { label: '오프라인', color: 'text-stone-500', dotColor: 'bg-corthex-surface' },
 }
 
 type Props = {

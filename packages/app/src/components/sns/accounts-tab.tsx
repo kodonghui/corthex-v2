@@ -63,7 +63,7 @@ export function AccountsTab({ accounts }: AccountsTabProps) {
   return (
     <div data-testid="sns-accounts-tab" className="max-w-2xl space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-base font-semibold text-slate-50">SNS 계정 관리</h3>
+        <h3 className="text-base font-semibold text-corthex-text-secondary">SNS 계정 관리</h3>
         <button data-testid="sns-add-account-btn" onClick={openCreate}
           className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium">+ 계정 추가</button>
       </div>
@@ -102,7 +102,7 @@ export function AccountsTab({ accounts }: AccountsTabProps) {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeModal}>
           <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
-            <h4 className="text-base font-semibold text-slate-50">{editing ? '계정 수정' : '계정 추가'}</h4>
+            <h4 className="text-base font-semibold text-corthex-text-secondary">{editing ? '계정 수정' : '계정 추가'}</h4>
             {!editing && (
               <select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })}
                 className="w-full bg-stone-100 border border-stone-300 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-stone-600">

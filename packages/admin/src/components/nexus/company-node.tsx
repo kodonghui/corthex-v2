@@ -26,7 +26,7 @@ export const CompanyNode = memo(function CompanyNode({ data, selected }: { data:
           </div>
         </div>
       </div>
-      <Handle type="source" position={Position.Bottom} className="!bg-slate-400 !w-2 !h-2" />
+      <Handle type="source" position={Position.Bottom} className="!bg-corthex-surface !w-2 !h-2" />
     </div>
   )
 })

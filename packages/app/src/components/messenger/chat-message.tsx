@@ -25,7 +25,7 @@ export function ChatMessage({ isUser, message, time, avatarUrl, senderName }: Ch
     return (
         <div className="flex justify-start gap-3 max-w-[80%]">
             {avatarUrl && (
-                <div className="h-8 w-8 rounded-full bg-slate-300 bg-cover bg-center shrink-0 mt-1" style={{ backgroundImage: `url('${avatarUrl}')` }}></div>
+                <div className="h-8 w-8 rounded-full bg-corthex-surface bg-cover bg-center shrink-0 mt-1" style={{ backgroundImage: `url('${avatarUrl}')` }}></div>
             )}
             <div className="flex flex-col items-start gap-1">
                 <div className="bg-corthex-surface text-corthex-text-primary p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed border border-corthex-border/50 shadow-sm">

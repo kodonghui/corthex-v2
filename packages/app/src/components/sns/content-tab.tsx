@@ -18,7 +18,7 @@ const PLATFORM_BADGE_STYLES: Record<string, { bg: string; text: string; icon: ty
 }
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
-  draft: 'bg-slate-500/20 text-stone-500',
+  draft: 'bg-corthex-surface/20 text-stone-500',
   pending: 'bg-amber-500/20 text-amber-400',
   approved: 'bg-emerald-500/20 text-emerald-400',
   scheduled: 'bg-amber-500/20 text-amber-400',
@@ -239,9 +239,9 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {viewMode === 'list' && filteredList.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
             {filteredList.map((item) => {
-              const platStyle = PLATFORM_BADGE_STYLES[item.platform] || { bg: 'bg-slate-500/20', text: 'text-stone-500', icon: FileText }
+              const platStyle = PLATFORM_BADGE_STYLES[item.platform] || { bg: 'bg-corthex-surface/20', text: 'text-stone-500', icon: FileText }
               const PlatIcon = platStyle.icon
-              const statusBadge = STATUS_BADGE_STYLES[item.status] || 'bg-slate-500/20 text-stone-500'
+              const statusBadge = STATUS_BADGE_STYLES[item.status] || 'bg-corthex-surface/20 text-stone-500'
               const metrics = (item.metadata as Record<string, unknown>)?.metrics as SnsMetrics | undefined
               const isScheduled = item.status === 'scheduled' || item.status === 'pending'
               return (
@@ -420,7 +420,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
           <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[detail.status]}`}>{STATUS_LABELS[detail.status]}</span>
         </div>
 
-        <h3 className="text-lg font-semibold text-slate-50">{detail.title}</h3>
+        <h3 className="text-lg font-semibold text-corthex-text-secondary">{detail.title}</h3>
 
         {detail.body && (
           <div className="bg-stone-100/70 rounded-xl p-4 text-sm text-stone-600 whitespace-pre-wrap">{detail.body}</div>
@@ -602,7 +602,7 @@ export function ContentTab({ accounts, agents }: ContentTabProps) {
         {showVariantModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowVariantModal(false)}>
             <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
-              <h4 className="text-base font-semibold text-slate-50">AI A/B 변형 생성</h4>
+              <h4 className="text-base font-semibold text-corthex-text-secondary">AI A/B 변형 생성</h4>
               <div>
                 <label className="block text-xs text-stone-500 mb-1">변형 수 ({variantCount}개)</label>
                 <input type="range" min={2} max={5} value={variantCount} onChange={(e) => setVariantCount(Number(e.target.value))} className="w-full" />

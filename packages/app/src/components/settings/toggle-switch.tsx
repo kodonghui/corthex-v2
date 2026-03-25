@@ -31,7 +31,7 @@ export function ToggleSwitch({ id, title, description, defaultChecked = false, o
                     checked={checked}
                     onChange={handleChange}
                 />
-                <div className="w-12 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-corthex-accent"></div>
+                <div className="w-12 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-corthex-border peer-checked:bg-corthex-accent"></div>
             </label>
         </div>
     )

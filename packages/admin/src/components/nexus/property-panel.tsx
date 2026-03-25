@@ -115,7 +115,7 @@ export function PropertyPanel({ selectedNodeId, orgData, onClose, onSelectNode }
       data-testid="property-panel"
     >
       {/* Panel header with close */}
-      <div className="sticky top-0 bg-corthex-bg border-b border-slate-800 px-4 py-3 flex items-center justify-between z-10">
+      <div className="sticky top-0 bg-corthex-bg border-b border-corthex-border px-4 py-3 flex items-center justify-between z-10">
         <span className="text-xs font-medium text-corthex-text-disabled uppercase tracking-wide">{panelTitle}</span>
         <button
           onClick={onClose}

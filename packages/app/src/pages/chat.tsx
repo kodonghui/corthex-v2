@@ -149,7 +149,7 @@ export function ChatPage() {
             <p className="text-xs font-semibold">Workspace Alpha</p>
             <p className="text-[10px] uppercase tracking-widest" style={{ color: '#6b6b6b' }}>Active Session</p>
           </div>
-          <div className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
+          <div className="w-10 h-10 rounded-full border border-corthex-border flex items-center justify-center overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
             <span className="text-sm font-bold" style={{ color: 'var(--color-corthex-accent)' }}>U</span>
           </div>
         </div>
@@ -235,14 +235,14 @@ export function ChatPage() {
             <div className="flex-1 overflow-y-auto px-6 space-y-8 pb-10">
               {/* Soul Summary */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-widest border-b border-gray-100 pb-2" style={{ color: '#6b6b6b' }}>Agent 'Soul'</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest border-b border-corthex-border pb-2" style={{ color: '#6b6b6b' }}>Agent 'Soul'</h3>
                 <p className="text-sm leading-relaxed text-corthex-text-secondary">
                   {selectedAgent.soul || 'No soul description configured for this agent.'}
                 </p>
               </div>
               {/* Capability Tags */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-widest border-b border-gray-100 pb-2" style={{ color: '#6b6b6b' }}>Active Capabilities</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest border-b border-corthex-border pb-2" style={{ color: '#6b6b6b' }}>Active Capabilities</h3>
                 <div className="flex flex-wrap gap-2">
                   {(selectedAgent.allowedTools && selectedAgent.allowedTools.length > 0
                     ? selectedAgent.allowedTools
@@ -255,7 +255,7 @@ export function ChatPage() {
                 </div>
               </div>
               {/* Context Summary */}
-              <div className="p-4 rounded-2xl border border-gray-100" style={{ backgroundColor: '#f5f0eb' }}>
+              <div className="p-4 rounded-2xl border border-corthex-border" style={{ backgroundColor: '#f5f0eb' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: 'var(--color-corthex-accent)' }}>
                     <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
@@ -269,7 +269,7 @@ export function ChatPage() {
             </div>
             {/* Action Footer */}
             {selectedSessionId && (
-              <div className="p-6 border-t border-gray-100" style={{ backgroundColor: 'rgba(245,240,235,0.2)' }}>
+              <div className="p-6 border-t border-corthex-border" style={{ backgroundColor: 'rgba(245,240,235,0.2)' }}>
                 <button
                   onClick={() => selectedSessionId && handleDelete(selectedSessionId)}
                   className="w-full text-xs font-bold text-red-500 hover:bg-red-50 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 border border-red-100"

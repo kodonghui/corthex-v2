@@ -36,7 +36,7 @@ type CostData = {
 
 const SECTION_COLORS: Record<string, string> = {
   conclusion: 'bg-blue-50 border-l-4 border-blue-400',
-  analysis: 'bg-corthex-bg border-l-4 border-zinc-400',
+  analysis: 'bg-corthex-bg border-l-4 border-corthex-border',
   risk: 'bg-orange-50 border-l-4 border-orange-400',
   recommendation: 'bg-emerald-50 border-l-4 border-emerald-400',
 }
@@ -111,7 +111,7 @@ function QualityBadge({ qualityGate }: { qualityGate: QualityGateMeta }) {
         </Badge>
       </button>
       {showDetail && (
-        <div className="absolute z-20 top-full mt-1 left-0 bg-corthex-surface rounded-lg shadow-lg border border-zinc-200 p-3 min-w-[200px]">
+        <div className="absolute z-20 top-full mt-1 left-0 bg-corthex-surface rounded-lg shadow-lg border border-corthex-border p-3 min-w-[200px]">
           <p className="text-xs font-semibold text-corthex-text-secondary mb-2">품질 검수 상세</p>
           <p className="text-xs text-corthex-text-secondary">시도 횟수: {qualityGate.attemptNumber}회</p>
           <button

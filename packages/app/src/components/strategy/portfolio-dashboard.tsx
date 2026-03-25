@@ -234,7 +234,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
 
         {/* Holdings table */}
         {expanded && portfolio.holdings.length > 0 && (
-          <div className="mt-3 border-t border-zinc-100 pt-3">
+          <div className="mt-3 border-t border-corthex-border pt-3">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-corthex-text-disabled">
@@ -256,7 +256,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
                   const hReturnColor = holdingReturn > 0 ? 'text-emerald-500' : holdingReturn < 0 ? 'text-red-500' : 'text-corthex-text-disabled'
 
                   return (
-                    <tr key={h.ticker} className="border-t border-zinc-50">
+                    <tr key={h.ticker} className="border-t border-corthex-border">
                       <td className="py-1.5 text-corthex-text-primary">
                         <div>{h.name}</div>
                         <div className="text-corthex-text-disabled text-[10px]">{h.ticker}</div>
@@ -277,7 +277,7 @@ function PortfolioCard({ portfolio, prices }: { portfolio: Portfolio; prices: Re
         )}
 
         {expanded && portfolio.holdings.length === 0 && (
-          <p className="mt-3 text-xs text-corthex-text-disabled text-center py-2 border-t border-zinc-100">
+          <p className="mt-3 text-xs text-corthex-text-disabled text-center py-2 border-t border-corthex-border">
             보유 종목이 없습니다
           </p>
         )}

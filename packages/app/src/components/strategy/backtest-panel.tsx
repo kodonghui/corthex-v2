@@ -148,7 +148,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
               max={50}
               value={shortPeriod}
               onChange={(e) => setShortPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
+              className="block w-20 rounded-md border border-corthex-border bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
             />
           </label>
           <label className="space-y-1">
@@ -159,7 +159,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
               max={200}
               value={longPeriod}
               onChange={(e) => setLongPeriod(Number(e.target.value))}
-              className="block w-20 rounded-md border border-zinc-300 bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
+              className="block w-20 rounded-md border border-corthex-border bg-corthex-surface px-2 py-1.5 text-sm text-corthex-text-primary"
             />
           </label>
           <Button size="sm" onClick={runBacktest} disabled={candles.length === 0}>
@@ -169,7 +169,7 @@ export function BacktestPanel({ stockCode, candles, onMarkers, onParamsChange, i
 
         {/* Result Summary */}
         {result && (
-          <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
+          <div className="border border-corthex-border rounded-lg p-3 space-y-2">
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <span className="text-xs text-corthex-text-secondary">총 수익률</span>

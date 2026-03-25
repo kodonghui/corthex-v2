@@ -107,7 +107,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
       {/* 생성 모달 */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-corthex-bg border border-zinc-700 rounded-lg p-6 w-[90vw] max-w-96">
+          <div className="bg-corthex-bg border border-corthex-border rounded-lg p-6 w-[90vw] max-w-96">
             <h4 className="text-sm font-semibold mb-3">새 워크플로우</h4>
             <input
               type="text"
@@ -115,7 +115,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               placeholder="워크플로우 이름"
-              className="w-full px-3 py-2 bg-corthex-surface border border-zinc-600 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-corthex-surface border border-corthex-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
               autoFocus
               maxLength={200}
             />
@@ -154,7 +154,7 @@ export function WorkflowListPanel({ onSelect }: Props) {
             <div
               key={wf.id}
               onClick={() => onSelect(wf.id)}
-              className="bg-corthex-surface border border-zinc-700 rounded-lg p-4 cursor-pointer hover:border-zinc-500 transition-colors"
+              className="bg-corthex-surface border border-corthex-border rounded-lg p-4 cursor-pointer hover:border-corthex-border transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
                 <h4 className="font-semibold text-sm truncate flex-1">{wf.name}</h4>

@@ -160,7 +160,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
                   setShowTemplateConfirm(true)
                 }
               }}
-              className="w-full px-3 py-1.5 border border-zinc-200 rounded-md bg-corthex-surface text-xs text-corthex-text-primary focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+              className="w-full px-3 py-1.5 border border-corthex-border rounded-md bg-corthex-surface text-xs text-corthex-text-primary focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
             >
               <option value="">템플릿 불러오기...</option>
               {soulTemplates.map((t) => (
@@ -184,7 +184,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
           )}
 
           {/* 모바일 탭 전환 */}
-          <div className="flex md:hidden border-b border-zinc-200">
+          <div className="flex md:hidden border-b border-corthex-border">
             <button
               onClick={() => setMobileTab('edit')}
               className={`flex-1 py-2 text-sm font-medium text-center ${
@@ -214,7 +214,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
               <div className="relative">
                 <Suspense
                   fallback={
-                    <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] animate-pulse bg-corthex-elevated" />
+                    <div className="border border-corthex-border rounded-md p-3 min-h-[288px] animate-pulse bg-corthex-elevated" />
                   }
                 >
                   <CodeMirrorEditor
@@ -239,7 +239,7 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
 
             {/* 미리보기 */}
             <div className={`flex-1 ${mobileTab !== 'preview' ? 'hidden md:block' : ''}`}>
-              <div className="border border-zinc-200 rounded-md p-3 min-h-[288px] max-h-[288px] overflow-y-auto">
+              <div className="border border-corthex-border rounded-md p-3 min-h-[288px] max-h-[288px] overflow-y-auto">
                 {soulText ? (
                   <MarkdownRenderer content={soulText} />
                 ) : (

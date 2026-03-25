@@ -5,13 +5,13 @@ import type { Debate, DebateRound } from '@corthex/shared'
 const POSITION_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   support: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', label: '찬성' },
   oppose: { bg: 'bg-red-500/20', text: 'text-red-400', label: '반대' },
-  neutral: { bg: 'bg-slate-500/20', text: 'text-stone-500', label: '중립' },
+  neutral: { bg: 'bg-corthex-surface/20', text: 'text-stone-500', label: '중립' },
   'conditional-support': { bg: 'bg-amber-500/20', text: 'text-amber-400', label: '조건부 찬성' },
   'conditional-oppose': { bg: 'bg-orange-500/20', text: 'text-orange-400', label: '조건부 반대' },
 }
 
 function getPositionStyle(position: string) {
-  return POSITION_COLORS[position] ?? { bg: 'bg-slate-500/20', text: 'text-stone-500', label: position }
+  return POSITION_COLORS[position] ?? { bg: 'bg-corthex-surface/20', text: 'text-stone-500', label: position }
 }
 
 type AgentPositionTrack = {

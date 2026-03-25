@@ -140,7 +140,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             ? 'bg-blue-400 animate-pulse'
             : isFailed
               ? 'bg-red-400'
-              : 'bg-slate-600'
+              : 'bg-corthex-elevated'
 
         const connectorColor = isDone
           ? 'bg-emerald-500/40'

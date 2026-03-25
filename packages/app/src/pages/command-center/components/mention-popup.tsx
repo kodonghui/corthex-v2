@@ -19,7 +19,7 @@ type Props = {
 
 const STATUS_DOT: Record<string, string> = {
   ACTIVE: 'bg-emerald-500',
-  IDLE: 'bg-zinc-500',
+  IDLE: 'bg-corthex-surface',
   BUSY: 'bg-amber-500',
 }
 
@@ -94,7 +94,7 @@ export function MentionPopup({ query, selectedIndex, agents, deptMap, onSelect, 
             {agentsInDept.map((agent, i) => {
               const idx = groupStartIdx + i
               const isSelected = idx === selectedIndex
-              const dot = STATUS_DOT[agent.status] || 'bg-slate-600'
+              const dot = STATUS_DOT[agent.status] || 'bg-corthex-elevated'
               const tierLower = agent.tier?.toLowerCase()
               const tierInfo = TIER_BADGE[tierLower]
               return (

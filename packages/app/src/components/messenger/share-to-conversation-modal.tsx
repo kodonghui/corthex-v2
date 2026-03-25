@@ -53,7 +53,7 @@ export function ShareToConversationModal({ reportId, reportTitle, onClose, onSha
       <div className="bg-stone-100 border border-stone-200 rounded-2xl w-96 max-h-[70vh] shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-sm text-slate-50">메신저로 공유</h3>
+            <h3 className="font-medium text-sm text-corthex-text-secondary">메신저로 공유</h3>
             <p className="text-xs text-stone-500 mt-0.5 truncate">{reportTitle}</p>
           </div>
           <button onClick={onClose} className="text-stone-500 hover:text-corthex-text-disabled text-sm">✕</button>

@@ -22,7 +22,7 @@ export function AgentCard({ tier, name, department, status, jobCount }: AgentCar
     const getStatusIndicator = () => {
         switch (status) {
             case 'online': return <><div className="w-2 h-2 rounded-full bg-green-500"></div><span className="text-stone-600 text-xs font-mono">온라인</span></>;
-            case 'standby': return <><div className="w-2 h-2 rounded-full bg-slate-600"></div><span className="text-stone-600 text-xs font-mono">대기중</span></>;
+            case 'standby': return <><div className="w-2 h-2 rounded-full bg-corthex-elevated"></div><span className="text-stone-600 text-xs font-mono">대기중</span></>;
             case 'running': return <><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div><span className="text-stone-600 text-xs font-mono">실행중</span></>;
         }
     }

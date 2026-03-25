@@ -5,7 +5,7 @@ const STATUS_DOT: Record<string, { color: string; pulse?: boolean; label: string
   online: { color: 'bg-emerald-500', label: '온라인' },
   working: { color: 'bg-corthex-accent', pulse: true, label: '작업 중' },
   error: { color: 'bg-red-500', label: '오류' },
-  offline: { color: 'bg-slate-500', label: '오프라인' },
+  offline: { color: 'bg-corthex-surface', label: '오프라인' },
 }
 
 const TIER_BADGE: Record<string, { bg: string; label: string }> = {

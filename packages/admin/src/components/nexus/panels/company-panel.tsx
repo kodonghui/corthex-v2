@@ -27,7 +27,7 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
         </div>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
@@ -36,7 +36,7 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
         <StatCard label="직원" value={totalEmployees} />
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Department list */}
       <div>
@@ -55,7 +55,7 @@ export function CompanyPanel({ orgData }: { orgData: OrgChartData }) {
         </div>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Link to settings */}
       <div>

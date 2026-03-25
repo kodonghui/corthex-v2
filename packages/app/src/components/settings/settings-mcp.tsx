@@ -146,7 +146,7 @@ export function SettingsMcp() {
                 onChange={(e) => setFormUrl(e.target.value)}
                 onBlur={handleUrlBlur}
                 placeholder="http://localhost:3000/mcp 또는 https://host/sse"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-corthex-surface text-sm"
+                className="w-full px-3 py-2 rounded-md border border-corthex-border bg-corthex-surface text-sm"
               />
             </div>
             <div>
@@ -156,7 +156,7 @@ export function SettingsMcp() {
                 value={formName}
                 onChange={(e) => { setFormName(e.target.value); setNameManuallySet(true) }}
                 placeholder="자동 제안됨 (URL 입력 후)"
-                className="w-full px-3 py-2 rounded-md border border-zinc-200 bg-corthex-surface text-sm"
+                className="w-full px-3 py-2 rounded-md border border-corthex-border bg-corthex-surface text-sm"
               />
             </div>
 
@@ -164,11 +164,11 @@ export function SettingsMcp() {
               <button
                 onClick={() => testConnection.mutate(formUrl)}
                 disabled={!formUrl || testConnection.isPending}
-                className="px-3 py-2 text-xs border border-zinc-300 rounded-md hover:bg-corthex-elevated disabled:opacity-50"
+                className="px-3 py-2 text-xs border border-corthex-border rounded-md hover:bg-corthex-elevated disabled:opacity-50"
               >
                 {testConnection.isPending ? (
                   <span className="flex items-center gap-1">
-                    <span className="animate-spin inline-block w-3 h-3 border border-zinc-400 border-t-transparent rounded-full" />
+                    <span className="animate-spin inline-block w-3 h-3 border border-corthex-border border-t-transparent rounded-full" />
                     테스트 중...
                   </span>
                 ) : '연결 테스트'}
@@ -246,9 +246,9 @@ function ServerCard({
 
   const statusDot = {
     connected: 'bg-emerald-500',
-    disconnected: 'bg-zinc-400',
+    disconnected: 'bg-corthex-surface',
     error: 'bg-red-500',
-    loading: 'bg-zinc-300 animate-pulse',
+    loading: 'bg-corthex-surface animate-pulse',
   }[status]
 
   const statusLabel = {
@@ -259,7 +259,7 @@ function ServerCard({
   }[status]
 
   return (
-    <div className="rounded-md border border-zinc-200 overflow-hidden">
+    <div className="rounded-md border border-corthex-border overflow-hidden">
       <div
         className="flex items-center justify-between p-3 cursor-pointer hover:bg-corthex-bg"
         onClick={onToggle}
@@ -287,12 +287,12 @@ function ServerCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-zinc-200 p-3 bg-corthex-bg">
+        <div className="border-t border-corthex-border p-3 bg-corthex-bg">
           <p className="text-xs font-medium text-corthex-text-secondary mb-2">도구 목록</p>
           {toolsLoading ? (
             <div className="space-y-2">
-              <div className="h-4 bg-zinc-200 rounded animate-pulse w-3/4" />
-              <div className="h-4 bg-zinc-200 rounded animate-pulse w-1/2" />
+              <div className="h-4 bg-corthex-surface rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-corthex-surface rounded animate-pulse w-1/2" />
             </div>
           ) : tools.length === 0 ? (
             <p className="text-xs text-corthex-text-disabled">등록된 도구가 없습니다</p>

@@ -27,8 +27,8 @@ export function DebateMessage({ sender, time, message, icon, iconBgClass, avatar
                 iconClass: iconBgClass || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
             };
             case 'slate': return {
-                bgClass: 'bg-slate-200 text-corthex-text-primary border border-corthex-border',
-                iconClass: iconBgClass || 'bg-slate-200 border border-corthex-border'
+                bgClass: 'bg-corthex-surface text-corthex-text-primary border border-corthex-border',
+                iconClass: iconBgClass || 'bg-corthex-surface border border-corthex-border'
             };
         }
     }

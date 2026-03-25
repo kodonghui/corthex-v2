@@ -76,11 +76,11 @@ const TRIGGER_TYPE_BADGE: Record<string, { classes: string; label: string }> = {
   schedule: { classes: 'bg-purple-500/15 text-purple-400', label: '일정' },
   'market-open': { classes: 'bg-emerald-500/15 text-emerald-400', label: '장시작' },
   'market-close': { classes: 'bg-emerald-500/15 text-emerald-400', label: '장마감' },
-  custom: { classes: 'bg-slate-500/15 text-corthex-text-secondary', label: '커스텀' },
+  custom: { classes: 'bg-corthex-surface/15 text-corthex-text-secondary', label: '커스텀' },
 }
 
 const EVENT_STATUS_BADGE: Record<string, { label: string; classes: string }> = {
-  detected: { label: '감지됨', classes: 'bg-slate-500/15 text-corthex-text-secondary' },
+  detected: { label: '감지됨', classes: 'bg-corthex-surface/15 text-corthex-text-secondary' },
   executing: { label: '실행중', classes: 'bg-blue-500/15 text-blue-400 animate-pulse' },
   completed: { label: '완료', classes: 'bg-emerald-500/15 text-emerald-400' },
   failed: { label: '실패', classes: 'bg-red-500/15 text-red-400' },
@@ -440,7 +440,7 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
       {/* Row 1 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${t.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-slate-500'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${t.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-corthex-surface'}`} />
           <span className="text-sm font-semibold text-corthex-text-primary truncate max-w-[200px]">{t.name || t.instruction.slice(0, 40)}</span>
           <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.classes}`}>{typeBadge.label}</span>
         </div>
@@ -534,7 +534,7 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
           <p className="text-xs text-corthex-text-secondary text-center py-8">이벤트 기록이 없습니다</p>
         ) : (
           events.map(evt => {
-            const cfg = EVENT_STATUS_BADGE[evt.status] || { label: evt.status, classes: 'bg-slate-500/15 text-corthex-text-secondary' }
+            const cfg = EVENT_STATUS_BADGE[evt.status] || { label: evt.status, classes: 'bg-corthex-surface/15 text-corthex-text-secondary' }
             const isExpanded = expandedEventId === evt.id
             return (
               <div key={evt.id}>

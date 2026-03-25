@@ -371,7 +371,7 @@ export function ConversationChat({ conversationId, conversationDetail, currentUs
       {showLeaveConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-stone-100 border border-stone-200 rounded-2xl p-5 w-80 shadow-2xl">
-            <h3 className="font-medium text-sm text-slate-50 mb-3">대화방 나가기</h3>
+            <h3 className="font-medium text-sm text-corthex-text-secondary mb-3">대화방 나가기</h3>
             <p className="text-xs text-stone-500 mb-4">이 그룹 대화방에서 나가시겠습니까?</p>
             <div className="flex gap-2 justify-end">
               <button

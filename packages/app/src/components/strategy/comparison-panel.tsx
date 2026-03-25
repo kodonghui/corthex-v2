@@ -111,7 +111,7 @@ export function ComparisonPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-200">
+              <tr className="border-b border-corthex-border">
                 <th className="text-left px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">종목명</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">현재가</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-corthex-text-secondary whitespace-nowrap">등락률</th>
@@ -133,7 +133,7 @@ export function ComparisonPanel() {
                 return (
                   <tr
                     key={code}
-                    className="border-b border-zinc-100 last:border-0 hover:bg-corthex-bg cursor-pointer"
+                    className="border-b border-corthex-border last:border-0 hover:bg-corthex-bg cursor-pointer"
                     onClick={() => goToStock(code)}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">

@@ -71,7 +71,7 @@ export function SnsPostCard({ platform, status, time, content, imageUrl, likes =
                         No Image
                     </div>
                 )}
-                <div className={`flex items-center gap-6 mt-2 pt-4 border-t border-slate-100 ${status === '예약됨' ? 'opacity-50' : ''}`}>
+                <div className={`flex items-center gap-6 mt-2 pt-4 border-t border-corthex-border ${status === '예약됨' ? 'opacity-50' : ''}`}>
                     <div className="flex items-center gap-1.5 text-stone-400">
                         <Heart className="w-[18px] h-[18px]" />
                         <span className="text-xs font-mono font-medium">{likes}</span>

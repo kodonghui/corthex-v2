@@ -38,6 +38,14 @@
 - **"완료" 보고 전에 Gate를 반드시 실행해라.** Coverage Gate = grep/count로 실제 확인. "다 한 것 같다"는 완료가 아니다.
 - **프로젝트 상태 언급 시 코드를 직접 읽어서 확인.** 메모리나 추측으로 "없다/있다" 말하지 마라. (2026-03-25 office 패키지 "없다" 오답 사건)
 
+## 완료 보고 프로토콜 — "끝났다" 말하기 전 필수
+- **"완료"라고 말하려면 반드시 아래 검증 커맨드 결과를 포함해라. 결과 없는 완료 보고 = 거짓 보고.**
+- 검증 1: `grep -rc "bg-white\|bg-slate-\|text-slate-\|bg-zinc-\|text-gray-\|bg-gray-\|\[#[0-9a-fA-F]" packages/app/src packages/admin/src --include="*.tsx"` → 0이어야 완료
+- 검증 2: `npx tsc --noEmit` → app + admin 0 errors
+- 검증 3: 파이프라인 Coverage Gate → 라우트 수 vs 생성/리빌드 파일 수 1:1 매칭
+- **이 3개 중 하나라도 빠지면 "완료"가 아니다. "진행 중"이라고 보고해라.**
+- **에이전트가 "완료"라고 보고해도 직접 검증해라.** 에이전트 말만 믿고 "끝났다"고 보고하지 마라.
+
 ## Output Quality
 - Specific and detailed only. "Vague" = instant FAIL.
 - 질문에 대답할 때는 반드시 **최신 정확한 정보**로 답변. 모르거나 확실하지 않으면 WebSearch로 찾아서 답변. 추측 금지.

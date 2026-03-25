@@ -44,13 +44,13 @@ export function TriggerCard({
                             className="sr-only toggle-checkbox"
                             type="checkbox"
                         />
-                        <div className={`block w-12 h-6 rounded-full transition-colors ${isActive ? 'bg-corthex-accent' : 'bg-slate-200'}`}></div>
+                        <div className={`block w-12 h-6 rounded-full transition-colors ${isActive ? 'bg-corthex-accent' : 'bg-corthex-surface'}`}></div>
                         <div className={`absolute left-1 top-1 bg-corthex-surface w-4 h-4 rounded-full transition-transform ${isActive ? 'transform translate-x-6' : ''}`}></div>
                     </label>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 pt-4 border-t border-slate-100">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 pt-4 border-t border-corthex-border">
                 <div>
                     <p className="text-xs text-stone-400 mb-1">최근 실행</p>
                     <p className="font-mono text-sm">{lastRunTime} ({lastRunStatus})</p>
@@ -62,7 +62,7 @@ export function TriggerCard({
                 <div>
                     <p className="text-xs text-stone-400 mb-1">성공률 (30일)</p>
                     <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-corthex-surface rounded-full overflow-hidden">
                             <div className="h-full bg-emerald-500" style={{ width: successRate }}></div>
                         </div>
                         <span className="font-mono text-sm text-emerald-500">{successRate}</span>

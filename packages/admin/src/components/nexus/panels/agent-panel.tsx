@@ -123,7 +123,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
     online: 'bg-emerald-500',
     working: 'bg-corthex-accent',
     error: 'bg-red-500',
-    offline: 'bg-slate-500',
+    offline: 'bg-corthex-surface',
   }
 
   const availableTools = toolsData?.data ?? []
@@ -132,7 +132,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
     <div className="space-y-4" data-testid="agent-panel">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusColor[agent.status] ?? 'bg-slate-500'}`} />
+        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusColor[agent.status] ?? 'bg-corthex-surface'}`} />
         <h3 className="text-sm font-semibold text-corthex-text-primary truncate flex-1">{agent.name}</h3>
         <SaveIndicator status={saveStatus} />
       </div>
@@ -144,7 +144,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
         {agent.isSystem && <Badge variant="default">시스템</Badge>}
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Name */}
       <div>
@@ -190,7 +190,7 @@ export function AgentPanel({ agent }: { agent: OrgAgent }) {
         </a>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Allowed Tools */}
       <div>

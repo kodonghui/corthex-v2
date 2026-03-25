@@ -142,7 +142,7 @@ export function PresetManager({
                             disabled={isExecuting}
                             title="실행"
                             aria-label="실행"
-                            className="p-1 rounded text-emerald-400 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                            className="p-1 rounded text-emerald-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                           >
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                               <path d="M4 2l8 5-8 5V2z" fill="currentColor" />
@@ -155,7 +155,7 @@ export function PresetManager({
                                 onClick={() => startEdit(preset)}
                                 title="수정"
                                 aria-label="수정"
-                                className="p-1 rounded text-stone-500 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                                className="p-1 rounded text-stone-500 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 10.5l1-1 5-5 1 1-5 5-1 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
@@ -167,7 +167,7 @@ export function PresetManager({
                                 onClick={() => setDeleteConfirmId(preset.id)}
                                 title="삭제"
                                 aria-label="삭제"
-                                className="p-1 rounded text-red-400 hover:bg-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                                className="p-1 rounded text-red-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 4h8M5 4V3h4v1M5.5 6.5v3M8.5 6.5v3M4 4l.5 7h5l.5-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />

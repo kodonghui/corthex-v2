@@ -5,7 +5,7 @@ const statusColors: Record<string, string> = {
   online: 'bg-emerald-500',
   working: 'bg-amber-500 animate-pulse',
   error: 'bg-red-500',
-  offline: 'bg-slate-600',
+  offline: 'bg-corthex-elevated',
 }
 
 const statusLabels: Record<string, string> = {
@@ -56,7 +56,7 @@ export function AgentListModal({
       <div className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[70vh] flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 shrink-0">
-          <h3 className="text-lg font-semibold text-slate-50">에이전트 선택</h3>
+          <h3 className="text-lg font-semibold text-corthex-text-secondary">에이전트 선택</h3>
           <button
             onClick={onClose}
             className="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-200 transition-colors"

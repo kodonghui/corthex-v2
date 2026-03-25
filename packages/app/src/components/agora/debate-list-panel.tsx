@@ -12,16 +12,16 @@ type Props = {
 }
 
 const STATUS_BADGE: Record<DebateStatus, { label: string; className: string }> = {
-  pending: { label: '대기', className: 'bg-slate-500/20 text-stone-500' },
+  pending: { label: '대기', className: 'bg-corthex-surface/20 text-stone-500' },
   'in-progress': { label: '진행중', className: 'bg-amber-500/20 text-amber-400' },
   completed: { label: '완료', className: 'bg-emerald-500/20 text-emerald-400' },
   failed: { label: '실패', className: 'bg-red-500/20 text-red-400' },
 }
 
 const STATUS_DOT: Record<DebateStatus, string> = {
-  pending: 'bg-slate-500',
+  pending: 'bg-corthex-surface',
   'in-progress': 'bg-emerald-500',
-  completed: 'bg-slate-500',
+  completed: 'bg-corthex-surface',
   failed: 'bg-red-500',
 }
 
@@ -105,7 +105,7 @@ export function DebateListPanel({ selectedId, onSelect, onCreateNew }: Props) {
         {filtered.map((debate) => {
           const isSelected = debate.id === selectedId
           const isActive = debate.status === 'in-progress'
-          const dotColor = STATUS_DOT[debate.status] ?? 'bg-slate-500'
+          const dotColor = STATUS_DOT[debate.status] ?? 'bg-corthex-surface'
           return (
             <button
               key={debate.id}

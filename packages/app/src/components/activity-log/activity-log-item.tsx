@@ -18,7 +18,7 @@ export function ActivityLogItem({ title, statusText, statusBadgeClass, agentName
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${themeColorClass}`}></div>
             <div className="flex items-start gap-4 w-full">
                 <div className="relative">
-                    <div className="bg-slate-200 aspect-square bg-cover rounded-full h-12 w-12 border-2 border-white shadow-sm flex items-center justify-center text-stone-400">
+                    <div className="bg-corthex-surface aspect-square bg-cover rounded-full h-12 w-12 border-2 border-white shadow-sm flex items-center justify-center text-stone-400">
                         {icon}
                     </div>
                     <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${themeColorClass}`}></div>
@@ -29,7 +29,7 @@ export function ActivityLogItem({ title, statusText, statusBadgeClass, agentName
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${statusBadgeClass}`}>
                             {statusText}
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-corthex-elevated px-2 py-0.5 text-xs font-medium text-corthex-text-secondary ring-1 ring-inset ring-slate-500/20">
+                        <span className="inline-flex items-center rounded-full bg-corthex-elevated px-2 py-0.5 text-xs font-medium text-corthex-text-secondary ring-1 ring-inset ring-corthex-border/20">
                             {agentName}
                         </span>
                     </div>

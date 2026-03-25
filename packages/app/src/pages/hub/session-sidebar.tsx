@@ -173,7 +173,7 @@ export function SessionSidebar({
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-3 py-1.5 text-xs rounded-lg bg-stone-200 text-stone-600 hover:bg-slate-600 transition-colors"
+                className="px-3 py-1.5 text-xs rounded-lg bg-stone-200 text-stone-600 hover:bg-corthex-elevated transition-colors"
               >
                 취소
               </button>

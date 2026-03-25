@@ -28,7 +28,7 @@ export const HumanNode = memo(function HumanNode({ data, selected }: { data: Hum
       <Handle type="target" position={Position.Top} className="!bg-purple-400 !w-2 !h-2" />
       <div className="flex items-center gap-2">
         <span
-          className={`w-2 h-2 rounded-full flex-shrink-0 ${data.hasCliToken ? 'bg-emerald-500' : 'bg-slate-500'}`}
+          className={`w-2 h-2 rounded-full flex-shrink-0 ${data.hasCliToken ? 'bg-emerald-500' : 'bg-corthex-surface'}`}
           title={data.hasCliToken ? 'CLI 토큰 등록됨' : 'CLI 토큰 미등록'}
         />
         <span className="text-sm font-medium text-purple-100 truncate">{data.name}</span>

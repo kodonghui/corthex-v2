@@ -124,7 +124,7 @@ export function CreateDebateModal({ open, onClose, onCreated }: Props) {
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 block">
               참여 에이전트 (최소 2명)
             </label>
-            <div className="max-h-48 overflow-y-auto border border-stone-200 rounded-lg divide-y divide-slate-800/50">
+            <div className="max-h-48 overflow-y-auto border border-stone-200 rounded-lg divide-y divide-corthex-border/50">
               {agents.map((agent) => {
                 const selected = selectedAgentIds.includes(agent.id)
                 return (

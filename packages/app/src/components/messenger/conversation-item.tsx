@@ -20,9 +20,9 @@ export function ConversationItem({ name, time, previewMessage, icon, imageUrl, a
         <div className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-l-2 ${containerClass}`}>
             <div className="relative shrink-0">
                 {imageUrl ? (
-                    <div className="h-10 w-10 rounded-full bg-slate-300 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
+                    <div className="h-10 w-10 rounded-full bg-corthex-surface bg-cover bg-center" style={{ backgroundImage: `url('${imageUrl}')` }}></div>
                 ) : (
-                    <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-stone-400">
+                    <div className="h-10 w-10 rounded-full bg-corthex-surface flex items-center justify-center text-stone-400">
                         {icon}
                     </div>
                 )}

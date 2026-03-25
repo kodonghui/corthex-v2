@@ -28,7 +28,7 @@ export function CostBreakdownTable({ title, columns, items }: CostBreakdownTable
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200">
+                    <tbody className="divide-y divide-corthex-border">
                         {items.map((item, idx) => (
                             <tr key={idx}>
                                 <td className="py-3 px-4 text-sm text-corthex-text-primary font-medium flex items-center gap-2">

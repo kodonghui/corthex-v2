@@ -78,19 +78,19 @@ export const NexusToolbar = memo(function NexusToolbar({
         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
           isEditMode
             ? 'bg-corthex-accent text-white hover:bg-corthex-accent-deep'
-            : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600'
+            : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface'
         }`}
         title={isEditMode ? '보기 모드로 전환' : '편집 모드로 전환'}
       >
         {isEditMode ? '편집 중' : '보기'}
       </button>
 
-      <div className="w-px bg-slate-600" />
+      <div className="w-px bg-corthex-surface" />
 
       {/* Auto layout */}
       <button
         onClick={onAutoLayout}
-        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600 transition-colors"
+        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface transition-colors"
         title="자동 정렬 (ELK)"
       >
         자동 정렬
@@ -113,12 +113,12 @@ export const NexusToolbar = memo(function NexusToolbar({
       {/* Undo/Redo — edit mode only */}
       {isEditMode && (
         <>
-          <div className="w-px bg-slate-600" />
+          <div className="w-px bg-corthex-surface" />
           <button
             onClick={onUndo}
             disabled={!canUndo}
             className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              canUndo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
+              canUndo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
             }`}
             title={undoLabel || '실행 취소 (Ctrl+Z)'}
           >
@@ -128,7 +128,7 @@ export const NexusToolbar = memo(function NexusToolbar({
             onClick={onRedo}
             disabled={!canRedo}
             className={`px-2 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              canRedo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
+              canRedo ? 'bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface' : 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
             }`}
             title={redoLabel || '다시 실행 (Ctrl+Shift+Z)'}
           >
@@ -147,13 +147,13 @@ export const NexusToolbar = memo(function NexusToolbar({
       {/* Fit view */}
       <button
         onClick={onFitView}
-        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600 transition-colors"
+        className="px-3 py-1.5 text-xs font-medium rounded-md bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface transition-colors"
         title="전체 보기"
       >
         전체 보기
       </button>
 
-      <div className="w-px bg-slate-600" />
+      <div className="w-px bg-corthex-surface" />
 
       {/* Export dropdown */}
       <div className="relative" ref={dropdownRef}>
@@ -163,7 +163,7 @@ export const NexusToolbar = memo(function NexusToolbar({
           className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
             isExporting
               ? 'bg-corthex-elevated/50 text-corthex-text-secondary cursor-not-allowed'
-              : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-slate-600'
+              : 'bg-corthex-elevated text-corthex-text-disabled hover:bg-corthex-surface'
           }`}
           title="내보내기"
           data-testid="nexus-export-btn"

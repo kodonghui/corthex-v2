@@ -90,7 +90,7 @@ export function CardNewsTab({ agents }: CardNewsTabProps) {
     return (
       <div data-testid="sns-cardnews-create" className="max-w-2xl space-y-4">
         <button onClick={() => setView('list')} className="text-sm text-stone-500 hover:text-corthex-text-disabled">← 목록으로</button>
-        <h3 className="text-base font-semibold text-slate-50">카드뉴스 시리즈 만들기</h3>
+        <h3 className="text-base font-semibold text-corthex-text-secondary">카드뉴스 시리즈 만들기</h3>
 
         <div className="flex gap-2 mb-4">
           <button onClick={() => setCreateMode('manual')}

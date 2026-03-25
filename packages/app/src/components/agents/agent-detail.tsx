@@ -74,7 +74,7 @@ export function AgentDetail({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
                 <div className="lg:col-span-2 flex flex-col gap-4">
                     <h3 className="text-corthex-text-primary font-bold text-lg mb-2">최근 활동</h3>
-                    <div className="bg-corthex-surface/50 rounded-xl border border-stone-200 divide-y divide-slate-800">
+                    <div className="bg-corthex-surface/50 rounded-xl border border-stone-200 divide-y divide-corthex-border">
                         {activities.map(act => (
                             <div key={act.id} className="p-4 flex items-center justify-between hover:bg-stone-100/50 transition-colors">
                                 <div className="flex items-center gap-4">

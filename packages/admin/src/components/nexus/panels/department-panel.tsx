@@ -113,7 +113,7 @@ export function DepartmentPanel({
         {managerAgent && <Badge variant="info">매니저: {managerAgent.name}</Badge>}
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Name */}
       <div>
@@ -157,7 +157,7 @@ export function DepartmentPanel({
         </select>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Agent list */}
       <div>
@@ -169,7 +169,7 @@ export function DepartmentPanel({
               onClick={() => onSelectNode?.(`agent-${a.id}`)}
               className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-surface/50 transition-colors"
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${a.status === 'online' ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${a.status === 'online' ? 'bg-emerald-500' : 'bg-corthex-surface'}`} />
               <span className="text-xs text-corthex-text-disabled truncate">{a.name}</span>
               <span className="text-[10px] text-corthex-text-secondary ml-auto">{a.tier}</span>
             </button>

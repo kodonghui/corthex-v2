@@ -13,7 +13,7 @@ export function AgentListItem({ id, name, role, colorClass, status }: AgentListI
         switch (status) {
             case 'online': return 'bg-green-500';
             case 'standby': return 'bg-amber-500';
-            case 'offline': return 'bg-slate-500';
+            case 'offline': return 'bg-corthex-surface';
         }
     }
 

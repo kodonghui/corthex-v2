@@ -31,13 +31,13 @@ export function HumanPanel({
         <Badge variant="default">@{employee.username}</Badge>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* CLI Token */}
       <div>
         <label className="text-xs text-corthex-text-secondary uppercase tracking-wide">CLI 토큰</label>
         <div className="mt-1 flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${employee.hasCliToken ? 'bg-emerald-500' : 'bg-slate-600'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${employee.hasCliToken ? 'bg-emerald-500' : 'bg-corthex-surface'}`} />
           <span className="text-sm text-corthex-text-disabled">
             {employee.hasCliToken ? '등록됨' : '미등록'}
           </span>
@@ -50,7 +50,7 @@ export function HumanPanel({
         <p className="mt-1 text-sm text-corthex-text-disabled">{role.label}</p>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Owned agents */}
       <div>
@@ -62,7 +62,7 @@ export function HumanPanel({
               onClick={() => onSelectNode?.(`agent-${a.id}`)}
               className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded hover:bg-corthex-surface/50 transition-colors"
             >
-              <span className={`w-1.5 h-1.5 rounded-full ${a.status === 'online' ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${a.status === 'online' ? 'bg-emerald-500' : 'bg-corthex-surface'}`} />
               <span className="text-xs text-corthex-text-disabled truncate">{a.name}</span>
               <span className="text-[10px] text-corthex-text-secondary ml-auto">{a.tier}</span>
             </button>
@@ -73,7 +73,7 @@ export function HumanPanel({
         </div>
       </div>
 
-      <div className="border-b border-slate-800" />
+      <div className="border-b border-corthex-border" />
 
       {/* Link to employee management */}
       <div>

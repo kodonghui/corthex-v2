@@ -192,13 +192,13 @@ export function NotesPanel() {
 
       {isEditing && (
         <div className="fixed inset-0 z-50 bg-corthex-surface flex flex-col p-4 sm:static sm:inset-auto sm:z-auto sm:bg-transparent sm:sm:p-0">
-          <div className="border border-zinc-200 rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
+          <div className="border border-corthex-border rounded-lg p-3 space-y-2 flex-1 flex flex-col sm:flex-none">
             <input
               type="text"
               placeholder="제목 (선택)"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full text-sm bg-transparent border-b border-zinc-200 pb-1 outline-none placeholder:text-corthex-text-disabled"
+              className="w-full text-sm bg-transparent border-b border-corthex-border pb-1 outline-none placeholder:text-corthex-text-disabled"
             />
             <textarea
               value={editContent}
@@ -225,7 +225,7 @@ export function NotesPanel() {
 
       {/* 공유 관리 패널 */}
       {shareTarget && (
-        <div className="border border-zinc-200 rounded-lg p-3 space-y-2">
+        <div className="border border-corthex-border rounded-lg p-3 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-corthex-text-primary">공유 대상 관리</span>
             <button
@@ -249,7 +249,7 @@ export function NotesPanel() {
                   checked={sharedUserIds.has(user.id)}
                   onChange={() => toggleShare(user.id)}
                   disabled={shareMutation.isPending || unshareMutation.isPending}
-                  className="rounded border-zinc-300"
+                  className="rounded border-corthex-border"
                 />
                 <span className="text-corthex-text-primary">{user.name || user.email}</span>
               </label>
@@ -265,7 +265,7 @@ export function NotesPanel() {
       {notes.map((note) => (
         <div
           key={note.id}
-          className="border border-zinc-200 rounded-lg p-3 group"
+          className="border border-corthex-border rounded-lg p-3 group"
         >
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">

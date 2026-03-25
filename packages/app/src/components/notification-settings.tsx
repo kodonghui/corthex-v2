@@ -95,7 +95,7 @@ export function NotificationSettings() {
         <div className="px-4 py-3 border-b border-stone-200">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">전체 설정</p>
         </div>
-        <div className="divide-y divide-slate-700">
+        <div className="divide-y divide-corthex-border">
           <div className="flex items-center justify-between px-4 py-3">
             <span className="text-sm text-stone-600">앱 알림</span>
             <Toggle
@@ -122,7 +122,7 @@ export function NotificationSettings() {
           <div className="px-4 py-3 border-b border-stone-200">
             <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider">{cat.label}</p>
           </div>
-          <div className="divide-y divide-slate-700">
+          <div className="divide-y divide-corthex-border">
             {/* 헤더 */}
             <div className="flex items-center px-4 py-2 text-[11px] text-stone-400">
               <span className="flex-1" />

@@ -113,7 +113,7 @@ function InfoContent({ debate }: { debate: Debate }) {
         )}
         {!isActive && (
           <div className="flex items-center gap-2 text-stone-500">
-            <div className="w-2 h-2 rounded-full bg-slate-500" />
+            <div className="w-2 h-2 rounded-full bg-corthex-surface" />
             <span className="text-xs font-medium uppercase tracking-wider">
               {STATUS_LABELS[debate.status] ?? debate.status}
             </span>

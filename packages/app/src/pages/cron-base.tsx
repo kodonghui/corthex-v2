@@ -197,7 +197,7 @@ export function CronBasePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">크론기지 <span className="ml-2">⏰</span></h1>
+          <h1 className="text-2xl font-bold text-corthex-text-secondary">크론기지 <span className="ml-2">⏰</span></h1>
         </div>
         <button
           data-testid="add-cron-btn"
@@ -261,7 +261,7 @@ export function CronBasePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setDeleteTarget(null)} />
           <div className="relative bg-stone-100 border border-stone-200 rounded-xl p-5 max-w-sm mx-4 shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-50">크론 삭제</h3>
+            <h3 className="text-sm font-semibold text-corthex-text-secondary">크론 삭제</h3>
             <p className="text-xs text-stone-500 mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
               <button onClick={() => setDeleteTarget(null)} className="text-xs text-stone-500 hover:text-corthex-text-disabled px-3 py-1.5 rounded-lg">취소</button>
@@ -301,8 +301,8 @@ function ScheduleCard({
         {/* Row 1: Name + Agent */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className={`w-2.5 h-2.5 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-slate-500'}`} />
-            <span className="text-sm font-semibold text-slate-50 truncate max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
+            <span className={`w-2.5 h-2.5 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-corthex-surface'}`} />
+            <span className="text-sm font-semibold text-corthex-text-secondary truncate max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-stone-500">Agent: {s.agentName}</span>
@@ -364,7 +364,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
       ) : (
         <>
           {runs.map(run => {
-            const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-slate-500/15 text-stone-500' }
+            const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-corthex-surface/15 text-stone-500' }
             const progress = jobProgress[run.id]
             return (
               <div key={run.id} className="px-4 py-2.5 border-b border-stone-200/30 flex items-center justify-between">
@@ -506,7 +506,7 @@ function ScheduleModal({
     mode === 'legacy' ? (frequency !== 'custom' || days.length > 0) : !!cronExpression
   )
 
-  const inputClasses = 'w-full bg-corthex-surface/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-slate-50 rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-secondary'
+  const inputClasses = 'w-full bg-corthex-surface/50 border border-stone-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 text-sm text-corthex-text-secondary rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-secondary'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="cron-modal">
@@ -517,7 +517,7 @@ function ScheduleModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
-          <h3 className="text-lg font-semibold text-slate-50">{editing ? '크론 수정' : '크론 추가'}</h3>
+          <h3 className="text-lg font-semibold text-corthex-text-secondary">{editing ? '크론 수정' : '크론 추가'}</h3>
           <button onClick={onClose} className="text-stone-500 hover:text-corthex-text-disabled transition-colors">✕</button>
         </div>
 
@@ -564,7 +564,7 @@ function ScheduleModal({
                   type="button"
                   onClick={() => setMode(val)}
                   className={`text-xs px-3 py-1.5 rounded-md transition-colors flex-1 text-center ${
-                    mode === val ? 'bg-stone-200 text-slate-50' : 'text-stone-500 hover:text-stone-600'
+                    mode === val ? 'bg-stone-200 text-corthex-text-secondary' : 'text-stone-500 hover:text-stone-600'
                   }`}
                 >
                   {label}

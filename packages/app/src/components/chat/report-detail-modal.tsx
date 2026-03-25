@@ -139,7 +139,7 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
                 <span className="text-corthex-text-secondary">{label}</span>
                 <span className="text-corthex-text-secondary">{score}/{maxScore}</span>
               </div>
-              <div className="h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-corthex-surface rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-red-500'
@@ -151,7 +151,7 @@ function QualityScoreCard({ reviews }: { reviews: QualityReviewItem[] }) {
           )
         })}
       </div>
-      <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
+      <div className="flex items-center justify-between pt-2 border-t border-corthex-border">
         <span className="text-sm font-medium text-corthex-text-primary">총점</span>
         <Badge variant={latest.conclusion === 'pass' ? 'success' : 'error'}>
           {latest.conclusion === 'pass' ? 'PASS' : 'FAIL'}{' '}

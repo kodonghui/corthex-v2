@@ -13,7 +13,7 @@ export function SnsPlatformFilter({ platforms, onSelect }: SnsPlatformFilterProp
                     key={platform.id}
                     onClick={() => onSelect?.(platform.id)}
                     className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 text-sm leading-normal transition-colors border ${platform.active
-                            ? 'bg-slate-200 text-corthex-text-primary font-bold border-corthex-border'
+                            ? 'bg-corthex-surface text-corthex-text-primary font-bold border-corthex-border'
                             : 'bg-transparent text-corthex-text-secondary hover:bg-corthex-elevated font-medium border-corthex-border'
                         }`}
                 >

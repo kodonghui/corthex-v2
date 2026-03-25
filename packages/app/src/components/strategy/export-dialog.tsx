@@ -117,7 +117,7 @@ export function ExportDialog({ isOpen, onClose, stockCode }: Props) {
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                     format === f
                       ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                      : 'border-zinc-200 text-corthex-text-secondary hover:bg-corthex-bg'
+                      : 'border-corthex-border text-corthex-text-secondary hover:bg-corthex-bg'
                   }`}
                 >
                   {FORMAT_LABELS[f]}

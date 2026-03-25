@@ -75,7 +75,7 @@ export function StatsTab() {
           { label: '대기 중', value: pendingCount },
         ].map(({ label, value }) => (
           <div key={label} className="bg-stone-100/50 border border-stone-200 rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-slate-50">{value}</p>
+            <p className="text-2xl font-bold text-corthex-text-secondary">{value}</p>
             <p className="text-xs text-stone-500 mt-1">{label}</p>
           </div>
         ))}
@@ -104,7 +104,7 @@ export function StatsTab() {
           {stats.byPlatform.map((p) => (
             <div key={p.platform} className="bg-stone-100/50 border border-stone-200 rounded-xl p-4 text-center">
               <p className="text-xs text-stone-500">{PLATFORM_LABELS[p.platform] || p.platform}</p>
-              <p className="text-xl font-bold text-slate-50 mt-1">{p.total}</p>
+              <p className="text-xl font-bold text-corthex-text-secondary mt-1">{p.total}</p>
               <p className="text-xs text-emerald-400">발행 {p.published}건</p>
             </div>
           ))}

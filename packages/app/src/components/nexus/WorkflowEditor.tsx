@@ -199,7 +199,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
   return (
     <div className="flex flex-col h-full">
       {/* 툴바 */}
-      <div className="px-3 sm:px-4 py-2 border-b border-zinc-700 flex items-center gap-1.5 sm:gap-2">
+      <div className="px-3 sm:px-4 py-2 border-b border-corthex-border flex items-center gap-1.5 sm:gap-2">
         <button onClick={handleBack} className="text-sm text-corthex-text-disabled hover:text-corthex-text-disabled shrink-0">
           ← 목록
         </button>
@@ -230,13 +230,13 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         <div className="hidden md:flex items-center gap-2">
           <button
             onClick={handleAddNode}
-            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-zinc-600 rounded transition-colors"
+            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-corthex-surface rounded transition-colors"
           >
             + 노드
           </button>
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-zinc-600 text-white' : 'bg-corthex-elevated hover:bg-zinc-600'}`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${showHistory ? 'bg-corthex-surface text-white' : 'bg-corthex-elevated hover:bg-corthex-surface'}`}
           >
             실행 기록
           </button>
@@ -263,12 +263,12 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
         <div className="relative md:hidden" ref={moreMenuRef}>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-zinc-600 rounded transition-colors"
+            className="px-2 py-1 text-xs bg-corthex-elevated hover:bg-corthex-surface rounded transition-colors"
           >
             ···
           </button>
           {showMoreMenu && (
-            <div className="absolute right-0 top-full mt-1 w-44 bg-corthex-surface border border-zinc-700 rounded-lg shadow-lg z-50 py-1">
+            <div className="absolute right-0 top-full mt-1 w-44 bg-corthex-surface border border-corthex-border rounded-lg shadow-lg z-50 py-1">
               <button
                 onClick={handleAddNode}
                 className="w-full text-left px-3 py-2 text-xs hover:bg-corthex-elevated transition-colors"
@@ -290,7 +290,7 @@ export function WorkflowEditor({ workflowId, onBack }: Props) {
               >
                 {workflow.isTemplate ? '공유 해제' : '템플릿으로 공유'}
               </button>
-              <hr className="border-zinc-700 my-1" />
+              <hr className="border-corthex-border my-1" />
               <button
                 onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
                 className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-corthex-elevated transition-colors"
