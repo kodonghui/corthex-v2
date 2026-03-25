@@ -36,10 +36,10 @@ const TYPE_CATEGORY: Record<string, string> = {
 }
 
 const TYPE_ICON_STYLE: Record<string, { bg: string; dot: string; label: string; icon: 'success' | 'warning' | 'error' | 'info' | 'handoff' | 'system' }> = {
-  chat_complete: { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
+  chat_complete: { bg: 'var(--color-corthex-accent-muted)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
   delegation_complete: { bg: 'rgba(124,58,237,0.10)', dot: '#7c3aed', label: 'Handoff', icon: 'handoff' },
   tool_error: { bg: 'rgba(180,83,9,0.10)', dot: '#b45309', label: 'System Alert', icon: 'warning' },
-  job_complete: { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
+  job_complete: { bg: 'var(--color-corthex-accent-muted)', dot: 'var(--color-corthex-accent)', label: 'Agent', icon: 'success' },
   job_error: { bg: 'rgba(220,38,38,0.10)', dot: '#dc2626', label: 'Error', icon: 'error' },
   system: { bg: 'rgba(37,99,235,0.10)', dot: '#2563eb', label: 'System', icon: 'info' },
 }
@@ -240,41 +240,41 @@ export function NotificationsPage() {
         </header>
 
         {/* FILTER BAR */}
-        <nav className="mb-8 flex flex-wrap items-center justify-between gap-4 py-2">
-          <div className="flex flex-wrap items-center gap-2">
+        <nav className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center border-b border-corthex-border overflow-x-auto">
             {TAB_CHIPS.map((chip) => (
               <button
                 key={chip.key}
                 onClick={() => setTab(chip.key)}
-                className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
+                className={`px-5 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
                   activeTab === chip.key
-                    ? 'bg-corthex-accent text-white shadow-sm'
-                    : 'bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border'
+                    ? 'border-corthex-accent text-corthex-accent'
+                    : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
                 }`}
               >
                 {chip.label}
               </button>
             ))}
-            <div className="w-px h-5 bg-corthex-border mx-1" />
+            <div className="w-px h-5 bg-corthex-border mx-2" />
             {FILTER_CHIPS.map((chip) => (
               <button
                 key={chip.key}
                 onClick={() => setFilter(chip.key)}
-                className={`rounded-full px-5 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
+                className={`px-5 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
                   filter === chip.key
-                    ? 'bg-corthex-accent text-white shadow-sm'
-                    : 'bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border'
+                    ? 'border-corthex-accent text-corthex-accent'
+                    : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
                 }`}
                 data-testid={`filter-${chip.key}`}
               >
                 {chip.label}
                 {chip.key === 'unread' && unreadCount > 0 && (
-                  <span className="ml-1.5 text-[10px]">({unreadCount})</span>
+                  <span className="ml-1.5 text-[10px] font-mono">({unreadCount})</span>
                 )}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-corthex-text-secondary px-3 py-1 bg-corthex-bg rounded-lg border border-corthex-border/30">
+          <div className="flex items-center gap-2 text-corthex-text-secondary px-3 py-2 bg-corthex-elevated rounded-lg border border-corthex-border">
             <Search className="w-4 h-4 text-corthex-text-secondary/60" />
             <input
               className="bg-transparent border-none focus:ring-0 focus:outline-none text-xs font-mono w-48 p-0 placeholder:text-corthex-text-secondary/40 text-corthex-text-primary"
@@ -311,11 +311,13 @@ export function NotificationsPage() {
                 </div>
               ) : (
                 filteredNotifications.map((n) => {
-                  const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
+                  const iconStyle = TYPE_ICON_STYLE[n.type] || { bg: 'var(--color-corthex-accent-muted)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
                   const isSelected = selectedId === n.id
-                  const borderColor = iconStyle.icon === 'error' ? '#dc2626'
-                    : iconStyle.icon === 'handoff' ? '#7c3aed'
-                    : iconStyle.icon === 'warning' ? '#b45309'
+                  const borderColor = !n.isRead
+                    ? (iconStyle.icon === 'error' ? '#dc2626'
+                      : iconStyle.icon === 'handoff' ? '#7c3aed'
+                      : iconStyle.icon === 'warning' ? '#b45309'
+                      : 'var(--color-corthex-accent)')
                     : 'transparent'
 
                   return (
@@ -382,7 +384,7 @@ export function NotificationsPage() {
                   {/* Detail Header */}
                   <div className="mb-8">
                     {(() => {
-                      const style = TYPE_ICON_STYLE[selectedNotification.type] || { bg: 'rgba(96,108,56,0.10)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
+                      const style = TYPE_ICON_STYLE[selectedNotification.type] || { bg: 'var(--color-corthex-accent-muted)', dot: 'var(--color-corthex-accent)', label: 'Alert', icon: 'info' as const }
                       return (
                         <div
                           className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"

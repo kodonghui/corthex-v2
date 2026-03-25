@@ -140,18 +140,30 @@ export function CostsPage() {
         <div className="p-8 max-w-[1440px] mx-auto w-full space-y-12" data-testid="costs-page">
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-semibold tracking-tight text-corthex-text-primary">비용 분석 <span className="text-corthex-text-secondary font-light">Cost Analytics</span></h1>
-              <p className="text-corthex-text-secondary text-lg">AI 에이전트 운영 비용을 추적하고 최적화합니다</p>
+            <div className="space-y-1">
+              <p className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary">Cost Analytics</p>
+              <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary">Operational Expenditure</h1>
+              <p className="text-corthex-text-secondary text-sm">Real-time resource allocation and fiscal efficiency tracking.</p>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-3 px-5 py-2.5 bg-corthex-elevated rounded-lg border border-corthex-border hover:bg-corthex-border transition-colors">
-                <Calendar className="w-5 h-5 text-corthex-text-secondary" />
-                <span className="font-medium">{new Date().getFullYear()}년 {new Date().getMonth() + 1}월</span>
-              </button>
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-corthex-surface border border-corthex-border rounded-lg hover:shadow-sm transition-all text-corthex-text-primary font-medium">
-                <Download className="w-5 h-5" />
-                내보내기 Export CSV
+            <div className="flex items-center gap-3">
+              <div className="flex items-center bg-corthex-elevated border border-corthex-border p-1 rounded-lg">
+                {([7, 30, 90] as const).map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => { setDays(d); setChartRange(d === 7 ? '7d' : '30d') }}
+                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                      days === d
+                        ? 'bg-corthex-accent text-corthex-text-on-accent shadow-sm'
+                        : 'text-corthex-text-secondary hover:text-corthex-text-primary'
+                    }`}
+                  >
+                    {d}d
+                  </button>
+                ))}
+              </div>
+              <button className="flex items-center gap-2 px-4 py-2 bg-corthex-surface border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors text-corthex-text-primary text-xs font-bold uppercase tracking-widest">
+                <Download className="w-4 h-4" />
+                Export
               </button>
             </div>
           </header>

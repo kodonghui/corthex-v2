@@ -128,7 +128,7 @@ function getStoredLanguage(): string {
 
 const inputStyle: React.CSSProperties = {
   backgroundColor: 'var(--color-corthex-bg)',
-  borderColor: '#908a78',
+  borderColor: 'var(--color-corthex-border)',
   color: 'var(--color-corthex-text-primary)',
 }
 
@@ -160,35 +160,33 @@ export function SettingsPage() {
 
   return (
     <div
-      className="flex flex-1 justify-center py-5 px-4 sm:px-10 md:px-20 lg:px-40 min-h-screen"
-      style={{ backgroundColor: 'var(--color-corthex-bg)', fontFamily: "'Inter', sans-serif" }}
+      className="flex flex-1 justify-center py-5 px-4 sm:px-10 md:px-20 lg:px-40 min-h-screen bg-corthex-bg text-corthex-text-primary"
       data-testid="settings-page"
     >
       <div className="flex flex-col max-w-[800px] flex-1">
         {/* Header */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b px-4 sm:px-10 py-4" style={{ borderColor: 'var(--color-corthex-border)' }}>
-          <div className="flex items-center gap-4">
-            <div className="w-6 h-6 flex items-center justify-center" style={{ color: 'var(--color-corthex-accent)' }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            </div>
-            <h2 className="text-lg font-bold leading-tight tracking-tight" style={{ fontFamily: "'Inter', sans-serif", color: 'var(--color-corthex-text-primary)' }}>CORTHEX Settings</h2>
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-corthex-border px-4 sm:px-10 py-4">
+          <div className="flex items-center gap-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">System</p>
+            <span className="text-corthex-border">/</span>
+            <h2 className="text-sm font-bold text-corthex-text-primary uppercase tracking-widest">Configuration</h2>
           </div>
         </header>
 
         {/* Tab Navigation */}
-        <div className="pb-3 pt-2">
-          <div className="flex border-b px-4 sm:px-10 gap-8 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ borderColor: 'var(--color-corthex-border)' }}>
+        <div className="pb-0 pt-0">
+          <div className="flex border-b border-corthex-border px-4 sm:px-10 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {TABS.filter(t => !t.disabled).map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setTab(tab.value)}
-                className="flex flex-col items-center justify-center pb-3 pt-4 transition-colors whitespace-nowrap"
-                style={activeTab === tab.value
-                  ? { borderBottom: '2px solid #606C38', color: 'var(--color-corthex-accent)', fontWeight: 700 }
-                  : { borderBottom: '2px solid transparent', color: 'var(--color-corthex-text-secondary)', fontWeight: 500 }
-                }
+                className={`px-4 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
+                  activeTab === tab.value
+                    ? 'border-corthex-accent text-corthex-accent'
+                    : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
+                }`}
               >
-                <p className="text-sm leading-normal">{tab.label}</p>
+                {tab.label}
               </button>
             ))}
           </div>
@@ -467,7 +465,7 @@ function DisplayTab() {
                   onClick={() => handleThemeChange(opt.value)}
                   className="py-3 rounded-xl text-sm font-medium transition-all"
                   style={theme === opt.value
-                    ? { backgroundColor: 'rgba(96,108,56,0.1)', color: 'var(--color-corthex-accent)', border: '2px solid #606C38' }
+                    ? { backgroundColor: 'var(--color-corthex-accent-muted)', color: 'var(--color-corthex-accent)', border: '2px solid var(--color-corthex-accent)' }
                     : { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)', border: '2px solid transparent' }
                   }
                 >
@@ -677,7 +675,7 @@ function ApiKeyTab() {
         </div>
 
         {showForm && (
-          <div className="mb-6 p-5 rounded-2xl border flex flex-col gap-4" style={{ borderColor: 'rgba(96,108,56,0.3)', backgroundColor: 'rgba(96,108,56,0.03)' }}>
+          <div className="mb-6 p-5 rounded-2xl border flex flex-col gap-4" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)' }}>
             <label className="flex flex-col flex-1">
               <p className="text-base font-medium leading-normal pb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>서비스</p>
               <select

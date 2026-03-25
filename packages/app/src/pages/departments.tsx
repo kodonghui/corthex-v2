@@ -417,15 +417,15 @@ export function DepartmentsPage() {
           <aside className="w-[440px] sticky top-8 flex flex-col gap-6">
             <header className="flex justify-between items-end mb-2">
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tighter text-corthex-accent-deep">부서 관리</h1>
-                <p className="text-corthex-text-secondary font-medium text-sm tracking-wide uppercase">Departments</p>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary mb-1">Organization Oversight</p>
+                <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary">{departments.length} Departments</h1>
               </div>
               <button
                 onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-corthex-accent hover:bg-corthex-accent-deep text-white rounded-lg font-semibold transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-5 py-2.5 bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg font-bold text-sm transition-all active:scale-95"
               >
                 <Plus className="w-5 h-5" />
-                <span>부서 생성</span>
+                Create Department
               </button>
             </header>
 
@@ -443,29 +443,33 @@ export function DepartmentsPage() {
                     key={dept.id}
                     data-testid={`dept-row-${dept.id}`}
                     onClick={() => handleCardClick(dept)}
-                    className={`bg-corthex-elevated p-5 rounded-xl cursor-pointer transition-all group ${
+                    className={`bg-corthex-surface border rounded-xl p-5 cursor-pointer transition-all duration-300 group hover:border-corthex-accent/50 ${
                       isSelected
-                        ? 'border-2 border-corthex-accent shadow-lg'
-                        : 'border border-transparent hover:border-corthex-border/50 hover:shadow-lg'
+                        ? 'border-corthex-accent shadow-lg'
+                        : 'border-corthex-border'
                     }`}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-2 rounded-lg transition-colors ${isSelected ? 'bg-corthex-accent text-white' : 'bg-corthex-border text-corthex-accent-deep group-hover:bg-corthex-accent group-hover:text-white'}`}>
+                    <div className="flex justify-between items-start mb-5">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                        isSelected ? 'bg-corthex-accent text-corthex-text-on-accent' : 'bg-corthex-accent/10 text-corthex-accent group-hover:bg-corthex-accent group-hover:text-corthex-text-on-accent'
+                      }`}>
                         <Building2 className="w-5 h-5" />
                       </div>
-                      {isSelected && (
-                        <span className="text-[10px] font-mono text-corthex-accent font-bold px-2 py-0.5 bg-corthex-accent/10 rounded-full">ACTIVE</span>
-                      )}
+                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-corthex-success/10 text-corthex-success">
+                        Operational
+                      </span>
                     </div>
-                    <h3 className="font-bold text-corthex-text-primary text-lg leading-tight">{dept.name}</h3>
-                    <p className="text-corthex-text-secondary text-xs mt-1">{dept.description || '설명 없음'}</p>
-                    <div className="mt-4 space-y-1.5">
-                      <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary uppercase">
-                        <span>Budget</span>
-                        <span>--%</span>
+                    <h3 className={`text-base font-bold mb-1 transition-colors line-clamp-1 ${isSelected ? 'text-corthex-accent' : 'text-corthex-text-primary group-hover:text-corthex-accent'}`}>
+                      {dept.name}
+                    </h3>
+                    <p className="text-corthex-text-secondary text-xs mb-4 line-clamp-2">{dept.description || 'No description'}</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-end">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Budget</span>
+                        <span className="text-xs font-mono font-bold text-corthex-text-primary">--</span>
                       </div>
-                      <div className="w-full bg-corthex-border h-1.5 rounded-full overflow-hidden">
-                        <div className={`${isSelected ? 'bg-corthex-accent' : 'bg-corthex-accent-deep/30'} h-full`} style={{ width: '50%' }} />
+                      <div className="h-1.5 w-full bg-corthex-elevated rounded-full overflow-hidden">
+                        <div className={`${isSelected ? 'bg-corthex-accent' : 'bg-corthex-accent/40'} h-full rounded-full`} style={{ width: '50%' }} />
                       </div>
                     </div>
                   </div>
@@ -474,15 +478,17 @@ export function DepartmentsPage() {
 
               {/* Inactive departments inline */}
               {inactiveDepts.map((dept) => (
-                <div key={dept.id} className="bg-corthex-elevated p-5 rounded-xl opacity-50 border border-transparent">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-2 bg-corthex-border text-corthex-text-secondary rounded-lg">
+                <div key={dept.id} className="bg-corthex-surface border border-corthex-border rounded-xl p-5 opacity-50">
+                  <div className="flex justify-between items-start mb-5">
+                    <div className="w-10 h-10 bg-corthex-border rounded-lg flex items-center justify-center text-corthex-text-secondary">
                       <Building2 className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-mono text-corthex-text-secondary font-bold px-2 py-0.5 bg-corthex-border rounded-full">INACTIVE</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-corthex-border/50 text-corthex-text-secondary">
+                      Inactive
+                    </span>
                   </div>
-                  <h3 className="font-bold text-corthex-text-secondary text-lg leading-tight">{dept.name}</h3>
-                  {dept.description && <p className="text-corthex-text-secondary text-xs mt-1 line-clamp-2">{dept.description}</p>}
+                  <h3 className="text-base font-bold text-corthex-text-secondary mb-1 line-clamp-1">{dept.name}</h3>
+                  {dept.description && <p className="text-corthex-text-secondary text-xs line-clamp-2">{dept.description}</p>}
                 </div>
               ))}
             </div>
