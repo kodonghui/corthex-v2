@@ -73,7 +73,7 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
   }, [saveName, saveMutation])
 
   return (
-    <div data-testid={`sketch-preview-${commandId}`} className="bg-stone-100/50 border border-stone-200 rounded-xl overflow-hidden mt-2">
+    <div data-testid={`sketch-preview-${commandId}`} className="bg-corthex-surface border border-corthex-border rounded-xl overflow-hidden mt-2">
       {/* Mini canvas preview */}
       <div className="h-48 bg-corthex-surface/50 relative">
         {nodes.length > 0 ? (
@@ -94,7 +94,7 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
           </ReactFlow>
         ) : (
-          <div className="flex items-center justify-center h-full text-sm text-stone-500">
+          <div className="flex items-center justify-center h-full text-sm text-corthex-text-secondary">
             다이어그램 미리보기를 로드할 수 없습니다
           </div>
         )}
@@ -102,12 +102,12 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
 
       {/* Action buttons / Save dialog */}
       {showSaveDialog ? (
-        <div className="flex items-center gap-2 p-3 border-t border-stone-200">
+        <div className="flex items-center gap-2 p-3 border-t border-corthex-border">
           <input
             type="text"
             value={saveName}
             onChange={(e) => setSaveName(e.target.value)}
-            className="flex-1 bg-stone-200 border border-stone-300 rounded-lg px-2 py-1 text-xs text-white outline-none"
+            className="flex-1 bg-corthex-elevated border border-corthex-border rounded-lg px-2 py-1 text-xs text-corthex-text-primary outline-none"
             placeholder="스케치 이름"
             autoFocus
             onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setShowSaveDialog(false) }}
@@ -121,31 +121,31 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
           </button>
           <button
             onClick={() => setShowSaveDialog(false)}
-            className="text-xs px-3 py-1 rounded-lg bg-stone-200 hover:bg-corthex-elevated text-stone-600 transition-colors"
+            className="text-xs px-3 py-1 rounded-lg bg-corthex-elevated hover:bg-corthex-border text-corthex-text-secondary transition-colors"
           >
             취소
           </button>
         </div>
       ) : (
-        <div className="flex items-center gap-2 p-3 border-t border-stone-200">
+        <div className="flex items-center gap-2 p-3 border-t border-corthex-border">
           <button
             onClick={handleOpenInEditor}
             aria-label="SketchVibe에서 열기"
-            className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="text-xs px-3 py-1.5 rounded-lg bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-medium transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             SketchVibe에서 열기
           </button>
           <button
             onClick={() => setShowSaveDialog(true)}
             aria-label="저장"
-            className="text-xs px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-corthex-elevated text-stone-600 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="text-xs px-3 py-1.5 rounded-lg bg-corthex-elevated hover:bg-corthex-border text-corthex-text-secondary font-medium transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             저장
           </button>
           <button
             onClick={handleCopyMermaid}
             aria-label="Mermaid 코드 복사"
-            className="text-xs px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-corthex-elevated text-stone-600 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="text-xs px-3 py-1.5 rounded-lg bg-corthex-elevated hover:bg-corthex-border text-corthex-text-secondary font-medium transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             {copyToast ? '복사됨!' : 'Mermaid 복사'}
           </button>
@@ -160,8 +160,8 @@ export function SketchPreviewCard({ mermaid, description, commandId }: Props) {
  */
 export function SketchLoadingCard() {
   return (
-    <div data-testid="sketch-loading" className="h-32 bg-stone-100/50 border border-stone-200 rounded-xl flex items-center justify-center mt-2">
-      <span className="text-sm text-stone-500 animate-pulse">다이어그램 생성 중...</span>
+    <div data-testid="sketch-loading" className="h-32 bg-corthex-surface border border-corthex-border rounded-xl flex items-center justify-center mt-2">
+      <span className="text-sm text-corthex-text-secondary animate-pulse">다이어그램 생성 중...</span>
     </div>
   )
 }
