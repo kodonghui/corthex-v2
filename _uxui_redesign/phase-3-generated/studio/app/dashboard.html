@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX Studio - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#0891B2',
+                            50: '#ECFEFF',
+                            100: '#CFFAFE',
+                            200: '#A5F3FC',
+                            600: '#0891B2',
+                            700: '#0E7490',
+                        },
+                        slate: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            400: '#94A3B8',
+                            500: '#64748B',
+                            600: '#475569',
+                            800: '#1E293B',
+                            900: '#0F172A',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        "headline": ["Work Sans", "sans-serif"],
+                        "body": ["Work Sans", "sans-serif"],
+                        "label": ["Work Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #ECFEFF; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-primary-50 text-slate-900 antialiased">
+<!-- TopNavBar Execution -->
+<nav class="w-full sticky top-0 z-50 bg-cyan-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-cyan-100 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-[1600px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-cyan-700 dark:text-cyan-300">CORTHEX Studio</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-cyan-700 dark:text-cyan-300 border-b-2 border-cyan-600 py-5 transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-cyan-100/50 dark:hover:bg-slate-800/50 px-3 py-1 rounded transition-colors" href="#">Projects</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-cyan-100/50 dark:hover:bg-slate-800/50 px-3 py-1 rounded transition-colors" href="#">Collaborators</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-white border border-cyan-100 rounded-full text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none w-64 transition-all" placeholder="Search operations..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-600 hover:bg-cyan-100/50 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-cyan-100/50 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-cyan-200 overflow-hidden border border-cyan-300 ml-2">
+<img alt="User Profile" data-alt="Professional headshot of a creative director in a minimalist studio setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb_5LajIJuDHTI-xHeuwZcCOJ--_8qZUn3Hr0oNEY5kJ1uUJu-3S7RV83iyNZXDD091FjsTXo8BMYshi5fhgzMW2PTKDLmHLf7yxG_Vrr9lFY7IU79s2z2_P31U8fD5B_K445dh4yu418k9wPL5rrHDIzrVmVLm_6-EAz_XXXpMZRwMwZ5Ky9tcl7bTAt8A3Mx3-CsKM3yoCy0FCd-qJfs36KxyjdpEBvrjSxqpNCgy_0hMwjrGdeAHm2ItiOiOfVeLqU4GMPEU-U0"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex min-h-[calc(100vh-64px)] max-w-[1600px] mx-auto">
+<!-- SideNavBar Execution -->
+<aside class="h-[calc(100vh-64px)] w-64 hidden lg:flex flex-col border-r border-cyan-50 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-16">
+<div class="flex flex-col gap-2 p-4 h-full">
+<div class="mb-6 px-2">
+<h2 class="text-lg font-bold text-cyan-600">Workspace</h2>
+<p class="text-xs text-slate-500">Collaborative Mode</p>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        Dashboard
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+                        Projects
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+                        Collaborators
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                        Assets
+                    </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-slate-100">
+<div class="bg-cyan-50 rounded-xl p-4">
+<p class="text-[10px] font-bold text-cyan-600 uppercase tracking-wider mb-1">System Status</p>
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+<span class="text-xs font-medium text-slate-700">All Nodes Active</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 p-6 md:p-8 overflow-y-auto">
+<header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back, Director</h1>
+<p class="text-slate-500 mt-1">Operational overview for project "Nebula-X" is now ready.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white border border-cyan-100 rounded-lg text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export Report
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-semibold shadow-md shadow-cyan-200 hover:bg-cyan-700 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+                        New Deployment
+                    </button>
+</div>
+</header>
+<!-- Stat Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-cyan-50 flex flex-col justify-between group hover:border-cyan-200 transition-all">
+<div class="flex items-center justify-between mb-4">
+<div class="h-10 w-10 bg-cyan-50 text-cyan-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">person_pin</span>
+</div>
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12% vs LW</span>
+</div>
+<div>
+<p class="text-slate-500 text-sm font-medium">Active Agents</p>
+<h3 class="text-2xl font-bold text-slate-900 mt-1">24</h3>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-cyan-50 flex flex-col justify-between hover:border-cyan-200 transition-all">
+<div class="flex items-center justify-between mb-4">
+<div class="h-10 w-10 bg-cyan-50 text-cyan-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-full">Stable</span>
+</div>
+<div>
+<p class="text-slate-500 text-sm font-medium">Departments</p>
+<h3 class="text-2xl font-bold text-slate-900 mt-1">08</h3>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-cyan-50 flex flex-col justify-between hover:border-cyan-200 transition-all">
+<div class="flex items-center justify-between mb-4">
+<div class="h-10 w-10 bg-cyan-50 text-cyan-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">High Load</span>
+</div>
+<div>
+<p class="text-slate-500 text-sm font-medium">Pending Jobs</p>
+<h3 class="text-2xl font-bold text-slate-900 mt-1">142</h3>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-cyan-50 flex flex-col justify-between hover:border-cyan-200 transition-all">
+<div class="flex items-center justify-between mb-4">
+<div class="h-10 w-10 bg-cyan-50 text-cyan-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">In Budget</span>
+</div>
+<div>
+<p class="text-slate-500 text-sm font-medium">Total Costs</p>
+<h3 class="text-2xl font-bold text-slate-900 mt-1">$12,450</h3>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Active Units Section (Bento Grid Style) -->
+<div class="xl:col-span-2 space-y-6">
+<div class="bg-white rounded-xl shadow-sm border border-cyan-50 overflow-hidden">
+<div class="px-6 py-4 border-b border-cyan-50 flex items-center justify-between">
+<h2 class="text-lg font-bold text-slate-800">Active Units / Agent Status</h2>
+<button class="text-cyan-600 text-xs font-bold hover:underline">View All</button>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Unit Card 1 -->
+<div class="bg-slate-50 rounded-lg p-4 border border-transparent hover:border-cyan-200 hover:bg-white transition-all">
+<div class="flex items-center gap-4 mb-3">
+<img alt="Agent Alpha" class="h-12 w-12 rounded-lg object-cover" data-alt="Portrait of a focused professional female data scientist working in a high-tech environment with blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZtFCroYFMzNjjiD64ntNqNjXi-CJD-BWXAel71IuscqBXH9rcw0br6TAYKJiFcPTOVUd8z2yFcNz93GGi2aYWPe98-HhjGdV_rcrB1G53cQedqKBkelhc9uszy1tpF6hbdbOeCMbF0mkdxPiu8cPCsbRpsKFMv2DkuoAHZYXGX6EY0adzxxKMKmgIkxxV-MsXTIyBKzcGtvNMIyyjuQG1qR19hkVqjYzW0QS7zZF0NH0LVfV4i0LVbLcQ1yx6-C53DnmEkvWr0sKz"/>
+<div>
+<h4 class="font-bold text-slate-800">Agent Alpha-9</h4>
+<p class="text-xs text-slate-500">Neural Synthesis Dept.</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-500">Task Completion</span>
+<span class="font-bold text-cyan-600">88%</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-cyan-600 h-full w-[88%] rounded-full"></div>
+</div>
+</div>
+<!-- Unit Card 2 -->
+<div class="bg-slate-50 rounded-lg p-4 border border-transparent hover:border-cyan-200 hover:bg-white transition-all">
+<div class="flex items-center gap-4 mb-3">
+<img alt="Agent Beta" class="h-12 w-12 rounded-lg object-cover" data-alt="Close-up of a middle-aged male architect in glasses looking at a digital tablet with blueprints in the background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAxRXivTGFpR1WQiZ7HtasbiVbGAFy-J-tKvI3oWOrj0xtEwgeX1t1VXTdNIt9XVz9Dq89EsWtC93VUtTvQzDGEAtOtIuri0cGSGbRI9ezFL-kl1CDj8Oje8IVTGQ7reZIdFcIc6NyFjnCR_7gy75nLm3d-7USVDfFv4C5t4J9NZANP6po6N1UcOjXnEk7Scf0ulK1J5uNDTFodEQfcywkAnQLTPc1iYr1JiI3jI-B9FT92LyOFDD3FokiHef21LzlxLD951ZTnFEy"/>
+<div>
+<h4 class="font-bold text-slate-800">Agent Beta-2</h4>
+<p class="text-xs text-slate-500">Infrastructure Security</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-500">System Uptime</span>
+<span class="font-bold text-emerald-600">99.9%</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[99.9%] rounded-full"></div>
+</div>
+</div>
+<!-- Unit Card 3 -->
+<div class="bg-slate-50 rounded-lg p-4 border border-transparent hover:border-cyan-200 hover:bg-white transition-all">
+<div class="flex items-center gap-4 mb-3">
+<img alt="Agent Gamma" class="h-12 w-12 rounded-lg object-cover" data-alt="Headshot of a confident professional woman with curly hair smiling in a bright open office space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc3ldohk-mACpwsKQLJ1l7xFqi_R6ARTvEHhO2BRpDOH_kTg4BNuFmyr7KTshPYOSr0NDl5iTCeZasWLSgZAV1a6P8OprJVhGcEhpHrW70CX56cfyIrm9vS68IvVUEDMSjg4XUGuGvMZB2DFF2qNUzpr5d9fOHAo44fLPDrsECSf3nrE7Pd8pWa9OPTY8g-6eZm7rT7oT3zvjnZ85nq-zT2J_e0IbUe4D79HonoX1y4pCMSwijMa1NMOnI4l_0KA0vAtodWWCznx5N"/>
+<div>
+<h4 class="font-bold text-slate-800">Agent Gamma-4</h4>
+<p class="text-xs text-slate-500">Creative Direction</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-500">Asset Rendering</span>
+<span class="font-bold text-amber-600">42%</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full w-[42%] rounded-full"></div>
+</div>
+</div>
+<!-- Unit Card 4 -->
+<div class="bg-slate-50 rounded-lg p-4 border border-transparent hover:border-cyan-200 hover:bg-white transition-all">
+<div class="flex items-center gap-4 mb-3">
+<img alt="Agent Delta" class="h-12 w-12 rounded-lg object-cover" data-alt="Portrait of a young man with a creative haircut in a modern industrial coworking space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5tPEpCE2vO_NlOFw_hO5hHE7oEO8shqfElxLrZSIVSnkP_JlH49GecSrcWPY0aRd2nrgj1Sc96eOOQ-MO-CGW8HiyLvIkWihI6_rNICv37iffR-0ASFk36Cilk0IABYrttUW_beRJyiL8MNvEw7SGzZi4vdAG1zU9T5MQPfcMCwthtD_o3DPNuXc8uyO4nP0mD2SsHGIg0CPwKOA_vo1_glnF_kaT6K6DEghHL0E2e9YQ1Ii46wFp1x6Gba_SKIMu5tzMVOBPm3Qe"/>
+<div>
+<h4 class="font-bold text-slate-800">Agent Delta-1</h4>
+<p class="text-xs text-slate-500">Protocol Analytics</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-500">Validation Status</span>
+<span class="font-bold text-indigo-600">Synchronizing</span>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-indigo-500 h-full w-[65%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-xl p-6 text-white shadow-lg shadow-cyan-200/50 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-lg font-bold mb-2">Operation Cloudburst</h3>
+<p class="text-cyan-100 text-sm mb-6">Cross-department sync in progress. Estimated completion: 2h 15m.</p>
+<button class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-xs font-bold transition-all backdrop-blur-md border border-white/20">Manage Operation</button>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-9xl">rocket_launch</span>
+</div>
+<div class="bg-white rounded-xl p-6 border border-cyan-50 shadow-sm flex flex-col items-center justify-center text-center">
+<div class="h-12 w-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<h3 class="font-bold text-slate-800 mb-1">Attention Required</h3>
+<p class="text-xs text-slate-500 mb-4">03 Collaborators are requesting asset clearance for Phase II.</p>
+<button class="text-cyan-600 text-xs font-bold px-4 py-2 rounded-full border border-cyan-100 hover:bg-cyan-50 transition-all">Review Queue</button>
+</div>
+</div>
+</div>
+<!-- Live Event Stream Section -->
+<div class="xl:col-span-1">
+<div class="bg-white rounded-xl shadow-sm border border-cyan-50 h-full flex flex-col">
+<div class="px-6 py-4 border-b border-cyan-50">
+<h2 class="text-lg font-bold text-slate-800">Live Event Stream</h2>
+</div>
+<div class="p-6 flex-1 space-y-6 overflow-y-auto">
+<!-- Stream Item 1 -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+<div class="w-0.5 h-full bg-slate-100 mt-2"></div>
+</div>
+<div class="pb-6">
+<p class="text-xs text-slate-400 font-medium uppercase mb-1">09:42 AM</p>
+<p class="text-sm text-slate-700 leading-relaxed">
+<span class="font-bold text-slate-900">System</span> initialized autonomous rendering for <span class="font-bold text-cyan-600">Scene_042</span>.
+                                    </p>
+</div>
+</div>
+<!-- Stream Item 2 -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="h-3 w-3 rounded-full bg-cyan-500 ring-4 ring-cyan-50"></div>
+<div class="w-0.5 h-full bg-slate-100 mt-2"></div>
+</div>
+<div class="pb-6">
+<p class="text-xs text-slate-400 font-medium uppercase mb-1">09:15 AM</p>
+<p class="text-sm text-slate-700 leading-relaxed">
+<span class="font-bold text-slate-900">Director</span> modified permissions for <span class="font-bold text-slate-800">Asset_Library_V2</span>.
+                                    </p>
+</div>
+</div>
+<!-- Stream Item 3 -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="h-3 w-3 rounded-full bg-amber-500 ring-4 ring-amber-50"></div>
+<div class="w-0.5 h-full bg-slate-100 mt-2"></div>
+</div>
+<div class="pb-6">
+<p class="text-xs text-slate-400 font-medium uppercase mb-1">08:50 AM</p>
+<p class="text-sm text-slate-700 leading-relaxed">
+<span class="font-bold text-slate-900">Network Alert:</span> Latency spike detected in South-East Node. Auto-balancing active.
+                                    </p>
+</div>
+</div>
+<!-- Stream Item 4 -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="h-3 w-3 rounded-full bg-slate-400 ring-4 ring-slate-50"></div>
+<div class="w-0.5 h-full bg-slate-100 mt-2"></div>
+</div>
+<div class="pb-6">
+<p class="text-xs text-slate-400 font-medium uppercase mb-1">08:12 AM</p>
+<p class="text-sm text-slate-700 leading-relaxed">
+<span class="font-bold text-slate-900">Agent Alpha-9</span> logged in from localized workstation.
+                                    </p>
+</div>
+</div>
+<!-- Stream Item 5 -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+</div>
+<div>
+<p class="text-xs text-slate-400 font-medium uppercase mb-1">07:55 AM</p>
+<p class="text-sm text-slate-700 leading-relaxed">
+<span class="font-bold text-slate-900">Night Shift</span> report generated successfully. No errors found.
+                                    </p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-slate-50/50 border-t border-cyan-50">
+<button class="w-full py-2 bg-white border border-cyan-100 rounded-lg text-xs font-bold text-cyan-600 hover:bg-cyan-50 transition-all">Download Log History</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

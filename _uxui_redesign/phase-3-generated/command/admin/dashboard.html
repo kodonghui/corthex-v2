@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CORTHEX | NODE-01 ADMIN</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary-container": "#ca8a04",
+                "on-surface": "#e8e1df",
+                "on-secondary": "#432c02",
+                "outline-variant": "#514535",
+                "on-secondary-fixed": "#281800",
+                "surface-dim": "#151312",
+                "surface-tint": "#ffba46",
+                "secondary": "#e7c089",
+                "on-secondary-container": "#d5af79",
+                "on-tertiary-fixed": "#001d32",
+                "tertiary-fixed": "#cee5ff",
+                "on-tertiary-container": "#003251",
+                "on-tertiary": "#003353",
+                "surface-variant": "#373433",
+                "surface-container-low": "#1d1b1a",
+                "secondary-fixed": "#ffddb0",
+                "error": "#ffb4ab",
+                "on-primary": "#442c00",
+                "inverse-surface": "#e8e1df",
+                "on-primary-fixed": "#281800",
+                "surface-bright": "#3c3837",
+                "tertiary-container": "#3f9de4",
+                "tertiary-fixed-dim": "#96ccff",
+                "background": "#151312",
+                "surface-container-highest": "#373433",
+                "tertiary": "#96ccff",
+                "primary": "#ffba46",
+                "secondary-fixed-dim": "#e7c089",
+                "on-primary-fixed-variant": "#614000",
+                "surface-container": "#221f1e",
+                "surface-container-lowest": "#100e0d",
+                "surface": "#151312",
+                "primary-fixed-dim": "#ffba46",
+                "on-error": "#690005",
+                "on-primary-container": "#422a00",
+                "outline": "#9e8e7b",
+                "on-tertiary-fixed-variant": "#004a76",
+                "secondary-container": "#5d4216",
+                "inverse-on-surface": "#33302e",
+                "surface-container-high": "#2c2928",
+                "on-secondary-fixed-variant": "#5d4216",
+                "on-surface-variant": "#d5c4ae",
+                "on-background": "#e8e1df",
+                "error-container": "#93000a",
+                "on-error-container": "#ffdad6",
+                "primary-fixed": "#ffddb0",
+                "inverse-primary": "#805600"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["DM Sans"],
+                "label": ["Space Grotesk"]
+              },
+              borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0C0A09;
+            color: #e8e1df;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .hud-border-accent {
+            border-left: 2px solid #ca8a04;
+        }
+    </style>
+</head>
+<body class="bg-stone-950 text-on-surface antialiased overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 bg-stone-950 dark:bg-[#0C0A09] w-64 z-50">
+<div class="px-8 mb-12">
+<h1 class="text-2xl font-black tracking-tighter text-amber-600 dark:text-[#CA8A04] font-headline">CORTHEX</h1>
+<p class="text-[10px] font-label uppercase tracking-[0.2em] text-stone-500 mt-1">SYSTEM CONTROL</p>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center px-8 py-4 text-amber-500 dark:text-[#ffba46] font-bold border-l-4 border-amber-600 dark:border-[#CA8A04] bg-stone-900/50 transition-all duration-150 scale-98" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="dashboard">dashboard</span>
+<span class="font-label uppercase tracking-widest text-sm">Overview</span>
+</a>
+<a class="flex items-center px-8 py-4 text-stone-500 dark:text-stone-400 hover:text-stone-200 hover:bg-stone-900/80 transition-all duration-150" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="domain">domain</span>
+<span class="font-label uppercase tracking-widest text-sm">Companies</span>
+</a>
+<a class="flex items-center px-8 py-4 text-stone-500 dark:text-stone-400 hover:text-stone-200 hover:bg-stone-900/80 transition-all duration-150" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="group">group</span>
+<span class="font-label uppercase tracking-widest text-sm">Users</span>
+</a>
+<a class="flex items-center px-8 py-4 text-stone-500 dark:text-stone-400 hover:text-stone-200 hover:bg-stone-900/80 transition-all duration-150" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="smart_toy">smart_toy</span>
+<span class="font-label uppercase tracking-widest text-sm">Agents</span>
+</a>
+<a class="flex items-center px-8 py-4 text-stone-500 dark:text-stone-400 hover:text-stone-200 hover:bg-stone-900/80 transition-all duration-150" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="dns">dns</span>
+<span class="font-label uppercase tracking-widest text-sm">Server Health</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full bg-primary-container text-on-primary py-3 font-label font-bold tracking-widest text-xs transition-transform active:scale-95">
+                NEW AGENT
+            </button>
+<div class="mt-8 pt-8 space-y-4">
+<a class="flex items-center px-2 text-stone-500 hover:text-stone-200 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="settings">settings</span>
+<span class="font-label text-xs uppercase tracking-widest">Settings</span>
+</a>
+<a class="flex items-center px-2 text-stone-500 hover:text-stone-200 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="logout">logout</span>
+<span class="font-label text-xs uppercase tracking-widest">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen bg-surface-dim">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center h-16 px-8 sticky top-0 z-40 bg-stone-950/80 dark:bg-[#0C0A09]/80 backdrop-blur-md shadow-[0_0_20px_rgba(202,138,4,0.04)]">
+<div class="flex items-center space-x-4">
+<span class="text-xs font-label text-primary-container tracking-[0.3em] font-bold">NODE-01 // ROOT ACCESS</span>
+<div class="h-4 w-px bg-outline-variant/30"></div>
+<h2 class="font-headline font-bold text-on-surface uppercase tracking-tight">System Overview</h2>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative group">
+<input class="bg-surface-container-high border-none text-xs font-label tracking-widest px-4 py-2 w-64 focus:ring-1 focus:ring-primary-container transition-all" placeholder="QUERY DATABASE..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm" data-icon="search">search</span>
+</div>
+<div class="flex space-x-4 text-stone-400">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="notifications_active">notifications_active</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="lan">lan</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="terminal">terminal</span>
+</div>
+<div class="flex items-center space-x-3 border-l border-outline-variant/20 pl-6">
+<div class="text-right">
+<p class="text-[10px] font-label text-stone-500 leading-none">ROOT_ADMIN</p>
+<p class="text-xs font-headline font-bold text-on-surface">SYS.OPERATOR</p>
+</div>
+<img alt="Root Admin" class="w-8 h-8 grayscale contrast-125 border border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLwjkX97_Na3e4kxnzGWqm9W0MLTr5_Yvk12c1cbMrGIc1ZdyTf5lEUOTGeHEqEIwnuT5tQdGtiCckrbVg7ZL767tQe2aruWNl1WRAYArrnQZnlHBdDpI0ivH6d-4WK4NowrBCWYQ_l-ZxC1gr3YJa9wZJ-rrpcn-VGNTlW9QJheDJt6QKGaiq_kkmmMQEe-R-DSsu3cCdHgiE38k5cdJQwdxb8sLF7LHgGF5xzQx8e6nIUMAf7U2OQHPXuQKkdLKc8nIDO_rIAp0p"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 max-w-[1600px] mx-auto space-y-8">
+<!-- Large Metric Cards: Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6 h-[400px]">
+<!-- Metric: Companies -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-low hud-border-accent p-8 flex flex-col justify-between relative overflow-hidden group">
+<div class="z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-stone-500">Registry / Entities</span>
+<span class="text-primary-container material-symbols-outlined" data-icon="domain">domain</span>
+</div>
+<h3 class="font-headline text-5xl font-black mt-4 tracking-tighter text-on-surface">1,248</h3>
+<p class="text-primary text-xs font-label mt-2 tracking-widest font-bold">+12.4% <span class="text-stone-500 font-normal ml-1">VS LAST EPOCH</span></p>
+</div>
+<div class="z-10 bg-surface-container-highest/50 p-4 mt-8">
+<p class="text-[10px] font-label text-stone-500 mb-2 uppercase tracking-widest">Growth Vector</p>
+<div class="h-1 bg-stone-800 w-full overflow-hidden">
+<div class="h-full bg-primary-container w-[72%]"></div>
+</div>
+</div>
+<!-- Background HUD element -->
+<span class="absolute -bottom-8 -right-8 text-stone-900 font-headline text-9xl font-black select-none pointer-events-none opacity-20">ENT</span>
+</div>
+<!-- Metric: Users -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-high p-8 flex flex-col justify-between relative overflow-hidden group">
+<div class="z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-stone-500">Node / Active Users</span>
+<span class="text-primary material-symbols-outlined" data-icon="group">group</span>
+</div>
+<h3 class="font-headline text-5xl font-black mt-4 tracking-tighter text-on-surface">42,891</h3>
+<p class="text-primary text-xs font-label mt-2 tracking-widest font-bold">+5.1k <span class="text-stone-500 font-normal ml-1">NEW INSTANCES</span></p>
+</div>
+<div class="z-10 grid grid-cols-2 gap-4 mt-8">
+<div class="bg-surface-container-lowest p-3">
+<p class="text-[9px] font-label text-stone-500 uppercase">Verified</p>
+<p class="text-sm font-headline font-bold">38.2k</p>
+</div>
+<div class="bg-surface-container-lowest p-3">
+<p class="text-[9px] font-label text-stone-500 uppercase">Pending</p>
+<p class="text-sm font-headline font-bold">4.6k</p>
+</div>
+</div>
+<span class="absolute -bottom-8 -right-8 text-stone-900 font-headline text-9xl font-black select-none pointer-events-none opacity-20">USR</span>
+</div>
+<!-- Metric: Agents -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-highest p-8 flex flex-col justify-between relative overflow-hidden group shadow-[0_0_30px_rgba(202,138,4,0.08)]">
+<div class="z-10">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-primary">Cognition / Active Agents</span>
+<span class="text-primary material-symbols-outlined" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h3 class="font-headline text-5xl font-black mt-4 tracking-tighter text-primary">8,402</h3>
+<p class="text-stone-300 text-xs font-label mt-2 tracking-widest font-bold">98.2% <span class="text-stone-500 font-normal ml-1">COGNITIVE LOAD</span></p>
+</div>
+<button class="z-10 w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 font-label font-black tracking-[0.2em] text-xs hover:brightness-110 transition-all">
+                        EXPAND CLUSTER
+                    </button>
+<span class="absolute -bottom-8 -right-8 text-stone-800 font-headline text-9xl font-black select-none pointer-events-none opacity-20">AGT</span>
+</div>
+</div>
+<!-- Server Health & Activity Log -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Server Health Radial Meters -->
+<div class="col-span-12 lg:col-span-5 space-y-6">
+<div class="flex items-baseline justify-between">
+<h4 class="font-headline font-bold text-lg uppercase tracking-widest">Hardware Telemetry</h4>
+<span class="text-[10px] font-label text-primary uppercase animate-pulse">Live Link Active</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Meter 1: CPU -->
+<div class="bg-surface-container-low p-6 flex flex-col items-center justify-center space-y-4">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-stone-800" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary-container" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-headline font-bold">75%</span>
+<span class="text-[8px] font-label text-stone-500">CORE</span>
+</div>
+</div>
+<span class="font-label text-xs uppercase tracking-widest">CPU LOAD</span>
+</div>
+<!-- Meter 2: RAM -->
+<div class="bg-surface-container-low p-6 flex flex-col items-center justify-center space-y-4">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-stone-800" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-tertiary" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="140" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-headline font-bold">42%</span>
+<span class="text-[8px] font-label text-stone-500">MEM</span>
+</div>
+</div>
+<span class="font-label text-xs uppercase tracking-widest">MEMORY ALLOC</span>
+</div>
+<!-- Meter 3: DISK -->
+<div class="bg-surface-container-low p-6 flex flex-col items-center justify-center space-y-4">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-stone-800" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-amber-500" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="20" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-headline font-bold">91%</span>
+<span class="text-[8px] font-label text-stone-500">VOL</span>
+</div>
+</div>
+<span class="font-label text-xs uppercase tracking-widest">DISK CAPACITY</span>
+</div>
+<!-- Meter 4: NETWORK -->
+<div class="bg-surface-container-low p-6 flex flex-col items-center justify-center space-y-4">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-stone-800" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="180" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-headline font-bold">28%</span>
+<span class="text-[8px] font-label text-stone-500">NET</span>
+</div>
+</div>
+<span class="font-label text-xs uppercase tracking-widest">NETWORK THRU</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity Log -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-highest p-8 relative overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="font-headline font-bold text-lg uppercase tracking-widest">Activity Stream</h4>
+<p class="text-[10px] font-label text-stone-500 tracking-widest">REAL-TIME TRANSACTION LOG</p>
+</div>
+<button class="text-[10px] font-label text-primary-container border-b border-primary-container pb-1 tracking-widest hover:text-primary transition-colors">EXPORT LOGS</button>
+</div>
+<div class="space-y-4 overflow-y-auto max-h-[440px] pr-4 custom-scrollbar">
+<!-- Log Entry 1 -->
+<div class="flex items-center space-x-6 p-4 bg-surface-dim/40 border-l-2 border-primary-container/30 hover:bg-surface-dim transition-colors group">
+<span class="text-[10px] font-label text-stone-600 font-mono tracking-tighter">14:02:44</span>
+<div class="flex-grow">
+<p class="text-xs font-headline font-bold uppercase tracking-wide">Nexus Dynamics Ltd.</p>
+<p class="text-[10px] text-stone-500 font-body">Initialized new Agent cluster: <span class="text-stone-300">"PROMETHEUS-09"</span></p>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-primary/10 text-primary uppercase">Success</span>
+</div>
+<!-- Log Entry 2 -->
+<div class="flex items-center space-x-6 p-4 bg-surface-dim/40 border-l-2 border-tertiary/30 hover:bg-surface-dim transition-colors group">
+<span class="text-[10px] font-label text-stone-600 font-mono tracking-tighter">13:58:12</span>
+<div class="flex-grow">
+<p class="text-xs font-headline font-bold uppercase tracking-wide">Aether Corp</p>
+<p class="text-[10px] text-stone-500 font-body">Updated security protocols for <span class="text-stone-300">2,400 user instances</span></p>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-tertiary/10 text-tertiary uppercase">System</span>
+</div>
+<!-- Log Entry 3 -->
+<div class="flex items-center space-x-6 p-4 bg-surface-dim/40 border-l-2 border-primary-container/30 hover:bg-surface-dim transition-colors group">
+<span class="text-[10px] font-label text-stone-600 font-mono tracking-tighter">13:45:00</span>
+<div class="flex-grow">
+<p class="text-xs font-headline font-bold uppercase tracking-wide">Global Synthetics</p>
+<p class="text-[10px] text-stone-500 font-body">New company onboarding complete. Registry ID: <span class="text-stone-300">#GS-990</span></p>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-primary/10 text-primary uppercase">Registry</span>
+</div>
+<!-- Log Entry 4 -->
+<div class="flex items-center space-x-6 p-4 bg-surface-dim/40 border-l-2 border-error/30 hover:bg-surface-dim transition-colors group">
+<span class="text-[10px] font-label text-stone-600 font-mono tracking-tighter">13:22:09</span>
+<div class="flex-grow">
+<p class="text-xs font-headline font-bold uppercase tracking-wide">Admin: Sarah V.</p>
+<p class="text-[10px] text-stone-500 font-body">Unauthorized access attempt blocked on <span class="text-error">Node-04-Sub</span></p>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-error/10 text-error uppercase">Alert</span>
+</div>
+<!-- Log Entry 5 -->
+<div class="flex items-center space-x-6 p-4 bg-surface-dim/40 border-l-2 border-primary-container/30 hover:bg-surface-dim transition-colors group">
+<span class="text-[10px] font-label text-stone-600 font-mono tracking-tighter">13:10:55</span>
+<div class="flex-grow">
+<p class="text-xs font-headline font-bold uppercase tracking-wide">Cortex Core</p>
+<p class="text-[10px] text-stone-500 font-body">Routine maintenance cycle completed. 0 issues detected.</p>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-primary/10 text-primary uppercase">Maint</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Asymmetric Module -->
+<div class="bg-surface-container-high p-8 flex flex-col md:flex-row items-center justify-between border-t border-outline-variant/10">
+<div class="max-w-xl">
+<h5 class="font-headline font-bold text-2xl uppercase tracking-tighter text-on-surface mb-2">Neural Link Efficiency</h5>
+<p class="text-sm font-body text-stone-500 leading-relaxed">System performance is currently operating at <span class="text-primary font-bold">Level 4 Optimization</span>. All agent-client bridges are within acceptable latency parameters (&lt; 12ms). No immediate scaling required.</p>
+</div>
+<div class="mt-6 md:mt-0 flex items-center space-x-8">
+<div class="text-center">
+<p class="text-[10px] font-label text-stone-500 uppercase tracking-widest mb-1">Status</p>
+<p class="text-xl font-headline font-black text-primary">OPTIMAL</p>
+</div>
+<div class="h-10 w-px bg-outline-variant/30"></div>
+<div class="text-center">
+<p class="text-[10px] font-label text-stone-500 uppercase tracking-widest mb-1">Latency</p>
+<p class="text-xl font-headline font-black text-tertiary">11.4ms</p>
+</div>
+<button class="bg-surface-container-highest border border-primary/20 px-8 py-3 text-xs font-label uppercase tracking-widest font-bold hover:bg-primary/10 transition-all">
+                        RUN DIAGNOSTICS
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual HUD Accents -->
+<div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 z-50"></div>
+<div class="fixed bottom-0 right-0 p-4 z-50 pointer-events-none">
+<div class="bg-stone-900/80 backdrop-blur px-4 py-2 border border-primary/10">
+<span class="text-[8px] font-label text-stone-500 tracking-[0.4em] uppercase">System Latency: 4ms // Secure Connection // 256-bit</span>
+</div>
+</div>
+</body></html>

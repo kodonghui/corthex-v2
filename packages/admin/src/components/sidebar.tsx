@@ -101,15 +101,15 @@ export function Sidebar() {
   }, [selectedCompanyId, companies, setSelectedCompanyId])
 
   return (
-    <aside className="w-60 h-screen flex flex-col bg-corthex-accent-deep text-corthex-accent-hover">
-      <div className="p-4 border-b border-corthex-accent-deep">
+    <aside className="w-60 h-screen flex flex-col bg-corthex-sidebar-bg text-corthex-sidebar-text">
+      <div className="p-4 border-b border-corthex-sidebar-border">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-corthex-accent text-white flex items-center justify-center text-sm font-bold">
+          <div className="w-8 h-8 rounded-lg bg-corthex-sidebar-brand/30 text-corthex-sidebar-text flex items-center justify-center text-sm font-bold">
             C
           </div>
           <div>
-            <p className="text-sm font-bold text-corthex-border">CORTHEX</p>
-            <p className="text-xs text-corthex-accent-hover">Admin Console</p>
+            <p className="text-sm font-bold text-corthex-sidebar-text-active">CORTHEX</p>
+            <p className="text-xs text-corthex-sidebar-text">Admin Console</p>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export function Sidebar() {
           <select
             value={selectedCompanyId || ''}
             onChange={(e) => setSelectedCompanyId(e.target.value)}
-            className="w-full px-2 py-1.5 text-xs border border-corthex-accent-deep rounded-lg bg-corthex-accent-deep text-corthex-border focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
+            className="w-full px-2 py-1.5 text-xs border border-corthex-sidebar-border rounded-lg bg-corthex-sidebar-bg text-corthex-sidebar-text-active focus:ring-2 focus:ring-corthex-accent/40 focus:outline-none"
           >
             {companies.map((c) => (
               <option key={c.id} value={c.id}>
@@ -127,11 +127,11 @@ export function Sidebar() {
             ))}
           </select>
         ) : companiesLoading ? (
-          <div className="w-full px-2 py-1.5 text-xs text-corthex-accent-hover animate-pulse">
+          <div className="w-full px-2 py-1.5 text-xs text-corthex-sidebar-text animate-pulse">
             회사 로딩중...
           </div>
         ) : (
-          <div className="w-full px-2 py-1.5 text-xs text-corthex-accent-hover/60">
+          <div className="w-full px-2 py-1.5 text-xs text-corthex-sidebar-text/60">
             등록된 회사 없음
           </div>
         )}
@@ -148,8 +148,8 @@ export function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? 'bg-corthex-accent/30 text-corthex-border font-medium'
-                    : 'text-corthex-accent-hover hover:bg-corthex-accent/20 hover:text-corthex-border'
+                    ? 'bg-corthex-sidebar-active text-corthex-sidebar-text-active font-medium'
+                    : 'text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active'
                 }`
               }
             >
@@ -160,7 +160,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-corthex-accent-deep space-y-2">
+      <div className="p-3 border-t border-corthex-sidebar-border space-y-2">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
@@ -177,17 +177,17 @@ export function Sidebar() {
         <SwitchToCeoButton companyId={selectedCompanyId} />
         <div className="flex items-center justify-between px-3 py-2">
           <div>
-            <p className="text-sm font-medium text-corthex-border">{user?.name}</p>
-            <p className="text-xs text-corthex-accent-hover">{user?.role}</p>
+            <p className="text-sm font-medium text-corthex-sidebar-text-active">{user?.name}</p>
+            <p className="text-xs text-corthex-sidebar-text">{user?.role}</p>
           </div>
           <button
             onClick={logout}
-            className="text-xs text-corthex-accent-hover hover:text-red-400 transition-colors"
+            className="text-xs text-corthex-sidebar-text hover:text-red-400 transition-colors"
           >
             로그아웃
           </button>
         </div>
-        <div className="px-3 text-[10px] text-corthex-accent font-mono">
+        <div className="px-3 text-[10px] text-corthex-sidebar-text/50 font-mono">
           #{__BUILD_NUMBER__}{__BUILD_HASH__ ? ` · ${__BUILD_HASH__}` : ''}
         </div>
       </div>
