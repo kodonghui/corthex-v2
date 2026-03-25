@@ -54,7 +54,7 @@ const STATUS_CONFIG: Record<string, { dot: string; bg: string; text: string; lab
   online: { dot: 'bg-emerald-400 animate-pulse', bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: '활성' },
   working: { dot: 'bg-blue-400 animate-pulse', bg: 'bg-blue-500/10', text: 'text-blue-400', label: '작업중' },
   error: { dot: 'bg-red-400', bg: 'bg-red-500/10', text: 'text-red-400', label: '오류' },
-  offline: { dot: 'bg-corthex-surface', bg: 'bg-corthex-surface/10', text: 'text-stone-400', label: '오프라인' },
+  offline: { dot: 'bg-corthex-surface', bg: 'bg-corthex-surface/10', text: 'text-corthex-text-secondary', label: '오프라인' },
 }
 
 export function HomePage() {
@@ -88,7 +88,7 @@ export function HomePage() {
   const notifications = notifData?.data
 
   return (
-    <div data-testid="home-page" className="h-full overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+    <div data-testid="home-page" className="h-full overflow-y-auto bg-corthex-bg">
       <div className="max-w-5xl mx-auto px-6 md:px-8 py-8 space-y-8">
 
         {/* ── Greeting Header ── */}
@@ -96,25 +96,24 @@ export function HomePage() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
             안녕하세요, {user?.name}님
           </h1>
-          <p className="text-sm text-stone-400 font-medium">{formatDate()}</p>
+          <p className="text-sm text-corthex-text-secondary font-medium">{formatDate()}</p>
         </div>
 
         {/* ── Overnight Jobs Card ── */}
         {notifications && notifications.total > 0 && (
           <div
             data-testid="overnight-jobs-card"
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600/15 via-slate-800/80 to-slate-800/80 border border-violet-500/20 backdrop-blur-sm"
+            className="relative overflow-hidden rounded-2xl bg-corthex-surface border border-corthex-border"
           >
-            <div className="absolute top-0 right-0 w-40 h-40 bg-violet-500/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative px-6 py-5 border-b border-stone-200/40 flex items-center justify-between">
+            <div className="relative px-6 py-5 border-b border-corthex-border flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="w-10 h-10 rounded-xl bg-corthex-accent/15 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-corthex-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">밤사이 완료된 작업</h3>
+                  <h3 className="text-sm font-semibold text-corthex-text-primary">밤사이 완료된 작업</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {notifications.completedCount}건 완료
@@ -131,14 +130,14 @@ export function HomePage() {
                 <button
                   data-testid="mark-all-read-btn"
                   onClick={() => readAll.mutate()}
-                  className="text-xs text-stone-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-stone-200/60 transition-all border border-transparent hover:border-stone-300/50"
+                  className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-3 py-1.5 rounded-lg hover:bg-corthex-elevated transition-all border border-corthex-border"
                 >
                   모두 읽음
                 </button>
                 <button
                   data-testid="jobs-detail-btn"
                   onClick={() => navigate('/jobs')}
-                  className="text-xs text-violet-400 hover:text-violet-300 px-3 py-1.5 rounded-lg hover:bg-violet-500/10 transition-all border border-transparent hover:border-violet-500/20"
+                  className="text-xs text-corthex-accent hover:text-corthex-accent-hover px-3 py-1.5 rounded-lg hover:bg-corthex-accent-muted transition-all border border-transparent hover:border-corthex-accent/20"
                 >
                   자세히 →
                 </button>
@@ -146,7 +145,7 @@ export function HomePage() {
             </div>
             <div className="divide-y divide-corthex-border/30">
               {notifications.jobs.slice(0, 5).map((job) => (
-                <div key={job.id} className="px-6 py-3.5 flex items-start gap-3 hover:bg-stone-100/30 transition-colors">
+                <div key={job.id} className="px-6 py-3.5 flex items-start gap-3 hover:bg-corthex-elevated transition-colors">
                   {job.status === 'completed' ? (
                     <span className="mt-0.5 w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xs flex-shrink-0">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -159,13 +158,13 @@ export function HomePage() {
                   <div className="flex-1 min-w-0">
                     <span className="text-xs font-semibold text-corthex-text-disabled">{job.agentName}</span>
                     <span className="text-xs text-corthex-text-secondary mx-2">—</span>
-                    <span className="text-xs text-stone-500 truncate">{job.instruction}</span>
+                    <span className="text-xs text-corthex-text-secondary truncate">{job.instruction}</span>
                   </div>
                 </div>
               ))}
               {notifications.total > 5 && (
                 <div className="px-6 py-3 text-center">
-                  <button onClick={() => navigate('/jobs')} className="text-xs text-stone-400 hover:text-violet-400 transition-colors font-medium">
+                  <button onClick={() => navigate('/jobs')} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors font-medium">
                     +{notifications.total - 5}건 더 보기
                   </button>
                 </div>
@@ -179,19 +178,19 @@ export function HomePage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold uppercase tracking-widest text-corthex-accent/80">내 팀</h2>
             {allAgents.length > 0 && (
-              <span className="text-xs text-stone-400 font-mono">{allAgents.length}명</span>
+              <span className="text-xs text-corthex-text-secondary font-mono">{allAgents.length}명</span>
             )}
           </div>
           {agentsLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-2xl bg-stone-100/40 border border-stone-200/50 p-5 h-32">
+                <div key={i} className="rounded-2xl bg-corthex-elevated border border-corthex-border p-5 h-32 animate-pulse">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-xl bg-stone-200/50 animate-pulse" />
-                    <div className="h-3 w-16 bg-stone-200/50 animate-pulse rounded" />
+                    <div className="w-8 h-8 rounded-xl bg-corthex-border" />
+                    <div className="h-3 w-16 bg-corthex-border rounded" />
                   </div>
-                  <div className="h-3 w-24 bg-stone-200/30 animate-pulse rounded mt-3" />
-                  <div className="h-5 w-12 bg-stone-200/20 animate-pulse rounded-full mt-3" />
+                  <div className="h-3 w-24 bg-corthex-border/50 rounded mt-3" />
+                  <div className="h-5 w-12 bg-corthex-border/30 rounded-full mt-3" />
                 </div>
               ))}
             </div>
@@ -208,19 +207,19 @@ export function HomePage() {
                       <div
                         key={a.id}
                         data-testid={`agent-card-${a.id}`}
-                        className="rounded-2xl bg-stone-100/20 border border-stone-200/30 p-5 opacity-50"
+                        className="rounded-2xl bg-corthex-elevated border border-corthex-border p-5 opacity-50"
                       >
                         <div className="flex items-center gap-2.5 mb-2">
-                          <div className="w-8 h-8 rounded-xl bg-stone-200/30 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-corthex-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <div className="w-8 h-8 rounded-xl bg-corthex-border/50 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-corthex-text-disabled" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <span className="text-sm font-medium text-stone-400 truncate">{a.name}</span>
+                          <span className="text-sm font-medium text-corthex-text-disabled truncate">{a.name}</span>
                         </div>
                         <p className="text-xs text-corthex-text-secondary truncate">{a.role}</p>
-                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-stone-200/30 text-corthex-text-secondary">
-                          <span className="w-1.5 h-1.5 rounded-full bg-corthex-elevated" /> 오프라인
+                        <span className="inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-xs bg-corthex-border/50 text-corthex-text-secondary">
+                          <span className="w-1.5 h-1.5 rounded-full bg-corthex-border" /> 오프라인
                         </span>
                       </div>
                     )
@@ -232,8 +231,8 @@ export function HomePage() {
                       onClick={() => navigate('/chat')}
                       className={`relative overflow-hidden rounded-2xl p-5 cursor-pointer group transition-all duration-300 ${
                         isError
-                          ? 'bg-gradient-to-br from-red-600/10 via-slate-800/80 to-slate-800/80 border border-red-500/20 hover:border-red-500/40'
-                          : 'bg-gradient-to-br from-cyan-600/10 via-slate-800/80 to-slate-800/80 border border-corthex-accent/15 hover:border-corthex-accent/30'
+                          ? 'bg-corthex-elevated border border-red-500/20 hover:border-red-500/40'
+                          : 'bg-corthex-elevated border border-corthex-border hover:border-corthex-accent/50'
                       }`}
                     >
                       <div className={`absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-1/2 translate-x-1/2 transition-colors ${
@@ -251,7 +250,7 @@ export function HomePage() {
                             <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-medium">COS</span>
                           )}
                         </div>
-                        <p className="text-xs text-stone-500 truncate">{a.role}</p>
+                        <p className="text-xs text-corthex-text-secondary truncate">{a.role}</p>
                         <div className="flex items-center justify-between mt-3">
                           <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.text}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} /> {cfg.label}
@@ -267,21 +266,21 @@ export function HomePage() {
               </div>
               {overflowCount > 0 && (
                 <div className="text-right">
-                  <button onClick={() => navigate('/chat')} className="text-xs text-stone-400 hover:text-corthex-accent transition-colors font-medium">
+                  <button onClick={() => navigate('/chat')} className="text-xs text-corthex-text-secondary hover:text-corthex-accent transition-colors font-medium">
                     +{overflowCount}명 더 보기 →
                   </button>
                 </div>
               )}
             </>
           ) : (
-            <div className="rounded-2xl bg-stone-100/30 border border-stone-200/40 p-12 text-center backdrop-blur-sm">
-              <div className="w-14 h-14 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center mx-auto mb-4">
+            <div className="rounded-2xl bg-corthex-surface border border-corthex-border p-12 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-corthex-elevated border border-corthex-border flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7 text-corthex-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
                 </svg>
               </div>
-              <p className="text-sm text-stone-500 font-medium">아직 배정된 에이전트가 없습니다</p>
-              <p className="text-xs text-corthex-text-secondary mt-1">관리자에게 문의하세요.</p>
+              <p className="text-sm text-corthex-text-secondary font-medium">아직 배정된 에이전트가 없습니다</p>
+              <p className="text-xs text-corthex-text-disabled mt-1">관리자에게 문의하세요.</p>
             </div>
           )}
         </div>
@@ -344,15 +343,15 @@ export function HomePage() {
                 key={item.path}
                 data-testid={`quick-start-${item.path.slice(1)}`}
                 onClick={() => navigate(item.path)}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${item.gradient} via-slate-800/80 to-slate-800/80 border ${item.border} p-6 cursor-pointer group transition-all duration-300 hover:shadow-lg text-center`}
+                className={`relative overflow-hidden rounded-2xl bg-corthex-elevated border border-corthex-border hover:border-corthex-accent/50 p-6 cursor-pointer group transition-all duration-300 hover:shadow-lg text-center`}
               >
                 <div className={`absolute top-0 right-0 w-24 h-24 rounded-full -translate-y-1/2 translate-x-1/2 transition-colors ${item.decorBg}`} />
                 <div className="relative">
                   <div className={`w-12 h-12 rounded-xl ${item.iconBg} flex items-center justify-center mx-auto mb-3`}>
                     {item.icon}
                   </div>
-                  <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                  <p className="text-xs text-stone-400 mt-1">{item.description}</p>
+                  <h4 className="text-sm font-semibold text-corthex-text-primary">{item.title}</h4>
+                  <p className="text-xs text-corthex-text-secondary mt-1">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -396,16 +395,16 @@ function RecentNotifications() {
           모두 보기 →
         </button>
       </div>
-      <div className="rounded-2xl bg-stone-100/40 border border-stone-200/50 overflow-hidden backdrop-blur-sm">
+      <div className="rounded-2xl bg-corthex-surface border border-corthex-border overflow-hidden">
         <div className="divide-y divide-corthex-border/30">
           {items.map((n) => (
             <div
               key={n.id}
-              className={`px-5 py-3.5 flex items-center gap-3 hover:bg-stone-100/40 transition-colors ${!n.isRead ? 'bg-blue-500/5' : ''}`}
+              className={`px-5 py-3.5 flex items-center gap-3 hover:bg-corthex-elevated transition-colors ${!n.isRead ? 'bg-corthex-accent/5' : ''}`}
             >
-              {!n.isRead && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 shadow-sm shadow-blue-500/50" />}
+              {!n.isRead && <span className="w-2 h-2 rounded-full bg-corthex-accent flex-shrink-0" />}
               <span className="text-sm flex-shrink-0">{NOTIF_ICON[n.type] || '\u{1F514}'}</span>
-              <span className={`text-sm truncate flex-1 ${n.isRead ? 'text-stone-500' : 'text-white font-medium'}`}>
+              <span className={`text-sm truncate flex-1 ${n.isRead ? 'text-corthex-text-secondary' : 'text-corthex-text-primary font-medium'}`}>
                 {n.title}
               </span>
               <span className="text-xs text-corthex-text-secondary font-mono flex-shrink-0">

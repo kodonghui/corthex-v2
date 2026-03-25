@@ -89,10 +89,10 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
       <div
         data-testid="pipeline-bar"
         aria-live="polite"
-        className="flex items-center gap-3 px-6 py-3 border-b border-stone-200/80 shrink-0"
+        className="flex items-center gap-3 px-6 py-3 border-b border-corthex-border shrink-0"
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600/10 to-slate-800/60 flex items-center justify-center">
-          <span className="w-2 h-2 rounded-full bg-blue-500/40" />
+        <div className="w-8 h-8 rounded-lg bg-corthex-elevated flex items-center justify-center">
+          <span className="w-2 h-2 rounded-full bg-corthex-accent/40" />
         </div>
         <p className="text-xs text-corthex-text-secondary">명령을 입력하면 처리 파이프라인이 표시됩니다</p>
       </div>
@@ -103,7 +103,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
     <div
       data-testid="pipeline-bar"
       aria-live="polite"
-      className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-stone-200/80 shrink-0 overflow-x-auto"
+      className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-corthex-border shrink-0 overflow-x-auto"
     >
       {stages.map((stage, idx) => {
         const isDone = stage.status === 'done'
@@ -111,12 +111,12 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
         const isFailed = stage.status === 'failed'
 
         const cardClass = isDone
-          ? 'bg-gradient-to-br from-emerald-600/20 via-slate-800 to-slate-800 border-emerald-500/30'
+          ? 'bg-corthex-elevated border-emerald-500/30'
           : isWorking
-            ? 'bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border-blue-500/30 shadow-lg shadow-blue-500/5'
+            ? 'bg-corthex-elevated border-corthex-accent/30 shadow-lg shadow-corthex-accent/5'
             : isFailed
-              ? 'bg-gradient-to-br from-red-600/20 via-slate-800 to-slate-800 border-red-500/30'
-              : 'bg-stone-100/40 border-stone-200/50'
+              ? 'bg-corthex-elevated border-red-500/30'
+              : 'bg-corthex-surface border-corthex-border'
 
         const iconBgClass = isDone
           ? 'bg-emerald-500/20'
@@ -124,7 +124,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
             ? 'bg-blue-500/20'
             : isFailed
               ? 'bg-red-500/20'
-              : 'bg-stone-200/50'
+              : 'bg-corthex-elevated'
 
         const iconColor = isDone
           ? 'text-emerald-400'
@@ -137,16 +137,16 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
         const dotClass = isDone
           ? 'bg-emerald-400'
           : isWorking
-            ? 'bg-blue-400 animate-pulse'
+            ? 'bg-corthex-accent animate-pulse'
             : isFailed
               ? 'bg-red-400'
-              : 'bg-corthex-elevated'
+              : 'bg-corthex-border'
 
         const connectorColor = isDone
           ? 'bg-emerald-500/40'
           : isFailed
             ? 'bg-red-500/40'
-            : 'bg-stone-200/50'
+            : 'bg-corthex-border/50'
 
         return (
           <div key={stage.id} className="flex items-center gap-3 shrink-0">
@@ -168,7 +168,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
                   )}
                 </span>
                 {isWorking && (
-                  <span className="absolute inset-0 rounded-full md:rounded-lg bg-blue-500/30 animate-ping" />
+                  <span className="absolute inset-0 rounded-full md:rounded-lg bg-corthex-accent/30 animate-ping" />
                 )}
               </div>
               <div>
@@ -176,7 +176,7 @@ export const PipelineVisualization = memo(function PipelineVisualization({ activ
                   <span className="text-[11px] md:text-xs font-semibold text-white">{stage.role}</span>
                   <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
                 </div>
-                <p className="text-[10px] md:text-xs text-stone-400 mt-0.5 hidden sm:block">{stage.description}</p>
+                <p className="text-[10px] md:text-xs text-corthex-text-secondary mt-0.5 hidden sm:block">{stage.description}</p>
               </div>
             </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
+import { Crown, Users, Info, AlertTriangle, Building2 } from 'lucide-react'
 
 // ── Types ──
 
@@ -148,7 +149,7 @@ function AgentNode({ agent, isSelected, onSelect }: { agent: OrgAgent; isSelecte
       data-testid={`agent-node-${agent.id}`}
       onClick={() => onSelect(agent)}
       className={`bg-corthex-elevated border rounded-lg p-3 cursor-pointer hover:border-corthex-border-strong hover:bg-corthex-border/50 transition-all ${
-        isSelected ? 'border-blue-500/30 bg-blue-500/5' : 'border-corthex-border'
+        isSelected ? 'border-corthex-accent/30 bg-corthex-accent/5' : 'border-corthex-border'
       }`}
     >
       <div className="flex items-center justify-between">
@@ -210,7 +211,7 @@ function OrgTreeView({ org, onSelectAgent }: { org: OrgChartData['data']; onSele
       <div className="relative w-full max-w-xs mx-auto mb-8">
         <div className="bg-corthex-elevated border-2 border-corthex-accent rounded-xl p-4 shadow-lg relative z-10 flex flex-col items-center text-center">
           <div className="absolute -top-3.5 bg-corthex-bg px-2">
-            <span className="text-yellow-500 text-2xl">👑</span>
+            <Crown className="w-5 h-5 text-corthex-accent" />
           </div>
           <h2 className="text-lg font-bold text-corthex-text-primary mt-2">{org.company.name}</h2>
           <p className="text-sm font-medium text-corthex-accent mt-1">Root</p>
@@ -243,7 +244,7 @@ function OrgTreeView({ org, onSelectAgent }: { org: OrgChartData['data']; onSele
                 <div className="w-full bg-corthex-elevated border border-corthex-border rounded-lg p-3 flex flex-col items-center text-center cursor-pointer hover:border-corthex-border-strong transition-colors">
                   <h3 className="text-sm font-semibold text-corthex-text-primary">{dept.name}</h3>
                   <div className="flex items-center mt-1.5 gap-1 text-xs text-corthex-text-secondary">
-                    <span>👥</span>
+                    <Users className="w-3 h-3" />
                     <span>{dept.agents.length}</span>
                   </div>
                 </div>
@@ -286,7 +287,7 @@ function OrgTreeView({ org, onSelectAgent }: { org: OrgChartData['data']; onSele
       {/* NEXUS hint */}
       <div className="mt-auto pt-8 pb-4 text-center w-full">
         <p className="text-xs text-corthex-text-secondary flex items-center justify-center gap-1">
-          ℹ️ 전체 캔버스를 보려면 NEXUS 탭을 이용하세요.
+          <Info className="w-3 h-3" /> 전체 캔버스를 보려면 NEXUS 탭을 이용하세요.
         </p>
       </div>
     </div>
@@ -327,7 +328,7 @@ export function OrgPage() {
     return (
       <div data-testid="org-page" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
-          <p className="text-2xl mb-2">⚠️</p>
+          <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-2" />
           <p className="text-sm text-red-400">조직 정보를 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-red-400 hover:text-red-300 underline mt-1">다시 시도</button>
         </div>
@@ -371,7 +372,7 @@ export function OrgPage() {
       {/* Empty state */}
       {isEmpty && (
         <div className="bg-corthex-elevated/60 border border-dashed border-corthex-border rounded-xl p-12 text-center">
-          <p className="text-4xl mb-3">🏢</p>
+          <Building2 className="w-10 h-10 text-corthex-text-secondary mx-auto mb-3" />
           <p className="text-sm font-medium text-corthex-text-secondary">조직이 구성되지 않았습니다</p>
           <p className="text-xs text-corthex-text-secondary mt-1">관리자 패널에서 부서와 에이전트를 추가해주세요</p>
         </div>
@@ -399,7 +400,7 @@ export function OrgPage() {
       {org.unassignedAgents.length > 0 && (
         <div data-testid="unassigned-section" className="bg-amber-500/5 border border-amber-500/20 rounded-xl overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-2">
-            <span className="text-amber-400">⚠</span>
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-400">미배속 에이전트</span>
             <span className="text-[10px] text-corthex-text-secondary bg-corthex-border/50 px-1.5 py-0.5 rounded">({org.unassignedAgents.length}명)</span>
           </div>

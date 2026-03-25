@@ -4,6 +4,7 @@ import { api } from '../lib/api'
 import { useWsStore } from '../stores/ws-store'
 import { useAuthStore } from '../stores/auth-store'
 import { toast } from 'sonner'
+import { Activity, Bot, Target, DollarSign } from 'lucide-react'
 
 // ── Types ──
 
@@ -296,7 +297,7 @@ export function ArgosPage() {
           <h1 className="text-2xl font-bold text-corthex-accent-deep">ARGOS</h1>
           <p className="text-sm text-corthex-text-secondary mt-1">조건 기반 정보 자동 수집 — 놓치지 않겠습니다</p>
         </div>
-        <button data-testid="add-trigger-btn" onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+        <button data-testid="add-trigger-btn" onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 transition-colors">
           + 트리거 추가
         </button>
       </div>
@@ -316,7 +317,7 @@ export function ArgosPage() {
           <p className="text-4xl mb-3">🔭</p>
           <p className="text-sm font-medium text-corthex-text-secondary">설정된 감시 트리거가 없습니다</p>
           <p className="text-xs text-corthex-text-secondary mt-1">트리거를 추가하면 조건 충족 시 자동으로 에이전트가 작업합니다</p>
-          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent text-white text-sm rounded-lg px-4 py-2 mt-4 transition-colors">트리거 추가</button>
+          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm rounded-lg px-4 py-2 mt-4 transition-colors">트리거 추가</button>
         </div>
       ) : (
         <div className="space-y-3 mt-6">
@@ -385,25 +386,25 @@ function StatusBar({ status }: { status?: ArgosStatus }) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Data */}
         <div className={`rounded-xl p-3 border ${status?.dataOk !== false ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20 animate-pulse'}`}>
-          <span className="text-lg">📡</span>
+          <Activity className={`w-5 h-5 ${status?.dataOk !== false ? 'text-emerald-400' : 'text-red-400'}`} />
           <p className="text-xs text-corthex-text-secondary font-medium mt-1">데이터</p>
           <p className={`text-lg font-bold ${status?.dataOk !== false ? 'text-emerald-400' : 'text-red-400'}`}>{status?.dataOk !== false ? 'OK' : 'NG'}</p>
         </div>
         {/* AI */}
         <div className={`rounded-xl p-3 border ${status?.aiOk !== false ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20 animate-pulse'}`}>
-          <span className="text-lg">🤖</span>
+          <Bot className={`w-5 h-5 ${status?.aiOk !== false ? 'text-emerald-400' : 'text-red-400'}`} />
           <p className="text-xs text-corthex-text-secondary font-medium mt-1">AI</p>
           <p className={`text-lg font-bold ${status?.aiOk !== false ? 'text-emerald-400' : 'text-red-400'}`}>{status?.aiOk !== false ? 'OK' : 'NG'}</p>
         </div>
         {/* Active Triggers */}
         <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-3">
-          <span className="text-lg">🎯</span>
+          <Target className="w-5 h-5 text-corthex-accent" />
           <p className="text-xs text-corthex-text-secondary font-medium mt-1">활성 트리거</p>
           <p className="text-lg font-bold text-corthex-text-primary">{status?.activeTriggersCount ?? 0}</p>
         </div>
         {/* Cost */}
         <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-3">
-          <span className="text-lg">💵</span>
+          <DollarSign className="w-5 h-5 text-corthex-accent" />
           <p className="text-xs text-corthex-text-secondary font-medium mt-1">오늘 비용</p>
           <p className="text-lg font-bold text-corthex-text-primary">${(status?.todayCost ?? 0).toFixed(2)}</p>
         </div>
@@ -432,7 +433,7 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
       onClick={onSelect}
       className={`bg-corthex-elevated border rounded-xl p-4 cursor-pointer transition-all ${
         isHighlighted ? 'border-corthex-accent/50 ring-2 ring-corthex-accent/30 bg-corthex-accent/5'
-        : isSelected ? 'bg-blue-500/5 border-blue-500/30 ring-1 ring-blue-500/20'
+        : isSelected ? 'bg-corthex-accent/5 border-corthex-accent/30 ring-1 ring-corthex-accent/20'
         : t.isActive ? 'border-corthex-border hover:border-corthex-border-strong hover:bg-corthex-elevated/70'
         : 'border-corthex-border opacity-50'
       }`}
@@ -492,7 +493,7 @@ function EventLogSection({ events, isLoading, pagination, selectedTriggerId, tri
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold text-corthex-text-primary">이벤트 로그</h3>
-          {selectedTriggerName && <span className="text-xs text-blue-400">— {selectedTriggerName}</span>}
+          {selectedTriggerName && <span className="text-xs text-corthex-accent">— {selectedTriggerName}</span>}
           {pagination && <span className="text-[10px] text-corthex-text-secondary bg-corthex-elevated px-1.5 py-0.5 rounded">{pagination.total}건</span>}
         </div>
         <div className="flex items-center gap-2">
@@ -725,7 +726,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
                   type="button"
                   onClick={() => setTriggerType(tt.value)}
                   className={`text-[11px] font-medium px-2 py-2 rounded-lg border transition-all text-center ${
-                    triggerType === tt.value ? 'bg-blue-500/15 border-blue-500/40 text-blue-400' : 'bg-corthex-elevated border-corthex-border text-corthex-text-secondary hover:border-corthex-border-strong'
+                    triggerType === tt.value ? 'bg-corthex-accent/15 border-corthex-accent/40 text-corthex-accent' : 'bg-corthex-elevated border-corthex-border text-corthex-text-secondary hover:border-corthex-border-strong'
                   }`}
                 >
                   {tt.label}
@@ -804,7 +805,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
                   <div className="flex gap-2">
                     {DAY_NAMES.map((d, i) => (
                       <button key={i} type="button" onClick={() => setActiveDays(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])}
-                        className={`w-8 h-8 text-xs rounded-lg border transition-all ${activeDays.includes(i) ? 'bg-blue-500/20 border-blue-500/40 text-blue-400' : 'border-corthex-border text-corthex-text-secondary'}`}>
+                        className={`w-8 h-8 text-xs rounded-lg border transition-all ${activeDays.includes(i) ? 'bg-corthex-accent/20 border-corthex-accent/40 text-corthex-accent' : 'border-corthex-border text-corthex-text-secondary'}`}>
                         {d}
                       </button>
                     ))}
@@ -882,7 +883,7 @@ function TriggerModal({ editing, agents, onClose, onSubmit, isPending }: {
         {/* Footer */}
         <div className="flex justify-end gap-2 px-5 py-4 border-t border-corthex-border">
           <button onClick={onClose} className="text-sm text-corthex-text-secondary hover:text-corthex-accent-deep px-4 py-2 rounded-lg hover:bg-corthex-border/50 transition-colors">취소</button>
-          <button onClick={handleSubmit} disabled={!isValid() || isPending} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+          <button onClick={handleSubmit} disabled={!isValid() || isPending} className="bg-corthex-accent hover:bg-corthex-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-corthex-text-on-accent text-sm font-medium px-4 py-2 rounded-lg transition-colors">
             {isPending ? '처리 중...' : editing ? '수정' : '등록'}
           </button>
         </div>

@@ -690,30 +690,28 @@ function NexusPageInner() {
       {/* Main Canvas Area */}
       <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
         {/* Top Bar */}
-        <header className="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05), transparent)' }}>
-          <div className="flex items-center gap-4 pointer-events-auto backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}>
-            <span className="text-sm font-medium" style={{ color: '#6a5d43' }}>
+        <header className="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), transparent)' }}>
+          <div className="flex items-center gap-4 pointer-events-auto backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm bg-corthex-surface/90 border border-corthex-border">
+            <span className="text-sm font-medium text-corthex-text-primary">
               {currentSketchName || 'Untitled Canvas'}
             </span>
-            {dirty && <span className="text-xs" style={{ color: '#c4622d' }}>(unsaved)</span>}
+            {dirty && <span className="text-xs text-corthex-accent">(unsaved)</span>}
           </div>
           <div className="flex items-center gap-4 pointer-events-auto">
             {autoSaveToast && (
-              <span className="text-xs px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(90,114,71,0.1)', color: 'var(--color-corthex-accent)' }}>
+              <span className="text-xs px-3 py-1 rounded-full bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20">
                 Auto-saved
               </span>
             )}
             <button
               onClick={handleSave}
-              className="text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
-              style={{ backgroundColor: '#c4622d' }}
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
             >
               Save
             </button>
             <button
               onClick={() => setShowExportKnowledge(true)}
-              className="text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
-              style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-4 py-2 rounded-2xl text-sm font-medium shadow-md transition-colors"
             >
               Share
             </button>
@@ -721,7 +719,7 @@ function NexusPageInner() {
         </header>
 
         {/* Canvas Content */}
-        <div className="flex-1 w-full h-full relative cursor-move" style={{ backgroundImage: 'radial-gradient(#e5e1d3 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+        <div className="flex-1 w-full h-full relative cursor-move" style={{ backgroundImage: 'radial-gradient(#44403C 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -736,7 +734,7 @@ function NexusPageInner() {
             fitView
             className="w-full h-full"
           >
-            <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1c9b2" />
+            <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#44403C" />
             <Controls
               className="!rounded-2xl !border !shadow-md"
               style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-surface)' }}
@@ -745,7 +743,7 @@ function NexusPageInner() {
               nodeStrokeWidth={3}
               pannable
               zoomable
-              style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e1d3', borderRadius: '12px' }}
+              style={{ backgroundColor: '#1C1917', border: '1px solid #44403C', borderRadius: '12px' }}
             />
           </ReactFlow>
 
@@ -789,7 +787,7 @@ function NexusPageInner() {
           <button
             onClick={handleAutoLayout}
             className="w-10 h-10 rounded-full shadow-md flex items-center justify-center border transition-colors"
-            style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
+            style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
           >
             <Maximize className="w-5 h-5" />
           </button>
@@ -804,13 +802,10 @@ function NexusPageInner() {
                 onClick={() => handleAddNode(type as SvNodeType)}
                 className="flex flex-col items-center gap-1 group"
               >
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                  style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
-                >
+                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border">
                   <span className="text-lg">{config.icon || '🤖'}</span>
                 </div>
-                <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>{config.label || type}</span>
+                <span className="text-[10px] font-medium text-corthex-text-disabled">{config.label || type}</span>
               </button>
             ))}
             <div className="w-px h-8" style={{ backgroundColor: 'var(--color-corthex-border)' }}></div>
@@ -818,13 +813,10 @@ function NexusPageInner() {
               onClick={handleMermaidExport}
               className="flex flex-col items-center gap-1 group"
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                style={{ backgroundColor: '#f2f0e9', color: '#6a5d43' }}
-              >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border">
                 <Share2 className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-medium" style={{ color: '#9c8d66' }}>
+              <span className="text-[10px] font-medium text-corthex-text-disabled">
                 {exportCopied ? 'Copied!' : 'Export'}
               </span>
             </button>
@@ -834,7 +826,7 @@ function NexusPageInner() {
 
       {/* Chat Panel */}
       {chatOpen && selectedAgent && selectedSessionId && (
-        <div className="w-96 border-l flex flex-col h-full" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: '#fbfaf8' }}>
+        <div className="w-96 border-l border-corthex-border flex flex-col h-full bg-corthex-surface">
           <ChatArea
             agent={selectedAgent}
             sessionId={selectedSessionId}
@@ -856,30 +848,27 @@ function NexusPageInner() {
 
       {/* Save Dialog */}
       {showSaveDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <div className="rounded-2xl shadow-2xl p-6 w-96 mx-4" style={{ backgroundColor: 'var(--color-corthex-surface)', border: '1px solid #e5e1d3' }}>
-            <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Save Canvas</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="rounded-2xl shadow-2xl p-6 w-96 mx-4 bg-corthex-surface border border-corthex-border">
+            <h3 className="text-sm font-semibold mb-3 text-corthex-text-primary">Save Canvas</h3>
             <input
               type="text"
               value={saveNameInput}
               onChange={(e) => setSaveNameInput(e.target.value)}
               placeholder="Canvas name"
-              className="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-1"
-              style={{ borderColor: 'var(--color-corthex-border)', color: '#463e30', backgroundColor: '#fbfaf8' }}
+              className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled mb-4 outline-none"
               autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="border rounded-lg px-4 py-2 text-sm transition-colors"
-                style={{ borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
+                className="border border-corthex-border rounded-lg px-4 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveNew}
-                className="text-white rounded-lg px-4 py-2 text-sm font-medium"
-                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+                className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg px-4 py-2 text-sm font-medium"
               >
                 Save
               </button>
@@ -890,32 +879,29 @@ function NexusPageInner() {
 
       {/* Mermaid Import Modal */}
       {showMermaidModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <div className="rounded-2xl shadow-2xl p-6 w-[500px] mx-4" style={{ backgroundColor: 'var(--color-corthex-surface)', border: '1px solid #e5e1d3' }}>
-            <h3 className="text-sm font-semibold mb-3" style={{ color: '#463e30' }}>Import Mermaid</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="rounded-2xl shadow-2xl p-6 w-[500px] mx-4 bg-corthex-surface border border-corthex-border">
+            <h3 className="text-sm font-semibold mb-3 text-corthex-text-primary">Import Mermaid</h3>
             <textarea
               value={mermaidInput}
               onChange={(e) => { setMermaidInput(e.target.value); setMermaidError('') }}
               placeholder="Paste Mermaid code here..."
               rows={8}
-              className="w-full border rounded-lg px-3 py-2 text-sm mb-2 font-mono focus:outline-none focus:ring-1"
-              style={{ borderColor: 'var(--color-corthex-border)', color: '#463e30', backgroundColor: '#fbfaf8' }}
+              className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 rounded-lg px-3 py-2 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled mb-2 font-mono outline-none"
             />
             {mermaidError && (
-              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{mermaidError}</p>
+              <p className="text-xs mb-2 text-red-400">{mermaidError}</p>
             )}
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => { setShowMermaidModal(false); setMermaidInput(''); setMermaidError('') }}
-                className="border rounded-lg px-4 py-2 text-sm"
-                style={{ borderColor: 'var(--color-corthex-border)', color: '#6a5d43' }}
+                className="border border-corthex-border rounded-lg px-4 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleMermaidImport}
-                className="text-white rounded-lg px-4 py-2 text-sm font-medium"
-                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+                className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg px-4 py-2 text-sm font-medium"
               >
                 Import
               </button>

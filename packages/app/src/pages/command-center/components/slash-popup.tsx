@@ -35,7 +35,7 @@ const ICON_BG: Record<string, string> = {
   summary: 'bg-violet-500/20 text-violet-400',
   broadcast: 'bg-corthex-accent/20 text-corthex-accent',
   chain: 'bg-orange-500/20 text-orange-400',
-  tools: 'bg-corthex-surface/20 text-stone-500',
+  tools: 'bg-corthex-surface/20 text-corthex-text-secondary',
   sketch: 'bg-pink-500/20 text-pink-400',
 }
 
@@ -122,12 +122,12 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
       ref={listRef}
       role="listbox"
       aria-label="슬래시 명령"
-      className="w-72 bg-stone-100 border border-stone-200 rounded-xl shadow-2xl overflow-hidden z-50"
+      className="w-72 bg-corthex-surface border border-corthex-border rounded-xl shadow-2xl overflow-hidden z-50"
     >
       <div className="max-h-72 overflow-y-auto">
         {/* Search */}
         <input
-          className="w-full px-3 py-2 text-sm bg-transparent text-white border-b border-stone-200 outline-none placeholder-slate-500"
+          className="w-full px-3 py-2 text-sm bg-transparent text-corthex-text-primary border-b border-corthex-border outline-none placeholder:text-corthex-text-disabled"
           placeholder="명령어 검색..."
           value={query}
           readOnly
@@ -136,17 +136,17 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
         {/* Built-in commands section */}
         {filteredCommands.length > 0 && (
           <>
-            <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-400">기본 명령어</p>
+            <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-corthex-text-secondary">기본 명령어</p>
             {filteredCommands.map((cmd, idx) => {
-              const bg = ICON_BG[cmd.icon] || 'bg-corthex-surface/20 text-stone-500'
+              const bg = ICON_BG[cmd.icon] || 'bg-corthex-surface/20 text-corthex-text-secondary'
               return (
                 <button
                   key={cmd.cmd}
                   data-testid={`slash-item-${idx}`}
                   role="option"
                   aria-selected={idx === selectedIndex}
-                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-stone-600 hover:bg-stone-200 transition-colors ${
-                    idx === selectedIndex ? 'bg-stone-200' : ''
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated transition-colors ${
+                    idx === selectedIndex ? 'bg-corthex-elevated' : ''
                   }`}
                   onClick={() => onSelect(cmd.cmd)}
                   onMouseDown={(e) => e.preventDefault()}
@@ -156,8 +156,8 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
                   </span>
                   <div className="min-w-0 flex-1">
                     <span className="font-medium text-corthex-text-disabled">{cmd.cmd}</span>
-                    {cmd.args && <span className="text-xs text-stone-400 ml-1">{cmd.args}</span>}
-                    <p className="text-xs text-stone-400">{cmd.desc}</p>
+                    {cmd.args && <span className="text-xs text-corthex-text-secondary ml-1">{cmd.args}</span>}
+                    <p className="text-xs text-corthex-text-secondary">{cmd.desc}</p>
                   </div>
                 </button>
               )
@@ -168,7 +168,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
         {/* Preset section */}
         {filteredPresets.length > 0 && (
           <>
-            <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-400 border-t border-stone-200">저장된 프리셋</p>
+            <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-corthex-text-secondary border-t border-corthex-border">저장된 프리셋</p>
             {filteredPresets.map((preset, idx) => {
               const globalIdx = filteredCommands.length + idx
               return (
@@ -177,8 +177,8 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
                   data-testid={`slash-item-${globalIdx}`}
                   role="option"
                   aria-selected={globalIdx === selectedIndex}
-                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-stone-600 hover:bg-stone-200 transition-colors ${
-                    globalIdx === selectedIndex ? 'bg-stone-200' : ''
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-corthex-text-secondary hover:bg-corthex-elevated transition-colors ${
+                    globalIdx === selectedIndex ? 'bg-corthex-elevated' : ''
                   }`}
                   onClick={() => onSelectPreset?.(preset)}
                   onMouseDown={(e) => e.preventDefault()}
@@ -192,7 +192,7 @@ export function SlashPopup({ query, selectedIndex, onSelect, onSelectPreset, onC
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-corthex-text-disabled truncate">{preset.name}</span>
                       {preset.category && (
-                        <span className="text-xs px-1 py-0.5 rounded bg-stone-200 text-stone-400">{preset.category}</span>
+                        <span className="text-xs px-1 py-0.5 rounded bg-corthex-elevated text-corthex-text-secondary">{preset.category}</span>
                       )}
                     </div>
                   </div>

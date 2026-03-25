@@ -170,7 +170,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
   const isEmpty = !text.trim()
 
   return (
-    <div className="relative shrink-0 border-t border-stone-200/50 bg-gradient-to-t from-slate-900 to-slate-900/95 backdrop-blur-sm p-4">
+    <div className="relative shrink-0 border-t border-corthex-border bg-corthex-bg p-4">
       {/* Quick Agent Mention Chips — mobile only */}
       {managers.length > 0 && !targetAgentId && (
         <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:hidden no-scrollbar">
@@ -182,7 +182,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
                 setTargetAgentId(agent.id)
                 handleChange(text + `@${agent.name} `)
               }}
-              className="flex-shrink-0 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-medium border border-stone-200 hover:border-corthex-accent hover:text-corthex-accent transition-colors flex items-center gap-1"
+              className="flex-shrink-0 px-3 py-1.5 bg-corthex-elevated text-corthex-text-secondary rounded-full text-xs font-medium border border-corthex-border hover:border-corthex-accent hover:text-corthex-accent transition-colors flex items-center gap-1"
             >
               <span className="text-corthex-accent font-bold">@</span>
               {agent.name}
@@ -221,14 +221,14 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
       {targetAgentId && (
         <span
           data-testid="target-chip"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs font-medium border border-blue-500/25 mb-3"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-corthex-accent/15 text-corthex-accent text-xs font-medium border border-corthex-accent/25 mb-3"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-corthex-accent" />
           <span>@{managers.find((m) => m.id === targetAgentId)?.name}</span>
           <button
             onClick={() => setTargetAgentId(undefined)}
             aria-label="대상 에이전트 제거"
-            className="hover:text-blue-100 transition-colors cursor-pointer ml-0.5 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none rounded"
+            className="hover:text-corthex-text-primary transition-colors cursor-pointer ml-0.5 focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none rounded"
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M3 3l6 6M9 3L3 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -246,7 +246,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={() => handleChange(text + '/')}
             title="슬래시 명령"
             aria-label="슬래시 명령"
-            className="p-2 rounded-xl text-stone-400 hover:text-blue-400 hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             <span className="text-sm font-mono font-bold">/</span>
           </button>
@@ -255,7 +255,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={() => handleChange(text + '@')}
             title="에이전트 멘션"
             aria-label="에이전트 멘션"
-            className="p-2 rounded-xl text-stone-400 hover:text-corthex-accent hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             <span className="text-sm font-bold">@</span>
           </button>
@@ -265,7 +265,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             onClick={onOpenPresets}
             title="템플릿"
             aria-label="템플릿"
-            className="p-2 rounded-xl text-stone-400 hover:text-amber-400 hover:bg-stone-100/80 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="p-2 rounded-xl text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 2l5 3-5 3V2z" fill="currentColor" opacity="0.3" />
@@ -286,7 +286,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
             placeholder="명령을 입력하세요... (Enter 전송 · Shift+Enter 줄바꿈)"
             aria-label="명령 입력"
             rows={1}
-            className="w-full bg-stone-100/80 border border-stone-300/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none resize-none transition-all"
+            className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/20 rounded-xl px-4 py-3 text-sm text-corthex-text-primary placeholder:text-corthex-text-disabled outline-none resize-none transition-all"
             style={{ minHeight: '48px', maxHeight: '160px' }}
           />
         </div>
@@ -298,7 +298,7 @@ export function CommandInput({ onSubmit, isSubmitting, managers, deptMap, preset
           onClick={handleSubmit}
           disabled={isEmpty || isSubmitting}
           aria-label="명령 전송"
-          className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+          className="flex items-center gap-2 px-5 py-3 bg-corthex-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed text-corthex-text-on-accent text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-corthex-accent/20 hover:shadow-corthex-accent/30 shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
         >
           {isSubmitting ? (
             <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />

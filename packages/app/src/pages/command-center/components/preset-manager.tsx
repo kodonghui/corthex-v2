@@ -87,16 +87,16 @@ export function PresetManager({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && mode === 'list' && onClose()}
     >
-      <div ref={modalRef} className="bg-stone-100 border border-stone-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+      <div ref={modalRef} className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-corthex-border shrink-0">
           <h3 id="preset-modal-title" className="text-lg font-semibold text-corthex-text-primary">
             {mode === 'create' ? '새 프리셋 만들기' : mode === 'edit' ? '프리셋 수정' : '명령 프리셋'}
           </h3>
           <button
             onClick={mode === 'list' ? onClose : resetForm}
             aria-label="닫기"
-            className="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-200 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+            className="text-corthex-text-secondary hover:text-corthex-text-primary p-1 rounded-lg hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -112,7 +112,7 @@ export function PresetManager({
               <button
                 data-testid="preset-create-btn"
                 onClick={() => setMode('create')}
-                className="w-full flex items-center gap-2 px-5 py-3 text-sm text-blue-400 hover:bg-stone-200/50 transition-colors border-b border-stone-200/50"
+                className="w-full flex items-center gap-2 px-5 py-3 text-sm text-corthex-accent hover:bg-corthex-elevated transition-colors border-b border-corthex-border/50"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -123,7 +123,7 @@ export function PresetManager({
               {/* Preset list */}
               {presets.length === 0 ? (
                 <div className="text-center py-10 px-5">
-                  <p className="text-sm text-stone-400">저장된 프리셋이 없습니다</p>
+                  <p className="text-sm text-corthex-text-secondary">저장된 프리셋이 없습니다</p>
                   <p className="text-xs text-corthex-text-secondary mt-1">자주 사용하는 명령을 프리셋으로 저장하세요</p>
                 </div>
               ) : (
@@ -131,7 +131,7 @@ export function PresetManager({
                   <div key={preset.id}>
                     <div
                       data-testid={`preset-item-${preset.id}`}
-                      className="px-5 py-3 border-b border-stone-200/50 hover:bg-stone-200/30 transition-colors group"
+                      className="px-5 py-3 border-b border-corthex-border/50 hover:bg-corthex-elevated transition-colors group"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-corthex-text-disabled">{preset.name}</span>
@@ -142,7 +142,7 @@ export function PresetManager({
                             disabled={isExecuting}
                             title="실행"
                             aria-label="실행"
-                            className="p-1 rounded text-emerald-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                            className="p-1 rounded text-emerald-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
                           >
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                               <path d="M4 2l8 5-8 5V2z" fill="currentColor" />
@@ -155,7 +155,7 @@ export function PresetManager({
                                 onClick={() => startEdit(preset)}
                                 title="수정"
                                 aria-label="수정"
-                                className="p-1 rounded text-stone-500 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                                className="p-1 rounded text-corthex-text-secondary hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 10.5l1-1 5-5 1 1-5 5-1 1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
@@ -167,7 +167,7 @@ export function PresetManager({
                                 onClick={() => setDeleteConfirmId(preset.id)}
                                 title="삭제"
                                 aria-label="삭제"
-                                className="p-1 rounded text-red-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+                                className="p-1 rounded text-red-400 hover:bg-corthex-elevated transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
                               >
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                   <path d="M3 4h8M5 4V3h4v1M5.5 6.5v3M8.5 6.5v3M4 4l.5 7h5l.5-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -177,10 +177,10 @@ export function PresetManager({
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-stone-400 mt-1 truncate">{preset.command}</p>
+                      <p className="text-xs text-corthex-text-secondary mt-1 truncate">{preset.command}</p>
                       <div className="flex items-center gap-1 mt-1">
                         {preset.category && (
-                          <span className="inline-flex text-xs px-1.5 py-0.5 rounded bg-stone-200 text-stone-500">{preset.category}</span>
+                          <span className="inline-flex text-xs px-1.5 py-0.5 rounded bg-corthex-elevated text-corthex-text-secondary">{preset.category}</span>
                         )}
                         {preset.isGlobal && (
                           <span className="inline-flex text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 ml-1">공유</span>
@@ -201,7 +201,7 @@ export function PresetManager({
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(null)}
-                            className="text-xs px-2 py-1 rounded bg-stone-200 text-stone-600"
+                            className="text-xs px-2 py-1 rounded bg-corthex-elevated text-corthex-text-secondary border border-corthex-border"
                           >
                             취소
                           </button>
@@ -221,7 +221,7 @@ export function PresetManager({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="프리셋 이름"
-                className="w-full bg-stone-200 border border-stone-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
+                className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/20 rounded-xl px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-disabled"
                 maxLength={100}
               />
               <textarea
@@ -229,7 +229,7 @@ export function PresetManager({
                 onChange={(e) => setCommand(e.target.value)}
                 placeholder="명령어 내용"
                 rows={3}
-                className="w-full bg-stone-200 border border-stone-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none resize-none h-24"
+                className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/20 rounded-xl px-3 py-2 text-sm text-corthex-text-primary outline-none resize-none h-24 placeholder:text-corthex-text-disabled"
                 maxLength={10000}
               />
               <input
@@ -237,13 +237,13 @@ export function PresetManager({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="설명 (선택사항)"
-                className="w-full bg-stone-200 border border-stone-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
+                className="w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/20 rounded-xl px-3 py-2 text-sm text-corthex-text-primary outline-none placeholder:text-corthex-text-disabled"
                 maxLength={500}
               />
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="bg-stone-200 border border-stone-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-3 py-2 text-sm text-white outline-none"
+                className="bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-2 focus:ring-corthex-accent/20 rounded-xl px-3 py-2 text-sm text-corthex-text-primary outline-none"
               >
                 <option value="">카테고리 선택</option>
                 {CATEGORIES.map((cat) => (
@@ -254,14 +254,14 @@ export function PresetManager({
               <div className="flex justify-end gap-2">
                 <button
                   onClick={resetForm}
-                  className="px-4 py-2 text-sm rounded-lg text-stone-500 hover:bg-stone-200 transition-colors"
+                  className="px-4 py-2 text-sm rounded-lg text-corthex-text-secondary hover:bg-corthex-elevated transition-colors"
                 >
                   취소
                 </button>
                 <button
                   onClick={mode === 'create' ? handleCreate : handleUpdate}
                   disabled={!name.trim() || !command.trim() || isCreating}
-                  className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm rounded-lg bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isCreating ? '저장 중...' : '저장'}
                 </button>

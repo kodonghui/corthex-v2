@@ -45,7 +45,7 @@ const AgentAvatar = memo(function AgentAvatar({ name, role }: { name?: string; r
   return (
     <div
       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold border
-        ${c ? `${c.bg} ${c.text} ${c.border}` : 'bg-stone-100 text-stone-600 border-stone-200'}`}
+        ${c ? `${c.bg} ${c.text} ${c.border}` : 'bg-corthex-elevated text-corthex-text-secondary border-corthex-border'}`}
       aria-label={`Agent ${name || 'unknown'}`}
     >
       {initial}
@@ -55,7 +55,7 @@ const AgentAvatar = memo(function AgentAvatar({ name, role }: { name?: string; r
 
 const UserAvatar = memo(function UserAvatar() {
   return (
-    <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0" aria-label="User">
+    <div className="w-9 h-9 rounded-xl bg-corthex-accent flex items-center justify-center shrink-0" aria-label="User">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-white">
         <circle cx="8" cy="5.5" r="3" stroke="currentColor" strokeWidth="1.3" />
         <path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -71,12 +71,12 @@ const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick
       className="flex flex-col items-center justify-center h-full text-center px-6"
     >
       {/* Gradient icon container */}
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 via-slate-800 to-slate-800 border border-blue-500/20 flex items-center justify-center mb-5">
+      <div className="w-16 h-16 rounded-2xl bg-corthex-elevated border border-corthex-border flex items-center justify-center mb-5">
         <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
         </svg>
       </div>
-      <p className="text-base font-semibold text-stone-600 mb-1">아직 명령이 없습니다</p>
+      <p className="text-base font-semibold text-corthex-text-primary mb-1">아직 명령이 없습니다</p>
       <p className="text-xs text-corthex-text-secondary mb-5">아래 예시를 클릭하거나 직접 명령을 입력하세요</p>
 
       {/* Example command cards */}
@@ -88,7 +88,7 @@ const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick
               key={cmd.text}
               data-testid="example-command"
               onClick={() => onExampleClick(cmd.text)}
-              className="flex items-center gap-3 p-3.5 rounded-xl bg-stone-100/40 border border-stone-200/50 hover:border-blue-500/30 hover:bg-stone-100/60 text-left transition-all duration-200 group cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:outline-none"
+              className="flex items-center gap-3 p-3.5 rounded-xl bg-corthex-elevated border border-corthex-border hover:border-corthex-accent/30 hover:bg-corthex-elevated text-left transition-all duration-200 group cursor-pointer focus-visible:ring-2 focus-visible:ring-corthex-accent/50 focus-visible:outline-none"
             >
               <div className={`w-8 h-8 rounded-lg ${colors.iconBg} flex items-center justify-center shrink-0 ${colors.hoverBg} transition-colors`}>
                 <svg className={`w-4 h-4 ${colors.iconText}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -96,10 +96,10 @@ const EmptyState = memo(function EmptyState({ onExampleClick }: { onExampleClick
                 </svg>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-stone-600 group-hover:text-blue-300 transition-colors">{cmd.label}</p>
+                <p className="text-xs font-medium text-corthex-text-secondary group-hover:text-corthex-accent transition-colors">{cmd.label}</p>
                 <p className="text-xs text-corthex-text-secondary mt-0.5 truncate">{cmd.text}</p>
               </div>
-              <svg className="w-3.5 h-3.5 text-corthex-text-secondary group-hover:text-blue-400 transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
+              <svg className="w-3.5 h-3.5 text-corthex-text-secondary group-hover:text-corthex-accent transition-colors shrink-0" fill="none" viewBox="0 0 12 12">
                 <path d="M4.5 2.5l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
@@ -146,11 +146,11 @@ export function MessageThread({
       >
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-stone-200/50 animate-pulse shrink-0" />
+            <div className="w-9 h-9 rounded-xl bg-corthex-elevated animate-pulse shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="bg-stone-200/50 animate-pulse rounded h-3 w-24" />
-              <div className="bg-stone-200/30 animate-pulse rounded h-3 w-full" />
-              <div className="bg-stone-200/30 animate-pulse rounded h-3 w-3/4" />
+              <div className="bg-corthex-elevated animate-pulse rounded h-3 w-24" />
+              <div className="bg-corthex-border/30 animate-pulse rounded h-3 w-full" />
+              <div className="bg-corthex-border/30 animate-pulse rounded h-3 w-3/4" />
             </div>
           </div>
         ))}
@@ -165,10 +165,10 @@ export function MessageThread({
   return (
     <div className="flex flex-col h-full relative">
       {/* Thread header */}
-      <div className="px-4 py-3 border-b border-stone-200/40 shrink-0">
+      <div className="px-4 py-3 border-b border-corthex-border shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-widest text-blue-400/80">대화 기록</span>
-          <span className="text-xs font-mono px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <span className="text-xs font-semibold uppercase tracking-widest text-corthex-accent/80">대화 기록</span>
+          <span className="text-xs font-mono px-1.5 py-0.5 rounded-full bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20">
             {messages.length}
           </span>
         </div>
@@ -191,8 +191,8 @@ export function MessageThread({
                 key={msg.id}
                 data-testid={`msg-user-${msg.commandId || msg.id}`}
                 onClick={() => msg.commandId && onReportClick(msg.commandId)}
-                className={`flex items-start gap-3 cursor-pointer rounded-xl p-3 transition-all duration-200 hover:bg-stone-100/50 ${
-                  isSelected ? 'ring-1 ring-blue-500/40 bg-blue-500/5' : ''
+                className={`flex items-start gap-3 cursor-pointer rounded-xl p-3 transition-all duration-200 hover:bg-corthex-elevated/50 ${
+                  isSelected ? 'ring-1 ring-corthex-accent/40 bg-corthex-accent/5' : ''
                 }`}
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter' && msg.commandId) onReportClick(msg.commandId) }}
@@ -202,14 +202,14 @@ export function MessageThread({
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-white">You</span>
                     {msg.createdAt && (
-                      <span className="text-xs text-stone-400 font-mono">{formatTime(msg.createdAt)}</span>
+                      <span className="text-xs text-corthex-text-secondary font-mono">{formatTime(msg.createdAt)}</span>
                     )}
                   </div>
-                  <p className="text-sm text-stone-600 mt-1">{msg.text}</p>
+                  <p className="text-sm text-corthex-text-secondary mt-1">{msg.text}</p>
                 </div>
                 {isSelected && (
                   <div className="shrink-0 mt-1">
-                    <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-4 h-4 text-corthex-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -225,8 +225,8 @@ export function MessageThread({
                 key={msg.id}
                 data-testid={`msg-agent-${msg.commandId || msg.id}`}
                 onClick={() => msg.commandId && onReportClick(msg.commandId)}
-                className={`flex items-start gap-3 cursor-pointer rounded-xl p-3 transition-all duration-200 hover:bg-stone-100/50 ${
-                  isSelected ? 'ring-1 ring-blue-500/40 bg-blue-500/5' : ''
+                className={`flex items-start gap-3 cursor-pointer rounded-xl p-3 transition-all duration-200 hover:bg-corthex-elevated/50 ${
+                  isSelected ? 'ring-1 ring-corthex-accent/40 bg-corthex-accent/5' : ''
                 }`}
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter' && msg.commandId) onReportClick(msg.commandId) }}
@@ -238,7 +238,7 @@ export function MessageThread({
                       {msg.agentName || 'Agent'}
                     </span>
                     {msg.agentRole && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-stone-200/60 text-stone-500 border border-stone-300/30">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-corthex-elevated text-corthex-text-secondary border border-corthex-border/40">
                         {msg.agentRole}
                       </span>
                     )}
@@ -256,7 +256,7 @@ export function MessageThread({
                       </span>
                     )}
                     {msg.createdAt && (
-                      <span className="text-xs text-stone-400 font-mono">{formatTime(msg.createdAt)}</span>
+                      <span className="text-xs text-corthex-text-secondary font-mono">{formatTime(msg.createdAt)}</span>
                     )}
                   </div>
 
@@ -275,7 +275,7 @@ export function MessageThread({
                   )}
 
                   {!msg.sketchResult && !msg.sketchLoading && (
-                    <p className="text-sm text-stone-600 mt-1.5 leading-relaxed">
+                    <p className="text-sm text-corthex-text-secondary mt-1.5 leading-relaxed">
                       {msg.text || (msg.result ? msg.result.slice(0, 150) + '…' : '')}
                     </p>
                   )}
@@ -313,7 +313,7 @@ export function MessageThread({
           data-testid="scroll-bottom-btn"
           onClick={scrollToBottom}
           aria-label="Scroll to bottom"
-          className="absolute bottom-4 right-4 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl p-2.5 shadow-lg border border-stone-200/50 hover:border-stone-300 transition-all z-10 cursor-pointer"
+          className="absolute bottom-4 right-4 bg-corthex-elevated hover:bg-corthex-border text-corthex-text-secondary rounded-xl p-2.5 shadow-lg border border-corthex-border hover:border-corthex-border-strong transition-all z-10 cursor-pointer"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M8 3v10M8 13l-4-4M8 13l4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
