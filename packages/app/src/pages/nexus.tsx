@@ -160,27 +160,27 @@ function NexusFloatingToolbar({
   const { zoomIn, zoomOut, fitView } = useReactFlow()
 
   return (
-    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 bg-corthex-surface/90 backdrop-blur-lg border border-corthex-border rounded-xl shadow-2xl p-2 flex items-center gap-1">
+    <div className="absolute bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-40 bg-corthex-surface/90 backdrop-blur-lg border border-corthex-border rounded-xl shadow-2xl p-1.5 md:p-2 flex items-center gap-1 max-w-[calc(100vw-2rem)] overflow-x-auto">
       {/* Zoom */}
-      <div className="flex items-center border-r border-corthex-border px-2 gap-1">
+      <div className="flex items-center border-r border-corthex-border px-1.5 md:px-2 gap-1 shrink-0">
         <button
           onClick={() => zoomIn()}
-          className="p-2 hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
           title="Zoom In"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
-        <span className="text-[10px] font-mono w-10 text-center text-corthex-text-secondary">{zoom}%</span>
+        <span className="text-[10px] font-mono w-10 text-center text-corthex-text-secondary hidden md:block">{zoom}%</span>
         <button
           onClick={() => zoomOut()}
-          className="p-2 hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
           title="Zoom Out"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
         <button
           onClick={() => fitView({ padding: 0.1 })}
-          className="p-2 hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-primary rounded-lg transition-colors"
           title="Fit to View"
         >
           <Maximize2 className="w-4 h-4" />
@@ -188,7 +188,7 @@ function NexusFloatingToolbar({
       </div>
 
       {/* Layout */}
-      <div className="flex items-center border-r border-corthex-border px-2 gap-1">
+      <div className="hidden md:flex items-center border-r border-corthex-border px-2 gap-1 shrink-0">
         <button className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-corthex-text-secondary hover:text-corthex-text-primary hover:bg-corthex-elevated rounded-lg transition-colors">
           <Share2 className="w-3.5 h-3.5" /> Tree
         </button>
@@ -198,7 +198,7 @@ function NexusFloatingToolbar({
       </div>
 
       {/* Export */}
-      <div className="flex items-center px-2 gap-1">
+      <div className="hidden md:flex items-center px-2 gap-1 shrink-0">
         <button className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-corthex-text-secondary hover:text-corthex-text-primary hover:bg-corthex-elevated rounded-lg transition-colors">
           <Download className="w-3.5 h-3.5" /> Export
         </button>
@@ -386,8 +386,8 @@ function NexusPageInner() {
       {/* ── Overlays ── */}
 
       {/* Top-left: Title */}
-      <div className="absolute top-6 left-6 z-30 pointer-events-none">
-        <h1 className="text-xl font-bold text-corthex-text-primary tracking-tight">
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-30 pointer-events-none">
+        <h1 className="text-base md:text-xl font-bold text-corthex-text-primary tracking-tight">
           CORTHEX <span className="text-corthex-accent">NEXUS</span>
         </h1>
         <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-corthex-text-secondary">
@@ -396,8 +396,8 @@ function NexusPageInner() {
       </div>
 
       {/* Top-right: Network Health + Settings */}
-      <div className="absolute top-6 right-6 z-30 flex flex-col gap-2">
-        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-lg w-64 shadow-xl">
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-2">
+        <div className="hidden md:block bg-corthex-surface border border-corthex-border p-4 rounded-lg w-64 shadow-xl">
           <div className="flex justify-between items-center mb-4">
             <span className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary">
               Network Health
@@ -444,7 +444,7 @@ function NexusPageInner() {
       />
 
       {/* Bottom-left: Legend */}
-      <div className="absolute bottom-10 left-10 z-30">
+      <div className="hidden md:block absolute bottom-10 left-10 z-30">
         <div className="bg-corthex-bg/80 backdrop-blur-md p-3 rounded border border-corthex-border/50">
           <div className="text-[9px] uppercase tracking-widest font-bold text-corthex-text-disabled mb-2">Legend</div>
           <div className="flex flex-col gap-2">

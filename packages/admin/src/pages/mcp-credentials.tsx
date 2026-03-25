@@ -84,11 +84,11 @@ export function McpCredentialsPage() {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-bold font-mono tracking-tighter text-corthex-text-primary leading-none mb-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-mono tracking-tighter text-corthex-text-primary leading-none mb-3">
             MCP<span className="text-corthex-accent">.</span>CRED
           </h1>
           <p className="text-corthex-text-secondary text-sm max-w-xl uppercase tracking-widest">
@@ -97,7 +97,7 @@ export function McpCredentialsPage() {
         </div>
         <button
           onClick={() => { setShowForm(true); setEditKeyName(null); setForm(EMPTY_FORM) }}
-          className="flex items-center gap-2 bg-corthex-accent text-corthex-text-on-accent font-bold px-6 py-3 rounded hover:brightness-110 transition-all uppercase tracking-widest text-sm"
+          className="flex items-center gap-2 bg-corthex-accent text-corthex-text-on-accent font-bold px-6 py-3 min-h-[44px] rounded hover:brightness-110 transition-all uppercase tracking-widest text-sm"
         >
           <Plus className="w-4 h-4" />
           Add Credential
@@ -140,7 +140,7 @@ export function McpCredentialsPage() {
           <h3 className="text-sm font-semibold text-corthex-text-primary mb-4">
             {editKeyName ? '크리덴셜 값 변경' : '새 크리덴셜 등록'}
           </h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs text-corthex-text-disabled">Key Name *</label>
               <input
@@ -149,7 +149,7 @@ export function McpCredentialsPage() {
                 value={form.keyName}
                 onChange={e => setForm(f => ({ ...f, keyName: e.target.value }))}
                 placeholder="tistory_access_token"
-                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent disabled:opacity-50 font-mono"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-2 text-base sm:text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent disabled:opacity-50 font-mono"
               />
             </div>
             <div className="space-y-1">
@@ -163,10 +163,10 @@ export function McpCredentialsPage() {
                 value={form.value}
                 onChange={e => setForm(f => ({ ...f, value: e.target.value }))}
                 placeholder="••••••••••••••••"
-                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-2 text-base sm:text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
-            <div className="col-span-2 flex items-center gap-3">
+            <div className="col-span-1 sm:col-span-2 flex items-center gap-3">
               <button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
@@ -239,45 +239,45 @@ export function McpCredentialsPage() {
             <table className="w-full text-left font-mono text-sm border-collapse">
               <thead>
                 <tr className="text-[10px] text-corthex-text-disabled/60 border-b border-corthex-border/10 uppercase tracking-widest">
-                  <th className="px-8 py-4 font-medium">Key Name</th>
-                  <th className="px-8 py-4 font-medium">Auth Type</th>
-                  <th className="px-8 py-4 font-medium">Key Reference</th>
-                  <th className="px-8 py-4 font-medium">Status</th>
-                  <th className="px-8 py-4 font-medium">Last Updated</th>
-                  <th className="px-8 py-4 font-medium text-right">Actions</th>
+                  <th className="px-4 sm:px-6 md:px-8 py-4 font-medium">Key Name</th>
+                  <th className="hidden sm:table-cell px-4 sm:px-6 md:px-8 py-4 font-medium">Auth Type</th>
+                  <th className="hidden md:table-cell px-4 sm:px-6 md:px-8 py-4 font-medium">Key Reference</th>
+                  <th className="px-4 sm:px-6 md:px-8 py-4 font-medium">Status</th>
+                  <th className="hidden lg:table-cell px-4 sm:px-6 md:px-8 py-4 font-medium">Last Updated</th>
+                  <th className="px-4 sm:px-6 md:px-8 py-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-corthex-border/5">
                 {credentials.map(cred => (
                   <tr key={cred.id} className="hover:bg-corthex-elevated transition-colors group">
-                    <td className="px-8 py-5">
+                    <td className="px-4 sm:px-6 md:px-8 py-4 sm:py-5">
                       <span className="text-corthex-accent font-bold font-mono">{cred.keyName}</span>
                     </td>
-                    <td className="px-8 py-5 text-corthex-text-primary">API_KEY</td>
-                    <td className="px-8 py-5 text-corthex-text-secondary font-mono">••••••••••••••••</td>
-                    <td className="px-8 py-5">
+                    <td className="hidden sm:table-cell px-4 sm:px-6 md:px-8 py-4 sm:py-5 text-corthex-text-primary">API_KEY</td>
+                    <td className="hidden md:table-cell px-4 sm:px-6 md:px-8 py-4 sm:py-5 text-corthex-text-secondary font-mono">••••••••••••••••</td>
+                    <td className="px-4 sm:px-6 md:px-8 py-4 sm:py-5">
                       <span className="flex items-center gap-2 text-[10px] font-bold text-corthex-accent px-2 py-1 bg-corthex-accent/10 w-fit rounded">
                         <span className="w-1.5 h-1.5 bg-corthex-accent rounded-full" />
                         ACTIVE
                       </span>
                     </td>
-                    <td className="px-8 py-5 text-corthex-text-disabled text-xs">
+                    <td className="hidden lg:table-cell px-4 sm:px-6 md:px-8 py-4 sm:py-5 text-corthex-text-disabled text-xs">
                       {new Date(cred.updatedAt).toLocaleDateString('ko-KR', {
                         year: 'numeric', month: '2-digit', day: '2-digit',
                         hour: '2-digit', minute: '2-digit',
                       })}
                     </td>
-                    <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <td className="px-4 sm:px-6 md:px-8 py-4 sm:py-5 text-right">
+                      <div className="flex justify-end gap-2 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEdit(cred)}
-                          className="p-1.5 text-corthex-text-secondary hover:text-corthex-accent transition-colors rounded"
+                          className="p-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors rounded"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setConfirmDelete(cred.keyName)}
-                          className="p-1.5 text-corthex-text-disabled hover:text-red-400 transition-colors rounded"
+                          className="p-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-corthex-text-disabled hover:text-red-400 transition-colors rounded"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

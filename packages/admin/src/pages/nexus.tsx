@@ -569,7 +569,7 @@ function NexusCanvas() {
         {/* Property Panel (Right Side) */}
         {selectedNodeId && data?.data && (
           <aside
-            className="w-[420px] border-l border-corthex-border z-30 shadow-2xl flex flex-col h-full"
+            className="fixed inset-0 z-40 sm:static sm:inset-auto sm:z-30 w-full sm:w-[420px] border-l border-corthex-border shadow-2xl flex flex-col h-full"
             style={{ backgroundColor: ORGANIC.bg }}
           >
             <div className="p-6 border-b border-corthex-border">

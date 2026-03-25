@@ -572,27 +572,27 @@ export function CostsPage() {
 
   return (
     <div data-testid="costs-page" className="bg-corthex-bg min-h-screen">
-      <div className="p-8">
+      <div className="p-4 sm:p-6 md:p-8">
 
         {/* Header */}
-        <header className="mb-10 flex justify-between items-end border-b border-corthex-border/30 pb-6">
+        <header className="mb-6 md:mb-10 flex flex-col md:flex-row justify-between md:items-end gap-4 border-b border-corthex-border/30 pb-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-corthex-accent shadow-[0_0_8px_rgba(202,138,4,0.5)]" />
               <span className="font-mono text-[10px] tracking-[0.3em] text-corthex-text-disabled">TERMINAL_ID: 0x882A_COST</span>
             </div>
-            <h1 className="font-mono text-3xl font-bold tracking-tight text-corthex-text-primary">
+            <h1 className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-corthex-text-primary">
               COST MANAGEMENT // <span className="text-corthex-accent-deep">SYSTEM_OVERVIEW</span>
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             {/* Period quick-select */}
             <div className="flex gap-px bg-corthex-border/20 p-px">
               {(['24H', '7D', '30D', 'ALL'] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => handlePeriod(p)}
-                  className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                  className={`px-3 sm:px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors min-h-[44px] sm:min-h-0 ${
                     period === p
                       ? 'bg-corthex-accent text-corthex-text-on-accent font-bold'
                       : 'bg-corthex-surface text-corthex-text-disabled hover:text-corthex-accent'
@@ -608,14 +608,14 @@ export function CostsPage() {
                 type="date"
                 value={startDate}
                 onChange={(e) => { setStartDate(e.target.value); setPeriod('ALL') }}
-                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
+                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-base sm:text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
               <span className="font-mono text-xs text-corthex-text-disabled">~</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => { setEndDate(e.target.value); setPeriod('ALL') }}
-                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
+                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-base sm:text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
             </div>
           </div>
@@ -638,8 +638,8 @@ export function CostsPage() {
         <RecentCostRecords startDate={startDate} endDate={endDate} companyId={companyId} />
 
         {/* Footer meta */}
-        <footer className="mt-12 pt-6 border-t border-corthex-border/10 flex justify-between items-center font-mono text-[9px] text-corthex-text-disabled/30">
-          <div className="flex gap-8">
+        <footer className="mt-8 md:mt-12 pt-6 border-t border-corthex-border/10 flex flex-col sm:flex-row justify-between items-center gap-2 font-mono text-[9px] text-corthex-text-disabled/30">
+          <div className="flex gap-4 sm:gap-8">
             <span>SYSTEM_VERSION: 4.2.0-STABLE</span>
             <span>LAST_SYNC: {new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC</span>
           </div>

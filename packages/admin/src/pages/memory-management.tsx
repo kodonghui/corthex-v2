@@ -91,7 +91,7 @@ export function MemoryManagementPage() {
   const flagged = flaggedData?.data?.observations ?? []
 
   return (
-    <div className="p-8 max-w-6xl mx-auto w-full" data-testid="memory-management-page">
+    <div className="p-4 lg:p-8 max-w-6xl mx-auto w-full" data-testid="memory-management-page">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold uppercase tracking-widest text-corthex-text-primary">
@@ -134,9 +134,9 @@ export function MemoryManagementPage() {
               <p className="text-xs text-corthex-text-disabled mt-1">All clear</p>
             </div>
           ) : flagged.map(obs => (
-            <div key={obs.id} className="px-6 py-4 flex items-start gap-4">
+            <div key={obs.id} className="px-4 lg:px-6 py-4 flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className="text-xs font-mono px-2 py-0.5 bg-corthex-elevated border border-corthex-border text-corthex-text-disabled uppercase tracking-widest">
                     {obs.domain}
                   </span>
@@ -149,18 +149,18 @@ export function MemoryManagementPage() {
                   Agent: {obs.agentId.slice(0, 8)}...
                 </p>
               </div>
-              <div className="flex gap-2 shrink-0">
+              <div className="flex gap-2 shrink-0 self-end sm:self-auto">
                 <button
                   onClick={() => dismissMut.mutate(obs.id)}
                   disabled={dismissMut.isPending}
-                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-colors bg-corthex-accent-muted text-corthex-accent border border-corthex-border hover:bg-corthex-elevated disabled:opacity-50"
+                  className="px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest transition-colors bg-corthex-accent-muted text-corthex-accent border border-corthex-border hover:bg-corthex-elevated disabled:opacity-50"
                 >
                   Dismiss
                 </button>
                 <button
                   onClick={() => deleteMut.mutate(obs.id)}
                   disabled={deleteMut.isPending}
-                  className="p-1.5 text-xs font-bold transition-colors bg-red-500/10 text-corthex-error border border-red-500/20 hover:bg-red-500/20 disabled:opacity-50"
+                  className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-xs font-bold transition-colors bg-red-500/10 text-corthex-error border border-red-500/20 hover:bg-red-500/20 disabled:opacity-50"
                   title="Delete permanently"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -186,63 +186,128 @@ export function MemoryManagementPage() {
         ) : agents.length === 0 ? (
           <div className="px-6 py-8 text-center text-sm text-corthex-text-disabled">No agents with memory data</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left border-b border-corthex-border bg-corthex-elevated">
-                  <th className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Agent ID</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Observations</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Reflected</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Unreflected</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Memories</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Active</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Avg Conf</th>
-                  <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-corthex-border">
-                {agents.map(a => (
-                  <tr key={a.agentId} className="text-sm hover:bg-corthex-elevated/50 transition-colors">
-                    <td className="px-6 py-3 font-mono text-xs text-corthex-text-primary">{a.agentId.slice(0, 8)}...</td>
-                    <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.totalObservations}</td>
-                    <td className="px-4 py-3 font-mono text-corthex-accent">{a.reflectedObservations}</td>
-                    <td className="px-4 py-3 font-mono text-corthex-error">{a.unreflectedObservations}</td>
-                    <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.totalMemories}</td>
-                    <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.activeMemories}</td>
-                    <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.avgConfidence}%</td>
-                    <td className="px-4 py-3">
-                      {resettingAgent === a.agentId ? (
-                        <div className="flex gap-1.5">
-                          <button
-                            onClick={() => resetMut.mutate(a.agentId)}
-                            disabled={resetMut.isPending}
-                            className="px-2 py-1 text-xs font-bold uppercase tracking-widest bg-corthex-error text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
-                          >
-                            Confirm
-                          </button>
-                          <button
-                            onClick={() => setResettingAgent(null)}
-                            className="px-2 py-1 text-xs font-bold uppercase tracking-widest bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:bg-corthex-border transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setResettingAgent(a.agentId)}
-                          className="flex items-center gap-1 px-2 py-1 text-xs font-bold uppercase tracking-widest transition-colors bg-red-500/10 text-corthex-error border border-red-500/20 hover:bg-red-500/20"
-                          title="Reset all memories"
-                        >
-                          <RotateCcw className="w-3 h-3" />
-                          Reset
-                        </button>
-                      )}
-                    </td>
+          <>
+            {/* Desktop table */}
+            <div className="overflow-x-auto hidden lg:block">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b border-corthex-border bg-corthex-elevated">
+                    <th className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Agent ID</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Observations</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Reflected</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Unreflected</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Memories</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Active</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Avg Conf</th>
+                    <th className="px-4 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-corthex-border">
+                  {agents.map(a => (
+                    <tr key={a.agentId} className="text-sm hover:bg-corthex-elevated/50 transition-colors">
+                      <td className="px-6 py-3 font-mono text-xs text-corthex-text-primary">{a.agentId.slice(0, 8)}...</td>
+                      <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.totalObservations}</td>
+                      <td className="px-4 py-3 font-mono text-corthex-accent">{a.reflectedObservations}</td>
+                      <td className="px-4 py-3 font-mono text-corthex-error">{a.unreflectedObservations}</td>
+                      <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.totalMemories}</td>
+                      <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.activeMemories}</td>
+                      <td className="px-4 py-3 font-mono text-corthex-text-primary">{a.avgConfidence}%</td>
+                      <td className="px-4 py-3">
+                        {resettingAgent === a.agentId ? (
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={() => resetMut.mutate(a.agentId)}
+                              disabled={resetMut.isPending}
+                              className="px-2 py-1 text-xs font-bold uppercase tracking-widest bg-corthex-error text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => setResettingAgent(null)}
+                              className="px-2 py-1 text-xs font-bold uppercase tracking-widest bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:bg-corthex-border transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setResettingAgent(a.agentId)}
+                            className="flex items-center gap-1 px-2 py-1 text-xs font-bold uppercase tracking-widest transition-colors bg-red-500/10 text-corthex-error border border-red-500/20 hover:bg-red-500/20"
+                            title="Reset all memories"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Reset
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile card view */}
+            <div className="lg:hidden divide-y divide-corthex-border">
+              {agents.map(a => (
+                <div key={a.agentId} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs text-corthex-text-primary font-bold">{a.agentId.slice(0, 8)}...</span>
+                    {resettingAgent === a.agentId ? (
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={() => resetMut.mutate(a.agentId)}
+                          disabled={resetMut.isPending}
+                          className="px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-error text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => setResettingAgent(null)}
+                          className="px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:bg-corthex-border transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setResettingAgent(a.agentId)}
+                        className="flex items-center gap-1 px-3 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest transition-colors bg-red-500/10 text-corthex-error border border-red-500/20 hover:bg-red-500/20"
+                        title="Reset all memories"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Obs</span>
+                      <span className="text-corthex-text-primary">{a.totalObservations}</span>
+                    </div>
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Reflected</span>
+                      <span className="text-corthex-accent">{a.reflectedObservations}</span>
+                    </div>
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Unreflect</span>
+                      <span className="text-corthex-error">{a.unreflectedObservations}</span>
+                    </div>
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Memories</span>
+                      <span className="text-corthex-text-primary">{a.totalMemories}</span>
+                    </div>
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Active</span>
+                      <span className="text-corthex-text-primary">{a.activeMemories}</span>
+                    </div>
+                    <div className="flex justify-between bg-corthex-elevated p-2 border border-corthex-border">
+                      <span className="text-corthex-text-disabled">Conf</span>
+                      <span className="text-corthex-text-primary">{a.avgConfidence}%</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
@@ -259,9 +324,9 @@ export function MemoryManagementPage() {
         {!currentSettings ? (
           <div className="px-6 py-8 text-center text-sm animate-pulse text-corthex-text-disabled">Loading...</div>
         ) : (
-          <div className="px-6 py-5 space-y-4">
-            <div className="flex items-center gap-4">
-              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-56">
+          <div className="px-4 lg:px-6 py-5 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-full sm:w-56">
                 Master Switch
               </label>
               <button
@@ -284,8 +349,8 @@ export function MemoryManagementPage() {
               ['minObservationsForReflection', 'Min Observations for Reflection', 1, 1000],
               ['memoryDecayDays', 'Memory Decay (days)', 1, 365],
             ] as const).map(([key, label, min, max]) => (
-              <div key={key} className="flex items-center gap-4">
-                <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-56">
+              <div key={key} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-full sm:w-56">
                   {label}
                 </label>
                 <input
@@ -294,12 +359,12 @@ export function MemoryManagementPage() {
                   max={max}
                   value={currentSettings[key]}
                   onChange={(e) => setSettingsForm({ ...currentSettings, [key]: Number(e.target.value) })}
-                  className="w-28 px-3 py-1.5 text-sm font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
+                  className="w-full sm:w-28 px-3 py-2 text-base font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
                 />
               </div>
             ))}
-            <div className="flex items-center gap-4">
-              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-56">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-full sm:w-56">
                 Min Avg Confidence
               </label>
               <input
@@ -309,11 +374,11 @@ export function MemoryManagementPage() {
                 step={0.05}
                 value={currentSettings.minAvgConfidence}
                 onChange={(e) => setSettingsForm({ ...currentSettings, minAvgConfidence: Number(e.target.value) })}
-                className="w-28 px-3 py-1.5 text-sm font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
+                className="w-full sm:w-28 px-3 py-2 text-base font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
               />
             </div>
-            <div className="flex items-center gap-4">
-              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-56">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary w-full sm:w-56">
                 Max Daily Cost (USD)
               </label>
               <input
@@ -323,7 +388,7 @@ export function MemoryManagementPage() {
                 step={0.01}
                 value={currentSettings.maxDailyCostUsd}
                 onChange={(e) => setSettingsForm({ ...currentSettings, maxDailyCostUsd: Number(e.target.value) })}
-                className="w-28 px-3 py-1.5 text-sm font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
+                className="w-full sm:w-28 px-3 py-2 text-base font-mono border border-corthex-border bg-corthex-elevated text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
               />
             </div>
             {settingsForm && (

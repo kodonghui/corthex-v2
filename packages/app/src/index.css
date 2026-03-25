@@ -71,6 +71,14 @@
   --topbar-height: 56px;
   --content-max: 1160px;
 
+  /* Mobile layout tokens (Critic-C feedback) */
+  --mobile-topbar-height: 48px;
+  --bottom-nav-height: 56px;
+  --mobile-page-padding: 16px;
+  --mobile-card-gap: 12px;
+  --mobile-section-gap: 24px;
+  --mobile-touch-min: 44px;
+
   /* Animations — shared across all themes */
   --animate-slide-in: slide-in 200ms ease-out;
   --animate-slide-up: slide-up 200ms ease-out;

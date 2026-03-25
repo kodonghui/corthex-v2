@@ -139,18 +139,18 @@ export function ChatPage() {
   return (
     <div data-testid="chat-page" className="h-screen overflow-hidden flex bg-corthex-bg text-corthex-text-primary">
       {/* LEFT: Session List */}
-      <aside className={`w-72 border-r border-corthex-border flex flex-col bg-corthex-surface shrink-0 ${showChat ? 'hidden md:flex' : 'flex'}`}>
-        <div className="h-14 flex items-center justify-between px-5 border-b border-corthex-border shrink-0">
+      <aside className={`w-full md:w-72 border-r border-corthex-border flex flex-col bg-corthex-surface shrink-0 ${showChat ? 'hidden md:flex' : 'flex'}`}>
+        <div className="h-14 flex items-center justify-between px-4 md:px-5 border-b border-corthex-border shrink-0">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Sessions</p>
             <p className="text-xs font-mono text-corthex-text-primary">{sessions.length} conversations</p>
           </div>
           <button
             onClick={() => setShowAgentModal(true)}
-            className="p-2 bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg transition-colors"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg transition-colors"
             title="New Chat Session"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5 md:w-4 md:h-4" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -167,7 +167,7 @@ export function ChatPage() {
               <div
                 key={session.id}
                 onClick={() => handleSessionSelect(session.id)}
-                className={`p-3 rounded-lg cursor-pointer transition-all ${
+                className={`p-3 rounded-lg cursor-pointer transition-all min-h-[44px] ${
                   isActive
                     ? 'bg-corthex-accent/10 border border-corthex-accent/30'
                     : 'hover:bg-corthex-elevated border border-transparent'
@@ -199,7 +199,7 @@ export function ChatPage() {
 
       {/* RIGHT: Agent Info */}
       {selectedAgent && (
-        <aside className="w-[320px] bg-corthex-surface border-l border-corthex-border flex flex-col hidden xl:flex shrink-0">
+        <aside className="hidden xl:flex w-[320px] bg-corthex-surface border-l border-corthex-border flex-col shrink-0">
           <div className="p-6 border-b border-corthex-border flex flex-col items-center text-center">
             <div className="relative mb-4">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-corthex-accent to-corthex-accent-deep p-0.5">

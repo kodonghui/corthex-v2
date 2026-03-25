@@ -301,7 +301,7 @@ export function AgentsPage() {
       {/* MAIN TABLE AREA */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* SCROLLABLE CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
 
           {/* SUMMARY STATS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -333,8 +333,8 @@ export function AgentsPage() {
           </div>
 
           {/* FILTERS */}
-          <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-wrap gap-4 items-end">
-            <div className="flex-1 min-w-[200px]">
+          <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-wrap gap-3 sm:gap-4 items-end">
+            <div className="flex-1 min-w-0 sm:min-w-[200px]">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Search_Registry</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-corthex-text-disabled" />
@@ -342,24 +342,24 @@ export function AgentsPage() {
                   data-testid="agents-search-input"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 text-xs font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 text-base sm:text-xs font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent"
                   placeholder="AGENT_NAME..."
                   type="text"
                 />
               </div>
             </div>
-            <div className="w-48">
+            <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Tier</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
                 <option>ALL_TIERS</option>
                 <option>MANAGER</option>
                 <option>SPECIALIST</option>
                 <option>WORKER</option>
               </select>
             </div>
-            <div className="w-48">
+            <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Status</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
                 <option>ALL_STATES</option>
                 <option>ONLINE</option>
                 <option>WORKING</option>
@@ -370,7 +370,7 @@ export function AgentsPage() {
             <button
               data-testid="agents-create-btn"
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-2 px-6 py-2 font-mono text-[10px] tracking-widest uppercase font-bold"
+              className="flex items-center gap-2 px-6 py-2 font-mono text-[10px] tracking-widest uppercase font-bold min-h-[44px]"
               style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
             >
               <Plus className="w-3 h-3" />
@@ -392,12 +392,12 @@ export function AgentsPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-corthex-elevated font-mono text-[10px] tracking-widest uppercase text-corthex-text-disabled">
-                    <th className="px-6 py-4 font-normal">Agent_Identity</th>
-                    <th className="px-6 py-4 font-normal">Role</th>
-                    <th className="px-6 py-4 font-normal">Core_Model</th>
-                    <th className="px-6 py-4 font-normal text-center">Protocol_Tier</th>
-                    <th className="px-6 py-4 font-normal">Status</th>
-                    <th className="px-6 py-4 font-normal text-right">Actions</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal">Agent_Identity</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal hidden sm:table-cell">Role</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal hidden md:table-cell">Core_Model</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal text-center hidden sm:table-cell">Protocol_Tier</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal">Status</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -421,7 +421,7 @@ export function AgentsPage() {
                         className="border-b border-corthex-border hover:bg-corthex-elevated transition-colors cursor-pointer"
                         style={isSelected ? { backgroundColor: 'var(--color-corthex-elevated)' } : {}}
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-corthex-elevated border border-corthex-border flex items-center justify-center shrink-0">
                               <Bot className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
@@ -436,21 +436,21 @@ export function AgentsPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
                           <span className="font-mono text-[11px] text-corthex-text-secondary">{a.role || '—'}</span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                           <span className="font-mono text-[11px] bg-corthex-elevated border border-corthex-border px-2 py-1 text-corthex-text-secondary">
                             {a.modelName}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-center hidden sm:table-cell">
                           <span className="font-mono text-[10px] font-bold border px-2 py-0.5 uppercase"
                             style={{ borderColor: tierColor, color: tierColor }}>
                             {a.tier.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                           <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5" style={{ backgroundColor: statusDotColor }} />
                             <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: statusDotColor }}>
@@ -458,10 +458,10 @@ export function AgentsPage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                           <button
                             onClick={(e) => { e.stopPropagation(); openDetail(a) }}
-                            className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled hover:text-corthex-text-primary transition-colors"
+                            className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled hover:text-corthex-text-primary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                           >
                             Edit
                           </button>
@@ -475,17 +475,17 @@ export function AgentsPage() {
           </div>
 
           {/* PAGINATION */}
-          <div className="flex justify-between items-center bg-corthex-surface border border-corthex-border px-6 py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-corthex-surface border border-corthex-border px-4 sm:px-6 py-4">
             <div className="font-mono text-[10px] tracking-widest text-corthex-text-disabled uppercase">
               SHOWING {filteredAgents.length} OF {agents.length} AGENTS
             </div>
             <div className="flex gap-2">
-              <button className="bg-corthex-elevated w-8 h-8 flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
+              <button className="bg-corthex-elevated min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button className="w-8 h-8 flex items-center justify-center font-mono text-[10px]"
+              <button className="min-w-[44px] min-h-[44px] flex items-center justify-center font-mono text-[10px]"
                 style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>01</button>
-              <button className="bg-corthex-elevated w-8 h-8 flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
+              <button className="bg-corthex-elevated min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -497,7 +497,7 @@ export function AgentsPage() {
       {selectedAgent && (
         <section
           data-testid="agents-detail-panel"
-          className="w-96 shrink-0 border-l border-corthex-border flex flex-col overflow-hidden bg-corthex-surface"
+          className="fixed inset-0 z-40 sm:static sm:inset-auto sm:z-auto w-full sm:w-96 shrink-0 border-l border-corthex-border flex flex-col overflow-hidden bg-corthex-surface"
         >
           {/* Panel Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border bg-corthex-elevated">

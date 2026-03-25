@@ -223,8 +223,8 @@ export function MarketingPipelinePage() {
   const kanbanColumns = [
     { id: 'waiting' as const, label: 'Queued', dotStyle: { backgroundColor: 'var(--color-corthex-text-secondary)' }, items: executions.filter(e => e.status === 'waiting') },
     { id: 'running' as const, label: 'Running', dotStyle: { backgroundColor: 'var(--color-corthex-accent)' }, items: executions.filter(e => e.status === 'running') },
-    { id: 'success' as const, label: 'Completed', dotStyle: { backgroundColor: '#22c55e' }, items: executions.filter(e => e.status === 'success') },
-    { id: 'error' as const, label: 'Failed', dotStyle: { backgroundColor: '#ef4444' }, items: executions.filter(e => e.status === 'error') },
+    { id: 'success' as const, label: 'Completed', dotStyle: { backgroundColor: 'var(--color-corthex-success)' }, items: executions.filter(e => e.status === 'success') },
+    { id: 'error' as const, label: 'Failed', dotStyle: { backgroundColor: 'var(--color-corthex-error)' }, items: executions.filter(e => e.status === 'error') },
   ]
 
   return (
@@ -234,11 +234,11 @@ export function MarketingPipelinePage() {
       style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
     >
       {/* Header */}
-      <header className="px-8 py-6 border-b border-corthex-border flex items-center justify-between gap-4">
+      <header className="px-4 lg:px-8 py-4 lg:py-6 border-b border-corthex-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <GitBranch className="h-6 w-6 text-corthex-accent" />
+          <GitBranch className="h-6 w-6 text-corthex-accent shrink-0" />
           <div>
-            <h1 className="text-2xl font-black text-corthex-text-primary tracking-tight flex items-center gap-3">
+            <h1 className="text-xl lg:text-2xl font-black text-corthex-text-primary tracking-tight flex flex-wrap items-center gap-2 lg:gap-3">
               CONTENT PIPELINE
               {preset && (
                 <span className="text-[10px] px-2 py-0.5 border rounded uppercase font-black text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)', borderColor: 'rgba(96,108,56,0.2)' }}>
@@ -254,12 +254,12 @@ export function MarketingPipelinePage() {
       </header>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto p-8">
-        <div className="flex gap-6 h-full min-w-max">
+      <div className="flex-1 overflow-x-auto p-4 lg:p-8">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 h-full sm:min-w-max">
           {kanbanColumns.map(col => {
             const config = EXEC_STATUS[col.id]
             return (
-              <div key={col.id} className="flex flex-col gap-4 w-72">
+              <div key={col.id} className="flex flex-col gap-4 w-full sm:w-72">
                 {/* Column Header */}
                 <div className="flex items-center gap-2 px-1">
                   <span
@@ -319,7 +319,7 @@ export function MarketingPipelinePage() {
 
       {/* Pipeline Info Footer */}
       {preset && (
-        <div className="px-8 py-4 border-t border-corthex-border grid grid-cols-4 gap-4">
+        <div className="px-4 lg:px-8 py-4 border-t border-corthex-border grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg">
             <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">단계</p>
             <p className="text-xl font-mono text-corthex-text-primary">{preset.stages.length}단계</p>

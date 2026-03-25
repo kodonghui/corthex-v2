@@ -409,23 +409,23 @@ export function JobsPage() {
     >
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="px-8 pt-8 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-4 sm:pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <nav className="flex items-center gap-1.5 text-xs mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>
             <span className="hover:opacity-70 cursor-pointer" style={{ color: 'var(--color-corthex-accent)' }}>System</span>
             <ChevronRight className="w-3 h-3" />
             <span style={{ color: 'var(--color-corthex-text-primary)' }}>Jobs Manager</span>
           </nav>
-          <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: 'var(--color-corthex-text-primary)' }}>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight" style={{ color: 'var(--color-corthex-text-primary)' }}>
             Jobs Manager{' '}
             <span className="font-mono text-lg ml-2" style={{ color: 'var(--color-corthex-accent)' }}>
               [{String(totalCount).padStart(2, '0')}]
             </span>
           </h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3">
           <button
-            className="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-semibold transition-all hover:opacity-80"
+            className="min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded text-sm font-semibold transition-all hover:opacity-80"
             style={{
               background: 'var(--color-corthex-elevated)',
               border: '1px solid var(--color-corthex-border)',
@@ -437,7 +437,7 @@ export function JobsPage() {
           </button>
           <button
             onClick={() => { setModalType(activeTab === 'trigger' ? 'trigger' : activeTab === 'schedule' ? 'schedule' : 'oneTime'); setShowModal(true) }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded text-sm font-black transition-all active:scale-95"
+            className="min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded text-sm font-black transition-all active:scale-95"
             style={{
               background: 'var(--color-corthex-accent)',
               color: 'white',
@@ -452,7 +452,7 @@ export function JobsPage() {
       </div>
 
       {/* ── Stats Grid ─────────────────────────────────────────────────── */}
-      <div className="px-8 grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
         {[
           { label: '완료된 작업', value: allJobs.filter(j => j.status === 'completed').length },
           { label: '실행 중', value: allJobs.filter(j => j.status === 'processing').length },
@@ -478,13 +478,13 @@ export function JobsPage() {
       </div>
 
       {/* ── Tab Bar ────────────────────────────────────────────────────── */}
-      <div className="px-8" style={{ borderBottom: '1px solid var(--color-corthex-border)' }}>
-        <div className="flex" data-testid="jobs-tabs">
+      <div className="px-4 sm:px-6 lg:px-8" style={{ borderBottom: '1px solid var(--color-corthex-border)' }}>
+        <div className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" data-testid="jobs-tabs">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className="flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors whitespace-nowrap"
+              className="min-h-[44px] flex items-center gap-2 px-4 sm:px-6 py-3 text-sm font-medium transition-colors whitespace-nowrap"
               style={{
                 color: activeTab === tab.key ? 'var(--color-corthex-accent)' : 'var(--color-corthex-text-secondary)',
                 borderBottom: activeTab === tab.key ? '2px solid var(--color-corthex-accent)' : '2px solid transparent',
@@ -504,21 +504,21 @@ export function JobsPage() {
 
       {/* ── Filter Bar ─────────────────────────────────────────────────── */}
       <div
-        className="px-8 py-3 flex flex-wrap items-center gap-4"
+        className="px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center gap-3 sm:gap-4"
         style={{
           background: 'color-mix(in srgb, var(--color-corthex-elevated) 60%, transparent)',
           borderBottom: '1px solid var(--color-corthex-border)',
         }}
       >
         {/* Search */}
-        <div className="relative flex-1 min-w-[260px]">
+        <div className="relative flex-1 min-w-[200px] sm:min-w-[260px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Job ID, 제목, 에이전트 검색..."
-            className="w-full pl-10 pr-4 py-2 rounded text-sm outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded text-base sm:text-sm outline-none transition-all min-h-[44px]"
             style={{
               background: 'color-mix(in srgb, var(--color-corthex-bg) 60%, transparent)',
               border: '1px solid var(--color-corthex-border)',
@@ -534,7 +534,7 @@ export function JobsPage() {
             <select
               value={agentFilter}
               onChange={e => setAgentFilter(e.target.value)}
-              className="rounded px-3 py-2 text-xs outline-none"
+              className="min-h-[44px] rounded px-3 py-2 text-base sm:text-xs outline-none"
               style={{
                 background: 'var(--color-corthex-elevated)',
                 border: '1px solid var(--color-corthex-border)',
@@ -553,7 +553,7 @@ export function JobsPage() {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="rounded px-3 py-2 text-xs outline-none"
+            className="min-h-[44px] rounded px-3 py-2 text-base sm:text-xs outline-none"
             style={{
               background: 'var(--color-corthex-elevated)',
               border: '1px solid var(--color-corthex-border)',
@@ -585,7 +585,7 @@ export function JobsPage() {
       </div>
 
       {/* ── Table Content ──────────────────────────────────────────────── */}
-      <div className="px-8 py-6 flex-1">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1">
 
         {/* Loading */}
         {isTabLoading && (
@@ -611,12 +611,12 @@ export function JobsPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr>
-                        <th style={thStyle}>ID</th>
+                        <th style={thStyle} className="hidden sm:table-cell">ID</th>
                         <th style={thStyle}>Title</th>
                         <th style={thStyle}>Assigned Agent</th>
                         <th style={thStyle}>Status</th>
-                        <th style={thStyle}>Created</th>
-                        <th style={thStyle}>Duration</th>
+                        <th style={thStyle} className="hidden md:table-cell">Created</th>
+                        <th style={thStyle} className="hidden lg:table-cell">Duration</th>
                         <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
                       </tr>
                     </thead>
@@ -645,7 +645,7 @@ export function JobsPage() {
                               data-testid={`job-card-${job.id}`}
                             >
                               {/* ID */}
-                              <td style={tdStyle}>
+                              <td style={tdStyle} className="hidden sm:table-cell">
                                 <span className="font-mono text-xs font-bold" style={{ color: 'var(--color-corthex-accent)' }}>
                                   {shortId(job.id)}
                                 </span>
@@ -727,14 +727,14 @@ export function JobsPage() {
                               </td>
 
                               {/* Created */}
-                              <td style={tdStyle}>
+                              <td style={tdStyle} className="hidden md:table-cell">
                                 <span className="font-mono text-[11px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
                                   {createdLabel}
                                 </span>
                               </td>
 
                               {/* Duration */}
-                              <td style={tdStyle}>
+                              <td style={tdStyle} className="hidden lg:table-cell">
                                 <span className="text-xs" style={{ color: 'var(--color-corthex-text-primary)' }}>
                                   {getDuration(job)}
                                 </span>

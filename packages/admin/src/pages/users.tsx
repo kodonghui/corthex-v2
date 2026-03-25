@@ -136,15 +136,15 @@ export function UsersPage() {
   return (
     <div className="min-h-screen bg-corthex-bg" data-testid="users-page">
       {/* Header & Search */}
-      <section className="p-8 flex-1 flex flex-col gap-8">
+      <section className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col gap-6 md:gap-8">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 bg-corthex-surface p-6 border border-corthex-border">
           <div className="space-y-1">
-            <h1 className="text-5xl font-black tracking-tighter text-corthex-text-primary uppercase">Admin Users</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-corthex-text-primary uppercase">Admin Users</h1>
             <p className="font-mono text-xs text-corthex-accent/60 uppercase tracking-[0.2em]">Access Control &amp; Identity Management</p>
           </div>
           <button
             onClick={() => setShowCreate(!showCreate)}
-            className="bg-corthex-accent text-corthex-text-on-accent px-8 py-3 font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-corthex-accent-hover transition-colors active:scale-95"
+            className="bg-corthex-accent text-corthex-text-on-accent px-6 py-3 md:px-8 font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-corthex-accent-hover transition-colors active:scale-95 min-h-[44px]"
             data-testid="add-user-btn"
           >
             <UserPlus size={14} />
@@ -240,7 +240,7 @@ export function UsersPage() {
         )}
 
         {/* Filters Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-corthex-bg border border-corthex-border p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-corthex-bg border border-corthex-border p-4">
           <div className="relative flex items-center">
             <Search size={14} className="absolute left-3 text-corthex-text-disabled" />
             <input
@@ -298,13 +298,13 @@ export function UsersPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-corthex-elevated border-b border-corthex-border">
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Identifier</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Credentials</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Access Role</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Affiliation</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Node Status</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Telemetry</th>
-                  <th className="p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest text-right">Actions</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Identifier</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest hidden sm:table-cell">Credentials</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest hidden md:table-cell">Access Role</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest hidden lg:table-cell">Affiliation</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">Node Status</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest hidden lg:table-cell">Telemetry</th>
+                  <th className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-corthex-border">
@@ -328,9 +328,9 @@ export function UsersPage() {
                       </div>
                     </td>
                     {/* Credentials */}
-                    <td className="p-4 font-mono text-xs text-corthex-text-secondary">{u.email || `@${u.username}`}</td>
+                    <td className="p-3 md:p-4 font-mono text-xs text-corthex-text-secondary hidden sm:table-cell">{u.email || `@${u.username}`}</td>
                     {/* Access Role */}
-                    <td className="p-4">
+                    <td className="p-3 md:p-4 hidden md:table-cell">
                       {editUser?.id === u.id ? (
                         <select
                           value={editForm.role}
@@ -351,11 +351,11 @@ export function UsersPage() {
                       )}
                     </td>
                     {/* Affiliation */}
-                    <td className="p-4 font-mono text-xs text-corthex-text-secondary uppercase">
+                    <td className="p-3 md:p-4 font-mono text-xs text-corthex-text-secondary uppercase hidden lg:table-cell">
                       {u.companyId?.slice(0, 8) || 'N/A'}
                     </td>
                     {/* Node Status */}
-                    <td className="p-4">
+                    <td className="p-3 md:p-4">
                       <div className="flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 rounded-full ${u.isActive ? 'bg-corthex-success' : 'bg-corthex-error'}`} />
                         <span className={`font-mono text-[10px] uppercase ${u.isActive ? 'text-corthex-success' : 'text-corthex-error'}`}>
@@ -364,13 +364,13 @@ export function UsersPage() {
                       </div>
                     </td>
                     {/* Telemetry */}
-                    <td className="p-4 font-mono text-[10px] text-corthex-text-secondary">
+                    <td className="p-3 md:p-4 font-mono text-[10px] text-corthex-text-secondary hidden lg:table-cell">
                       {u.createdAt
                         ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                         : 'N/A'}
                     </td>
                     {/* Actions */}
-                    <td className="p-4 text-right">
+                    <td className="p-3 md:p-4 text-right">
                       {editUser?.id === u.id ? (
                         <div className="flex justify-end gap-3 text-corthex-text-disabled">
                           <button
@@ -438,7 +438,7 @@ export function UsersPage() {
 
           {/* Terminal Pagination */}
           {filteredUsers.length > 0 && (
-            <footer className="flex justify-between items-center bg-corthex-surface border-t border-corthex-border p-4">
+            <footer className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-corthex-surface border-t border-corthex-border p-4">
               <div className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest flex items-center gap-4">
                 <span>DATABASE_SECTOR: USR</span>
                 <span className="w-1 h-1 bg-corthex-border rounded-full" />

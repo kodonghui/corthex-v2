@@ -7,9 +7,9 @@ import { Paintbrush, Terminal, Cpu, ArrowRight, Activity } from 'lucide-react'
 
 export default function SketchVibePage() {
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 lg:p-8 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center">
             <Paintbrush className="w-5 h-5 text-corthex-accent" />
@@ -30,7 +30,7 @@ export default function SketchVibePage() {
       </div>
 
       {/* Status Card */}
-      <div className="bg-corthex-surface border border-corthex-border p-6 mb-4">
+      <div className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 mb-4">
         <div className="flex items-center gap-3 mb-4">
           <Terminal className="w-4 h-4 text-corthex-accent" />
           <h2 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">
@@ -50,7 +50,7 @@ export default function SketchVibePage() {
       </div>
 
       {/* How it works */}
-      <div className="bg-corthex-surface border border-corthex-border p-6 mb-4">
+      <div className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 mb-4">
         <h2 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary mb-6">
           사용 방법
         </h2>

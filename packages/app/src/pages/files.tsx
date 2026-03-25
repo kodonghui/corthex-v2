@@ -175,21 +175,21 @@ export function FilesPage() {
         </div>
       )}
 
-      <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col gap-4 sm:gap-6">
         {/* Page Header */}
-        <div className="flex items-end justify-between" data-testid="files-header">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3" data-testid="files-header">
           <div>
-            <h2 className="text-3xl font-black text-corthex-text-primary tracking-tight mb-1 uppercase">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-corthex-text-primary tracking-tight mb-1 uppercase">
               {user?.name ? `${user.name}'s Drive` : 'Project Drive'}
             </h2>
             <p className="text-corthex-text-secondary text-sm">Quantum-resistant encrypted storage. Restricted access protocol active.</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full sm:w-auto">
             <input ref={fileInputRef} type="file" hidden onChange={handleUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="flex items-center gap-2 px-4 py-2 bg-corthex-surface border border-corthex-accent/30 text-corthex-accent rounded text-xs font-bold hover:bg-corthex-accent hover:text-corthex-bg transition-all disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] w-full sm:w-auto bg-corthex-surface border border-corthex-accent/30 text-corthex-accent rounded text-xs font-bold hover:bg-corthex-accent hover:text-corthex-bg transition-all disabled:opacity-50"
               aria-label="파일 업로드"
               data-testid="upload-button"
             >
@@ -200,13 +200,13 @@ export function FilesPage() {
         </div>
 
         {/* Toolbar: filters + search + sort + view */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2" data-testid="files-filters">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3 md:gap-4">
+          <div className="flex items-center gap-2 overflow-x-auto" data-testid="files-filters">
             {FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setFilter(opt.value)}
-                className={`px-3 py-1.5 text-xs font-bold rounded border transition-colors ${
+                className={`px-3 py-1.5 text-xs font-bold rounded border transition-colors min-h-[44px] whitespace-nowrap ${
                   filter === opt.value
                     ? 'bg-corthex-accent text-corthex-bg border-corthex-accent'
                     : 'bg-corthex-elevated text-corthex-text-secondary border-corthex-border hover:border-corthex-accent/50'
@@ -217,11 +217,11 @@ export function FilesPage() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <div className="relative">
               <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
               <input
-                className="bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs py-2 pl-9 pr-4 rounded w-56 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent transition-all placeholder:text-corthex-text-disabled"
+                className="bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-base sm:text-xs py-2 pl-9 pr-4 rounded w-full sm:w-56 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent transition-all placeholder:text-corthex-text-disabled"
                 placeholder="Search encrypted files..."
                 type="text"
                 value={search}
@@ -380,7 +380,7 @@ export function FilesPage() {
         )}
 
         {/* Storage summary / Bottom context bar */}
-        <div className="mt-8 pt-6 border-t border-corthex-border flex flex-wrap gap-8">
+        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-corthex-border flex flex-wrap gap-4 sm:gap-8">
           <div className="flex flex-col gap-1">
             <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Files</span>
             <span className="text-sm font-bold text-corthex-accent font-mono">{files.length}</span>

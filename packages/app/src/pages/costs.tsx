@@ -137,12 +137,12 @@ export function CostsPage() {
 
   return (
     <div className="min-h-screen overflow-y-auto bg-corthex-bg text-corthex-text-primary">
-        <div className="p-8 max-w-[1440px] mx-auto w-full space-y-12" data-testid="costs-page">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto w-full space-y-8 sm:space-y-12" data-testid="costs-page">
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-1">
               <p className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary">Cost Analytics</p>
-              <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary">Operational Expenditure</h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-corthex-text-primary">Operational Expenditure</h1>
               <p className="text-corthex-text-secondary text-sm">Real-time resource allocation and fiscal efficiency tracking.</p>
             </div>
             <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export function CostsPage() {
                   <button
                     key={d}
                     onClick={() => { setDays(d); setChartRange(d === 7 ? '7d' : '30d') }}
-                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                    className={`px-4 py-1.5 min-h-[44px] sm:min-h-0 text-xs font-bold rounded-md transition-colors ${
                       days === d
                         ? 'bg-corthex-accent text-corthex-text-on-accent shadow-sm'
                         : 'text-corthex-text-secondary hover:text-corthex-text-primary'
@@ -161,7 +161,7 @@ export function CostsPage() {
                   </button>
                 ))}
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-corthex-surface border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors text-corthex-text-primary text-xs font-bold uppercase tracking-widest">
+              <button className="flex items-center gap-2 px-4 py-2 min-h-[44px] bg-corthex-surface border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors text-corthex-text-primary text-xs font-bold uppercase tracking-widest">
                 <Download className="w-4 h-4" />
                 Export
               </button>
@@ -194,7 +194,7 @@ export function CostsPage() {
                     <Wallet className="w-5 h-5 text-corthex-text-secondary" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-mono text-3xl font-bold">${costData.totalCostUsd.toFixed(2)}</p>
+                    <p className="font-mono text-2xl sm:text-3xl font-bold">${costData.totalCostUsd.toFixed(2)}</p>
                     <p className="text-xs text-corthex-text-secondary">Updated {costData.days}d ago</p>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export function CostsPage() {
                     <SlidersHorizontal className="w-5 h-5 text-corthex-text-secondary" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-mono text-3xl font-bold">${topModel?.costUsd.toFixed(2) ?? '0.00'}</p>
+                    <p className="font-mono text-2xl sm:text-3xl font-bold">${topModel?.costUsd.toFixed(2) ?? '0.00'}</p>
                     <p className="text-xs text-corthex-text-secondary">{topModel?.model ?? 'Anthropic (Claude)'}</p>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export function CostsPage() {
                     <Brain className="w-5 h-5 text-corthex-text-secondary" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-mono text-3xl font-bold">${dailyAvg.toFixed(2)}</p>
+                    <p className="font-mono text-2xl sm:text-3xl font-bold">${dailyAvg.toFixed(2)}</p>
                     <p className="text-xs text-corthex-text-secondary">Current period projection</p>
                   </div>
                 </div>
@@ -224,7 +224,7 @@ export function CostsPage() {
                     <CreditCard className="w-5 h-5 text-corthex-text-secondary" />
                   </div>
                   <div className="space-y-3">
-                    <p className="font-mono text-3xl font-bold">{budget ? `${((costData.totalCostUsd / (budget.monthlyBudgetUsd || 1)) * 100).toFixed(1)}%` : `${activeAgentCount}`}</p>
+                    <p className="font-mono text-2xl sm:text-3xl font-bold">{budget ? `${((costData.totalCostUsd / (budget.monthlyBudgetUsd || 1)) * 100).toFixed(1)}%` : `${activeAgentCount}`}</p>
                     {budget && (
                       <>
                         <div className="w-full h-2 bg-corthex-border rounded-full overflow-hidden">
@@ -243,9 +243,9 @@ export function CostsPage() {
               {/* Charts Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Monthly Trend Chart */}
-                <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-8 flex flex-col gap-6">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-corthex-text-primary">일별 비용 추이 Daily Cost Trend</h3>
+                <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-4 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <h3 className="text-base sm:text-lg font-semibold text-corthex-text-primary">일별 비용 추이 Daily Cost Trend</h3>
                     <div className="flex gap-2">
                       <button
                         onClick={() => { setDays(7); setChartRange('7d') }}
@@ -300,8 +300,8 @@ export function CostsPage() {
                 </div>
 
                 {/* Agent Cost Breakdown */}
-                <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-8 flex flex-col gap-6">
-                  <h3 className="text-lg font-semibold text-corthex-text-primary">에이전트별 비용 Agent Cost Breakdown</h3>
+                <div className="bg-corthex-elevated border border-corthex-border rounded-xl p-4 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-corthex-text-primary">에이전트별 비용 Agent Cost Breakdown</h3>
                   <div className="space-y-5">
                     {agentCostData.slice(0, 5).map((a) => (
                       <div key={a.agentId || a.agentName} className="space-y-1.5">
@@ -331,7 +331,7 @@ export function CostsPage() {
 
               {/* Detailed Cost Table */}
               <div className="bg-corthex-elevated border border-corthex-border rounded-xl overflow-hidden">
-                <div className="px-8 py-6 flex justify-between items-center border-b border-corthex-border">
+                <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-corthex-border">
                   <h3 className="text-lg font-semibold text-corthex-text-primary">상세 비용 Detailed Cost Records</h3>
                   <button className="text-sm font-semibold flex items-center gap-1 text-corthex-accent hover:underline">
                     <Download className="w-4 h-4" />
@@ -342,11 +342,11 @@ export function CostsPage() {
                   <table className="w-full text-left">
                     <thead>
                       <tr className="bg-corthex-elevated text-corthex-text-secondary text-xs uppercase tracking-wider">
-                        <th className="px-8 py-4 font-bold">Agent Name</th>
-                        <th className="px-8 py-4 font-bold">Model</th>
-                        <th className="px-8 py-4 font-bold text-center">Tokens</th>
-                        <th className="px-8 py-4 font-bold text-right">Cost (USD)</th>
-                        <th className="px-8 py-4 font-bold text-center">Runs</th>
+                        <th className="px-4 sm:px-6 lg:px-8 py-4 font-bold">Agent Name</th>
+                        <th className="px-4 sm:px-6 lg:px-8 py-4 font-bold hidden sm:table-cell">Model</th>
+                        <th className="px-4 sm:px-6 lg:px-8 py-4 font-bold text-center hidden md:table-cell">Tokens</th>
+                        <th className="px-4 sm:px-6 lg:px-8 py-4 font-bold text-right">Cost (USD)</th>
+                        <th className="px-4 sm:px-6 lg:px-8 py-4 font-bold text-center hidden sm:table-cell">Runs</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-corthex-border/50">
@@ -360,7 +360,7 @@ export function CostsPage() {
                           const IconComp = iconComps[i % iconComps.length]
                           return (
                             <tr key={a.agentId || a.agentName} className="hover:bg-corthex-elevated transition-colors">
-                              <td className="px-8 py-4">
+                              <td className="px-4 sm:px-6 lg:px-8 py-4">
                                 <div className="flex items-center gap-3">
                                   <div className="w-8 h-8 rounded-full bg-corthex-accent/10 flex items-center justify-center">
                                     <IconComp className="w-4 h-4 text-corthex-accent" />
@@ -368,18 +368,18 @@ export function CostsPage() {
                                   <span className="font-medium text-corthex-text-primary">{a.agentName}</span>
                                 </div>
                               </td>
-                              <td className="px-8 py-4">
+                              <td className="px-4 sm:px-6 lg:px-8 py-4 hidden sm:table-cell">
                                 <span className="px-2 py-1 rounded bg-corthex-elevated text-[10px] font-bold text-corthex-text-secondary">
                                   {costData.byModel[i % costData.byModel.length]?.model ?? 'CLAUDE'}
                                 </span>
                               </td>
-                              <td className="px-8 py-4 text-center font-mono text-xs">
+                              <td className="px-4 sm:px-6 lg:px-8 py-4 text-center font-mono text-xs hidden md:table-cell">
                                 {formatNumber(a.count * 100)}
                               </td>
-                              <td className="px-8 py-4 text-right font-mono font-bold text-corthex-text-primary">
+                              <td className="px-4 sm:px-6 lg:px-8 py-4 text-right font-mono font-bold text-corthex-text-primary">
                                 ${a.costUsd.toFixed(2)}
                               </td>
-                              <td className="px-8 py-4 text-center font-mono text-xs text-corthex-text-secondary">
+                              <td className="px-4 sm:px-6 lg:px-8 py-4 text-center font-mono text-xs text-corthex-text-secondary hidden sm:table-cell">
                                 {formatNumber(a.count)}
                               </td>
                             </tr>
@@ -389,7 +389,7 @@ export function CostsPage() {
                     </tbody>
                   </table>
                 </div>
-                <div className="px-8 py-6 border-t border-corthex-border flex items-center justify-between">
+                <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-t border-corthex-border flex items-center justify-between">
                   <p className="text-xs text-corthex-text-secondary">Showing {Math.min(agentCostData.length, 10)} of {agentCostData.length} agents</p>
                   <div className="flex gap-2">
                     <button className="p-2 border border-corthex-border rounded-lg hover:bg-corthex-elevated transition-colors">

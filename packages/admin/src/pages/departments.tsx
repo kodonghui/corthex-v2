@@ -153,19 +153,19 @@ export function DepartmentsPage() {
 
   return (
     <div className="min-h-screen bg-corthex-bg" data-testid="departments-page">
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
         {/* Page Header */}
-        <header className="flex justify-between items-end mb-12 relative">
+        <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 sm:gap-6 mb-8 md:mb-12 relative">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 bg-corthex-accent shadow-[0_0_8px_rgba(202,138,4,0.6)]" />
               <span className="font-mono text-xs tracking-[0.3em] text-corthex-accent uppercase">Registry / Sector</span>
             </div>
-            <h1 className="text-5xl font-black tracking-tighter uppercase text-corthex-text-primary leading-none" data-testid="departments-title">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase text-corthex-text-primary leading-none" data-testid="departments-title">
               Departments
             </h1>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             <div className="text-right">
               <p className="font-mono text-[10px] uppercase text-corthex-text-disabled mb-1">Total Sectors</p>
               <p className="font-mono text-2xl font-bold text-corthex-text-primary">
@@ -174,11 +174,12 @@ export function DepartmentsPage() {
             </div>
             <button
               onClick={() => setShowCreate(true)}
-              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-8 py-4 font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 active:scale-95 shadow-[8px_8px_0px_rgba(202,138,4,0.2)]"
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-6 py-3 md:px-8 md:py-4 font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 active:scale-95 shadow-[8px_8px_0px_rgba(202,138,4,0.2)] min-h-[44px]"
               data-testid="departments-create-btn"
             >
               <Plus className="w-5 h-5" />
-              Create Department
+              <span className="hidden sm:inline">Create Department</span>
+              <span className="sm:hidden">Create</span>
             </button>
           </div>
         </header>
@@ -204,7 +205,7 @@ export function DepartmentsPage() {
                     data-testid="departments-create-name"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
+                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-base sm:text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
                     placeholder="e.g. ENGINEERING"
                     required
                   />
@@ -215,7 +216,7 @@ export function DepartmentsPage() {
                     data-testid="departments-create-desc"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
+                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-base sm:text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
                     placeholder="부서의 역할과 목적"
                   />
                 </div>
@@ -245,24 +246,24 @@ export function DepartmentsPage() {
         {/* Department Table */}
         <section className="bg-corthex-surface border border-corthex-border/20 shadow-2xl overflow-hidden">
           {/* Table Controls */}
-          <div className="bg-corthex-elevated px-6 py-4 border-b border-corthex-border flex justify-between items-center">
-            <div className="flex gap-4">
-              <div className="relative">
+          <div className="bg-corthex-elevated px-4 sm:px-6 py-4 border-b border-corthex-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+            <div className="flex gap-4 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-none">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-[10px] pl-10 pr-4 py-2 w-64 outline-none transition-all placeholder:opacity-30"
+                  className="bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-base sm:text-[10px] pl-10 pr-4 py-2 w-full sm:w-64 outline-none transition-all placeholder:opacity-30"
                   placeholder="FILTER DEPARTMENTS..."
                   type="text"
                 />
               </div>
             </div>
             <div className="flex items-center gap-4 text-corthex-text-disabled">
-              <button className="hover:text-corthex-accent transition-colors"><Filter className="w-5 h-5" /></button>
-              <button className="hover:text-corthex-accent transition-colors"><Download className="w-5 h-5" /></button>
-              <div className="h-4 w-px bg-corthex-border" />
-              <span className="font-mono text-[10px] uppercase tracking-widest">Active nodes: {allAgents.length}</span>
+              <button className="hover:text-corthex-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><Filter className="w-5 h-5" /></button>
+              <button className="hover:text-corthex-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><Download className="w-5 h-5" /></button>
+              <div className="h-4 w-px bg-corthex-border hidden sm:block" />
+              <span className="font-mono text-[10px] uppercase tracking-widest hidden sm:inline">Active nodes: {allAgents.length}</span>
             </div>
           </div>
 
@@ -290,28 +291,28 @@ export function DepartmentsPage() {
               <table className="w-full text-left border-collapse" data-testid="departments-table">
                 <thead>
                   <tr className="bg-corthex-elevated border-b border-corthex-border">
-                    <th className="px-8 py-6">
+                    <th className="px-4 sm:px-6 md:px-8 py-4 md:py-6">
                       <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
                         <Building2 className="w-3 h-3" />
                         Department Name
                       </span>
                     </th>
-                    <th className="px-8 py-6">
+                    <th className="px-4 sm:px-6 md:px-8 py-4 md:py-6 hidden md:table-cell">
                       <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
                         <Key className="w-3 h-3" />
                         Description
                       </span>
                     </th>
-                    <th className="px-8 py-6">
+                    <th className="px-4 sm:px-6 md:px-8 py-4 md:py-6 hidden sm:table-cell">
                       <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
                         <Users className="w-3 h-3" />
                         Agent Count
                       </span>
                     </th>
-                    <th className="px-8 py-6 text-right">
+                    <th className="px-4 sm:px-6 md:px-8 py-4 md:py-6 text-right">
                       <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase">Status</span>
                     </th>
-                    <th className="px-8 py-6 text-right">
+                    <th className="px-4 sm:px-6 md:px-8 py-4 md:py-6 text-right">
                       <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase">Actions</span>
                     </th>
                   </tr>
@@ -362,7 +363,7 @@ export function DepartmentsPage() {
 
                     return (
                       <tr key={d.id} className="hover:bg-corthex-elevated/40 transition-colors group" data-testid={`departments-row-${d.id}`}>
-                        <td className="px-8 py-6">
+                        <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6">
                           <div className="flex flex-col">
                             <span className="text-corthex-text-primary font-bold tracking-tight uppercase group-hover:text-corthex-accent transition-colors" data-testid={`departments-name-${d.id}`}>
                               {d.name}
@@ -372,10 +373,10 @@ export function DepartmentsPage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-8 py-6">
+                        <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6 hidden md:table-cell">
                           <span className="text-sm text-corthex-text-secondary">{d.description || '—'}</span>
                         </td>
-                        <td className="px-8 py-6">
+                        <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6 hidden sm:table-cell">
                           <div className="flex items-center gap-4">
                             <span className="font-mono text-lg font-bold text-corthex-text-primary" data-testid={`departments-agent-count-${d.id}`}>{count}</span>
                             <div className="flex-1 h-1 bg-corthex-border w-24 relative overflow-hidden">
@@ -386,7 +387,7 @@ export function DepartmentsPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-right">
+                        <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6 text-right">
                           <div
                             className={`inline-flex items-center gap-2 px-3 py-1 border-l-2 ${
                               d.isActive
@@ -404,22 +405,22 @@ export function DepartmentsPage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6 text-right">
+                          <div className="flex justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               data-testid={`departments-edit-${d.id}`}
                               onClick={() => {
                                 setEditId(d.id)
                                 setEditForm({ name: d.name, description: d.description || '' })
                               }}
-                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
+                              className="p-2 sm:p-1.5 text-corthex-text-disabled hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                             >
                               <Pencil className="w-4 h-4" />
                             </button>
                             <button
                               data-testid={`departments-delete-${d.id}`}
                               onClick={() => openCascadeModal(d)}
-                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-error hover:bg-corthex-elevated rounded transition-colors"
+                              className="p-2 sm:p-1.5 text-corthex-text-disabled hover:text-corthex-error hover:bg-corthex-elevated rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -434,7 +435,7 @@ export function DepartmentsPage() {
           </div>
 
           {/* Footer Pagination */}
-          <div className="bg-corthex-elevated px-8 py-6 flex justify-between items-center border-t border-corthex-border">
+          <div className="bg-corthex-elevated px-4 sm:px-6 md:px-8 py-4 md:py-6 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-corthex-border">
             <div className="font-mono text-[10px] text-corthex-text-disabled opacity-60 uppercase">
               Showing {filteredDepts.length} of {depts.length} Registered Departments
             </div>
@@ -453,29 +454,29 @@ export function DepartmentsPage() {
         </section>
 
         {/* Stats Cards */}
-        <div className="mt-12 grid grid-cols-4 gap-6">
-          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+        <div className="mt-8 md:mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="bg-corthex-surface p-4 md:p-6 border-l-2 border-corthex-accent">
             <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Total Departments</p>
             <div className="flex items-end justify-between">
               <span className="text-3xl font-black text-corthex-text-primary">{depts.length}</span>
               <BarChart2 className="w-6 h-6 text-corthex-accent opacity-40" />
             </div>
           </div>
-          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+          <div className="bg-corthex-surface p-4 md:p-6 border-l-2 border-corthex-accent">
             <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Active Depts</p>
             <div className="flex items-end justify-between">
               <span className="text-3xl font-black text-corthex-text-primary">{depts.filter((d) => d.isActive).length}</span>
               <Shield className="w-6 h-6 text-corthex-accent opacity-40" />
             </div>
           </div>
-          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+          <div className="bg-corthex-surface p-4 md:p-6 border-l-2 border-corthex-accent">
             <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Total Agents</p>
             <div className="flex items-end justify-between">
               <span className="text-3xl font-black text-corthex-text-primary">{allAgents.length}</span>
               <Users className="w-6 h-6 text-corthex-accent opacity-40" />
             </div>
           </div>
-          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-error">
+          <div className="bg-corthex-surface p-4 md:p-6 border-l-2 border-corthex-error">
             <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">System Alerts</p>
             <div className="flex items-end justify-between">
               <span className="text-3xl font-black text-corthex-error">{depts.filter((d) => !d.isActive).length}</span>

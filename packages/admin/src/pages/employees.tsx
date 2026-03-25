@@ -197,7 +197,7 @@ export function EmployeesPage() {
 
   return (
     <div className="min-h-screen bg-corthex-bg" data-testid="employees-page">
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
         {/* Page Header */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
@@ -216,7 +216,7 @@ export function EmployeesPage() {
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Search employees..."
-                className="bg-corthex-surface border border-corthex-border text-corthex-text-secondary text-sm rounded-lg pl-10 pr-4 py-2.5 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent outline-none w-56 transition-all"
+                className="bg-corthex-surface border border-corthex-border text-corthex-text-secondary text-base sm:text-sm rounded-lg pl-10 pr-4 py-2.5 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent outline-none w-full sm:w-56 transition-all"
                 data-testid="search-input"
                 type="text"
               />
@@ -252,7 +252,7 @@ export function EmployeesPage() {
             {/* Add Employee */}
             <button
               onClick={() => setShowInvite(true)}
-              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all active:scale-95 shadow-lg min-h-[44px]"
               data-testid="invite-btn"
             >
               <UserPlus className="w-4 h-4" />
@@ -267,12 +267,12 @@ export function EmployeesPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-corthex-border bg-corthex-elevated/50">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Name</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Username</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Department</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Status</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Hire Date</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Name</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled hidden sm:table-cell">Username</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled hidden md:table-cell">Department</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Status</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled hidden lg:table-cell">Hire Date</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-corthex-border/50">
@@ -291,10 +291,10 @@ export function EmployeesPage() {
                 ) : (
                   employees.map((emp) => (
                     <tr key={emp.id} className="hover:bg-corthex-elevated/40 transition-colors group">
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
                         <div className="flex items-center gap-3">
                           <div className="relative">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm bg-corthex-elevated text-corthex-accent border border-corthex-border">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm bg-corthex-elevated text-corthex-accent border border-corthex-border shrink-0">
                               {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
                             <span
@@ -309,10 +309,10 @@ export function EmployeesPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-corthex-text-secondary text-sm font-medium">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-corthex-text-secondary text-sm font-medium hidden sm:table-cell">
                         @{emp.username}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {emp.departments.length === 0 ? (
                             <span className="px-2 py-1 bg-corthex-elevated text-corthex-text-disabled text-[10px] font-bold uppercase tracking-wider border border-corthex-border rounded">
@@ -330,7 +330,7 @@ export function EmployeesPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
                         <div className="flex items-center gap-1.5">
                           <span
                             className={`w-2 h-2 rounded-full ${emp.isActive ? 'bg-corthex-success' : 'bg-corthex-text-disabled'}`}
@@ -342,13 +342,13 @@ export function EmployeesPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-corthex-text-secondary text-sm font-mono italic">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-corthex-text-secondary text-sm font-mono italic hidden lg:table-cell">
                         {new Date(emp.createdAt).toLocaleDateString('en-US', {
                           month: 'short', day: '2-digit', year: 'numeric',
                         }).toUpperCase()}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                        <div className="flex justify-end gap-2 opacity-100 sm:opacity-40 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => {
                               setEditTarget(emp)
@@ -385,7 +385,7 @@ export function EmployeesPage() {
 
           {/* Pagination */}
           {pagination && (
-            <div className="flex items-center justify-between px-6 py-4 bg-corthex-elevated/30 border-t border-corthex-border">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-corthex-elevated/30 border-t border-corthex-border">
               <p className="text-corthex-text-disabled text-xs font-medium">
                 Showing{' '}
                 <span className="text-corthex-text-secondary">{(page - 1) * 20 + 1}</span> to{' '}
@@ -482,7 +482,7 @@ export function EmployeesPage() {
                 <input
                   value={inviteForm.username}
                   onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="사용자 아이디"
                   required
                 />
@@ -492,7 +492,7 @@ export function EmployeesPage() {
                 <input
                   value={inviteForm.name}
                   onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="직원 이름"
                   required
                 />
@@ -503,7 +503,7 @@ export function EmployeesPage() {
                   type="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="email@example.com"
                   required
                 />
@@ -576,7 +576,7 @@ export function EmployeesPage() {
                 <input
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   required
                 />
               </div>
@@ -586,7 +586,7 @@ export function EmployeesPage() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                 />
               </div>
               <div>

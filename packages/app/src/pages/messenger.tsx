@@ -154,6 +154,7 @@ export function MessengerPage() {
   }
 
   const [activeConvId, setActiveConvId] = useState('1')
+  const [mobileShowChat, setMobileShowChat] = useState(false)
 
   return (
     <div
@@ -161,7 +162,7 @@ export function MessengerPage() {
       className="flex h-[calc(100vh-64px)] overflow-hidden"
     >
       {/* Panel 1: Contact List (Active Nodes) */}
-      <section className="w-full md:w-80 border-r border-corthex-border flex flex-col bg-corthex-bg/30 shrink-0">
+      <section className={`w-full md:w-80 border-r border-corthex-border flex-col bg-corthex-bg/30 shrink-0 ${mobileShowChat ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 flex items-center justify-between border-b border-corthex-border/50">
           <h2 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Active Nodes</h2>
           <Filter className="w-4 h-4 text-corthex-text-secondary" />
@@ -170,8 +171,8 @@ export function MessengerPage() {
           {DEMO_CONVERSATIONS.map((conv) => (
             <div
               key={conv.id}
-              onClick={() => setActiveConvId(conv.id)}
-              className={`p-4 flex gap-3 cursor-pointer group transition-colors ${
+              onClick={() => { setActiveConvId(conv.id); setMobileShowChat(true) }}
+              className={`p-3 sm:p-4 flex gap-3 cursor-pointer group transition-colors min-h-[64px] ${
                 activeConvId === conv.id
                   ? 'bg-corthex-surface/40 border-l-2 border-corthex-accent'
                   : 'hover:bg-corthex-surface/30 border-l-2 border-transparent'
@@ -213,7 +214,7 @@ export function MessengerPage() {
       </section>
 
       {/* Panel 2: Conversation View */}
-      <section className="hidden md:flex flex-1 flex-col bg-corthex-bg relative overflow-hidden">
+      <section className={`flex-1 flex-col bg-corthex-bg relative overflow-hidden ${mobileShowChat ? 'flex' : 'hidden md:flex'}`}>
         {/* Subtle grid background */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -224,8 +225,14 @@ export function MessengerPage() {
         />
 
         {/* Chat Header */}
-        <div className="h-16 border-b border-corthex-border/60 flex items-center justify-between px-6 bg-corthex-bg/50 relative z-10">
+        <div className="h-16 border-b border-corthex-border/60 flex items-center justify-between px-4 md:px-6 bg-corthex-bg/50 relative z-10">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileShowChat(false)}
+              className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-corthex-text-secondary hover:text-corthex-text-primary transition-colors -ml-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#22c55e' }} />
             <div>
               <h2 className="text-sm font-bold tracking-wider text-corthex-text-primary uppercase">
@@ -234,8 +241,8 @@ export function MessengerPage() {
               <p className="text-[10px] text-corthex-text-disabled uppercase tracking-tighter">Connection Stable • Ping: 14ms</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-3 py-1.5 border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-surface transition-colors">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 border border-corthex-border rounded-lg text-xs font-medium text-corthex-text-secondary hover:bg-corthex-surface transition-colors">
               <Video className="w-4 h-4" />
               <span>Secure Feed</span>
             </button>
@@ -246,7 +253,7 @@ export function MessengerPage() {
         </div>
 
         {/* Message History */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 relative z-10">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 relative z-10">
           <div className="flex justify-center">
             <span className="bg-corthex-surface/50 text-[10px] text-corthex-text-disabled px-3 py-1 rounded-full uppercase tracking-widest border border-corthex-border">
               Protocol Initiated - 14:00
@@ -287,7 +294,7 @@ export function MessengerPage() {
                       <span className="text-xs font-bold text-corthex-accent">{msg.sender}</span>
                       <span className="text-[10px] text-corthex-text-disabled">{msg.time}</span>
                     </div>
-                    <div className="mt-2 bg-corthex-surface/40 border border-corthex-border rounded-lg p-2 flex items-center gap-3 w-64 hover:bg-corthex-surface/60 transition-colors cursor-pointer group">
+                    <div className="mt-2 bg-corthex-surface/40 border border-corthex-border rounded-lg p-2 flex items-center gap-3 w-full sm:w-64 hover:bg-corthex-surface/60 transition-colors cursor-pointer group">
                       <div className="w-10 h-10 bg-corthex-accent/20 rounded flex items-center justify-center">
                         <FileText className="w-5 h-5 text-corthex-accent" />
                       </div>
@@ -330,8 +337,8 @@ export function MessengerPage() {
         </div>
 
         {/* Input Bar */}
-        <div className="p-6 bg-corthex-bg relative z-10">
-          <div className="bg-corthex-surface border border-corthex-border rounded-xl p-2 flex items-center gap-3 focus-within:border-corthex-accent/50 transition-all">
+        <div className="p-3 md:p-6 bg-corthex-bg relative z-10">
+          <div className="bg-corthex-surface border border-corthex-border rounded-xl p-2 flex items-center gap-2 md:gap-3 focus-within:border-corthex-accent/50 transition-all">
             <button
               onClick={() => toast.info('이 기능은 준비 중입니다')}
               className="p-2 text-corthex-text-secondary hover:text-corthex-text-primary transition-colors"
@@ -339,27 +346,27 @@ export function MessengerPage() {
               <Plus className="w-5 h-5" />
             </button>
             <input
-              className="flex-1 bg-transparent border-none text-sm text-corthex-text-primary focus:ring-0 placeholder:text-corthex-text-disabled"
+              className="flex-1 bg-transparent border-none text-base sm:text-sm text-corthex-text-primary focus:ring-0 placeholder:text-corthex-text-disabled min-h-[44px]"
               placeholder="Type command or message..."
               type="text"
             />
             <div className="flex items-center gap-1">
-              <button className="p-2 text-corthex-text-secondary hover:text-corthex-text-primary transition-colors">
+              <button className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-corthex-text-secondary hover:text-corthex-text-primary transition-colors">
                 <Smile className="w-5 h-5" />
               </button>
-              <button className="p-2 text-corthex-text-secondary hover:text-corthex-text-primary transition-colors">
+              <button className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-corthex-text-secondary hover:text-corthex-text-primary transition-colors">
                 <Paperclip className="w-5 h-5" />
               </button>
               <div className="h-6 w-px bg-corthex-border mx-1" />
               <button
                 onClick={() => toast.info('이 기능은 준비 중입니다')}
-                className="p-2 bg-corthex-accent hover:bg-corthex-accent-deep text-corthex-bg rounded-lg transition-all flex items-center justify-center"
+                className="p-2 min-h-[44px] min-w-[44px] bg-corthex-accent hover:bg-corthex-accent-deep text-corthex-bg rounded-lg transition-all flex items-center justify-center"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-3 px-1">
+          <div className="hidden md:flex justify-between items-center mt-3 px-1">
             <div className="flex gap-3">
               <span className="text-[10px] text-corthex-text-disabled uppercase font-mono tracking-tight">Terminal: Active</span>
               <span className="text-[10px] text-corthex-text-disabled uppercase font-mono tracking-tight">Level: 4 Clearance</span>

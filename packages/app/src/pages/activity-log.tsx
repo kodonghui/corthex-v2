@@ -352,20 +352,20 @@ export function ActivityLogPage() {
   return (
     <div className="flex-1 flex flex-col bg-corthex-bg overflow-hidden" data-testid="activity-log-page">
       <main className="flex flex-col flex-1 overflow-hidden">
-        <section className="flex-1 overflow-y-auto p-8">
+        <section className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Page Header */}
           <div className="mb-8">
-            <div className="flex items-end justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
               <div>
-                <h2 className="text-3xl font-black text-corthex-text-primary tracking-tighter uppercase mb-1">Activity Log</h2>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-corthex-text-primary tracking-tighter uppercase mb-1">Activity Log</h2>
                 <p className="text-corthex-text-secondary font-medium">Real-time system event monitoring and audit trails.</p>
               </div>
-              <div className="flex gap-3">
-                <button className="px-4 py-2 bg-corthex-elevated border border-corthex-border text-corthex-text-secondary text-sm font-semibold rounded flex items-center gap-2 hover:bg-corthex-surface transition-colors">
+              <div className="flex gap-2 sm:gap-3">
+                <button className="min-h-[44px] px-4 py-2 bg-corthex-elevated border border-corthex-border text-corthex-text-secondary text-sm font-semibold rounded flex items-center gap-2 hover:bg-corthex-surface transition-colors">
                   <Download className="w-4 h-4" />
                   Export CSV
                 </button>
-                <div className="px-4 py-2 bg-corthex-accent text-white text-sm font-bold rounded flex items-center gap-2">
+                <div className="min-h-[44px] px-4 py-2 bg-corthex-accent text-white text-sm font-bold rounded flex items-center gap-2">
                   <RefreshCw className="w-4 h-4" />
                   <WsStatusIndicator />
                   Live Update
@@ -375,22 +375,22 @@ export function ActivityLogPage() {
           </div>
 
           {/* Filters Bar */}
-          <div className="bg-corthex-surface border border-corthex-border rounded-lg p-4 mb-6 flex flex-wrap items-center gap-6">
+          <div className="bg-corthex-surface border border-corthex-border rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-6">
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Date Range</label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-base sm:text-sm text-corthex-text-primary min-h-[44px]"
                 />
-                <span className="text-corthex-text-secondary text-xs">~</span>
+                <span className="text-corthex-text-secondary text-xs hidden sm:inline">~</span>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-base sm:text-sm text-corthex-text-primary min-h-[44px]"
                 />
               </div>
             </div>
@@ -400,7 +400,7 @@ export function ActivityLogPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-corthex-text-secondary" />
                 <input
-                  className="bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 rounded text-sm text-corthex-text-primary w-44"
+                  className="bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 rounded text-base sm:text-sm text-corthex-text-primary w-full sm:w-44 min-h-[44px]"
                   placeholder="All Agents"
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
@@ -416,7 +416,7 @@ export function ActivityLogPage() {
                   <button
                     key={item.value}
                     onClick={() => setTab(item.value)}
-                    className="px-4 py-1.5 rounded text-xs font-bold transition-colors"
+                    className="min-h-[44px] px-4 py-1.5 rounded text-xs font-bold transition-colors"
                     style={tab === item.value
                       ? { backgroundColor: 'var(--color-corthex-surface)', color: 'var(--color-corthex-accent)' }
                       : { color: 'var(--color-corthex-text-secondary)' }
@@ -435,7 +435,7 @@ export function ActivityLogPage() {
                 <select
                   value={conclusionFilter}
                   onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-base sm:text-sm text-corthex-text-primary min-h-[44px]"
                   data-testid="conclusion-filter"
                 >
                   <option value="">All</option>
@@ -452,7 +452,7 @@ export function ActivityLogPage() {
                   placeholder="Filter by tool..."
                   value={toolNameFilter}
                   onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-base sm:text-sm text-corthex-text-primary min-h-[44px]"
                   data-testid="tool-name-filter"
                 />
               </div>
@@ -530,7 +530,8 @@ export function ActivityLogPage() {
           {/* Data Table */}
           <div className="bg-corthex-surface border border-corthex-border rounded-lg overflow-hidden">
             {tab === 'agents' && (
-              <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b border-corthex-border bg-corthex-elevated">
                     <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Timestamp</th>
@@ -592,6 +593,7 @@ export function ActivityLogPage() {
                   )}
                 </tbody>
               </table>
+              </div>
             )}
 
             {tab === 'delegations' && (
@@ -663,7 +665,7 @@ export function ActivityLogPage() {
                 </p>
                 <div className="flex gap-2">
                   <button
-                    className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
+                    className="w-8 h-8 min-h-[44px] min-w-[44px] rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
                     disabled={page <= 1}
                     onClick={() => setPage(p => p - 1)}
                   >
@@ -673,7 +675,7 @@ export function ActivityLogPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className="w-8 h-8 rounded border flex items-center justify-center text-xs font-bold transition-colors"
+                      className="w-8 h-8 min-h-[44px] min-w-[44px] rounded border flex items-center justify-center text-xs font-bold transition-colors"
                       style={page === p
                         ? { borderColor: 'var(--color-corthex-accent)', backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-accent)' }
                         : { borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }
@@ -683,7 +685,7 @@ export function ActivityLogPage() {
                     </button>
                   ))}
                   <button
-                    className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
+                    className="w-8 h-8 min-h-[44px] min-w-[44px] rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
                     disabled={page >= totalPages}
                     onClick={() => setPage(p => p + 1)}
                   >

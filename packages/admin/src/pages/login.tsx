@@ -48,26 +48,26 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-corthex-bg text-corthex-text-primary">
-      <main className="flex-grow flex items-center justify-center p-6">
+      <main className="flex-grow flex items-center justify-center p-4 sm:p-6">
         <div className="relative w-full max-w-md">
           {/* Decorative blur orbs */}
           <div className="absolute -top-24 -left-24 w-64 h-64 bg-corthex-accent/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-corthex-info/5 rounded-full blur-3xl pointer-events-none" />
 
           {/* Login card */}
-          <div className="relative overflow-hidden rounded-xl p-8 md:p-10 bg-corthex-surface border border-corthex-border/20">
+          <div className="relative overflow-hidden rounded-xl p-6 sm:p-8 md:p-10 bg-corthex-surface border border-corthex-border/20">
             {/* Top accent line */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-corthex-accent to-transparent opacity-50" />
 
             {/* Header */}
-            <div className="flex flex-col items-center mb-10">
+            <div className="flex flex-col items-center mb-8 sm:mb-10">
               <div
                 className="w-16 h-16 bg-corthex-accent flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(202,138,4,0.3)]"
                 style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}
               >
                 <Shield className="w-8 h-8 text-corthex-text-on-accent" />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-corthex-text-primary">CORTHEX ADMIN</h1>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-corthex-text-primary">CORTHEX ADMIN</h1>
               <p className="text-corthex-text-secondary text-sm mt-1 font-mono tracking-widest uppercase">Central Command Access</p>
             </div>
 
@@ -81,7 +81,7 @@ export function LoginPage() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-base text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
                     placeholder="admin"
                     required
                   />
@@ -96,7 +96,7 @@ export function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-base text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
                     placeholder="••••••••"
                     required
                   />
@@ -118,7 +118,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading || countdown > 0}
-                className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-bold py-4 rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-sm disabled:opacity-50"
+                className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-bold py-4 rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-sm disabled:opacity-50 min-h-[48px]"
               >
                 {loading ? '로그인 중...' : countdown > 0 ? `${countdown}초 후 재시도` : '세션 시작'}
                 {!loading && countdown <= 0 && <LogIn className="w-5 h-5" />}
@@ -142,7 +142,7 @@ export function LoginPage() {
         </div>
       </main>
 
-      <footer className="fixed bottom-0 w-full flex justify-center items-center gap-6 py-6">
+      <footer className="fixed bottom-0 w-full flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 py-4 sm:py-6">
         <span className="text-corthex-text-disabled text-xs tracking-wide">© 2024 CORTHEX. All rights reserved.</span>
         <div className="flex gap-4">
           <a className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Privacy Policy</a>

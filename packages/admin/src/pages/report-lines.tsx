@@ -79,7 +79,7 @@ export function ReportLinesPage() {
   if (!selectedCompanyId) return <div className="p-8 text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">회사를 선택하세요</div>
 
   return (
-    <div className="p-8 space-y-6 max-w-4xl">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-4xl">
       {/* Header */}
       <div className="border-b border-corthex-border pb-6">
         <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">
@@ -91,7 +91,7 @@ export function ReportLinesPage() {
       </div>
 
       {/* Add New Line Section */}
-      <section className="bg-corthex-surface border border-corthex-border p-6 space-y-4">
+      <section className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 space-y-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="w-1.5 h-4 bg-corthex-accent flex-shrink-0"></span>
           <h2 className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">새 보고 라인 추가</h2>
@@ -129,7 +129,7 @@ export function ReportLinesPage() {
             <button
               onClick={handleSave}
               disabled={!hasChanges || saveMutation.isPending}
-              className="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors w-full md:w-auto"
             >
               <Plus className="w-3.5 h-3.5" />
               {saveMutation.isPending ? '저장 중...' : '추가'}
@@ -146,7 +146,7 @@ export function ReportLinesPage() {
       )}
 
       {/* Table */}
-      <section className="bg-corthex-surface border border-corthex-border overflow-hidden">
+      <section className="bg-corthex-surface border border-corthex-border overflow-hidden overflow-x-auto">
         {isLoading ? (
           <div className="p-5 space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -160,9 +160,9 @@ export function ReportLinesPage() {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-10">
               <tr className="bg-corthex-elevated border-b border-corthex-border">
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">대상 사용자 (Reporter)</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">직속 상사 (Supervisor)</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-right">관리</th>
+                <th className="px-3 sm:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">대상 사용자</th>
+                <th className="px-3 sm:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">직속 상사</th>
+                <th className="px-3 sm:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-right">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-corthex-border">
@@ -173,18 +173,18 @@ export function ReportLinesPage() {
 
                 return (
                   <tr key={u.id} className="hover:bg-corthex-elevated/50 transition-colors">
-                    <td className="px-5 py-4">
+                    <td className="px-3 sm:px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center text-corthex-accent font-bold text-xs font-mono flex-shrink-0">
                           {initial}
                         </div>
-                        <div>
-                          <p className="text-sm font-bold font-mono text-corthex-text-primary uppercase tracking-tight">{u.name}</p>
-                          <p className="text-xs font-mono text-corthex-text-disabled">@{u.username} / {u.role}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold font-mono text-corthex-text-primary uppercase tracking-tight truncate">{u.name}</p>
+                          <p className="text-xs font-mono text-corthex-text-disabled truncate">@{u.username} / {u.role}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 sm:px-5 py-4">
                       {reportTarget ? (
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center text-corthex-accent font-bold text-xs font-mono flex-shrink-0">
@@ -208,9 +208,9 @@ export function ReportLinesPage() {
                         </select>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-3 sm:px-5 py-4 text-right">
                       <button
-                        className="text-corthex-text-disabled hover:text-corthex-error transition-colors p-1"
+                        className="text-corthex-text-disabled hover:text-corthex-error transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         onClick={() => handleChange(u.id, '')}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -229,7 +229,7 @@ export function ReportLinesPage() {
           </div>
         )}
 
-        <div className="px-5 py-3 border-t border-corthex-border bg-corthex-elevated flex items-center justify-between">
+        <div className="px-3 sm:px-5 py-3 border-t border-corthex-border bg-corthex-elevated flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <p className="text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">
             전체 {users.length}명 · 보고 라인 {Object.keys(lines).filter((k) => lines[k]).length}개 설정됨
           </p>
@@ -237,7 +237,7 @@ export function ReportLinesPage() {
             <button
               onClick={handleSave}
               disabled={saveMutation.isPending}
-              className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 transition-colors"
+              className="px-4 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 transition-colors"
             >
               {saveMutation.isPending ? '저장 중...' : '변경사항 저장'}
             </button>

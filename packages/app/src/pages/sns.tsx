@@ -148,10 +148,10 @@ export function SnsPage() {
   const publishedCount = stats?.byStatus.find((s) => s.status === 'published')?.count ?? 0
 
   return (
-    <div data-testid="sns-page" className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+    <div data-testid="sns-page" className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 md:space-y-8">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-corthex-surface border border-corthex-border p-4 rounded-xl flex flex-col gap-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="bg-corthex-surface border border-corthex-border p-3 md:p-4 rounded-xl flex flex-col gap-1">
           <span className="text-[10px] uppercase tracking-widest text-corthex-text-disabled font-bold">Total Reach</span>
           <div className="flex items-end justify-between">
             <span className="text-2xl font-black text-corthex-text-primary">{stats ? `${stats.total}` : '—'}</span>
@@ -194,7 +194,7 @@ export function SnsPage() {
             <button
               key={t.value}
               onClick={() => setTab(t.value)}
-              className={`px-4 py-1.5 text-xs font-bold rounded transition-colors ${
+              className={`px-4 py-2 md:py-1.5 text-xs font-bold rounded transition-colors min-h-[44px] ${
                 tab === t.value
                   ? 'bg-corthex-surface text-corthex-accent shadow-sm'
                   : 'text-corthex-text-disabled hover:text-corthex-text-secondary'
@@ -264,8 +264,8 @@ export function SnsPage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-6 pt-2 border-t border-corthex-surface">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap gap-4 md:gap-6 pt-2 border-t border-corthex-surface">
+                  <div className="flex items-center gap-2 min-h-[44px]">
                     <Heart className="w-4 h-4 text-corthex-text-disabled" />
                     <span className="font-mono text-xs text-corthex-text-secondary">
                       {isPublished ? post.reactions[0].count.toLocaleString() : '--'}
@@ -303,14 +303,14 @@ export function SnsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => toast.info('이 기능은 준비 중입니다')}
-                    className="p-2 rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
+                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
                   {!isPublished && (
                     <button
                       onClick={() => toast.info('이 기능은 준비 중입니다')}
-                      className="p-2 rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
+                      className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded bg-corthex-surface hover:bg-corthex-elevated text-corthex-text-secondary border border-corthex-border transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

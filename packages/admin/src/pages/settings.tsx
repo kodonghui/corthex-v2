@@ -83,7 +83,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
   }
 
   return (
-    <div className="bg-corthex-bg border border-corthex-border/10 p-6" data-testid="settings-company-info">
+    <div className="bg-corthex-bg border border-corthex-border/10 p-4 sm:p-6" data-testid="settings-company-info">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 flex items-center justify-center bg-corthex-accent-muted">
           <Building2 className="w-4 h-4 text-corthex-accent" />
@@ -92,12 +92,12 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-12 gap-8 items-start">
-          <div className="col-span-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-start">
+          <div className="md:col-span-4">
             <label className="font-mono font-bold text-xs text-corthex-text-primary uppercase tracking-widest block mb-1">Company Name</label>
             <p className="text-xs text-corthex-text-disabled font-mono">Global identifier for this terminal instance.</p>
           </div>
-          <div className="col-span-8">
+          <div className="md:col-span-8">
             <input
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
@@ -106,12 +106,12 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-8 items-start">
-          <div className="col-span-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-start">
+          <div className="md:col-span-4">
             <label className="font-mono font-bold text-xs text-corthex-text-primary uppercase tracking-widest block mb-1">Slug</label>
             <p className="text-xs text-corthex-text-disabled font-mono">Read-only system identifier.</p>
           </div>
-          <div className="col-span-8">
+          <div className="md:col-span-8">
             <input
               value={company.slug}
               disabled
@@ -120,12 +120,12 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-8 items-center">
-          <div className="col-span-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-start md:items-center">
+          <div className="md:col-span-4">
             <label className="font-mono font-bold text-xs text-corthex-text-primary uppercase tracking-widest block mb-1">Status</label>
             <p className="text-xs text-corthex-text-disabled font-mono">Company active state.</p>
           </div>
-          <div className="col-span-8 flex items-center gap-3">
+          <div className="md:col-span-8 flex items-center gap-3">
             <span
               className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 font-mono font-bold uppercase tracking-widest ${
                 company.isActive
@@ -246,7 +246,7 @@ function ApiKeySection({ companyId }: { companyId: string }) {
   }
 
   return (
-    <div className="bg-corthex-bg border border-corthex-border/10 p-6" data-testid="settings-api-keys">
+    <div className="bg-corthex-bg border border-corthex-border/10 p-4 sm:p-6" data-testid="settings-api-keys">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 flex items-center justify-center bg-corthex-accent-muted">
@@ -268,8 +268,8 @@ function ApiKeySection({ companyId }: { companyId: string }) {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={handleSubmitAdd} className="mb-5 p-5 space-y-3 border border-corthex-accent/20 bg-corthex-elevated/30">
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleSubmitAdd} className="mb-5 p-4 sm:p-5 space-y-3 border border-corthex-accent/20 bg-corthex-elevated/30">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block font-mono font-bold text-xs text-corthex-text-secondary uppercase tracking-widest mb-1.5">Provider</label>
               <select
@@ -385,10 +385,10 @@ function ApiKeySection({ companyId }: { companyId: string }) {
           {apiKeys.map((k) => (
             <div
               key={k.id}
-              className="flex items-center justify-between px-4 py-3 border border-corthex-border/10 bg-corthex-elevated/20 hover:bg-corthex-elevated/40 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border border-corthex-border/10 bg-corthex-elevated/20 hover:bg-corthex-elevated/40 transition-colors"
             >
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs px-2.5 py-0.5 font-mono font-bold uppercase tracking-widest bg-corthex-accent-muted text-corthex-accent">
                     {k.provider}
                   </span>
@@ -485,7 +485,7 @@ function HandoffDepthSection({ companyId }: { companyId: string }) {
   }
 
   return (
-    <div className="bg-corthex-bg border border-corthex-border/10 p-6" data-testid="settings-handoff-depth">
+    <div className="bg-corthex-bg border border-corthex-border/10 p-4 sm:p-6" data-testid="settings-handoff-depth">
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 flex items-center justify-center bg-corthex-accent-muted">
           <ArrowLeftRight className="w-4 h-4 text-corthex-accent" />
@@ -565,7 +565,7 @@ function DefaultSettingsSection({
   }
 
   return (
-    <div className="bg-corthex-bg border border-corthex-border/10 p-6" data-testid="settings-defaults">
+    <div className="bg-corthex-bg border border-corthex-border/10 p-4 sm:p-6" data-testid="settings-defaults">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 flex items-center justify-center bg-corthex-accent-muted">
           <SlidersHorizontal className="w-4 h-4 text-corthex-accent" />
@@ -694,7 +694,7 @@ export function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-corthex-bg">
-      <div className="p-12 max-w-6xl" data-testid="settings-page">
+      <div className="p-4 sm:p-6 lg:p-12 max-w-6xl" data-testid="settings-page">
 
         {/* Header Section */}
         <div className="mb-12">
@@ -702,7 +702,7 @@ export function SettingsPage() {
             <div className="w-2 h-2 rounded-full bg-corthex-accent shadow-[0_0_8px_rgba(202,138,4,0.5)]" />
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/80">System Configuration</span>
           </div>
-          <h2 className="text-5xl font-bold text-corthex-text-primary tracking-tight mb-4">Admin Settings</h2>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-corthex-text-primary tracking-tight mb-4">Admin Settings</h2>
           <p className="text-corthex-text-secondary max-w-2xl leading-relaxed font-mono text-sm">
             Configure global parameters for the CORTHEX core environment. High-precision adjustments made here affect all operational sub-systems.
           </p>
@@ -712,12 +712,12 @@ export function SettingsPage() {
         <div className="bg-corthex-surface shadow-2xl border border-corthex-border/10 overflow-hidden">
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-corthex-border/10 bg-corthex-bg/50">
+          <div className="flex border-b border-corthex-border/10 bg-corthex-bg/50 overflow-x-auto">
             {SETTINGS_TABS.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`px-8 py-5 font-mono font-bold text-sm tracking-wide transition-colors ${
+                className={`px-4 sm:px-8 py-4 sm:py-5 font-mono font-bold text-sm tracking-wide transition-colors whitespace-nowrap min-h-[44px] ${
                   activeTab === tab.value
                     ? 'text-corthex-accent border-b-2 border-corthex-accent bg-corthex-surface'
                     : 'text-corthex-text-disabled hover:text-corthex-text-secondary hover:bg-corthex-elevated'
@@ -729,7 +729,7 @@ export function SettingsPage() {
           </div>
 
           {/* Tab Content */}
-          <div className="p-10 space-y-6">
+          <div className="p-4 sm:p-6 lg:p-10 space-y-6">
             {activeTab === 'general' && (
               <>
                 <CompanyInfoSection company={company} onSave={handleSaveInfo} />
@@ -745,7 +745,7 @@ export function SettingsPage() {
           </div>
 
           {/* Footer Action Bar */}
-          <div className="bg-corthex-bg/80 border-t border-corthex-border/10 px-10 py-6 flex justify-between items-center">
+          <div className="bg-corthex-bg/80 border-t border-corthex-border/10 px-4 sm:px-10 py-4 sm:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div className="flex items-center gap-4">
               <Info className="w-4 h-4 text-corthex-text-disabled" />
               <p className="text-[10px] font-mono text-corthex-text-disabled tracking-widest uppercase">
@@ -756,7 +756,7 @@ export function SettingsPage() {
         </div>
 
         {/* Auxiliary Info Cards */}
-        <div className="mt-12 grid grid-cols-3 gap-6">
+        <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div className="bg-corthex-surface p-6 border border-corthex-border/5">
             <div className="flex items-center justify-between mb-4">
               <Terminal className="w-5 h-5 text-corthex-accent" />

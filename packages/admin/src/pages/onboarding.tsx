@@ -119,7 +119,7 @@ const TOTAL_SEGMENTS = 20
 function StepIndicator({ current }: { current: number }) {
   const activeSegments = Math.round((current / STEPS.length) * TOTAL_SEGMENTS)
   return (
-    <div className="w-full mb-12">
+    <div className="w-full mb-8 sm:mb-12">
       <div className="flex justify-between items-end mb-3">
         <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">
           System Initialization
@@ -138,11 +138,11 @@ function StepIndicator({ current }: { current: number }) {
           />
         ))}
       </div>
-      <div className="flex justify-between mt-3">
+      <div className="flex justify-between mt-3 overflow-x-auto">
         {STEPS.map((step) => (
           <div
             key={step.num}
-            className={`font-mono text-[9px] uppercase tracking-widest transition-colors ${
+            className={`font-mono text-[9px] uppercase tracking-widest transition-colors flex-shrink-0 ${
               step.num === current
                 ? 'text-corthex-accent'
                 : step.num < current
@@ -194,7 +194,7 @@ function FooterNav({
   showSkip?: boolean
 }) {
   return (
-    <div className="px-8 py-6 flex justify-between items-center border-t border-corthex-border/40">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-t border-corthex-border/40">
       <div>
         {step > 1 && (
           <button
@@ -218,7 +218,7 @@ function FooterNav({
         <button
           onClick={onNext}
           disabled={nextDisabled}
-          className="flex items-center gap-3 bg-corthex-elevated hover:bg-corthex-accent text-corthex-text-primary hover:text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-8 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border border-corthex-border hover:border-corthex-accent"
+          className="flex items-center justify-center gap-3 bg-corthex-elevated hover:bg-corthex-accent text-corthex-text-primary hover:text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-6 sm:px-8 min-h-[44px] transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border border-corthex-border hover:border-corthex-accent w-full sm:w-auto"
         >
           {nextLabel || 'Continue'}
           <ArrowRight className="w-4 h-4" />
@@ -257,8 +257,8 @@ function WelcomeStep({
 
   return (
     <StepCard>
-      <div className="p-10 border-b border-corthex-border/40">
-        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+      <div className="p-4 sm:p-6 lg:p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-2xl sm:text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
           Create Company Entity
         </h1>
         <p className="text-corthex-text-secondary text-sm max-w-md">
@@ -266,7 +266,7 @@ function WelcomeStep({
         </p>
       </div>
 
-      <div className="p-10 space-y-8">
+      <div className="p-4 sm:p-6 lg:p-10 space-y-8">
         {/* Company Name */}
         <div className="space-y-2">
           <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">
@@ -277,7 +277,7 @@ function WelcomeStep({
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono tracking-tight py-3 px-0 placeholder:text-corthex-text-disabled transition-colors duration-150 text-lg"
+                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono tracking-tight py-3 px-0 placeholder:text-corthex-text-disabled transition-colors duration-150 text-base sm:text-lg"
                 autoFocus
               />
               <div className="flex gap-3">
@@ -371,9 +371,9 @@ function TemplateStep({
   if (applyResult) {
     return (
       <StepCard>
-        <div className="p-10">
+        <div className="p-4 sm:p-6 lg:p-10">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-8 h-8 bg-corthex-accent/20 flex items-center justify-center">
+            <div className="w-8 h-8 bg-corthex-accent/20 flex items-center justify-center flex-shrink-0">
               <Check className="w-5 h-5 text-corthex-accent" />
             </div>
             <div>
@@ -383,7 +383,7 @@ function TemplateStep({
               </h3>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 max-w-sm">
+          <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
             <div className="bg-corthex-elevated border border-corthex-border px-4 py-4">
               <p className="font-mono text-2xl font-bold text-corthex-accent">{applyResult.departmentsCreated}</p>
               <p className="font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mt-1">부서 생성</p>
@@ -401,15 +401,15 @@ function TemplateStep({
 
   return (
     <StepCard>
-      <div className="p-10 border-b border-corthex-border/40">
-        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+      <div className="p-4 sm:p-6 lg:p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-2xl sm:text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
           Define Your Departments
         </h1>
         <p className="text-corthex-text-secondary text-sm">
           Configure the logical structures of your organization. This helps CORTHEX categorize data and agent permissions.
         </p>
       </div>
-      <div className="p-10 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-10 space-y-6">
         {/* Template list */}
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary mb-4">
@@ -425,7 +425,7 @@ function TemplateStep({
                 return depts.map((dept) => (
                   <div
                     key={`${t.id}-${dept.name}`}
-                    className="flex items-center justify-between p-4 border border-corthex-border hover:border-corthex-accent bg-corthex-elevated transition-colors duration-150"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border border-corthex-border hover:border-corthex-accent bg-corthex-elevated transition-colors duration-150"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-9 h-9 bg-corthex-surface flex items-center justify-center border border-corthex-border">
@@ -444,7 +444,7 @@ function TemplateStep({
                         applyMutation.mutate(t.id)
                       }}
                       disabled={applyMutation.isPending}
-                      className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-4 py-2 hover:bg-corthex-accent-hover disabled:opacity-50 transition-colors"
+                      className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-4 py-2 min-h-[44px] hover:bg-corthex-accent-hover disabled:opacity-50 transition-colors w-full sm:w-auto"
                     >
                       {applyMutation.isPending && selectedTemplate?.id === t.id ? '적용 중...' : 'Apply'}
                     </button>
@@ -569,15 +569,15 @@ function ApiKeyStep({
 
   return (
     <StepCard>
-      <div className="p-10 border-b border-corthex-border/40">
-        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+      <div className="p-4 sm:p-6 lg:p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-2xl sm:text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
           API Key Setup
         </h1>
         <p className="text-corthex-text-secondary text-sm">
           AI 에이전트가 사용할 외부 API 키를 등록합니다. 나중에 설정해도 됩니다.
         </p>
       </div>
-      <div className="p-10 space-y-4">
+      <div className="p-4 sm:p-6 lg:p-10 space-y-4">
         {ONBOARDING_PROVIDERS.map((provider) => {
           const schemaFields = providerSchemas[provider] || ['api_key']
           const alreadyExists = existingProviders.has(provider)
@@ -714,22 +714,22 @@ function InviteStep({
 
   return (
     <StepCard>
-      <div className="p-10 border-b border-corthex-border/40">
-        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+      <div className="p-4 sm:p-6 lg:p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-2xl sm:text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
           Invite Team Members
         </h1>
         <p className="text-corthex-text-secondary text-sm">
           팀원을 초대해보세요. 나중에 직원 관리 페이지에서도 추가할 수 있습니다.
         </p>
       </div>
-      <div className="p-10 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-10 space-y-6">
         {/* Invited list */}
         {invited.length > 0 && (
           <div className="space-y-2">
             {invited.map((emp, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between px-4 py-3 bg-corthex-elevated border border-corthex-accent/30"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 bg-corthex-elevated border border-corthex-accent/30"
               >
                 <div>
                   <p className="font-mono text-sm font-bold text-corthex-text-primary">{emp.name}</p>
@@ -757,7 +757,7 @@ function InviteStep({
             <Users className="w-4 h-4 text-corthex-accent" />
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">Add Member</p>
           </div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">아이디</label>
               <input
@@ -881,14 +881,14 @@ function SummaryStep({
 
   return (
     <StepCard>
-      <div className="p-10">
+      <div className="p-4 sm:p-6 lg:p-10">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-corthex-accent flex items-center justify-center">
+          <div className="w-10 h-10 bg-corthex-accent flex items-center justify-center flex-shrink-0">
             <Check className="w-6 h-6 text-corthex-text-on-accent" />
           </div>
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">Setup Complete</p>
-            <h2 className="font-mono text-2xl font-extrabold tracking-tighter uppercase text-corthex-text-primary">
+            <h2 className="font-mono text-xl sm:text-2xl font-extrabold tracking-tighter uppercase text-corthex-text-primary">
               CORTHEX 준비 완료
             </h2>
           </div>
@@ -901,7 +901,7 @@ function SummaryStep({
           {summaryItems.map((item) => (
             <div
               key={item.label}
-              className="flex items-center justify-between px-5 py-3 bg-corthex-elevated border border-corthex-border"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 px-4 sm:px-5 py-3 bg-corthex-elevated border border-corthex-border"
             >
               <span className="font-mono text-xs text-corthex-text-secondary uppercase tracking-widest">{item.label}</span>
               <span className="font-mono text-sm font-bold text-corthex-text-primary">{item.value}</span>
@@ -913,7 +913,7 @@ function SummaryStep({
           <button
             onClick={() => completeMutation.mutate()}
             disabled={completeMutation.isPending}
-            className="flex items-center gap-3 bg-corthex-accent text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-10 hover:bg-corthex-accent-hover disabled:opacity-50 active:scale-95 transition-all duration-150"
+            className="flex items-center justify-center gap-3 bg-corthex-accent text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-6 sm:px-10 min-h-[44px] hover:bg-corthex-accent-hover disabled:opacity-50 active:scale-95 transition-all duration-150 w-full sm:w-auto"
           >
             {completeMutation.isPending ? '저장 중...' : 'CORTHEX 사용 시작하기'}
             <ArrowRight className="w-4 h-4" />
@@ -1000,7 +1000,7 @@ export function OnboardingWizardPage() {
       />
 
       {/* Navigation Header */}
-      <header className="relative z-10 w-full bg-corthex-surface border-b-2 border-corthex-accent flex justify-between items-center px-8 py-4">
+      <header className="relative z-10 w-full bg-corthex-surface border-b-2 border-corthex-accent flex justify-between items-center px-4 lg:px-8 py-4">
         <div className="flex items-center gap-3">
           <span className="font-mono text-xl font-black text-corthex-accent tracking-tighter">CORTHEX</span>
         </div>
@@ -1009,7 +1009,7 @@ export function OnboardingWizardPage() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-20">
+      <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-20">
         {/* Industrial Progress Bar */}
         <StepIndicator current={currentStep} />
 

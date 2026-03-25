@@ -75,7 +75,7 @@ function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
@@ -145,8 +145,9 @@ export function Sidebar() {
               key={item.to}
               to={item.to}
               end={item.to === '/'}
+              onClick={onNavClick}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm min-h-[44px] transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent ${
                   isActive
                     ? 'bg-corthex-sidebar-active text-corthex-sidebar-text-active font-medium'
                     : 'text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active'

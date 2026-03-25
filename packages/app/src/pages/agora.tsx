@@ -166,7 +166,7 @@ export function AgoraPage() {
   const [sortTab, setSortTab] = useState<'latest' | 'trending' | 'unresolved'>('latest')
 
   return (
-    <div data-testid="agora-page" className="p-6 max-w-[1200px] mx-auto w-full">
+    <div data-testid="agora-page" className="p-4 md:p-6 max-w-[1200px] mx-auto w-full">
       {/* Mobile create button */}
       <div className="lg:hidden mb-4">
         <button
@@ -180,7 +180,7 @@ export function AgoraPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Sidebar */}
-        <aside className="col-span-12 lg:col-span-3 space-y-6">
+        <aside className="col-span-12 lg:col-span-3 space-y-4 md:space-y-6">
           {/* Categories */}
           <div>
             <h3 className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary mb-4">
@@ -191,7 +191,7 @@ export function AgoraPage() {
                 <button
                   key={cat.label}
                   onClick={() => setActiveCategory(cat.label)}
-                  className={`w-full flex justify-between items-center px-3 py-2 rounded-lg text-sm transition-colors ${
+                  className={`w-full flex justify-between items-center px-3 py-2.5 md:py-2 rounded-lg text-sm transition-colors min-h-[44px] ${
                     activeCategory === cat.label
                       ? 'bg-corthex-accent/10 text-corthex-accent border border-corthex-accent/20'
                       : 'text-corthex-text-secondary hover:bg-corthex-elevated hover:text-corthex-text-primary'
@@ -281,7 +281,7 @@ export function AgoraPage() {
               return (
                 <article
                   key={thread.id}
-                  className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-xl p-5 transition-all cursor-pointer"
+                  className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-xl p-4 md:p-5 transition-all cursor-pointer"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span
@@ -321,26 +321,26 @@ export function AgoraPage() {
           </div>
 
           {/* Pagination */}
-          <div className="mt-8 flex items-center justify-center gap-2">
-            <button className="p-2 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+          <div className="mt-8 flex items-center justify-center gap-1.5 md:gap-2">
+            <button className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="w-10 h-10 rounded-lg border border-corthex-accent text-corthex-accent bg-corthex-accent/10 font-mono text-sm">
+            <button className="w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-corthex-accent text-corthex-accent bg-corthex-accent/10 font-mono text-sm">
               1
             </button>
             {[2, 3].map((n) => (
               <button
                 key={n}
-                className="w-10 h-10 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm"
+                className="w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm"
               >
                 {n}
               </button>
             ))}
-            <span className="text-corthex-text-disabled px-2">...</span>
-            <button className="w-10 h-10 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm">
+            <span className="text-corthex-text-disabled px-1 md:px-2 hidden sm:inline">...</span>
+            <button className="hidden sm:flex w-10 h-10 min-w-[44px] min-h-[44px] items-center justify-center rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors font-mono text-sm">
               12
             </button>
-            <button className="p-2 rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+            <button className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>

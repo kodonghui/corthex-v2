@@ -189,9 +189,9 @@ export function NotificationsPage() {
         className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased"
         data-testid="notifications-page"
       >
-        <div className="p-8 max-w-[1440px] mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Settings</h1>
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Settings</h1>
             <button
               onClick={() => setShowSettings(false)}
               className="flex items-center gap-2 px-4 py-2 text-corthex-accent-deep font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
@@ -211,18 +211,18 @@ export function NotificationsPage() {
       className="bg-corthex-bg min-h-screen font-sans text-corthex-text-primary antialiased"
       data-testid="notifications-page"
     >
-      <div className="p-8 max-w-[1440px] mx-auto min-h-screen flex flex-col">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto min-h-screen flex flex-col">
         {/* HEADER SECTION */}
-        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <header className="mb-6 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Center</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tighter text-corthex-accent-deep uppercase">Notification Center</h1>
             <p className="text-corthex-text-secondary mt-2 font-medium">CORTHEX System Alerts &amp; Updates</p>
           </div>
           <div className="flex items-center gap-3">
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllRead.mutate()}
-                className="flex items-center gap-2 px-4 py-2 text-corthex-accent-deep font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
+                className="flex items-center gap-2 px-4 py-2 min-h-[44px] text-corthex-accent-deep font-mono text-xs uppercase tracking-widest hover:bg-corthex-elevated transition-colors rounded-lg"
                 data-testid="mark-all-read"
               >
                 <CheckCheck className="w-4 h-4" />
@@ -246,7 +246,7 @@ export function NotificationsPage() {
               <button
                 key={chip.key}
                 onClick={() => setTab(chip.key)}
-                className={`px-5 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
+                className={`px-3 sm:px-5 py-3 min-h-[44px] text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
                   activeTab === chip.key
                     ? 'border-corthex-accent text-corthex-accent'
                     : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
@@ -260,7 +260,7 @@ export function NotificationsPage() {
               <button
                 key={chip.key}
                 onClick={() => setFilter(chip.key)}
-                className={`px-5 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
+                className={`px-3 sm:px-5 py-3 min-h-[44px] text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
                   filter === chip.key
                     ? 'border-corthex-accent text-corthex-accent'
                     : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
@@ -277,7 +277,7 @@ export function NotificationsPage() {
           <div className="flex items-center gap-2 text-corthex-text-secondary px-3 py-2 bg-corthex-elevated rounded-lg border border-corthex-border">
             <Search className="w-4 h-4 text-corthex-text-secondary/60" />
             <input
-              className="bg-transparent border-none focus:ring-0 focus:outline-none text-xs font-mono w-48 p-0 placeholder:text-corthex-text-secondary/40 text-corthex-text-primary"
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-base sm:text-xs font-mono w-32 sm:w-48 p-0 placeholder:text-corthex-text-secondary/40 text-corthex-text-primary"
               placeholder="Filter alerts..."
               type="text"
               value={searchQuery}
@@ -287,14 +287,14 @@ export function NotificationsPage() {
         </nav>
 
         {/* MASTER-DETAIL LAYOUT */}
-        <main className="flex-1 flex flex-col lg:flex-row gap-0 bg-corthex-bg rounded-2xl overflow-hidden shadow-2xl shadow-corthex-accent-deep/5 ring-1 ring-corthex-border/30">
+        <main className="flex-1 flex flex-col lg:flex-row gap-0 bg-corthex-bg rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl shadow-corthex-accent-deep/5 ring-1 ring-corthex-border/30">
           {/* LIST PANEL (LEFT) */}
-          <section className="lg:w-[60%] flex flex-col border-r border-corthex-border/30">
+          <section className="lg:w-[60%] flex flex-col border-b lg:border-b-0 lg:border-r border-corthex-border/30">
             <div className="p-4 bg-corthex-elevated text-[10px] font-mono uppercase tracking-[0.2em] text-corthex-text-secondary/60 flex justify-between">
               <span>Active Stream</span>
               <span>{filteredNotifications.length} Records Found</span>
             </div>
-            <div className="flex-1 overflow-y-auto max-h-[700px]">
+            <div className="flex-1 overflow-y-auto max-h-[400px] lg:max-h-[700px]">
               {isLoading ? (
                 <div className="space-y-0">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -451,7 +451,7 @@ export function NotificationsPage() {
                         {selectedNotification.actionUrl && (
                           <button
                             onClick={() => handleNavigate(selectedNotification)}
-                            className="w-full py-4 bg-corthex-accent text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-corthex-accent-deep transition-all active:scale-[0.98]"
+                            className="w-full py-4 min-h-[44px] bg-corthex-accent text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-corthex-accent-deep transition-all active:scale-[0.98]"
                           >
                             <CheckCircle className="w-5 h-5" />
                             Open Related Page
@@ -460,7 +460,7 @@ export function NotificationsPage() {
                         {!selectedNotification.isRead && (
                           <button
                             onClick={() => markRead.mutate(selectedNotification.id)}
-                            className="w-full py-4 bg-corthex-border text-corthex-text-primary font-bold rounded-xl border border-corthex-border flex items-center justify-center gap-2 hover:bg-corthex-elevated transition-all active:scale-[0.98]"
+                            className="w-full py-4 min-h-[44px] bg-corthex-border text-corthex-text-primary font-bold rounded-xl border border-corthex-border flex items-center justify-center gap-2 hover:bg-corthex-elevated transition-all active:scale-[0.98]"
                           >
                             <CheckCheck className="w-5 h-5" />
                             Mark as Read
@@ -479,7 +479,7 @@ export function NotificationsPage() {
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center p-8">
+              <div className="flex-1 flex items-center justify-center p-6 sm:p-8">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-2xl bg-corthex-elevated flex items-center justify-center mx-auto mb-4">
                     <Info className="w-8 h-8 text-corthex-text-secondary/30" />
@@ -492,7 +492,7 @@ export function NotificationsPage() {
         </main>
 
         {/* FOOTER STATUS */}
-        <footer className="mt-8 flex justify-between items-center px-2">
+        <footer className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-2">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-corthex-accent" />

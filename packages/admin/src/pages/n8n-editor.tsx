@@ -94,7 +94,7 @@ export function N8nEditorPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header Bar */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-corthex-border bg-corthex-surface">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 lg:px-6 py-3 border-b border-corthex-border bg-corthex-surface">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 bg-corthex-accent-muted border border-corthex-border flex items-center justify-center">
             <Workflow className="w-3.5 h-3.5 text-corthex-accent" />
@@ -105,7 +105,7 @@ export function N8nEditorPage() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2">
             <Activity className="h-3.5 w-3.5 text-corthex-success" />
             <span className="text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">
@@ -114,7 +114,7 @@ export function N8nEditorPage() {
           </div>
           <button
             onClick={() => setIframeKey(k => k + 1)}
-            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest"
+            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest min-h-[44px]"
           >
             <RefreshCw className="h-3 w-3" />
             새로고침
@@ -123,7 +123,7 @@ export function N8nEditorPage() {
             href="/api/admin/n8n-editor/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest"
+            className="flex items-center gap-1.5 text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors uppercase tracking-widest min-h-[44px]"
           >
             <ExternalLink className="h-3 w-3" />
             새 탭
@@ -137,7 +137,7 @@ export function N8nEditorPage() {
           key={iframeKey}
           src="/api/admin/n8n-editor/"
           className="w-full border-0"
-          style={{ height: 'calc(100vh - 180px)' }}
+          style={{ height: 'calc(100vh - 160px)' }}
           title="n8n Workflow Editor"
           sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
         />

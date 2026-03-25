@@ -242,12 +242,12 @@ export function N8nWorkflowsPage() {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
-      <header className="flex justify-between items-center px-8 py-4 border-b border-corthex-border bg-corthex-surface/50 shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="relative">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-4 lg:px-8 py-4 border-b border-corthex-border bg-corthex-surface/50 shrink-0">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <Activity className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-corthex-text-disabled" />
             <input
-              className="bg-corthex-elevated border border-corthex-border rounded text-sm pl-10 pr-4 py-1.5 w-64 text-corthex-text-secondary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent"
+              className="bg-corthex-elevated border border-corthex-border rounded text-base sm:text-sm pl-10 pr-4 py-2 sm:py-1.5 w-full sm:w-64 text-corthex-text-secondary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent"
               placeholder="Filter active workflows..."
               type="text"
             />
@@ -266,9 +266,9 @@ export function N8nWorkflowsPage() {
       </header>
 
       {/* Content Canvas */}
-      <div className="flex-1 p-8 flex gap-8 min-h-0">
+      <div className="flex-1 p-4 lg:p-8 flex flex-col lg:flex-row gap-4 lg:gap-8 min-h-0">
         {/* Left: Workflow Inventory */}
-        <div className="flex-1 flex flex-col space-y-6 min-w-0">
+        <div className="flex-1 flex flex-col space-y-4 lg:space-y-6 min-w-0">
           {/* FR-N8N5: Service suspended banner */}
           {isUnavailable && <ServiceSuspendedBanner />}
 
@@ -280,21 +280,21 @@ export function N8nWorkflowsPage() {
           )}
 
           {/* Title Row */}
-          <div className="flex justify-between items-end">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
             <div>
-              <h2 className="text-3xl font-black tracking-tighter text-corthex-text-primary">WORKFLOWS</h2>
+              <h2 className="text-2xl lg:text-3xl font-black tracking-tighter text-corthex-text-primary">WORKFLOWS</h2>
               <p className="text-xs font-mono text-corthex-text-secondary uppercase tracking-widest mt-1">
                 {wfLoading ? 'Loading...' : `Found ${workflows.length} automated sequences`}
               </p>
             </div>
-            <button className="bg-corthex-accent text-corthex-text-on-accent font-black px-6 py-2 flex items-center gap-2 hover:bg-corthex-accent-hover transition-colors text-xs tracking-tighter uppercase rounded">
+            <button className="bg-corthex-accent text-corthex-text-on-accent font-black px-6 py-2.5 min-h-[44px] w-full sm:w-auto justify-center flex items-center gap-2 hover:bg-corthex-accent-hover transition-colors text-xs tracking-tighter uppercase rounded">
               <Plus className="w-4 h-4" />
               New Workflow
             </button>
           </div>
 
-          {/* Table */}
-          <div className="border border-corthex-border rounded overflow-hidden">
+          {/* Table — Desktop */}
+          <div className="hidden lg:block border border-corthex-border rounded overflow-hidden">
             {/* Table Header */}
             <div
               className="px-6 py-3 bg-corthex-elevated/30 border-b border-corthex-border text-[10px] font-mono text-corthex-text-disabled uppercase tracking-[0.2em]"
@@ -333,8 +333,48 @@ export function N8nWorkflowsPage() {
             )}
           </div>
 
+          {/* Cards — Mobile */}
+          <div className="lg:hidden space-y-3">
+            {wfLoading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-corthex-surface/20 animate-pulse rounded-lg border border-corthex-border/50" />
+              ))
+            ) : workflows.length === 0 ? (
+              <div className="text-center py-12 text-corthex-text-disabled">
+                <Workflow className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">등록된 워크플로우가 없습니다</p>
+              </div>
+            ) : (
+              workflows.map((wf) => (
+                <div
+                  key={wf.id}
+                  onClick={() => setSelectedWorkflowId(wf.id)}
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    selectedWorkflowId === wf.id
+                      ? 'bg-corthex-accent/5 border-corthex-accent'
+                      : 'bg-corthex-surface/20 border-corthex-border hover:bg-corthex-elevated/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-corthex-text-primary font-bold text-sm">{wf.name}</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-2 h-2 rounded-full ${wf.active ? 'bg-corthex-accent' : 'bg-corthex-elevated'}`} />
+                      <span className={`text-[10px] font-mono uppercase ${wf.active ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`}>
+                        {wf.active ? 'Active' : 'Standby'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-corthex-text-secondary font-mono">{formatDate(wf.updatedAt)}</span>
+                    <span className="font-mono text-corthex-text-secondary">{wf.active ? '98%' : 'N/A'}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
             <div className="bg-corthex-elevated/40 border border-corthex-border p-6 flex flex-col justify-between aspect-video rounded">
               <span className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-widest">
                 Total Throughput
@@ -370,7 +410,7 @@ export function N8nWorkflowsPage() {
         </div>
 
         {/* Right: Live Execution Stream */}
-        <aside className="w-96 flex flex-col bg-corthex-surface border border-corthex-border rounded overflow-hidden shrink-0">
+        <aside className="w-full lg:w-96 flex flex-col bg-corthex-surface border border-corthex-border rounded overflow-hidden shrink-0">
           <div className="p-4 border-b border-corthex-border flex items-center justify-between bg-corthex-elevated/50">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-corthex-accent animate-pulse rounded-full" />
@@ -384,7 +424,7 @@ export function N8nWorkflowsPage() {
           </div>
 
           {/* FR-N8N2: Execution results (read-only) */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[11px]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-[11px] max-h-64 lg:max-h-none">
             {execLoading ? (
               <div className="flex flex-col items-center justify-center h-32 text-corthex-text-disabled">
                 <RefreshCw className="w-5 h-5 mb-2 animate-spin" />
@@ -405,7 +445,7 @@ export function N8nWorkflowsPage() {
           <div className="p-4 border-t border-corthex-border bg-corthex-elevated/30 flex items-center gap-3">
             <Terminal className="w-4 h-4 text-corthex-text-disabled" />
             <input
-              className="bg-transparent border-none p-0 text-[10px] font-mono text-corthex-text-secondary focus:ring-0 focus:outline-none placeholder:text-corthex-text-disabled w-full"
+              className="bg-transparent border-none p-0 text-base sm:text-[10px] font-mono text-corthex-text-secondary focus:ring-0 focus:outline-none placeholder:text-corthex-text-disabled w-full"
               placeholder="Send command to kernel..."
               type="text"
             />

@@ -419,15 +419,15 @@ export function OrgTemplatesPage() {
   }
 
   return (
-    <div className="p-8 space-y-6" data-testid="org-templates-page">
+    <div className="p-4 lg:p-8 space-y-6" data-testid="org-templates-page">
       {/* Page Header */}
-      <div className="flex items-end justify-between border-b border-corthex-border pb-6">
+      <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-4 border-b border-corthex-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 bg-corthex-accent"></div>
             <span className="text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">System / Templates / Registry</span>
           </div>
-          <h1 className="text-2xl font-bold uppercase tracking-widest text-corthex-text-primary">
+          <h1 className="text-xl lg:text-2xl font-bold uppercase tracking-widest text-corthex-text-primary">
             Organization Templates
           </h1>
           <p className="text-xs font-mono text-corthex-text-disabled mt-1 uppercase tracking-widest">
@@ -436,7 +436,7 @@ export function OrgTemplatesPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-6 py-2 bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest hover:bg-corthex-accent-hover transition-colors flex-shrink-0 flex items-center gap-2"
+          className="px-6 py-3 min-h-[44px] bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest hover:bg-corthex-accent-hover transition-colors flex-shrink-0 flex items-center gap-2 w-full lg:w-auto justify-center"
         >
           현재 조직 → 템플릿 저장
         </button>
@@ -449,8 +449,8 @@ export function OrgTemplatesPage() {
         </div>
       ) : (
         <div className="bg-corthex-surface border border-corthex-border overflow-hidden">
-          {/* Table Header */}
-          <div className="grid grid-cols-12 bg-corthex-elevated border-b border-corthex-border px-6 py-3">
+          {/* Desktop Table Header */}
+          <div className="hidden lg:grid grid-cols-12 bg-corthex-elevated border-b border-corthex-border px-6 py-3">
             <div className="col-span-4 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Template Identification</div>
             <div className="col-span-2 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-center">Depts</div>
             <div className="col-span-2 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-center">Agents</div>
@@ -463,8 +463,8 @@ export function OrgTemplatesPage() {
               const depts = t.templateData?.departments || []
               const totalAgents = depts.reduce((s, d) => s + d.agents.length, 0)
               return (
-                <div key={t.id} className="grid grid-cols-12 px-6 py-6 hover:bg-corthex-elevated transition-colors group">
-                  <div className="col-span-4 flex items-center gap-4">
+                <div key={t.id} className="lg:grid lg:grid-cols-12 px-4 lg:px-6 py-4 lg:py-6 hover:bg-corthex-elevated transition-colors group space-y-3 lg:space-y-0">
+                  <div className="lg:col-span-4 flex items-center gap-4">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-widest text-corthex-text-primary mb-1">{t.name}</h3>
                       {t.description && (
@@ -480,26 +480,28 @@ export function OrgTemplatesPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-2 flex flex-col items-center justify-center">
+                  <div className="lg:col-span-2 flex lg:flex-col items-center lg:justify-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled lg:hidden">Depts:</span>
                     <span className="font-mono text-xl font-bold text-corthex-text-primary">{depts.length}</span>
-                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled">Depts</span>
+                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled hidden lg:block">Depts</span>
                   </div>
-                  <div className="col-span-2 flex flex-col items-center justify-center">
+                  <div className="lg:col-span-2 flex lg:flex-col items-center lg:justify-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled lg:hidden">Agents:</span>
                     <span className="font-mono text-xl font-bold text-corthex-text-primary">{totalAgents}</span>
-                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled">Agents</span>
+                    <span className="text-xs font-mono uppercase tracking-widest text-corthex-text-disabled hidden lg:block">Agents</span>
                   </div>
-                  <div className="col-span-2 flex items-center justify-center">
+                  <div className="lg:col-span-2 flex items-center lg:justify-center">
                     {t.downloadCount > 0 && (
                       <span className="text-xs font-mono text-corthex-text-disabled">{t.downloadCount}회</span>
                     )}
                   </div>
-                  <div className="col-span-2 flex items-center justify-end gap-3">
+                  <div className="lg:col-span-2 flex items-center lg:justify-end gap-3">
                     {t.companyId && !t.isBuiltin && (
                       t.isPublished ? (
                         <button
                           onClick={() => unpublishMutation.mutate(t.id)}
                           disabled={unpublishMutation.isPending}
-                          className="text-xs font-mono text-corthex-error hover:text-red-400 transition-colors disabled:opacity-50 uppercase tracking-widest"
+                          className="text-xs font-mono text-corthex-error hover:text-red-400 transition-colors disabled:opacity-50 uppercase tracking-widest min-h-[44px]"
                         >
                           회수
                         </button>
@@ -507,7 +509,7 @@ export function OrgTemplatesPage() {
                         <button
                           onClick={() => setPublishConfirmId(t.id)}
                           disabled={publishMutation.isPending}
-                          className="text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors disabled:opacity-50 uppercase tracking-widest"
+                          className="text-xs font-mono text-corthex-text-disabled hover:text-corthex-accent transition-colors disabled:opacity-50 uppercase tracking-widest min-h-[44px]"
                         >
                           공개
                         </button>
@@ -515,7 +517,7 @@ export function OrgTemplatesPage() {
                     )}
                     <button
                       onClick={() => setPreviewTemplate(t)}
-                      className="px-4 py-2 bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest hover:bg-corthex-accent-hover transition-colors"
+                      className="px-4 py-2 min-h-[44px] bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest hover:bg-corthex-accent-hover transition-colors flex-1 lg:flex-none"
                     >
                       Apply
                     </button>

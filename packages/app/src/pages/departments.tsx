@@ -219,25 +219,25 @@ function DepartmentDetailSection({
   const agents = agentsData?.data ?? []
 
   return (
-    <div className="bg-corthex-elevated rounded-xl p-8 border border-corthex-border">
+    <div className="bg-corthex-elevated rounded-xl p-4 lg:p-8 border border-corthex-border">
       {/* Header Section */}
-      <div className="flex justify-between items-start mb-10">
-        <div className="flex gap-6 items-center">
-          <div className="w-20 h-20 bg-corthex-accent-deep text-white rounded-2xl flex items-center justify-center shadow-2xl">
-            <Building2 className="w-10 h-10" />
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6 lg:mb-10">
+        <div className="flex gap-4 lg:gap-6 items-center">
+          <div className="w-14 h-14 lg:w-20 lg:h-20 bg-corthex-accent-deep text-white rounded-2xl flex items-center justify-center shadow-2xl shrink-0">
+            <Building2 className="w-7 h-7 lg:w-10 lg:h-10" />
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-4xl font-black text-corthex-accent-deep tracking-tight">{dept.name}</h2>
+              <h2 className="text-2xl lg:text-4xl font-black text-corthex-accent-deep tracking-tight">{dept.name}</h2>
             </div>
-            <p className="mt-2 text-corthex-text-secondary max-w-xl leading-relaxed">{dept.description || '설명 없음'}</p>
+            <p className="mt-2 text-corthex-text-secondary max-w-xl leading-relaxed text-sm lg:text-base">{dept.description || '설명 없음'}</p>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button onClick={onEdit} className="px-6 py-2.5 bg-corthex-elevated text-corthex-text-primary font-bold rounded-lg hover:bg-corthex-border transition-colors border border-corthex-border active:scale-95">
+        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+          <button onClick={onEdit} className="flex-1 sm:flex-none px-4 lg:px-6 py-2.5 min-h-[44px] bg-corthex-elevated text-corthex-text-primary font-bold rounded-lg hover:bg-corthex-border transition-colors border border-corthex-border active:scale-95">
             수정 Edit
           </button>
-          <button onClick={onDelete} className="px-6 py-2.5 bg-red-600/10 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-95">
+          <button onClick={onDelete} className="flex-1 sm:flex-none px-4 lg:px-6 py-2.5 min-h-[44px] bg-red-600/10 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-95">
             삭제 Delete
           </button>
         </div>
@@ -265,44 +265,82 @@ function DepartmentDetailSection({
             <p className="text-sm text-corthex-text-secondary">이 부서에 할당된 에이전트가 없습니다</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl bg-corthex-bg border border-corthex-border/50">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-corthex-border/50">
-                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Agent Name</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Tier</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Status</th>
-                  <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Model</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-corthex-border/30">
-                {agents.map((agent) => {
-                  const statusInfo = STATUS_COLORS[agent.status] ?? STATUS_COLORS.offline
-                  const tierColor = TIER_COLORS[agent.tier] ?? TIER_COLORS.worker
-                  return (
-                    <tr key={agent.id} className="hover:bg-corthex-elevated transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${tierColor}`}>
-                            {agent.name.slice(0, 2)}
-                          </div>
-                          <span className="font-bold text-corthex-text-primary">{agent.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-corthex-text-secondary capitalize">{agent.tier}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+          <>
+            {/* Mobile card layout */}
+            <div className="lg:hidden space-y-3">
+              {agents.map((agent) => {
+                const statusInfo = STATUS_COLORS[agent.status] ?? STATUS_COLORS.offline
+                const tierColor = TIER_COLORS[agent.tier] ?? TIER_COLORS.worker
+                return (
+                  <div key={agent.id} className="bg-corthex-bg rounded-xl border border-corthex-border p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${tierColor}`}>
+                        {agent.name.slice(0, 2)}
+                      </div>
+                      <span className="font-bold text-corthex-text-primary">{agent.name}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <span className="text-corthex-text-secondary block mb-0.5">Tier</span>
+                        <span className="text-corthex-text-primary capitalize">{agent.tier}</span>
+                      </div>
+                      <div>
+                        <span className="text-corthex-text-secondary block mb-0.5">Status</span>
+                        <div className="flex items-center gap-1">
                           <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
-                          <span className="text-sm font-medium text-corthex-text-primary">{statusInfo.label}</span>
+                          <span className="text-corthex-text-primary">{statusInfo.label}</span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-mono text-corthex-accent-deep">{agent.modelName}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                      <div>
+                        <span className="text-corthex-text-secondary block mb-0.5">Model</span>
+                        <span className="font-mono text-corthex-accent-deep truncate block">{agent.modelName}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden lg:block overflow-hidden rounded-xl bg-corthex-bg border border-corthex-border/50">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-corthex-border/50">
+                    <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Agent Name</th>
+                    <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Tier</th>
+                    <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Status</th>
+                    <th className="px-6 py-4 text-[10px] font-mono text-corthex-text-secondary uppercase tracking-widest">Model</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-corthex-border/30">
+                  {agents.map((agent) => {
+                    const statusInfo = STATUS_COLORS[agent.status] ?? STATUS_COLORS.offline
+                    const tierColor = TIER_COLORS[agent.tier] ?? TIER_COLORS.worker
+                    return (
+                      <tr key={agent.id} className="hover:bg-corthex-elevated transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${tierColor}`}>
+                              {agent.name.slice(0, 2)}
+                            </div>
+                            <span className="font-bold text-corthex-text-primary">{agent.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-corthex-text-secondary capitalize">{agent.tier}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
+                            <span className="text-sm font-medium text-corthex-text-primary">{statusInfo.label}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-mono text-corthex-accent-deep">{agent.modelName}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
+
         )}
       </section>
     </div>
@@ -384,11 +422,11 @@ export function DepartmentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="departments-page" className="flex-1 p-8 space-y-6 bg-corthex-bg">
+      <div data-testid="departments-page" className="flex-1 p-4 lg:p-8 space-y-6 bg-corthex-bg">
         <Skeleton className="h-10 w-48" />
-        <div className="flex gap-8">
-          <div className="w-[440px]">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+          <div className="w-full lg:w-[440px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-44 w-full rounded-xl" />)}
             </div>
           </div>
@@ -400,7 +438,7 @@ export function DepartmentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="departments-page" className="flex-1 p-8 bg-corthex-bg">
+      <div data-testid="departments-page" className="flex-1 p-4 lg:p-8 bg-corthex-bg">
         <div className="bg-red-600/10 border border-red-600/20 rounded-xl p-6 text-center">
           <p className="text-sm text-red-600">부서 목록을 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-red-600 hover:opacity-70 underline mt-2">다시 시도</button>
@@ -411,18 +449,18 @@ export function DepartmentsPage() {
 
   return (
     <div data-testid="departments-page" className="flex-1 bg-corthex-bg overflow-y-auto">
-      <div className="p-8 max-w-[1440px] mx-auto">
-        <div className="flex gap-8 items-start">
+      <div className="p-4 lg:p-8 max-w-[1440px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start">
           {/* LEFT PANEL: Department Navigation */}
-          <aside className="w-[440px] sticky top-8 flex flex-col gap-6">
-            <header className="flex justify-between items-end mb-2">
+          <aside className="w-full lg:w-[440px] lg:sticky lg:top-8 flex flex-col gap-6">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mb-2">
               <div>
                 <p className="text-[10px] uppercase tracking-widest font-bold text-corthex-text-secondary mb-1">Organization Oversight</p>
-                <h1 className="text-4xl font-bold tracking-tight text-corthex-text-primary">{departments.length} Departments</h1>
+                <h1 className="text-2xl lg:text-4xl font-bold tracking-tight text-corthex-text-primary">{departments.length} Departments</h1>
               </div>
               <button
                 onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg font-bold text-sm transition-all active:scale-95"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg font-bold text-sm transition-all active:scale-95"
               >
                 <Plus className="w-5 h-5" />
                 Create Department
@@ -435,7 +473,7 @@ export function DepartmentsPage() {
             )}
 
             {/* Department Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {activeDepts.map((dept) => {
                 const isSelected = resolvedSelected?.id === dept.id
                 return (
@@ -495,7 +533,7 @@ export function DepartmentsPage() {
           </aside>
 
           {/* RIGHT PANEL: Department Detail */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0 w-full lg:w-auto">
             {resolvedSelected ? (
               <DepartmentDetailSection
                 dept={resolvedSelected}

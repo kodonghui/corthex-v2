@@ -207,23 +207,23 @@ export function KnowledgePage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-corthex-bg" data-testid="knowledge-page">
       {/* Page Header with Tabs */}
-      <header className="border-b border-corthex-border px-6 py-4 bg-corthex-surface flex items-center justify-between shrink-0">
+      <header className="border-b border-corthex-border px-4 sm:px-6 py-3 sm:py-4 bg-corthex-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-corthex-accent-deep">Library</h1>
-          <p className="text-sm text-corthex-text-secondary mt-0.5">Knowledge documents & agent memories</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-corthex-accent-deep">Library</h1>
+          <p className="text-xs sm:text-sm text-corthex-text-secondary mt-0.5">Knowledge documents & agent memories</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex bg-corthex-elevated rounded-lg p-0.5">
             <button
               onClick={() => setActiveTab('docs')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'docs' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors min-h-[44px] ${activeTab === 'docs' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
               data-testid="tab-docs"
             >
               문서
             </button>
             <button
               onClick={() => setActiveTab('memories')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'memories' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors min-h-[44px] ${activeTab === 'memories' ? 'bg-corthex-surface text-corthex-accent-deep shadow-sm' : 'text-corthex-text-secondary hover:text-corthex-accent-deep'}`}
               data-testid="tab-memories"
             >
               에이전트 기억
@@ -351,11 +351,11 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Top bar matching tabs */}
-      <div className="flex items-center justify-between px-6 py-3 shrink-0 bg-corthex-surface" style={{ borderBottom: `1px solid ${borderColor}` }}>
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 shrink-0 bg-corthex-surface" style={{ borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFolderTree(!showFolderTree)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-secondary transition-colors"
+            className="lg:hidden p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-corthex-elevated text-corthex-text-secondary hover:text-corthex-text-secondary transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
@@ -396,7 +396,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel: Library Tree */}
         {showFolderTree && (
-          <aside className="w-64 flex-shrink-0 bg-corthex-surface flex flex-col p-4 overflow-y-auto" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
+          <aside className="absolute lg:relative z-20 lg:z-0 w-64 flex-shrink-0 bg-corthex-surface flex flex-col p-4 overflow-y-auto h-full" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
             <FolderTree
               folders={folders}
               selectedFolderId={selectedFolderId}
@@ -444,7 +444,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
               </span>
               <input
-                className="block w-full pl-10 pr-3 py-2 border rounded-xl text-sm outline-none"
+                className="block w-full pl-10 pr-3 py-2 border rounded-xl text-base sm:text-sm outline-none"
                 placeholder="Search documents..."
                 value={searchInput}
                 onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
@@ -545,7 +545,7 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
 
         {/* Right Panel: Document Preview */}
         {detailDoc ? (
-          <aside className="w-[500px] flex-shrink-0 bg-corthex-surface flex flex-col overflow-hidden hidden lg:flex">
+          <aside className="w-full lg:w-[500px] flex-shrink-0 bg-corthex-surface flex flex-col overflow-hidden hidden lg:flex">
             <DocDetailView
               doc={detailDoc}
               folders={folders}
@@ -785,9 +785,9 @@ function DocDetailView({ doc, folders, onBack, onEdit, onDelete, onShowVersions,
 
       {/* Preview Content */}
       <div className="flex-1 overflow-y-auto scroll-smooth">
-        <div className="max-w-3xl mx-auto py-12 px-8">
+        <div className="max-w-3xl mx-auto py-8 sm:py-12 px-4 sm:px-8">
           <span className="inline-block font-bold text-xs tracking-widest uppercase mb-4" style={{ color: oliveColor }}>Internal Documentation</span>
-          <h1 className="font-bold text-4xl mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>{fullDoc.title}</h1>
+          <h1 className="font-bold text-2xl sm:text-3xl lg:text-4xl mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>{fullDoc.title}</h1>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-6">

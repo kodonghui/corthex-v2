@@ -193,7 +193,7 @@ function MarketCard({
         <div className="flex items-center justify-between pt-4 border-t border-corthex-border/30">
           <button
             onClick={(e) => { e.stopPropagation(); onClick() }}
-            className="px-4 py-1.5 bg-corthex-accent-deep hover:bg-corthex-accent text-corthex-text-on-accent font-black text-[10px] tracking-tighter uppercase transition-all"
+            className="px-4 py-1.5 min-h-[44px] bg-corthex-accent-deep hover:bg-corthex-accent text-corthex-text-on-accent font-black text-[10px] tracking-tighter uppercase transition-all"
           >
             DEPLOY UNIT
           </button>
@@ -268,13 +268,13 @@ export function AgentMarketplacePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="SEARCH ASSETS..."
-            className="w-full bg-corthex-elevated border-none text-[10px] font-mono tracking-widest pl-10 pr-4 py-2 focus:ring-1 focus:ring-corthex-accent text-corthex-text-secondary placeholder-corthex-text-disabled/50 rounded"
+            className="w-full bg-corthex-elevated border-none text-base sm:text-[10px] font-mono tracking-widest pl-10 pr-4 py-2 min-h-[44px] focus:ring-1 focus:ring-corthex-accent text-corthex-text-secondary placeholder-corthex-text-disabled/50 rounded"
           />
         </div>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded px-3 py-2 text-xs font-mono text-corthex-text-primary outline-none min-w-[160px]"
+          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded px-3 py-2 text-base sm:text-xs font-mono text-corthex-text-primary outline-none min-w-0 sm:min-w-[160px] min-h-[44px]"
         >
           <option value="">전체 카테고리</option>
           {categories.map((cat) => (
@@ -284,7 +284,7 @@ export function AgentMarketplacePage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value)}
-          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded px-3 py-2 text-xs font-mono text-corthex-text-primary outline-none min-w-[130px]"
+          className="bg-corthex-surface border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent rounded px-3 py-2 text-base sm:text-xs font-mono text-corthex-text-primary outline-none min-w-0 sm:min-w-[130px] min-h-[44px]"
         >
           <option value="">전체 티어</option>
           <option value="manager">매니저</option>

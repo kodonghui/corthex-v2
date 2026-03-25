@@ -204,7 +204,7 @@ export function ToolsPage() {
 
   return (
     <div data-testid="tools-page" className="min-h-screen bg-corthex-bg">
-      <div className="p-8 space-y-8">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
         {/* Page Header */}
         <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-corthex-border/10 pb-8">
           <div className="space-y-2">
@@ -212,7 +212,7 @@ export function ToolsPage() {
               <div className="w-1.5 h-1.5 bg-corthex-accent animate-pulse" />
               <span className="font-mono text-xs tracking-widest text-corthex-accent uppercase">Module / Registry</span>
             </div>
-            <h1 className="text-5xl font-black tracking-tighter text-corthex-text-primary uppercase">Tool Registry</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-corthex-text-primary uppercase">Tool Registry</h1>
             <p className="text-corthex-text-secondary max-w-xl text-sm leading-relaxed">
               Interface for low-level diagnostic and data extraction protocols. Manage core system tools, monitor execution metrics, and provision new automation assets.
             </p>
@@ -242,7 +242,7 @@ export function ToolsPage() {
             )}
             <button
               onClick={() => setShowCreateDialog(true)}
-              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-black px-8 py-4 flex items-center gap-3 transition-all active:scale-95"
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-black px-6 py-3 md:px-8 md:py-4 flex items-center gap-3 transition-all active:scale-95 min-h-[44px]"
             >
               <Plus className="w-5 h-5" />
               <span className="uppercase tracking-widest text-sm">Register Tool</span>
@@ -252,13 +252,13 @@ export function ToolsPage() {
 
         {/* Filters & Search */}
         <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-[240px]">
+          <div className="flex-1 min-w-0 sm:min-w-[200px]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-corthex-text-disabled" />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-[10px] outline-none transition-colors placeholder:opacity-30"
+                className="w-full pl-10 pr-4 py-2 bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-base sm:text-[10px] outline-none transition-colors placeholder:opacity-30"
                 placeholder="QUERY_SYSTEM_TOOLS..."
                 type="text"
               />
@@ -268,7 +268,7 @@ export function ToolsPage() {
             <select
               value={activeCategory}
               onChange={(e) => setActiveCategory(e.target.value)}
-              className="bg-corthex-bg border border-corthex-border text-corthex-text-secondary font-mono text-xs py-2 pl-3 pr-8 focus:ring-1 focus:ring-corthex-accent outline-none appearance-none"
+              className="bg-corthex-bg border border-corthex-border text-corthex-text-secondary font-mono text-base sm:text-xs py-2 pl-3 pr-8 focus:ring-1 focus:ring-corthex-accent outline-none appearance-none min-h-[44px]"
             >
               <option value="all">전체 카테고리</option>
               {CATEGORIES.map((cat) => (
@@ -300,33 +300,33 @@ export function ToolsPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-corthex-elevated border-b border-corthex-border/20">
-                      <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70">Tool Identity</th>
-                      <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70">Classification</th>
-                      <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-center">Protocol Status</th>
-                      <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-right">Scope</th>
-                      <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-center">Control</th>
+                      <th className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70">Tool Identity</th>
+                      <th className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 hidden sm:table-cell">Classification</th>
+                      <th className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-center">Protocol Status</th>
+                      <th className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-right hidden md:table-cell">Scope</th>
+                      <th className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent/70 text-center">Control</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-corthex-border/10">
                     {filteredTools.map((tool) => (
                       <tr key={tool.name} className="hover:bg-corthex-elevated/40 transition-colors group">
-                        <td className="px-6 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-corthex-elevated flex items-center justify-center text-corthex-accent border border-corthex-border/20">
+                        <td className="px-3 sm:px-6 py-3 sm:py-5">
+                          <div className="flex items-center gap-3 sm:gap-4">
+                            <div className="w-10 h-10 bg-corthex-elevated flex items-center justify-center text-corthex-accent border border-corthex-border/20 shrink-0">
                               <Wrench className="w-5 h-5" />
                             </div>
-                            <div>
-                              <p className="font-black text-corthex-text-primary group-hover:text-corthex-accent transition-colors uppercase tracking-tight">{tool.name}</p>
-                              <p className="font-mono text-[10px] text-corthex-text-disabled opacity-50 uppercase">{tool.description || 'No description'}</p>
+                            <div className="min-w-0">
+                              <p className="font-black text-corthex-text-primary group-hover:text-corthex-accent transition-colors uppercase tracking-tight truncate">{tool.name}</p>
+                              <p className="font-mono text-[10px] text-corthex-text-disabled opacity-50 uppercase truncate">{tool.description || 'No description'}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-3 sm:px-6 py-3 sm:py-5 hidden sm:table-cell">
                           <span className="font-mono text-xs border border-corthex-border/30 px-2 py-0.5 text-corthex-text-secondary">
                             {tool.category}
                           </span>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-3 sm:px-6 py-3 sm:py-5">
                           <div className="flex items-center justify-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${tool.registered ? 'bg-corthex-success shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-corthex-text-disabled/30'}`} />
                             <span className={`font-mono text-[10px] uppercase font-bold ${tool.registered ? 'text-corthex-success' : 'text-corthex-text-disabled/50'}`}>
@@ -334,15 +334,15 @@ export function ToolsPage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-right">
+                        <td className="px-3 sm:px-6 py-3 sm:py-5 text-right hidden md:table-cell">
                           <span className="font-mono text-xs border border-corthex-border/30 px-2 py-0.5 text-corthex-text-secondary">
                             platform
                           </span>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                           <div className="flex items-center justify-center gap-1">
                             <button
-                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
+                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                               onClick={() => setEditingTool(tool)}
                               data-testid={`edit-tool-${tool.name}`}
                             >
@@ -357,13 +357,13 @@ export function ToolsPage() {
               </div>
 
               {/* Table Footer */}
-              <div className="bg-corthex-elevated px-6 py-3 flex items-center justify-between border-t border-corthex-border/10">
+              <div className="bg-corthex-elevated px-4 lg:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-corthex-border/10">
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest">
                     Displaying {filteredTools.length}/{allTools.length} Total Entities
                   </span>
-                  <div className="h-4 w-px bg-corthex-border/20" />
-                  <span className="font-mono text-[10px] text-corthex-accent/70 uppercase tracking-widest">Registry Sync: Nominal</span>
+                  <div className="hidden sm:block h-4 w-px bg-corthex-border/20" />
+                  <span className="hidden sm:block font-mono text-[10px] text-corthex-accent/70 uppercase tracking-widest">Registry Sync: Nominal</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button className="w-8 h-8 flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors border border-corthex-border/10 hover:border-corthex-accent/40">
@@ -513,7 +513,7 @@ export function ToolsPage() {
                   type="text"
                   value={newTool.name}
                   onChange={(e) => setNewTool((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors min-h-[44px]"
                   placeholder="예: web-search"
                   required
                 />
@@ -524,7 +524,7 @@ export function ToolsPage() {
                   type="text"
                   value={newTool.description}
                   onChange={(e) => setNewTool((prev) => ({ ...prev, description: e.target.value }))}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors min-h-[44px]"
                   placeholder="도구에 대한 간단한 설명"
                 />
               </div>
@@ -533,7 +533,7 @@ export function ToolsPage() {
                 <select
                   value={newTool.category}
                   onChange={(e) => setNewTool((prev) => ({ ...prev, category: e.target.value }))}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors min-h-[44px]"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>{categoryLabels[cat]}</option>
@@ -570,7 +570,7 @@ export function ToolsPage() {
                   type="text"
                   value={editingTool.name}
                   onChange={(e) => setEditingTool((prev) => prev ? { ...prev, name: e.target.value } : null)}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors min-h-[44px]"
                   required
                 />
               </div>
@@ -580,7 +580,7 @@ export function ToolsPage() {
                   type="text"
                   value={editingTool.description || ''}
                   onChange={(e) => setEditingTool((prev) => prev ? { ...prev, description: e.target.value } : null)}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors min-h-[44px]"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">

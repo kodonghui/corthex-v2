@@ -142,7 +142,7 @@ export function MarketingSettingsPage() {
   }
 
   return (
-    <div className="p-8 space-y-6 max-w-4xl">
+    <div className="p-4 lg:p-8 space-y-6 max-w-4xl">
       {/* Header */}
       <div className="border-b border-corthex-border pb-6">
         <h1 className="text-lg font-bold uppercase tracking-widest text-corthex-text-primary">
@@ -197,7 +197,7 @@ export function MarketingSettingsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-widest text-corthex-text-secondary mb-1">
                       Provider
@@ -205,7 +205,7 @@ export function MarketingSettingsPage() {
                     <select
                       value={current?.provider || ''}
                       onChange={(e) => handleProviderChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none"
+                      className="w-full px-3 py-2 text-base font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none"
                     >
                       {categoryProviders.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -219,7 +219,7 @@ export function MarketingSettingsPage() {
                     <select
                       value={current?.model || ''}
                       onChange={(e) => handleModelChange(key, e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none"
+                      className="w-full px-3 py-2 text-base font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none"
                     >
                       {(selectedProvider?.models || []).map((m) => (
                         <option key={m} value={m}>{m}</option>
@@ -279,7 +279,7 @@ export function MarketingSettingsPage() {
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <input
                       type={isShowingKey ? 'text' : 'password'}
@@ -288,7 +288,7 @@ export function MarketingSettingsPage() {
                       onChange={(e) =>
                         setApiKeyInputs((prev) => ({ ...prev, [providerId]: e.target.value }))
                       }
-                      className="w-full px-3 py-2 pr-8 text-xs font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
+                      className="w-full px-3 py-2 pr-8 text-base font-mono border border-corthex-border bg-corthex-bg text-corthex-text-primary focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none"
                     />
                     <button
                       onClick={() =>
@@ -302,7 +302,7 @@ export function MarketingSettingsPage() {
                   <button
                     onClick={() => handleSaveApiKey(providerId)}
                     disabled={!apiKeyInputs[providerId]?.trim() || storeKey.isPending}
-                    className="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-3 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-colors w-full sm:w-auto"
                   >
                     <Save className="w-3.5 h-3.5" />
                     저장
@@ -322,7 +322,7 @@ export function MarketingSettingsPage() {
             저작권 워터마크
           </h2>
         </div>
-        <div className="bg-corthex-elevated border border-corthex-border p-4 flex items-center justify-between">
+        <div className="bg-corthex-elevated border border-corthex-border p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-corthex-text-primary">생성 콘텐츠 워터마크</p>
             <p className="text-xs font-mono text-corthex-text-disabled mt-0.5">

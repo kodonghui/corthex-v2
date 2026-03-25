@@ -352,13 +352,13 @@ export function OpsLogPage() {
       style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
     >
       {/* Header */}
-      <div className="p-8 pb-0">
+      <div className="p-4 sm:p-6 lg:p-8 pb-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-3xl font-black text-corthex-text-primary tracking-tighter">Operations Log</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-corthex-text-primary tracking-tighter">Operations Log</h2>
             <p className="text-corthex-text-secondary mt-1 max-w-2xl">Real-time execution records for the CORTHEX core processing unit and distributed resource network.</p>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg min-w-[120px]">
               <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">Total Events</p>
               <p className="text-xl font-mono text-corthex-text-primary">{total.toLocaleString()}</p>
@@ -381,11 +381,11 @@ export function OpsLogPage() {
         </div>
 
         {/* Filters & Actions */}
-        <div className="flex items-center justify-between border-b border-corthex-border pb-4" data-testid="filters-row">
-          <div className="flex gap-1 bg-corthex-surface p-1 rounded-lg border border-corthex-border">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-corthex-border pb-4" data-testid="filters-row">
+          <div className="flex gap-1 bg-corthex-surface p-1 rounded-lg border border-corthex-border overflow-x-auto">
             <button
               onClick={() => { setStatusFilter(''); setPage(1) }}
-              className="px-4 py-1.5 rounded-md text-xs font-semibold transition-all"
+              className="min-h-[44px] px-4 py-1.5 rounded-md text-xs font-semibold transition-all"
               style={statusFilter === '' ? { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-primary)' } : { color: 'var(--color-corthex-text-secondary)' }}
             >
               ALL
@@ -394,7 +394,7 @@ export function OpsLogPage() {
               <button
                 key={k}
                 onClick={() => { setStatusFilter(k); setPage(1) }}
-                className="px-4 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-2"
+                className="min-h-[44px] px-4 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-2"
                 style={statusFilter === k ? { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-primary)' } : { color: 'var(--color-corthex-text-secondary)' }}
                 data-testid="bookmark-filter"
               >
@@ -403,19 +403,19 @@ export function OpsLogPage() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2">
               <input
                 placeholder="검색..."
                 value={searchInput}
                 onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-                className="py-1.5 px-3 border border-corthex-border rounded-lg text-xs text-corthex-text-primary bg-corthex-bg w-40"
+                className="min-h-[44px] py-1.5 px-3 border border-corthex-border rounded-lg text-base sm:text-xs text-corthex-text-primary bg-corthex-bg w-40"
                 data-testid="search-input"
               />
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-                className="py-1.5 px-3 border border-corthex-border rounded-lg text-xs text-corthex-text-primary bg-corthex-bg"
+                className="min-h-[44px] py-1.5 px-3 border border-corthex-border rounded-lg text-base sm:text-xs text-corthex-text-primary bg-corthex-bg"
               >
                 {SORT_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -425,7 +425,7 @@ export function OpsLogPage() {
             {selectedIds.size === 2 && (
               <button
                 onClick={() => setCompareOpen(true)}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-colors"
+                className="min-h-[44px] text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-colors"
                 style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                 data-testid="compare-btn"
               >
@@ -434,14 +434,14 @@ export function OpsLogPage() {
             )}
             <button
               onClick={handleExport}
-              className="text-xs text-corthex-text-secondary flex items-center gap-2 border border-corthex-border px-3 py-1.5 rounded-lg hover:bg-corthex-surface transition-colors"
+              className="min-h-[44px] text-xs text-corthex-text-secondary flex items-center gap-2 border border-corthex-border px-3 py-1.5 rounded-lg hover:bg-corthex-surface transition-colors"
               data-testid="export-btn"
             >
               <Download className="w-3.5 h-3.5" /> Export CSV
             </button>
             <button
               onClick={() => { setBookmarkedOnly(!bookmarkedOnly); setPage(1) }}
-              className="text-xs flex items-center gap-2 border px-3 py-1.5 rounded-lg transition-colors"
+              className="min-h-[44px] text-xs flex items-center gap-2 border px-3 py-1.5 rounded-lg transition-colors"
               style={bookmarkedOnly
                 ? { borderColor: 'rgba(180,83,9,0.3)', color: '#b45309', backgroundColor: 'rgba(180,83,9,0.05)' }
                 : { borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }
@@ -486,7 +486,7 @@ export function OpsLogPage() {
       </div>
 
       {/* Table Container */}
-      <div className="flex-1 mx-8 my-4 bg-corthex-bg rounded-xl border border-corthex-border overflow-hidden flex flex-col" data-testid="ops-table">
+      <div className="flex-1 mx-3 sm:mx-6 lg:mx-8 my-3 sm:my-4 bg-corthex-bg rounded-xl border border-corthex-border overflow-hidden flex flex-col" data-testid="ops-table">
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-corthex-elevated border-b border-corthex-border z-10">
@@ -583,13 +583,13 @@ export function OpsLogPage() {
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="px-6 py-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-border)' }} data-testid="pagination">
+        <div className="px-4 sm:px-6 py-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-border)' }} data-testid="pagination">
           <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{total.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
-              className="border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors"
+              className="min-h-[44px] min-w-[44px] border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors flex items-center justify-center"
               style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
@@ -600,7 +600,7 @@ export function OpsLogPage() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors"
+              className="min-h-[44px] min-w-[44px] border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors flex items-center justify-center"
               style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
             >
               <ChevronRight className="h-3.5 w-3.5" />
@@ -630,7 +630,7 @@ export function OpsLogPage() {
       {replayConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setReplayConfirm(null)} />
-          <div className="relative bg-corthex-surface border rounded-2xl shadow-2xl p-6 w-96" style={{ borderColor: 'var(--color-corthex-border)' }}>
+          <div className="relative bg-corthex-surface border rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" style={{ borderColor: 'var(--color-corthex-border)' }}>
             <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-text-primary)', fontFamily: "'Inter', sans-serif" }}>명령 리플레이</h3>
             <p className="text-xs mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>동일 명령을 다시 실행합니다. 결과가 다를 수 있습니다.</p>
             <div className="flex justify-end gap-2">
@@ -679,7 +679,7 @@ function DetailModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[85vh] overflow-y-auto p-4 sm:p-6"
         style={{ borderColor: 'var(--color-corthex-border)' }}
         onClick={e => e.stopPropagation()}
         data-testid="detail-modal"
@@ -688,7 +688,7 @@ function DetailModal({
           <div className="py-8 space-y-3">
             <div className="h-4 w-1/3 rounded animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
             <div className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[1,2,3,4].map(i => <div key={i} className="h-14 rounded-lg animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />)}
             </div>
           </div>
@@ -725,7 +725,7 @@ function DetailModal({
             </div>
 
             {/* Metadata */}
-            <div className="grid grid-cols-4 gap-3 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
               <MetaCard label="유형" value={TYPE_LABELS[detail.type] || detail.type} />
               <MetaCard label="상태" value={STATUS_LABELS[detail.status] || detail.status} />
               <MetaCard label="에이전트" value={detail.targetAgentName || '-'} />
@@ -805,7 +805,7 @@ function CompareModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+        className="relative bg-corthex-surface border rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto p-4 sm:p-6"
         style={{ borderColor: 'var(--color-corthex-border)' }}
         onClick={e => e.stopPropagation()}
         data-testid="compare-modal"
@@ -816,14 +816,14 @@ function CompareModal({
         </div>
 
         {/* Comparison bars */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <CompareBar label="품질 점수" valueA={a.qualityScore} valueB={b.qualityScore} format={(v) => v?.toFixed(1) || '-'} />
           <CompareBar label="소요시간" valueA={a.durationMs} valueB={b.durationMs} format={(v) => formatDuration(v)} />
           <CompareBar label="비용" valueA={a.totalCostMicro} valueB={b.totalCostMicro} format={(v) => formatCost(v)} />
         </div>
 
         {/* Side-by-side results */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ComparePanel item={a} label="A" />
           <ComparePanel item={b} label="B" />
         </div>

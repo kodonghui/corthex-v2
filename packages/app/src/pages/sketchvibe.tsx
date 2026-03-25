@@ -690,8 +690,8 @@ function NexusPageInner() {
       {/* Main Canvas Area */}
       <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
         {/* Top Bar */}
-        <header className="h-16 flex items-center justify-between px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), transparent)' }}>
-          <div className="flex items-center gap-4 pointer-events-auto backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm bg-corthex-surface/90 border border-corthex-border">
+        <header className="h-14 md:h-16 flex items-center justify-between px-3 md:px-8 absolute top-0 w-full z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), transparent)' }}>
+          <div className="flex items-center gap-2 md:gap-4 pointer-events-auto backdrop-blur-md px-3 md:px-4 py-2 rounded-2xl shadow-sm bg-corthex-surface/90 border border-corthex-border">
             <span className="text-sm font-medium text-corthex-text-primary">
               {currentSketchName || 'Untitled Canvas'}
             </span>
@@ -794,18 +794,18 @@ function NexusPageInner() {
         </div>
 
         {/* Floating Toolbar */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="rounded-full shadow-xl px-6 py-3 flex items-center gap-6 border" style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)' }}>
+        <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-20 max-w-[calc(100vw-2rem)]">
+          <div className="rounded-full shadow-xl px-3 md:px-6 py-2 md:py-3 flex items-center gap-3 md:gap-6 border overflow-x-auto" style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)' }}>
             {Object.entries(NODE_PALETTE).slice(0, 4).map(([type, config]) => (
               <button
                 key={type}
                 onClick={() => handleAddNode(type as SvNodeType)}
                 className="flex flex-col items-center gap-1 group"
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border">
+                <div className="w-11 h-11 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors bg-corthex-elevated text-corthex-text-secondary hover:bg-corthex-border">
                   <span className="text-lg">{config.icon || '🤖'}</span>
                 </div>
-                <span className="text-[10px] font-medium text-corthex-text-disabled">{config.label || type}</span>
+                <span className="text-[10px] font-medium text-corthex-text-disabled hidden md:block">{config.label || type}</span>
               </button>
             ))}
             <div className="w-px h-8" style={{ backgroundColor: 'var(--color-corthex-border)' }}></div>
@@ -826,7 +826,7 @@ function NexusPageInner() {
 
       {/* Chat Panel */}
       {chatOpen && selectedAgent && selectedSessionId && (
-        <div className="w-96 border-l border-corthex-border flex flex-col h-full bg-corthex-surface">
+        <div className="hidden md:flex w-96 border-l border-corthex-border flex-col h-full bg-corthex-surface">
           <ChatArea
             agent={selectedAgent}
             sessionId={selectedSessionId}

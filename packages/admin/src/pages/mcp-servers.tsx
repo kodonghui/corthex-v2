@@ -197,9 +197,9 @@ export function McpServersPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-6">
       {/* Page Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <div className="flex items-center gap-2 text-[10px] text-corthex-text-disabled font-mono tracking-widest uppercase mb-1">
             <span>Admin</span>
@@ -210,7 +210,7 @@ export function McpServersPage() {
         </div>
         <button
           onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY_FORM) }}
-          className="px-5 py-2 bg-corthex-accent text-corthex-text-on-accent font-black text-xs tracking-tighter rounded hover:brightness-110 transition-all flex items-center gap-2 uppercase"
+          className="px-5 py-3 min-h-[44px] bg-corthex-accent text-corthex-text-on-accent font-black text-xs tracking-tighter rounded hover:brightness-110 transition-all flex items-center gap-2 uppercase w-full sm:w-auto justify-center"
         >
           <Plus className="w-4 h-4" />
           PROVISION SERVER
@@ -223,7 +223,7 @@ export function McpServersPage() {
           <h3 className="text-sm font-semibold text-corthex-text-primary mb-4">
             {editId ? 'MCP 서버 수정' : '새 MCP 서버 등록'}
           </h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs text-corthex-text-disabled">Display Name *</label>
               <input
@@ -231,7 +231,7 @@ export function McpServersPage() {
                 value={form.displayName}
                 onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))}
                 placeholder="notion"
-                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent"
+                className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-2 text-base text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
             <div className="space-y-1">
@@ -267,7 +267,7 @@ export function McpServersPage() {
                 className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-corthex-text-primary placeholder-corthex-text-disabled focus:outline-none focus:ring-1 focus:ring-corthex-accent"
               />
             </div>
-            <div className="col-span-2 space-y-1">
+            <div className="sm:col-span-2 space-y-1">
               <label className="text-xs text-corthex-text-disabled">
                 Env Variables (KEY=VALUE 형식 또는 JSON)
                 <span className="text-corthex-text-secondary ml-1">— 크리덴셜 템플릿: {'{{credential:key_name}}'}</span>
@@ -280,7 +280,7 @@ export function McpServersPage() {
                 className="w-full bg-corthex-bg border border-corthex-border rounded px-3 py-1.5 text-sm text-corthex-text-primary placeholder-corthex-text-disabled font-mono focus:outline-none focus:ring-1 focus:ring-corthex-accent resize-none"
               />
             </div>
-            <div className="col-span-2 flex items-center gap-3">
+            <div className="sm:col-span-2 flex items-center gap-3">
               <button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
@@ -422,7 +422,7 @@ export function McpServersPage() {
       </div>
 
       {/* Bento Metric Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-3 opacity-10">
             <Activity className="w-10 h-10 text-corthex-accent" />

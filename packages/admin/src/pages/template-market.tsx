@@ -229,7 +229,7 @@ function MarketCard({ template, onClick }: { template: MarketTemplate; onClick: 
         <div className="flex items-center justify-between pt-4 border-t border-corthex-border/30 mt-auto">
           <button
             onClick={(e) => { e.stopPropagation(); onClick() }}
-            className="px-4 py-1.5 bg-corthex-elevated hover:bg-corthex-accent hover:text-corthex-text-on-accent text-corthex-text-primary font-black text-[10px] tracking-tighter uppercase transition-all"
+            className="px-4 py-1.5 bg-corthex-elevated hover:bg-corthex-accent hover:text-corthex-text-on-accent text-corthex-text-primary font-black text-[10px] tracking-tighter uppercase transition-all min-h-[44px] flex items-center"
           >
             CLONE TEMPLATE
           </button>
@@ -282,7 +282,7 @@ export function TemplateMarketPage() {
 
   if (!selectedCompanyId) {
     return (
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6">
         <h1 className="text-3xl font-black tracking-tighter uppercase text-corthex-text-primary">Template Market</h1>
         <div className="bg-corthex-surface border border-corthex-border rounded-xl">
           <p className="text-sm text-corthex-text-secondary text-center py-8">사이드바에서 회사를 선택해주세요.</p>
@@ -293,7 +293,7 @@ export function TemplateMarketPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6">
         <h1 className="text-3xl font-black tracking-tighter uppercase text-corthex-text-primary">Template Market</h1>
         <div className="text-center text-corthex-text-secondary py-12">로딩 중...</div>
       </div>
@@ -302,7 +302,7 @@ export function TemplateMarketPage() {
 
   if (isError) {
     return (
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6">
         <h1 className="text-3xl font-black tracking-tighter uppercase text-corthex-text-primary">Template Market</h1>
         <div className="bg-corthex-surface border border-corthex-border rounded-xl">
           <div className="text-center py-8 space-y-3">
@@ -322,19 +322,19 @@ export function TemplateMarketPage() {
   return (
     <div className="min-h-full">
       {/* Header Section */}
-      <section className="px-8 pt-8 pb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      <section className="px-4 sm:px-6 md:px-8 pt-6 md:pt-8 pb-4 md:pb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="h-[1px] w-6 bg-corthex-accent" />
             <span className="text-xs font-mono text-corthex-accent tracking-widest uppercase">Central Repository</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter uppercase text-corthex-text-primary">Template Market</h1>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tighter uppercase text-corthex-text-primary">Template Market</h1>
           <p className="text-corthex-text-secondary text-sm max-w-xl">
             다른 회사가 공유한 조직 구조 템플릿을 찾아보고, 마음에 드는 것을 복제하여 사용할 수 있습니다.
           </p>
         </div>
         <div className="bg-corthex-surface p-1 flex items-center border border-corthex-border shadow-sm">
-          <button className="bg-corthex-elevated text-corthex-accent px-5 py-2.5 font-mono text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 transition-transform">
+          <button className="bg-corthex-elevated text-corthex-accent px-5 py-2.5 min-h-[44px] font-mono text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 transition-transform">
             <Plus className="w-4 h-4" />
             Submit Template
           </button>
@@ -342,14 +342,14 @@ export function TemplateMarketPage() {
       </section>
 
       {/* Filter Bar */}
-      <div className="bg-corthex-surface mx-8 mb-6 sticky top-0 z-30 p-4 border-l-4 border-corthex-accent shadow-lg flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-corthex-surface mx-4 sm:mx-6 md:mx-8 mb-6 sticky top-0 z-30 p-4 border-l-4 border-corthex-accent shadow-lg flex flex-col md:flex-row items-center gap-4">
         <div className="relative w-full md:w-96">
           <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent border-none border-b border-corthex-border/30 focus:border-corthex-accent focus:ring-0 text-sm font-mono text-corthex-text-primary py-2 pl-10 placeholder-corthex-text-disabled/50 outline-none"
+            className="w-full bg-transparent border-none border-b border-corthex-border/30 focus:border-corthex-accent focus:ring-0 text-base sm:text-sm font-mono text-corthex-text-primary py-2 pl-10 placeholder-corthex-text-disabled/50 outline-none min-h-[44px]"
             placeholder="FILTER_BY_KEYWORD..."
           />
         </div>
@@ -358,7 +358,7 @@ export function TemplateMarketPage() {
             <span className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-widest mr-2 whitespace-nowrap">Tags:</span>
             <button
               onClick={() => setSelectedTag('')}
-              className={`px-3 py-1.5 text-[10px] font-mono uppercase whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 text-[10px] font-mono uppercase whitespace-nowrap transition-colors min-h-[44px] flex items-center ${
                 !selectedTag ? 'bg-corthex-accent text-corthex-text-on-accent' : 'bg-corthex-elevated text-corthex-text-secondary opacity-70 hover:opacity-100'
               }`}
             >
@@ -368,7 +368,7 @@ export function TemplateMarketPage() {
               <button
                 key={tag}
                 onClick={() => setSelectedTag(tag === selectedTag ? '' : tag)}
-                className={`px-3 py-1.5 text-[10px] font-mono uppercase whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 text-[10px] font-mono uppercase whitespace-nowrap transition-colors min-h-[44px] flex items-center ${
                   selectedTag === tag ? 'bg-corthex-accent text-corthex-text-on-accent' : 'bg-corthex-elevated text-corthex-text-secondary opacity-70 hover:opacity-100'
                 }`}
               >
@@ -380,7 +380,7 @@ export function TemplateMarketPage() {
       </div>
 
       {/* Marketplace Grid */}
-      <div className="px-8 pb-8">
+      <div className="px-4 sm:px-6 md:px-8 pb-6 md:pb-8">
         {templates.length === 0 ? (
           <div className="bg-corthex-surface border border-corthex-border rounded-xl">
             <div className="text-center py-16">

@@ -111,7 +111,7 @@ function TierForm({
         <select
           value={modelPreference}
           onChange={(e) => setModelPreference(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-corthex-surface border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-base sm:text-sm bg-corthex-surface border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {MODEL_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -267,16 +267,16 @@ export function TiersPage() {
 
   return (
     <div data-testid="tiers-page" className="flex-1 bg-corthex-bg overflow-y-auto">
-      <div className="p-8 max-w-4xl mx-auto min-h-screen">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto min-h-screen">
         {/* HEADER */}
-        <div className="flex justify-between items-end mb-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 sm:mb-12 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2 text-corthex-text-primary">Tiers Hierarchy</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-2 text-corthex-text-primary">Tiers Hierarchy</h1>
             <p className="text-corthex-text-secondary text-sm">Define and manage hierarchical permission structures and model assignments for agents.</p>
           </div>
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all active:scale-95"
+            className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg px-4 py-2 min-h-[44px] rounded-lg font-medium flex items-center gap-2 transition-all active:scale-95"
           >
             <Plus className="w-5 h-5" />
             <span>Create Tier</span>
@@ -299,10 +299,10 @@ export function TiersPage() {
               return (
                 <div key={tier.id} className="w-full" data-testid={`tier-row-${tier.id}`}>
                   {/* Tier Card */}
-                  <div className="bg-corthex-surface border border-corthex-border rounded-xl p-6 transition-all duration-200 hover:border-corthex-accent/50 relative overflow-hidden">
+                  <div className="bg-corthex-surface border border-corthex-border rounded-xl p-4 sm:p-6 transition-all duration-200 hover:border-corthex-accent/50 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: levelColor }} />
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-5">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 sm:gap-5">
                         {/* Level badge */}
                         <div className="bg-corthex-elevated border border-corthex-border rounded-lg p-3 text-center min-w-[64px]" style={{ backgroundColor: index === 0 ? `${levelColor}19` : undefined, borderColor: index === 0 ? `${levelColor}33` : undefined }}>
                           <div className="text-[10px] font-mono font-bold uppercase tracking-widest" style={{ color: index === 0 ? levelColor : undefined, opacity: index === 0 ? 1 : 0.6 }}>LEVEL</div>
@@ -310,7 +310,7 @@ export function TiersPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <h2 className="text-xl font-bold text-corthex-text-primary">{tier.name}</h2>
+                            <h2 className="text-lg sm:text-xl font-bold text-corthex-text-primary">{tier.name}</h2>
                             {index === 0 && (
                               <span className="bg-corthex-success/10 text-corthex-success text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-corthex-success/20">Active Authority</span>
                             )}
@@ -331,25 +331,25 @@ export function TiersPage() {
                         <button
                           onClick={() => handleMoveUp(index)}
                           disabled={index === 0 || reorderMutation.isPending}
-                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
+                          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
                           title="Move up"
                         >▲</button>
                         <button
                           onClick={() => handleMoveDown(index)}
                           disabled={index === tiers.length - 1 || reorderMutation.isPending}
-                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
+                          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 text-xs"
                           title="Move down"
                         >▼</button>
                         <button
                           onClick={() => setEditTier(tier)}
-                          className="p-2 hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary"
+                          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded transition-colors text-corthex-text-secondary hover:text-corthex-text-primary"
                           title="Edit"
                         >
                           <Shield className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteTier(tier)}
-                          className="p-2 hover:bg-corthex-error/10 rounded transition-colors text-corthex-text-secondary hover:text-corthex-error"
+                          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-corthex-error/10 rounded transition-colors text-corthex-text-secondary hover:text-corthex-error"
                           title="Delete"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
@@ -357,7 +357,7 @@ export function TiersPage() {
                       </div>
                     </div>
                     {/* Metrics row */}
-                    <div className="mt-4 pt-4 border-t border-corthex-border/30 grid grid-cols-3 gap-6">
+                    <div className="mt-4 pt-4 border-t border-corthex-border/30 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
                       <div>
                         <div className="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-1 font-mono">MAX TOOLS</div>
                         <div className="text-sm font-mono font-bold text-corthex-text-primary">
@@ -388,7 +388,7 @@ export function TiersPage() {
             {/* Add Tier Placeholder */}
             <div
               onClick={() => setCreateOpen(true)}
-              className="mt-6 w-full flex flex-col items-center justify-center p-8 border-2 border-dashed border-corthex-border rounded-xl group hover:border-corthex-accent/40 transition-colors cursor-pointer"
+              className="mt-6 w-full flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-dashed border-corthex-border rounded-xl group hover:border-corthex-accent/40 transition-colors cursor-pointer"
             >
               <div className="w-12 h-12 rounded-full bg-corthex-elevated flex items-center justify-center mb-4 group-hover:bg-corthex-accent/10 transition-colors">
                 <Plus className="w-5 h-5 text-corthex-text-disabled group-hover:text-corthex-accent" />
@@ -400,22 +400,22 @@ export function TiersPage() {
         )}
 
         {/* SUMMARY SECTION */}
-        <footer className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
+        <footer className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+          <div className="bg-corthex-elevated p-4 sm:p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Total Tiers</p>
               <p className="text-2xl font-black text-corthex-accent">{tiers.length}</p>
             </div>
             <GitBranch className="w-9 h-9 text-corthex-border" />
           </div>
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
+          <div className="bg-corthex-elevated p-4 sm:p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Total Tools</p>
               <p className="text-2xl font-black text-corthex-accent">{tiers.reduce((sum, t) => sum + (t.maxTools || 0), 0)}</p>
             </div>
             <Users className="w-9 h-9 text-corthex-border" />
           </div>
-          <div className="bg-corthex-elevated p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
+          <div className="bg-corthex-elevated p-4 sm:p-6 rounded-xl border border-corthex-border/50 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary">Avg Model</p>
               <p className="text-2xl font-black text-corthex-accent font-mono">

@@ -271,19 +271,19 @@ export function ReportsPage() {
   if (view === 'create') {
     return (
       <div className="h-full flex flex-col" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }} data-testid="reports-page">
-        <div className="px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-corthex-surface">
-          <button onClick={handleBack} className="text-sm text-corthex-text-secondary hover:text-corthex-text-secondary" data-testid="back-btn">
+        <div className="px-4 lg:px-8 py-4 border-b border-corthex-border flex items-center gap-3 bg-corthex-surface">
+          <button onClick={handleBack} className="text-sm min-h-[44px] text-corthex-text-secondary hover:text-corthex-text-secondary" data-testid="back-btn">
             &larr; 목록
           </button>
           <h2 className="text-lg font-semibold text-corthex-text-primary">새 보고서</h2>
         </div>
-        <div className="flex-1 overflow-y-auto px-12 py-8 max-w-2xl mx-auto w-full space-y-4">
+        <div className="flex-1 overflow-y-auto px-4 lg:px-12 py-6 lg:py-8 max-w-2xl mx-auto w-full space-y-4">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="보고서 제목"
-            className={inputClass}
+            className={`${inputClass} text-base`}
             data-testid="report-title-input"
           />
           <textarea
@@ -291,23 +291,23 @@ export function ReportsPage() {
             onChange={(e) => setContent(e.target.value)}
             placeholder="보고서 내용을 마크다운으로 작성하세요..."
             rows={16}
-            className={inputClass}
+            className={`${inputClass} text-base`}
             data-testid="report-content-input"
           />
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => {
                 if (!title.trim()) return
                 createReport.mutate({ title: title.trim(), content })
               }}
               disabled={!title.trim() || createReport.isPending}
-              className="text-white rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-50 transition-colors shadow-sm"
+              className="text-white rounded-xl px-5 py-2.5 min-h-[44px] text-sm font-bold disabled:opacity-50 transition-colors shadow-sm w-full sm:w-auto"
               style={{ backgroundColor: accentColor }}
               data-testid="save-draft-btn"
             >
               {createReport.isPending ? '저장 중...' : '초안 저장'}
             </button>
-            <button onClick={handleBack} className="text-corthex-text-secondary hover:text-corthex-text-secondary text-sm px-5 py-2.5">
+            <button onClick={handleBack} className="text-corthex-text-secondary hover:text-corthex-text-secondary text-sm px-5 py-2.5 min-h-[44px]">
               취소
             </button>
           </div>
@@ -320,8 +320,8 @@ export function ReportsPage() {
   return (
     <div className="h-full flex flex-col overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", backgroundColor: 'var(--color-corthex-bg)' }} data-testid="reports-page">
       <div className="flex h-full overflow-hidden">
-        {/* Filter Sidebar */}
-        <aside className="w-52 border-r border-corthex-border flex flex-col gap-6 p-4 shrink-0 overflow-y-auto bg-corthex-elevated/30">
+        {/* Filter Sidebar — hidden on mobile */}
+        <aside className="hidden lg:flex w-52 border-r border-corthex-border flex-col gap-6 p-4 shrink-0 overflow-y-auto bg-corthex-elevated/30">
           <section>
             <label className="block text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest mb-3">Report Type</label>
             <div className="space-y-2">
@@ -365,16 +365,16 @@ export function ReportsPage() {
           </section>
         </aside>
 
-        {/* Center: Table Area */}
-        <div className="flex-1 flex flex-col overflow-hidden border-r border-corthex-border">
-          <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-corthex-border bg-corthex-surface/50">
-            <h1 className="text-xl font-black tracking-tight text-corthex-text-primary flex items-center gap-3">
+        {/* Center: Table Area — hidden on mobile when detail is open */}
+        <div className={`flex-1 flex flex-col overflow-hidden lg:border-r border-corthex-border ${selectedReport && view === 'detail' ? 'hidden lg:flex' : 'flex'}`}>
+          <div className="flex items-center justify-between px-4 lg:px-6 py-4 shrink-0 border-b border-corthex-border bg-corthex-surface/50 gap-3">
+            <h1 className="text-lg lg:text-xl font-black tracking-tight text-corthex-text-primary flex items-center gap-2 lg:gap-3">
               Active Reports
               <span className="bg-corthex-accent/10 text-corthex-accent text-[10px] px-2 py-0.5 rounded border border-corthex-accent/30 font-mono">{filteredReports.length}</span>
             </h1>
             <button
               onClick={() => setView('create')}
-              className="text-sm font-bold px-5 py-2.5 rounded text-white flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+              className="text-sm font-bold px-4 lg:px-5 py-2.5 min-h-[44px] rounded text-white flex items-center gap-2 transition-all active:scale-95 shadow-lg shrink-0"
               style={{ backgroundColor: accentColor }}
               data-testid="new-report-btn"
             >
@@ -385,11 +385,11 @@ export function ReportsPage() {
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-corthex-elevated/80 backdrop-blur-md z-10">
                 <tr className="text-[10px] font-black text-corthex-text-secondary uppercase tracking-widest border-b border-corthex-border">
-                  <th className="px-6 py-4">Title</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Author</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4"></th>
+                  <th className="px-4 lg:px-6 py-4">Title</th>
+                  <th className="px-4 lg:px-6 py-4">Status</th>
+                  <th className="hidden md:table-cell px-6 py-4">Author</th>
+                  <th className="hidden md:table-cell px-6 py-4">Date</th>
+                  <th className="hidden md:table-cell px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-corthex-border/50">
@@ -408,29 +408,29 @@ export function ReportsPage() {
                         className={`hover:bg-corthex-elevated/40 transition-colors cursor-pointer ${isSelected ? 'bg-corthex-accent/5' : ''}`}
                         data-testid={`report-item-${r.id}`}
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-4 lg:px-6 py-4">
                           <div className="flex flex-col">
                             <span className={`font-bold transition-colors ${isSelected ? 'text-corthex-accent' : 'text-corthex-text-primary'}`}>{r.title}</span>
                             <span className="text-[10px] text-corthex-text-disabled font-mono">{r.id.slice(0, 12)}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 lg:px-6 py-4">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${style.bgClass} ${style.textClass}`}>{style.label}</span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="hidden md:table-cell px-6 py-4">
                           <div className="flex items-center gap-2">
                             <Wrench className="w-4 h-4 text-corthex-text-disabled" />
                             <span className="text-sm text-corthex-text-secondary">{r.authorName}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="hidden md:table-cell px-6 py-4">
                           <span className="font-mono text-xs text-corthex-text-secondary">{new Date(r.submittedAt || r.updatedAt).toLocaleDateString('en-US')}</span>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="hidden md:table-cell px-6 py-4 text-right">
                           {r.status !== 'draft' && (
                             <button
                               onClick={(e) => { e.stopPropagation(); setSelectedReport(r.id); setShowShareModal(true) }}
-                              className="text-corthex-text-disabled hover:text-corthex-accent transition-colors"
+                              className="text-corthex-text-disabled hover:text-corthex-accent transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                             >
                               <Share2 className="w-4 h-4" />
                             </button>
@@ -446,7 +446,7 @@ export function ReportsPage() {
         </div>
 
         {/* Right: Report Detail Viewer */}
-        <div className="w-[440px] shrink-0 flex flex-col overflow-hidden bg-corthex-surface">
+        <div className={`w-full lg:w-[440px] shrink-0 flex flex-col overflow-hidden bg-corthex-surface ${!selectedReport || view !== 'detail' ? 'hidden lg:flex' : 'flex'}`}>
               {!selectedReport || !report ? (
                 <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
                   보고서를 선택하세요
@@ -454,25 +454,28 @@ export function ReportsPage() {
               ) : (
                 <>
                   {/* Detail Header Actions */}
-                  <div className="px-8 py-4 border-b border-corthex-border flex justify-between items-center bg-corthex-elevated/30">
-                    <div className="flex gap-4">
+                  <div className="px-4 lg:px-8 py-4 border-b border-corthex-border flex justify-between items-center bg-corthex-elevated/30">
+                    <div className="flex gap-2 lg:gap-4">
+                      <button onClick={handleBack} className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded-lg transition-colors text-corthex-text-secondary">
+                        &larr;
+                      </button>
                       {report.status !== 'draft' && (
-                        <button onClick={handleDownload} disabled={downloading} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors">
+                        <button onClick={handleDownload} disabled={downloading} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded-lg transition-colors">
                           <Download className="w-5 h-5" />
                         </button>
                       )}
                       {report.status !== 'draft' && (
-                        <button onClick={() => setShowShareModal(true)} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors">
+                        <button onClick={() => setShowShareModal(true)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded-lg transition-colors">
                           <Share2 className="w-5 h-5" />
                         </button>
                       )}
                       {isMyReport && report.status === 'draft' && (
-                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 hover:bg-corthex-elevated rounded-lg transition-colors text-red-500">
+                        <button onClick={() => setDeleteConfirmOpen(true)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-corthex-elevated rounded-lg transition-colors text-red-500">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       )}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 lg:gap-3">
                       {isMyReport && report.status === 'draft' && (
                         <>
                           <button
@@ -508,7 +511,7 @@ export function ReportsPage() {
                   </div>
 
                   {/* Markdown Content */}
-                  <div className="flex-1 overflow-y-auto px-12 py-10 max-w-4xl mx-auto w-full space-y-8">
+                  <div className="flex-1 overflow-y-auto px-4 lg:px-12 py-6 lg:py-10 max-w-4xl mx-auto w-full space-y-6 lg:space-y-8">
                     {editMode ? (
                       <div className="space-y-4">
                         <input
@@ -541,8 +544,8 @@ export function ReportsPage() {
                     ) : (
                       <>
                         <div className="space-y-4">
-                          <h1 className="text-4xl leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{report.title}</h1>
-                          <div className="flex items-center gap-6 py-4 border-y border-corthex-border/50">
+                          <h1 className="text-2xl lg:text-4xl leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>{report.title}</h1>
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 py-4 border-y border-corthex-border/50">
                             <div className="flex flex-col">
                               <span className="text-[10px] text-corthex-text-secondary uppercase tracking-widest font-bold">Created Date</span>
                               <span className="text-sm font-medium">{new Date(report.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -616,7 +619,7 @@ export function ReportsPage() {
                             <label className="block text-[10px] font-bold uppercase tracking-widest text-corthex-text-secondary mb-2 px-1">Add your feedback</label>
                             <div className="relative">
                               <textarea
-                                className="w-full bg-corthex-surface border-corthex-border rounded-2xl p-4 text-sm placeholder:text-corthex-text-secondary border"
+                                className="w-full bg-corthex-surface border-corthex-border rounded-2xl p-4 text-base sm:text-sm placeholder:text-corthex-text-secondary border"
                                 placeholder="Write a comment..."
                                 rows={3}
                                 value={commentInput}
@@ -629,7 +632,7 @@ export function ReportsPage() {
                                   if (commentInput.trim()) createComment.mutate(commentInput.trim())
                                 }}
                                 disabled={!commentInput.trim() || createComment.isPending}
-                                className="absolute bottom-3 right-3 text-white p-2 rounded-xl transition-colors shadow-lg disabled:opacity-50"
+                                className="absolute bottom-3 right-3 text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl transition-colors shadow-lg disabled:opacity-50"
                                 style={{ backgroundColor: accentColor, boxShadow: `0 4px 14px ${accentColor}4d` }}
                                 data-testid="comment-send-btn"
                               >
@@ -649,7 +652,7 @@ export function ReportsPage() {
       {/* ConfirmDialog: CEO 보고 */}
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
             <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">CEO에게 보고</h3>
             <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 CEO에게 보고하시겠습니까? 보고 후 본문 수정이 제한됩니다.</p>
             <div className="flex justify-end gap-2">
@@ -663,7 +666,7 @@ export function ReportsPage() {
       {/* ConfirmDialog: 삭제 */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-96">
+          <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
             <h3 className="text-sm font-semibold text-corthex-text-primary mb-2">보고서 삭제</h3>
             <p className="text-xs text-corthex-text-secondary mb-4">이 보고서를 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
             <div className="flex justify-end gap-2">

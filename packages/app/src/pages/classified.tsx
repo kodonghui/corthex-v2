@@ -242,13 +242,13 @@ export function ClassifiedPage() {
   return (
     <div data-testid="classified-page" className="font-sans min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}>
       {/* BEGIN: MainHeader */}
-      <header className="h-16 border-b bg-corthex-surface sticky top-0 z-50 flex items-center justify-between px-8" style={{ borderColor: 'var(--color-corthex-border)' }}>
-        <div className="flex items-center gap-4">
+      <header className="h-14 md:h-16 border-b bg-corthex-surface sticky top-0 z-50 flex items-center justify-between px-4 md:px-8" style={{ borderColor: 'var(--color-corthex-border)' }}>
+        <div className="flex items-center gap-3 md:gap-4">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>C</div>
           <h1 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--color-corthex-text-primary)' }}>CORTHEX <span style={{ color: 'var(--color-corthex-text-secondary)' }} className="font-normal">v2.0</span></h1>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="text-right">
+        <div className="flex items-center gap-3 md:gap-6">
+          <div className="text-right hidden sm:block">
             <p className="text-xs font-medium uppercase tracking-widest leading-none" style={{ color: 'var(--color-corthex-text-secondary)' }}>Access Level</p>
             <p className="text-sm font-bold" style={{ color: '#dc2626' }}>CLEARANCE: SECRET</p>
           </div>
@@ -260,13 +260,13 @@ export function ClassifiedPage() {
       {/* END: MainHeader */}
 
       {/* BEGIN: InterfaceContainer */}
-      <main className="max-w-[1600px] mx-auto p-6 lg:p-8 h-[calc(100vh-64px)] overflow-hidden">
-        <div className="grid grid-cols-12 gap-6 h-full">
+      <main className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden">
+        <div className="grid grid-cols-12 gap-4 md:gap-6 h-full">
           {/* BEGIN: LeftSidebar (Security Classifications) */}
-          <aside className="col-span-12 lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-            <div className="bg-corthex-elevated rounded-2xl p-5 border border-corthex-border h-full">
-              <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: 'var(--color-corthex-text-secondary)' }}>Security Clearance</h2>
-              <nav className="space-y-2">
+          <aside className="col-span-12 lg:col-span-3 xl:col-span-2 flex flex-col gap-4 lg:h-full overflow-y-auto">
+            <div className="bg-corthex-elevated rounded-2xl p-4 md:p-5 border border-corthex-border lg:h-full">
+              <h2 className="text-xs font-bold uppercase tracking-wider mb-3 md:mb-6" style={{ color: 'var(--color-corthex-text-secondary)' }}>Security Clearance</h2>
+              <nav className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible">
                 {classificationButtons.map((btn) => {
                   const isActive = activeClassification === btn.key
                   const count = stats?.byClassification[btn.key] ?? 0
@@ -277,7 +277,7 @@ export function ClassifiedPage() {
                         setActiveClassification(isActive ? null : btn.key)
                         setPage(1)
                       }}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
+                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors min-h-[44px] whitespace-nowrap shrink-0 ${
                         isActive
                           ? 'shadow-lg'
                           : 'hover:bg-corthex-elevated group'
@@ -298,7 +298,7 @@ export function ClassifiedPage() {
                   )
                 })}
               </nav>
-              <div className="mt-8 pt-6" style={{ borderTop: '1px solid #e5e1d3' }}>
+              <div className="hidden lg:block mt-8 pt-6" style={{ borderTop: '1px solid #e5e1d3' }}>
                 <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>API Archive Context</h2>
                 <div className="p-3 rounded-lg border" style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: 'var(--color-corthex-border)' }}>
                   <code className="text-[10px] break-all font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>GET /api/workspace/archive</code>
@@ -310,11 +310,11 @@ export function ClassifiedPage() {
 
           {/* BEGIN: CenterContent (Document List) */}
           <section className="col-span-12 lg:col-span-5 xl:col-span-6 flex flex-col gap-4 overflow-hidden">
-            <div className="flex items-center justify-between px-2">
-              <h2 className="text-xl font-bold" style={{ color: 'var(--color-corthex-text-primary)' }}>Classified Archive</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-2">
+              <h2 className="text-lg md:text-xl font-bold" style={{ color: 'var(--color-corthex-text-primary)' }}>Classified Archive</h2>
               <div className="flex gap-2">
                 <input
-                  className="text-sm rounded-full px-4 py-1.5 w-48 transition-all border focus:ring-1 focus:ring-corthex-accent"
+                  className="text-sm rounded-full px-4 py-1.5 w-full sm:w-48 transition-all border focus:ring-1 focus:ring-corthex-accent min-h-[44px]"
                   style={{ borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
                   placeholder="Filter documents..."
                   type="text"
@@ -397,7 +397,7 @@ export function ClassifiedPage() {
           {/* END: CenterContent */}
 
           {/* BEGIN: RightSidebar (Document Detail View) */}
-          <aside className="col-span-12 lg:col-span-4 xl:col-span-4 h-full hidden lg:block">
+          <aside className={`col-span-12 lg:col-span-4 xl:col-span-4 h-full ${detailId ? 'fixed inset-0 z-40 lg:static lg:z-auto' : 'hidden lg:block'}`}>
             <div className="bg-corthex-elevated rounded-2xl border border-corthex-border h-full flex flex-col overflow-hidden">
               {!detailId ? (
                 <div className="flex-1 flex items-center justify-center text-corthex-text-secondary text-sm">
@@ -410,10 +410,18 @@ export function ClassifiedPage() {
               ) : (
                 <>
                   {/* Detail Header */}
-                  <div className="p-6 border-b border-corthex-border">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[detail.classification] }} />
-                      <span className="text-xs font-bold text-corthex-text-secondary tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
+                  <div className="p-4 md:p-6 border-b border-corthex-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: CLASSIFICATION_DOT_COLORS[detail.classification] }} />
+                        <span className="text-xs font-bold text-corthex-text-secondary tracking-tighter">REF: GET /api/workspace/archive/{detail.id.slice(0, 8)}</span>
+                      </div>
+                      <button
+                        onClick={() => setDetailId(null)}
+                        className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-corthex-text-secondary hover:text-corthex-text-primary transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
                     </div>
                     <h2 className="text-2xl font-bold text-corthex-text-primary leading-tight">{detail.title}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">

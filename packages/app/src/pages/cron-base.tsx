@@ -195,14 +195,14 @@ export function CronBasePage() {
   return (
     <div data-testid="cron-page" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-corthex-text-primary">크론기지</h1>
         </div>
         <button
           data-testid="add-cron-btn"
           onClick={openCreate}
-          className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+          className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 min-h-[44px] transition-colors"
         >
           + 크론 추가
         </button>
@@ -219,7 +219,7 @@ export function CronBasePage() {
         <div data-testid="cron-empty-state" className="bg-corthex-elevated border border-dashed border-corthex-border rounded-xl p-12 text-center">
           <p className="text-sm font-medium text-corthex-text-primary">설정된 크론 작업이 없습니다</p>
           <p className="text-xs text-corthex-text-secondary mt-1">정기적으로 에이전트가 수행할 작업을 추가해보세요</p>
-          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm rounded-lg px-4 py-2 mt-4 transition-colors">크론 추가</button>
+          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm rounded-lg px-4 py-2 min-h-[44px] mt-4 transition-colors">크론 추가</button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -263,8 +263,8 @@ export function CronBasePage() {
             <h3 className="text-sm font-semibold text-corthex-text-primary">크론 삭제</h3>
             <p className="text-xs text-corthex-text-secondary mt-2">이 스케줄과 실행 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setDeleteTarget(null)} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-3 py-1.5 rounded-lg">취소</button>
-              <button onClick={() => deleteTarget && deleteScheduleMutation.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-3 py-1.5 min-h-[44px] rounded-lg">취소</button>
+              <button onClick={() => deleteTarget && deleteScheduleMutation.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 min-h-[44px] rounded-lg">삭제</button>
             </div>
           </div>
         </div>
@@ -296,12 +296,12 @@ function ScheduleCard({
 
   return (
     <div data-testid={`schedule-card-${s.id}`} className={`bg-corthex-elevated border border-corthex-border rounded-xl overflow-hidden transition-all hover:border-corthex-border-strong ${!s.isActive ? 'opacity-50' : ''}`}>
-      <div className="px-4 py-4">
+      <div className="px-3 py-3 sm:px-4 sm:py-4">
         {/* Row 1: Name + Agent */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${s.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-corthex-surface'}`} />
-            <span className="text-sm font-semibold text-corthex-text-primary truncate max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
+            <span className="text-sm font-semibold text-corthex-text-primary truncate max-w-[200px] sm:max-w-[250px]">{s.name || s.instruction.slice(0, 40)}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-corthex-text-secondary">Agent: {s.agentName}</span>
@@ -312,8 +312,8 @@ function ScheduleCard({
         <p className="text-xs text-corthex-text-secondary line-clamp-2 mt-2">{s.instruction}</p>
 
         {/* Row 3: Schedule info + Actions */}
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-3 gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="text-xs font-medium text-corthex-accent">{cronDesc}</span>
             <span className="text-[10px] text-corthex-text-secondary">
               다음: {s.nextRunAt && s.isActive ? formatRelativeTime(s.nextRunAt) : '—'}
@@ -323,12 +323,12 @@ function ScheduleCard({
             </span>
           </div>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-            <button onClick={onEdit} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 rounded hover:bg-corthex-border/50 transition-colors">편집</button>
-            <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${s.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
+            <button onClick={onEdit} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 min-h-[44px] rounded hover:bg-corthex-border/50 transition-colors">편집</button>
+            <button onClick={onToggle} className={`text-xs px-2 py-1 min-h-[44px] rounded transition-colors ${s.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
               {s.isActive ? '중지' : '시작'}
             </button>
-            <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded transition-colors">삭제</button>
-            <button onClick={onToggleExpand} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1">{isExpanded ? '▲' : '▼'}</button>
+            <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 min-h-[44px] rounded transition-colors">삭제</button>
+            <button onClick={onToggleExpand} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 min-h-[44px]">{isExpanded ? '▲' : '▼'}</button>
           </div>
         </div>
       </div>
@@ -366,7 +366,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
             const cfg = RUN_STATUS_CONFIG[run.status] || { label: run.status, classes: 'bg-corthex-surface/15 text-corthex-text-secondary' }
             const progress = jobProgress[run.id]
             return (
-              <div key={run.id} className="px-4 py-2.5 border-b border-corthex-border/30 flex items-center justify-between">
+              <div key={run.id} className="px-3 py-2.5 sm:px-4 border-b border-corthex-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${cfg.classes}`}>{cfg.label}</span>
                   <span className="text-[10px] text-corthex-text-secondary font-mono">{run.startedAt ? formatShortDate(run.startedAt) : '—'}</span>
@@ -408,7 +408,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 px-2 py-1 min-h-[44px]"
               >
                 ← 이전
               </button>
@@ -416,7 +416,7 @@ function RunHistory({ scheduleId, jobProgress }: { scheduleId: string; jobProgre
               <button
                 onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                 disabled={page >= pagination.totalPages}
-                className="text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 px-2 py-1"
+                className="text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary disabled:opacity-30 px-2 py-1 min-h-[44px]"
               >
                 다음 →
               </button>
@@ -505,7 +505,7 @@ function ScheduleModal({
     mode === 'legacy' ? (frequency !== 'custom' || days.length > 0) : !!cronExpression
   )
 
-  const inputClasses = 'w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 text-sm text-corthex-text-primary rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-disabled'
+  const inputClasses = 'w-full bg-corthex-elevated border border-corthex-border focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent/30 text-base sm:text-sm text-corthex-text-primary rounded-lg px-3 py-2 outline-none transition-colors placeholder:text-corthex-text-disabled'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="cron-modal">
@@ -573,13 +573,13 @@ function ScheduleModal({
 
             {/* Preset */}
             {mode === 'preset' && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CRON_PRESETS.map(preset => (
                   <button
                     key={preset.value}
                     type="button"
                     onClick={() => handlePresetSelect(preset.value)}
-                    className={`text-xs px-3 py-2.5 rounded-lg border text-center transition-all ${
+                    className={`text-xs px-3 py-2.5 min-h-[44px] rounded-lg border text-center transition-all ${
                       selectedPreset === preset.value
                         ? 'bg-corthex-accent/15 border-corthex-accent/40 text-corthex-accent'
                         : 'bg-corthex-elevated border-corthex-border text-corthex-text-secondary hover:border-corthex-border-strong'
@@ -623,7 +623,7 @@ function ScheduleModal({
                 </div>
                 <div>
                   <label className="text-xs font-medium text-corthex-text-secondary mb-1.5 block">주기</label>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-3">
                     {([['daily', '매일'], ['weekdays', '평일'], ['custom', '특정 요일']] as const).map(([val, label]) => (
                       <label key={val} className="flex items-center gap-1.5 text-xs text-corthex-text-secondary cursor-pointer">
                         <input type="radio" name="frequency" checked={frequency === val} onChange={() => setFrequency(val)} className="accent-blue-500" />
@@ -634,13 +634,13 @@ function ScheduleModal({
                 </div>
                 {frequency === 'custom' && (
                   <div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {DAY_NAMES.map((dayName, i) => (
                         <button
                           key={i}
                           type="button"
                           onClick={() => setDays(prev => prev.includes(i) ? prev.filter(d => d !== i) : [...prev, i])}
-                          className={`w-8 h-8 text-xs rounded-lg border transition-all ${
+                          className={`w-8 h-8 min-h-[44px] min-w-[44px] text-xs rounded-lg border transition-all ${
                             days.includes(i) ? 'bg-corthex-accent/20 border-corthex-accent/40 text-corthex-accent' : 'border-corthex-border text-corthex-text-disabled'
                           }`}
                         >
@@ -665,11 +665,11 @@ function ScheduleModal({
 
         {/* Footer */}
         <div className="flex justify-end gap-2 px-5 py-4 border-t border-corthex-border">
-          <button onClick={onClose} className="text-sm text-corthex-text-secondary hover:text-corthex-text-primary px-4 py-2 rounded-lg hover:bg-corthex-elevated transition-colors">취소</button>
+          <button onClick={onClose} className="text-sm text-corthex-text-secondary hover:text-corthex-text-primary px-4 py-2 min-h-[44px] rounded-lg hover:bg-corthex-elevated transition-colors">취소</button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || isPending}
-            className="bg-corthex-accent hover:bg-corthex-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-corthex-text-on-accent text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-corthex-accent hover:bg-corthex-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-corthex-text-on-accent text-sm font-medium px-4 py-2 min-h-[44px] rounded-lg transition-colors"
           >
             {isPending ? '처리 중...' : editing ? '수정' : '등록'}
           </button>

@@ -54,14 +54,14 @@ export function MonitoringPage() {
 
   if (isError) {
     return (
-      <div className="p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
-        <div className="bg-corthex-surface border border-corthex-border p-8 text-center">
+      <div className="p-4 sm:p-6 md:p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
+        <div className="bg-corthex-surface border border-corthex-border p-6 md:p-8 text-center">
           <AlertCircle className="w-8 h-8 mx-auto mb-4" style={{ color: 'var(--color-corthex-error)' }} />
           <p className="text-sm font-mono" style={{ color: 'var(--color-corthex-error)' }}>Failed to load monitoring data.</p>
           <p className="text-xs mt-1 text-corthex-text-secondary">{(error as Error)?.message}</p>
           <button
             onClick={() => refetch()}
-            className="mt-4 px-6 py-2 text-sm font-mono uppercase tracking-widest"
+            className="mt-4 px-6 py-2 text-sm font-mono uppercase tracking-widest min-h-[44px]"
             style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
           >
             Retry
@@ -73,15 +73,15 @@ export function MonitoringPage() {
 
   if (isLoading || !data) {
     return (
-      <div className="p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
-        <div className="grid grid-cols-4 gap-4 mb-6" data-testid="loading-state">
+      <div className="p-4 sm:p-6 md:p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" data-testid="loading-state">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-corthex-surface border border-corthex-border h-24 animate-pulse" />
           ))}
         </div>
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 md:gap-6">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="col-span-4 bg-corthex-surface border border-corthex-border h-48 animate-pulse" />
+            <div key={i} className="sm:col-span-1 md:col-span-4 bg-corthex-surface border border-corthex-border h-48 animate-pulse" />
           ))}
         </div>
       </div>
@@ -92,10 +92,10 @@ export function MonitoringPage() {
   const memPct = d.memory.usagePercent
 
   return (
-    <div className="p-8 bg-corthex-bg min-h-screen relative" data-testid="monitoring-page">
+    <div className="p-4 sm:p-6 md:p-8 bg-corthex-bg min-h-screen relative" data-testid="monitoring-page">
 
       {/* HEADER METRIC STRIP */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Server Status */}
         <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-col justify-between h-24" data-testid="server-card">
           <span className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Server_Status</span>
@@ -244,7 +244,7 @@ export function MonitoringPage() {
             onClick={() => refetch()}
             disabled={isFetching}
             data-testid="refresh-btn"
-            className="mt-4 w-full py-2 bg-corthex-elevated hover:bg-corthex-border transition-colors text-[9px] uppercase tracking-tighter font-mono flex items-center justify-center gap-2 text-corthex-text-secondary disabled:opacity-50"
+            className="mt-4 w-full py-2 min-h-[44px] bg-corthex-elevated hover:bg-corthex-border transition-colors text-[9px] uppercase tracking-tighter font-mono flex items-center justify-center gap-2 text-corthex-text-secondary disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} />
             {isFetching ? 'Refreshing...' : 'Refresh'}
@@ -358,8 +358,8 @@ export function MonitoringPage() {
       </div>
 
       {/* DECORATIVE FOOTER */}
-      <div className="mt-12 flex justify-between items-center opacity-20 pointer-events-none">
-        <div className="flex gap-12 font-mono text-[9px] uppercase text-corthex-text-disabled">
+      <div className="mt-8 md:mt-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 opacity-20 pointer-events-none">
+        <div className="flex flex-wrap gap-4 sm:gap-12 font-mono text-[9px] uppercase text-corthex-text-disabled">
           <span>Runtime: {d.server.version.runtime}</span>
           <span>Hash: {d.server.version.hash || 'N/A'}</span>
           <span>Auto-refresh: 30s</span>

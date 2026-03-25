@@ -156,7 +156,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
   return (
     <div className="rounded-xl border border-corthex-border bg-corthex-surface overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-corthex-border">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-corthex-border">
         <div className="flex items-center gap-3">
           <div className="p-1.5 rounded bg-amber-50">
             <Clock className="h-4 w-4 text-amber-600" />
@@ -177,7 +177,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
       </div>
 
       {/* Content Preview (always show first item) */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {(expanded ? approval.contents : approval.contents.slice(0, 2)).map((content) => (
             <ContentPreview key={content.id} content={content} />
@@ -194,7 +194,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
       </div>
 
       {/* Actions */}
-      <div className="px-4 pb-4 space-y-3">
+      <div className="px-3 pb-3 sm:px-4 sm:pb-4 space-y-3">
         {/* Platform Selection */}
         <div>
           <p className="text-xs text-corthex-text-secondary mb-2">게시 플랫폼 선택</p>
@@ -231,11 +231,11 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => approveMutation.mutate()}
             disabled={approveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-colors"
           >
             <ThumbsUp className="h-4 w-4" />
             {approveMutation.isPending ? '처리중...' : '승인'}
@@ -244,7 +244,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
           {!showRejectInput ? (
             <button
               onClick={() => setShowRejectInput(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-lg bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors"
             >
               <ThumbsDown className="h-4 w-4" />
               거절
@@ -253,7 +253,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
             <button
               onClick={() => rejectMutation.mutate()}
               disabled={rejectMutation.isPending}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
             >
               <XCircle className="h-4 w-4" />
               {rejectMutation.isPending ? '처리중...' : '거절 확인'}
@@ -263,7 +263,7 @@ function PendingApprovalCard({ approval }: { approval: ApprovalRequest }) {
           <button
             onClick={() => postMutation.mutate()}
             disabled={postMutation.isPending || selectedPlatforms.length === 0}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-colors ml-auto hover:opacity-90"
+            className="flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-colors ml-auto hover:opacity-90"
             style={{ backgroundColor: 'var(--color-corthex-accent)' }}
           >
             <Send className="h-4 w-4" />
@@ -310,7 +310,7 @@ function HistoryItem({ approval }: { approval: ApprovalRequest }) {
   const StatusIcon = config.icon
 
   return (
-    <div className="flex items-center justify-between py-3 px-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-3 sm:px-4 gap-2">
       <div className="flex items-center gap-3">
         <div className={`p-1.5 rounded ${config.bg}`}>
           <StatusIcon className={`h-4 w-4 ${config.color}`} />
@@ -368,10 +368,10 @@ export function MarketingApprovalPage() {
       style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-50 flex justify-between items-center px-6 h-16 border-b border-corthex-border" style={{ backgroundColor: 'var(--color-corthex-surface)' }}>
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-50 flex justify-between items-center px-4 sm:px-6 h-14 sm:h-16 border-b border-corthex-border" style={{ backgroundColor: 'var(--color-corthex-surface)' }}>
+        <div className="flex items-center gap-2 sm:gap-4">
           <UserCheck className="h-5 w-5 text-corthex-accent" />
-          <h1 className="text-xl font-black tracking-tighter text-corthex-accent">APPROVAL QUEUE</h1>
+          <h1 className="text-base sm:text-xl font-black tracking-tighter text-corthex-accent">APPROVAL QUEUE</h1>
           {!pendingLoading && (
             <span className="text-[10px] px-2 py-0.5 rounded font-bold border text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)', borderColor: 'rgba(96,108,56,0.2)' }}>
               {pendingApprovals.length} PENDING
@@ -381,21 +381,21 @@ export function MarketingApprovalPage() {
       </header>
 
       {/* Content Canvas */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
         {/* Batch Action Toolbar */}
-        <div className="flex items-center justify-between bg-corthex-surface border border-corthex-border p-3 rounded-xl">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-corthex-surface border border-corthex-border p-3 rounded-xl gap-3">
           <div className="flex items-center gap-4 px-2">
             <input type="checkbox" className="rounded border-corthex-border bg-corthex-elevated" />
             <span className="text-sm font-medium text-corthex-text-secondary">
               전체 선택 <span className="text-corthex-text-secondary opacity-60">({pendingApprovals.length}건)</span>
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-corthex-elevated text-corthex-text-primary rounded-lg text-sm font-semibold hover:opacity-80 transition-all">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 min-h-[44px] bg-corthex-elevated text-corthex-text-primary rounded-lg text-sm font-semibold hover:opacity-80 transition-all">
               <XCircle className="h-4 w-4" />
               전체 거절
             </button>
-            <button className="flex items-center gap-2 px-6 py-2 text-white rounded-lg text-sm font-bold hover:opacity-90 transition-all" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>
+            <button className="flex items-center gap-2 px-6 py-2 min-h-[44px] text-white rounded-lg text-sm font-bold hover:opacity-90 transition-all" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>
               <CheckCircle2 className="h-4 w-4" />
               전체 승인
             </button>
@@ -425,8 +425,8 @@ export function MarketingApprovalPage() {
 
         {/* Stats Section */}
         <div className="border-t border-corthex-border pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-corthex-surface border border-corthex-border p-6 rounded-2xl flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 rounded-2xl flex flex-col gap-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)' }}>
                 <RefreshCw className="h-5 w-5" />
               </div>
@@ -438,7 +438,7 @@ export function MarketingApprovalPage() {
                 <div className="w-3/4 h-full rounded-full" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
               </div>
             </div>
-            <div className="bg-corthex-surface border border-corthex-border p-6 rounded-2xl flex flex-col gap-4">
+            <div className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 rounded-2xl flex flex-col gap-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)' }}>
                 <CheckCircle2 className="h-5 w-5" />
               </div>
@@ -454,7 +454,7 @@ export function MarketingApprovalPage() {
                 </span>
               </div>
             </div>
-            <div className="bg-corthex-surface border border-corthex-border p-6 rounded-2xl flex flex-col gap-4">
+            <div className="bg-corthex-surface border border-corthex-border p-4 sm:p-6 rounded-2xl flex flex-col gap-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)' }}>
                 <UserCheck className="h-5 w-5" />
               </div>
@@ -501,7 +501,7 @@ export function MarketingApprovalPage() {
       </div>
 
       {/* Footer */}
-      <footer className="h-12 border-t border-corthex-border flex items-center justify-between px-6 bg-corthex-surface text-[11px] text-corthex-text-secondary">
+      <footer className="h-12 border-t border-corthex-border flex items-center justify-between px-4 sm:px-6 bg-corthex-surface text-[11px] text-corthex-text-secondary">
         <span>총 {historyTotal}건 이력</span>
         <div className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />

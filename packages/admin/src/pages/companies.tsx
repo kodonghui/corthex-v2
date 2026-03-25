@@ -93,7 +93,7 @@ export function CompaniesPage() {
 
   return (
     <div className="min-h-screen bg-corthex-bg" data-testid="companies-page">
-      <div className="p-8 max-w-7xl mx-auto w-full">
+      <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
         {/* Header Section */}
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
@@ -101,7 +101,7 @@ export function CompaniesPage() {
               <div className="w-2 h-2 bg-corthex-accent" />
               <span className="font-mono text-xs tracking-[0.3em] text-corthex-accent">ADMIN_OVERRIDE</span>
             </div>
-            <h1 className="text-5xl font-black tracking-tighter uppercase leading-none text-corthex-text-primary">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none text-corthex-text-primary">
               Companies Management
             </h1>
             <p className="font-mono text-sm text-corthex-text-secondary mt-2 max-w-xl">
@@ -110,7 +110,7 @@ export function CompaniesPage() {
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="bg-corthex-accent text-corthex-text-on-accent font-black py-4 px-8 text-sm tracking-[0.15em] uppercase active:scale-95 transition-transform flex items-center gap-3 hover:bg-corthex-accent-hover"
+            className="bg-corthex-accent text-corthex-text-on-accent font-black py-3 px-6 md:py-4 md:px-8 text-sm tracking-[0.15em] uppercase active:scale-95 transition-transform flex items-center gap-3 hover:bg-corthex-accent-hover min-h-[44px]"
             data-testid="company-add-btn"
           >
             <Plus size={18} />
@@ -119,7 +119,7 @@ export function CompaniesPage() {
         </header>
 
         {/* Stats + Search Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-1 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-8">
           <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
             <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Total_Entities</span>
             <span className="text-4xl font-black tracking-tighter text-corthex-text-primary">{companies.length.toLocaleString()}</span>
@@ -162,14 +162,14 @@ export function CompaniesPage() {
                 e.preventDefault()
                 createMutation.mutate(form)
               }}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
               <div>
                 <label className="block font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mb-1.5">Company Name</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
+                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-base sm:text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
                   required
                 />
               </div>
@@ -178,7 +178,7 @@ export function CompaniesPage() {
                 <input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
-                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
+                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-base sm:text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
                   placeholder="lowercase, numbers, hyphens only"
                   required
                 />
@@ -344,7 +344,7 @@ export function CompaniesPage() {
 
         {/* Pagination */}
         {filteredCompanies.length > 0 && (
-          <div className="mt-8 flex items-center justify-between">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">
               Showing {filteredCompanies.length} of {companies.length} companies
             </p>
@@ -361,7 +361,7 @@ export function CompaniesPage() {
         )}
 
         {/* Footer Data Stream */}
-        <footer className="mt-16 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center gap-6">
+        <footer className="mt-8 md:mt-16 pt-6 md:pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
             <div className="flex flex-col">
               <span className="text-[9px] font-mono text-corthex-text-disabled uppercase">System_Load</span>

@@ -116,29 +116,29 @@ export function ApiKeysPage() {
   const activeKeys = keys.filter(k => k.isActive)
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
       {/* Page Header */}
-      <div className="flex justify-between items-end" data-testid="api-keys-header">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4" data-testid="api-keys-header">
         <div className="max-w-2xl">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-4 h-1 bg-corthex-accent" />
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-corthex-accent">ACCESS PROTOCOL</span>
           </div>
-          <h2 className="text-4xl font-black tracking-tighter mb-3 text-corthex-text-primary uppercase">API Keys Management</h2>
+          <h2 className="text-2xl lg:text-4xl font-black tracking-tighter mb-3 text-corthex-text-primary uppercase">API Keys Management</h2>
           <p className="text-corthex-text-secondary leading-relaxed max-w-xl text-sm">
             Secure access control and token distribution for the{' '}
             <span className="text-corthex-accent font-bold">CORTHEX</span>{' '}
             mesh network. Monitor usage patterns and rotate credentials through the encrypted telemetry stream.
           </p>
         </div>
-        <div className="flex flex-col items-end gap-4">
-          <div className="text-right">
+        <div className="flex flex-col items-start lg:items-end gap-4 w-full lg:w-auto">
+          <div className="hidden lg:block text-right">
             <span className="block text-[10px] font-mono text-corthex-text-disabled uppercase">Network Load</span>
             <span className="text-xl font-mono text-emerald-400">NOMINAL</span>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="bg-corthex-accent/20 border border-corthex-accent/30 text-corthex-accent px-5 py-2.5 font-black text-xs tracking-widest uppercase hover:bg-corthex-accent hover:text-corthex-text-on-accent transition-all duration-300 rounded"
+            className="bg-corthex-accent/20 border border-corthex-accent/30 text-corthex-accent px-5 py-3 min-h-[44px] font-black text-xs tracking-widest uppercase hover:bg-corthex-accent hover:text-corthex-text-on-accent transition-all duration-300 rounded w-full lg:w-auto"
           >
             GENERATE NEW KEY
           </button>
@@ -146,7 +146,7 @@ export function ApiKeysPage() {
       </div>
 
       {/* Bento Stats */}
-      <div className="grid grid-cols-4 gap-0.5 bg-corthex-border/10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-0.5 bg-corthex-border/10">
         <div className="bg-corthex-surface p-5">
           <span className="text-[10px] font-mono text-corthex-text-disabled uppercase block mb-2">Active Tokens</span>
           <span className="text-3xl font-mono text-corthex-text-primary">{activeKeys.length}</span>
@@ -182,7 +182,9 @@ export function ApiKeysPage() {
             <p className="text-sm text-corthex-text-secondary">새 API 키를 생성하여 외부 시스템과 연동하세요</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Desktop table */}
+          <div className="overflow-x-auto hidden lg:block">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-corthex-elevated/50 border-b border-corthex-border/10">
@@ -244,7 +246,7 @@ export function ApiKeysPage() {
                         {k.isActive && (
                           <button
                             onClick={() => setRotateConfirmId(k.id)}
-                            className="text-corthex-text-secondary hover:text-corthex-accent transition-colors"
+                            className="text-corthex-text-secondary hover:text-corthex-accent transition-colors p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                             title="로테이션"
                           >
                             <Edit2 className="w-5 h-5" />
@@ -252,7 +254,7 @@ export function ApiKeysPage() {
                         )}
                         <button
                           onClick={() => setDeleteConfirmId(k.id)}
-                          className="text-corthex-text-secondary hover:text-red-400 transition-colors"
+                          className="text-corthex-text-secondary hover:text-red-400 transition-colors p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
                           title="삭제"
                         >
                           {k.isActive ? <Ban className="w-5 h-5" /> : <Trash className="w-5 h-5" />}
@@ -264,14 +266,53 @@ export function ApiKeysPage() {
               </tbody>
             </table>
           </div>
+          {/* Mobile card view */}
+          <div className="lg:hidden divide-y divide-corthex-border/5">
+            {keys.map((k) => (
+              <div key={k.id} className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Key className={`w-4 h-4 flex-shrink-0 ${k.isActive ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`} />
+                    <span className="font-mono text-sm text-corthex-text-primary tracking-tight">{k.keyPrefix}••••</span>
+                  </div>
+                  {k.isActive ? (
+                    <span className="text-[10px] font-mono text-corthex-accent uppercase bg-corthex-accent/10 px-2 py-1 border border-corthex-accent/20">Active</span>
+                  ) : (
+                    <span className="text-[10px] font-mono text-corthex-text-disabled uppercase bg-corthex-elevated px-2 py-1 border border-corthex-border">Inactive</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {k.scopes.map((s) => (
+                    <span key={s} className="px-2 py-0.5 bg-corthex-elevated text-[9px] font-mono text-emerald-400 uppercase border border-emerald-400/20">{s}</span>
+                  ))}
+                  <span className="px-2 py-0.5 text-[9px] font-mono text-corthex-text-disabled">{k.rateLimitPerMin}/min</span>
+                </div>
+                <div className="text-xs font-mono text-corthex-text-secondary">
+                  Created: {fmtDate(k.createdAt)}
+                  {k.lastUsedAt && <> · Last: <span className="text-corthex-accent">{fmtDate(k.lastUsedAt)}</span></>}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  {k.isActive && (
+                    <button onClick={() => setRotateConfirmId(k.id)} className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-xs bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:text-corthex-accent transition-colors">
+                      <Edit2 className="w-4 h-4" /> Rotate
+                    </button>
+                  )}
+                  <button onClick={() => setDeleteConfirmId(k.id)} className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-xs bg-red-500/10 border border-red-500/20 text-corthex-error hover:bg-red-500/20 transition-colors">
+                    {k.isActive ? <Ban className="w-4 h-4" /> : <Trash className="w-4 h-4" />} Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          </>
         )}
 
         {/* Pagination Footer */}
-        <div className="px-8 py-4 border-t border-corthex-border/10 flex justify-between items-center bg-corthex-elevated/30">
+        <div className="px-4 lg:px-8 py-4 border-t border-corthex-border/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-corthex-elevated/30">
           <div className="flex items-center gap-4">
             <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">Showing {keys.length} Keys</span>
-            <div className="h-4 w-[1px] bg-corthex-border/20" />
-            <span className="text-[10px] font-mono text-corthex-accent uppercase flex items-center gap-2">
+            <div className="h-4 w-[1px] bg-corthex-border/20 hidden sm:block" />
+            <span className="text-[10px] font-mono text-corthex-accent uppercase hidden sm:flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-corthex-accent rounded-full animate-pulse" />
               Encrypted Socket Active
             </span>
@@ -288,7 +329,7 @@ export function ApiKeysPage() {
       </div>
 
       {/* Security Advisory */}
-      <div className="p-6 border border-corthex-border/10 bg-corthex-surface/50 flex gap-6 items-start rounded">
+      <div className="p-4 lg:p-6 border border-corthex-border/10 bg-corthex-surface/50 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start rounded">
         <Lock className="text-corthex-accent w-8 h-8 flex-shrink-0 mt-0.5" />
         <div>
           <h4 className="text-xs font-bold uppercase tracking-widest mb-2 text-corthex-text-primary">Security Protocol Gamma</h4>

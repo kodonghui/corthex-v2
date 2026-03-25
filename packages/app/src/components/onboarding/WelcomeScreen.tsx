@@ -29,7 +29,7 @@ export function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
         {/* CTA */}
         <button
           onClick={onGetStarted}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-corthex-accent text-white font-semibold rounded-xl hover:bg-corthex-accent-hover transition-colors shadow-md active:scale-[0.98]"
+          className="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] w-full sm:w-auto justify-center bg-corthex-accent text-white font-semibold rounded-xl hover:bg-corthex-accent-hover transition-colors shadow-md active:scale-[0.98]"
         >
           시작하기
           <ArrowRight className="w-4 h-4" />

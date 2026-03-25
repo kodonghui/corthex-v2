@@ -84,12 +84,12 @@ export function AgentReportsPage() {
   }
 
   return (
-    <div className="flex h-full relative">
+    <div className="flex flex-col lg:flex-row h-full relative">
       {/* Main Table Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Utility Bar */}
-        <div className="px-6 py-4 border-b border-corthex-border bg-corthex-surface flex items-center gap-4">
-          <div className="flex flex-col gap-1 flex-1 max-w-xs">
+        <div className="px-4 lg:px-6 py-4 border-b border-corthex-border bg-corthex-surface flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+          <div className="flex flex-col gap-1 flex-1 w-full sm:max-w-xs">
             <label className="text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">
               Report Classification
             </label>
@@ -100,7 +100,7 @@ export function AgentReportsPage() {
                 placeholder="FILTER BY TYPE..."
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full bg-corthex-elevated border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-xs py-2 pl-8 pr-3 focus:ring-0 focus:outline-none transition-colors"
+                className="w-full bg-corthex-elevated border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-base sm:text-xs py-2 pl-8 pr-3 focus:ring-0 focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -114,11 +114,11 @@ export function AgentReportsPage() {
           <table className="w-full border-collapse text-left">
             <thead className="sticky top-0 z-10">
               <tr className="bg-corthex-elevated border-b border-corthex-border">
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Title</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Type</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Generated</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Tags</th>
-                <th className="px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-right">Actions</th>
+                <th className="px-3 lg:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary">Title</th>
+                <th className="px-3 lg:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary hidden sm:table-cell">Type</th>
+                <th className="px-3 lg:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary hidden lg:table-cell">Generated</th>
+                <th className="px-3 lg:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary hidden lg:table-cell">Tags</th>
+                <th className="px-3 lg:px-5 py-3 text-xs font-bold uppercase tracking-widest text-corthex-text-secondary text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-corthex-border">
@@ -150,25 +150,25 @@ export function AgentReportsPage() {
                       : 'border-l-transparent hover:border-l-corthex-border'
                   }`}
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 lg:px-5 py-4">
                     <div className="flex items-center gap-2">
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${selectedId === r.id ? 'bg-corthex-accent' : 'bg-corthex-border'}`} />
-                      <span className="text-sm font-bold text-corthex-text-primary font-mono uppercase tracking-tight truncate max-w-xs">
+                      <span className="text-sm font-bold text-corthex-text-primary font-mono uppercase tracking-tight truncate max-w-[200px] lg:max-w-xs">
                         {r.title}
                       </span>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 lg:px-5 py-4 hidden sm:table-cell">
                     {r.type && (
                       <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 border text-xs font-bold font-mono uppercase tracking-widest ${typeClass(r.type)}`}>
                         {typeLabel(r.type)}
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-4 text-xs font-mono text-corthex-text-disabled">
+                  <td className="px-3 lg:px-5 py-4 text-xs font-mono text-corthex-text-disabled hidden lg:table-cell">
                     {new Date(r.createdAt).toLocaleString('ko-KR')}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 lg:px-5 py-4 hidden lg:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {r.tags.slice(0, 2).map((tag) => (
                         <span key={tag} className="text-xs px-1.5 py-0.5 bg-corthex-elevated text-corthex-text-disabled font-mono border border-corthex-border">
@@ -177,10 +177,10 @@ export function AgentReportsPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 lg:px-5 py-4 text-right">
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDownloadPdf(r.id) }}
-                      className="text-corthex-text-disabled hover:text-corthex-accent transition-colors"
+                      className="text-corthex-text-disabled hover:text-corthex-accent transition-colors p-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                       title="Download PDF"
                     >
                       <Download className="w-4 h-4" />
@@ -200,9 +200,9 @@ export function AgentReportsPage() {
         </div>
       </div>
 
-      {/* Detail Panel (slide-in from right) */}
+      {/* Detail Panel (slide-in from right, full overlay on mobile) */}
       {selectedId && (
-        <div className="w-[440px] border-l border-corthex-border bg-corthex-surface flex flex-col overflow-hidden">
+        <div className="fixed inset-0 lg:static lg:inset-auto w-full lg:w-[440px] border-l-0 lg:border-l border-corthex-border bg-corthex-surface flex flex-col overflow-hidden z-20 lg:z-auto">
           {detailLoading ? (
             <div className="flex-1 flex items-center justify-center text-xs font-mono text-corthex-text-disabled uppercase tracking-widest animate-pulse">
               Loading...
@@ -210,7 +210,7 @@ export function AgentReportsPage() {
           ) : detail ? (
             <>
               {/* Detail Header */}
-              <div className="px-5 py-4 border-b border-corthex-border bg-corthex-elevated flex items-start justify-between gap-4">
+              <div className="px-4 lg:px-5 py-4 border-b border-corthex-border bg-corthex-elevated flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-bold uppercase tracking-widest text-corthex-text-primary font-mono truncate">
                     {detail.title}
@@ -235,13 +235,13 @@ export function AgentReportsPage() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleDownloadPdf(detail.id)}
-                    className="px-3 py-1.5 bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest transition-colors hover:bg-corthex-accent-hover"
+                    className="px-3 py-2 min-h-[44px] bg-corthex-accent text-corthex-text-on-accent text-xs font-bold uppercase tracking-widest transition-colors hover:bg-corthex-accent-hover"
                   >
                     PDF
                   </button>
                   <button
                     onClick={() => setSelectedId(null)}
-                    className="text-corthex-text-disabled hover:text-corthex-text-primary transition-colors"
+                    className="text-corthex-text-disabled hover:text-corthex-text-primary transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   >
                     <X className="w-4 h-4" />
                   </button>

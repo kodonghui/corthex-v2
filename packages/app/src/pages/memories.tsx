@@ -620,10 +620,10 @@ export function MemoriesPage() {
     : agents.filter(a => a.agentName === agentFilter)
 
   return (
-    <div className="p-6 pb-10 max-w-6xl mx-auto">
+    <div className="p-4 md:p-6 pb-10 max-w-6xl mx-auto">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-corthex-text-primary mb-2">Agent Memories</h1>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-corthex-text-primary mb-2">Agent Memories</h1>
         <p className="text-corthex-text-secondary text-sm">Browse and analyze high-dimensional vector embeddings of agent cognitive history.</p>
       </div>
 
@@ -640,10 +640,10 @@ export function MemoriesPage() {
               type="text"
             />
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             <button
               onClick={() => setAgentFilter('all')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
+              className={`px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
                 agentFilter === 'all'
                   ? 'bg-corthex-accent text-corthex-bg'
                   : 'bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:border-corthex-accent/50'
@@ -655,7 +655,7 @@ export function MemoriesPage() {
               <button
                 key={agent.agentId}
                 onClick={() => setAgentFilter(agent.agentName)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
+                className={`px-4 py-2 min-h-[44px] rounded-lg text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
                   agentFilter === agent.agentName
                     ? 'bg-corthex-accent text-corthex-bg'
                     : 'bg-corthex-elevated border border-corthex-border text-corthex-text-secondary hover:border-corthex-accent/50'
@@ -707,7 +707,7 @@ export function MemoriesPage() {
             return (
               <div
                 key={agent.agentId}
-                className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-lg p-5 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden cursor-pointer"
+                className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-lg p-4 md:p-5 transition-all flex flex-col md:flex-row gap-4 md:gap-6 relative overflow-hidden cursor-pointer"
                 onClick={() => setSelectedAgent({ id: agent.agentId, name: agent.agentName })}
               >
                 {/* Left accent on hover */}
@@ -812,7 +812,7 @@ export function MemoriesPage() {
       )}
 
       {/* Floating Stats HUD */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50 pointer-events-none">
+      <div className="hidden md:flex fixed bottom-6 right-6 flex-col gap-3 z-50 pointer-events-none">
         <div className="bg-corthex-surface/80 backdrop-blur-md border border-corthex-accent/30 rounded-lg p-3 w-48 shadow-2xl pointer-events-auto">
           <div className="text-[10px] font-bold text-corthex-text-disabled uppercase tracking-widest mb-2 flex items-center justify-between">
             Global Recall Rate

@@ -52,12 +52,12 @@ export function TradingPage() {
 
   return (
     <div data-testid="trading-page" className="min-h-screen" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
-      <div className="p-8 max-w-[1440px] mx-auto">
+      <div className="p-4 md:p-8 max-w-[1440px] mx-auto">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-6 md:mb-8 gap-4 md:gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <h1 className="text-4xl font-extrabold tracking-tighter text-corthex-text-primary">트레이딩 Trading</h1>
+              <h1 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-corthex-text-primary">트레이딩 Trading</h1>
               <div className="flex items-center gap-2 px-3 py-1 bg-corthex-elevated rounded-full">
                 <span className="w-2 h-2 bg-corthex-accent rounded-full animate-pulse" />
                 <span className="text-xs font-medium text-corthex-text-secondary">시장 개장 Market Open</span>
@@ -66,12 +66,12 @@ export function TradingPage() {
             <p className="text-sm font-mono text-corthex-text-secondary opacity-70">TERMINAL_STABLE_V3.0.4 // SESSION_ACTIVE</p>
           </div>
           {/* Timeframe Selector */}
-          <div className="flex items-center bg-corthex-elevated p-1 rounded-xl">
+          <div className="flex items-center bg-corthex-elevated p-1 rounded-xl overflow-x-auto">
             {TIMEFRAMES.map((tf) => (
               <button
                 key={tf}
                 onClick={() => setSelectedTimeframe(tf)}
-                className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
+                className={`px-3 md:px-4 py-1.5 text-xs md:text-sm rounded-lg transition-colors whitespace-nowrap min-h-[44px] ${
                   selectedTimeframe === tf
                     ? 'font-bold bg-corthex-accent text-white shadow-sm'
                     : 'font-medium text-corthex-text-secondary hover:bg-corthex-border'
@@ -85,7 +85,7 @@ export function TradingPage() {
 
         <main className="flex flex-col lg:flex-row gap-6">
           {/* LEFT PANEL: Tickers */}
-          <section className="w-full lg:w-[350px] bg-corthex-elevated rounded-xl overflow-hidden shadow-sm flex flex-col border border-corthex-border">
+          <section className="w-full lg:w-[350px] bg-corthex-elevated rounded-xl overflow-hidden shadow-sm flex flex-col border border-corthex-border order-2 lg:order-1">
             <div className="p-5 border-b border-corthex-border">
               <h2 className="text-sm font-bold uppercase tracking-widest text-corthex-text-secondary flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
@@ -115,13 +115,13 @@ export function TradingPage() {
           </section>
 
           {/* CENTER PANEL: Chart */}
-          <section className="flex-1 flex flex-col gap-4">
-            <div className="flex items-center justify-between px-2">
-              <div className="flex items-baseline gap-4">
-                <h2 className="text-xl font-bold tracking-tight text-corthex-text-primary">BTC/USD 차트</h2>
+          <section className="flex-1 flex flex-col gap-4 order-1 lg:order-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+                <h2 className="text-lg md:text-xl font-bold tracking-tight text-corthex-text-primary">BTC/USD 차트</h2>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-mono font-bold">$67,432.50</span>
-                  <span className="text-sm font-mono text-corthex-accent">+$1,543.20 (+2.34%)</span>
+                  <span className="text-xl md:text-2xl font-mono font-bold">$67,432.50</span>
+                  <span className="text-xs md:text-sm font-mono text-corthex-accent">+$1,543.20 (+2.34%)</span>
                 </div>
               </div>
               <div className="flex bg-corthex-elevated rounded-lg p-0.5">
@@ -142,7 +142,7 @@ export function TradingPage() {
             </div>
 
             {/* Main Chart Area */}
-            <div className="bg-corthex-elevated rounded-xl flex-1 min-h-[450px] relative overflow-hidden border border-corthex-border">
+            <div className="bg-corthex-elevated rounded-xl flex-1 min-h-[250px] md:min-h-[450px] relative overflow-hidden border border-corthex-border">
               <div
                 className="absolute inset-0 opacity-20 pointer-events-none"
                 style={{
@@ -164,7 +164,7 @@ export function TradingPage() {
                 </div>
               </div>
               {/* OHLC Badges */}
-              <div className="absolute top-4 left-4 flex gap-4">
+              <div className="absolute top-2 left-2 md:top-4 md:left-4 flex flex-wrap gap-2 md:gap-4">
                 {[
                   { label: 'O', value: '65,889.20' },
                   { label: 'H', value: '68,120.00' },
@@ -187,7 +187,7 @@ export function TradingPage() {
           </section>
 
           {/* RIGHT PANEL */}
-          <aside className="w-full lg:w-[300px] bg-corthex-elevated border border-corthex-border rounded-xl p-6 flex flex-col gap-6 overflow-y-auto">
+          <aside className="w-full lg:w-[300px] bg-corthex-elevated border border-corthex-border rounded-xl p-4 md:p-6 flex flex-col gap-6 overflow-y-auto order-3">
             {/* P&L Summary Card */}
             <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 relative overflow-hidden">
               <div className="relative z-10">
@@ -256,7 +256,7 @@ export function TradingPage() {
                 </div>
                 <button
                   onClick={() => toast.info('이 기능은 준비 중입니다')}
-                  className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg font-bold py-3 rounded-lg transition-all active:scale-95"
+                  className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg font-bold py-3 min-h-[48px] rounded-lg transition-all active:scale-95"
                 >
                   주문 실행 Execute
                 </button>
@@ -313,8 +313,8 @@ export function TradingPage() {
         </main>
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-corthex-text-secondary uppercase tracking-[0.2em] gap-4">
-          <div className="flex gap-6">
+        <footer className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-corthex-text-secondary uppercase tracking-[0.2em] gap-4">
+          <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
             <span>Latency: 14ms</span>
             <span>Server: Tokyo-AWS-01</span>
             <span>API Status: 200 OK</span>

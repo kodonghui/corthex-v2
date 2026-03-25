@@ -69,10 +69,10 @@ export function LoginPage() {
       <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] opacity-10 pointer-events-none blur-3xl rounded-full bg-corthex-accent" />
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] opacity-5 pointer-events-none blur-3xl rounded-full bg-corthex-info" />
 
-      <main className="w-full max-w-md z-10">
+      <main className="w-full max-w-md z-10 pb-20">
         {/* Logo area */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 mb-4 flex items-center justify-center relative">
+        <div className="flex flex-col items-center mb-6 sm:mb-8">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 mb-4 flex items-center justify-center relative">
             <svg
               className="absolute inset-0 w-full h-full fill-none"
               stroke="currentColor"
@@ -91,7 +91,7 @@ export function LoginPage() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-corthex-surface border border-corthex-border rounded-xl p-8 shadow-2xl">
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl p-5 sm:p-8 shadow-2xl">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-corthex-text-primary">Command Access</h2>
             <p className="text-corthex-text-secondary text-sm mt-1">
@@ -110,7 +110,7 @@ export function LoginPage() {
                   <AtSign className="w-4 h-4 text-corthex-text-disabled group-focus-within:text-corthex-accent transition-colors" />
                 </div>
                 <input
-                  className="block w-full pl-10 pr-4 py-2.5 bg-corthex-elevated border border-corthex-border rounded-lg text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent transition-all duration-200"
+                  className="block w-full pl-10 pr-4 py-2.5 text-base bg-corthex-elevated border border-corthex-border rounded-lg text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent transition-all duration-200"
                   id="username"
                   placeholder="아이디를 입력하세요"
                   type="text"
@@ -137,7 +137,7 @@ export function LoginPage() {
                   <Lock className="w-4 h-4 text-corthex-text-disabled group-focus-within:text-corthex-accent transition-colors" />
                 </div>
                 <input
-                  className="block w-full pl-10 pr-10 py-2.5 bg-corthex-elevated border border-corthex-border rounded-lg text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent transition-all duration-200"
+                  className="block w-full pl-10 pr-10 py-2.5 text-base bg-corthex-elevated border border-corthex-border rounded-lg text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent transition-all duration-200"
                   id="password"
                   placeholder="••••••••••••"
                   type={showPassword ? 'text' : 'password'}
@@ -147,7 +147,7 @@ export function LoginPage() {
                   required
                 />
                 <button
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-corthex-text-disabled hover:text-corthex-text-secondary"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center min-w-[44px] justify-center text-corthex-text-disabled hover:text-corthex-text-secondary"
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -207,8 +207,8 @@ export function LoginPage() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 w-full py-6 flex flex-col items-center justify-center gap-2 px-4 z-10">
-        <div className="flex gap-6 mb-1">
+      <footer className="fixed bottom-0 w-full py-4 sm:py-6 flex flex-col items-center justify-center gap-2 px-4 z-10">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-1">
           {['Privacy Policy', 'Terms of Service', 'Support'].map((link) => (
             <span
               key={link}

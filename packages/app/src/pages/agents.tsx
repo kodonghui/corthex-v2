@@ -462,10 +462,10 @@ function AgentDetailPanel({
   return (
     <div className="flex flex-col gap-10">
       {/* Profile Header */}
-      <section className="flex justify-between items-start">
-        <div className="flex gap-6 items-center">
+      <section className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="flex gap-4 sm:gap-6 items-center">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-corthex-accent-deep flex items-center justify-center text-3xl font-bold text-white shadow-xl">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-corthex-accent-deep flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-xl">
               {getInitials(agent.name, agent.nameEn)}
             </div>
             <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-corthex-elevated border-4 border-corthex-elevated flex items-center justify-center">
@@ -474,7 +474,7 @@ function AgentDetailPanel({
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h2 className="text-3xl font-extrabold tracking-tight text-corthex-text-primary">
+              <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-corthex-text-primary">
                 {agent.name}
                 {agent.nameEn && <span className="text-corthex-text-secondary font-medium text-xl ml-2">{agent.nameEn}</span>}
               </h2>
@@ -505,39 +505,39 @@ function AgentDetailPanel({
       </section>
 
       {/* Stats Grid */}
-      <section className="grid grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">총 작업</p>
-          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--</p>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-corthex-accent-deep">--</p>
           <p className="text-[10px] text-corthex-accent mt-2 font-medium">실적 집계 중</p>
         </div>
         <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">성공률</p>
-          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--%</p>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-corthex-accent-deep">--%</p>
           <div className="w-full bg-corthex-border h-1 rounded-full mt-4 overflow-hidden">
             <div className="bg-corthex-accent h-full" style={{ width: '0%' }} />
           </div>
         </div>
         <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">평균 응답</p>
-          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">--s</p>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-corthex-accent-deep">--s</p>
           <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">데이터 수집 중</p>
         </div>
         <div className="bg-corthex-surface p-6 rounded-xl shadow-sm border border-corthex-border/30">
           <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">월간 비용</p>
-          <p className="text-3xl font-bold font-mono text-corthex-accent-deep">$--</p>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-corthex-accent-deep">$--</p>
           <p className="text-[10px] text-corthex-text-secondary mt-2 font-medium">예산 집계 중</p>
         </div>
       </section>
 
       {/* Detail Tabs */}
       <div className="border-b border-corthex-border mt-2">
-        <div className="flex gap-8">
+        <div className="flex gap-4 sm:gap-8 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {detailTabItems.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setDetailTab(tab.value)}
-              className={`pb-4 border-b-2 text-sm transition-colors ${
+              className={`pb-4 border-b-2 text-sm transition-colors whitespace-nowrap min-h-[44px] ${
                 detailTab === tab.value
                   ? 'font-bold text-corthex-accent border-corthex-accent'
                   : 'border-transparent text-corthex-text-secondary hover:text-corthex-accent-deep font-medium'
@@ -551,9 +551,9 @@ function AgentDetailPanel({
 
       {/* Tab Content */}
       {detailTab === 'overview' && (
-        <div className="grid grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Recent Tasks */}
-          <section className="col-span-8 space-y-4">
+          <section className="lg:col-span-8 space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold tracking-tight text-corthex-text-primary">
                 최근 활동 <span className="text-corthex-text-secondary font-normal text-sm ml-2">Recent Activity</span>
@@ -579,7 +579,7 @@ function AgentDetailPanel({
             </div>
           </section>
           {/* Performance */}
-          <section className="col-span-4 space-y-4">
+          <section className="lg:col-span-4 space-y-4">
             <h3 className="text-lg font-bold tracking-tight text-corthex-text-primary">
               성능 지표 <span className="text-corthex-text-secondary font-normal text-sm block">Performance</span>
             </h3>
@@ -613,7 +613,7 @@ function AgentDetailPanel({
 
       {detailTab === 'history' && (
         <div className="mt-2">
-          <div className="bg-corthex-elevated rounded-xl border border-corthex-border p-8 text-center">
+          <div className="bg-corthex-elevated rounded-xl border border-corthex-border p-6 sm:p-8 text-center">
             <Clock className="w-10 h-10 text-corthex-text-secondary mx-auto mb-3" />
             <p className="text-corthex-text-secondary text-sm">작업 이력이 없습니다</p>
             <p className="text-corthex-text-secondary text-xs mt-1">에이전트가 작업을 수행하면 여기에 기록됩니다</p>
@@ -782,8 +782,8 @@ export function AgentsPage() {
 
   if (isLoading) {
     return (
-      <div data-testid="agents-page" className="flex-1 p-8 bg-corthex-bg">
-        <div className="flex justify-between items-end mb-8">
+      <div data-testid="agents-page" className="flex-1 p-4 sm:p-6 lg:p-8 bg-corthex-bg">
+        <div className="flex justify-between items-end mb-6 sm:mb-8">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-10 w-36" />
         </div>
@@ -797,7 +797,7 @@ export function AgentsPage() {
 
   if (isError) {
     return (
-      <div data-testid="agents-page" className="flex-1 p-8 bg-corthex-bg">
+      <div data-testid="agents-page" className="flex-1 p-4 sm:p-6 lg:p-8 bg-corthex-bg">
         <div className="bg-corthex-surface border border-corthex-border rounded-xl p-6 text-center">
           <p className="text-sm text-red-500">에이전트 목록을 불러올 수 없습니다</p>
           <button onClick={() => refetch()} className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary underline mt-2">다시 시도</button>
@@ -808,12 +808,12 @@ export function AgentsPage() {
 
   return (
     <div data-testid="agents-page" className="flex-1 bg-corthex-bg min-h-screen">
-      <div className="p-8 max-w-[1440px] mx-auto">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto">
 
         {/* Page Header */}
-        <div className="flex justify-between items-end mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-corthex-text-primary tracking-tight mb-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-corthex-text-primary tracking-tight mb-1">
               Agents Ecosystem
             </h1>
             <div className="flex items-center gap-3">
@@ -828,7 +828,7 @@ export function AgentsPage() {
           </div>
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-corthex-accent hover:bg-corthex-accent-hover active:scale-[0.98] transition-all text-corthex-text-on-accent px-5 py-2.5 rounded-lg font-bold flex items-center gap-2"
+            className="bg-corthex-accent hover:bg-corthex-accent-hover active:scale-[0.98] transition-all text-corthex-text-on-accent px-5 py-2.5 min-h-[44px] rounded-lg font-bold flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             <Plus className="w-4 h-4" />
             에이전트 생성
@@ -844,7 +844,7 @@ export function AgentsPage() {
               placeholder="에이전트 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-xs rounded py-1.5 pl-9 pr-4 focus:outline-none focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent placeholder:text-corthex-text-disabled"
+              className="w-full bg-corthex-elevated border border-corthex-border text-corthex-text-primary text-base sm:text-xs rounded py-2.5 sm:py-1.5 pl-9 pr-4 min-h-[44px] focus:outline-none focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent placeholder:text-corthex-text-disabled"
             />
           </div>
           <div className="h-6 w-px bg-corthex-border" />
@@ -950,7 +950,7 @@ export function AgentsPage() {
 
         {/* Detail Panel — shown below grid when agent is selected */}
         {selectedAgent && (
-          <div className="mt-8 bg-corthex-elevated rounded-2xl border border-corthex-border p-8">
+          <div className="mt-6 sm:mt-8 bg-corthex-elevated rounded-2xl border border-corthex-border p-4 sm:p-6 lg:p-8">
             <AgentDetailPanel
               agent={selectedAgent}
               deptName={selectedAgent.departmentId ? deptMap.get(selectedAgent.departmentId) || '부서' : '미배속'}

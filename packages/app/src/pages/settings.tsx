@@ -180,7 +180,7 @@ export function SettingsPage() {
               <button
                 key={tab.value}
                 onClick={() => setTab(tab.value)}
-                className={`px-4 py-3 text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
+                className={`px-3 sm:px-4 py-3 min-h-[44px] text-xs sm:text-sm font-bold transition-all whitespace-nowrap border-b-2 -mb-px ${
                   activeTab === tab.value
                     ? 'border-corthex-accent text-corthex-accent'
                     : 'border-transparent text-corthex-text-secondary hover:text-corthex-text-primary'
@@ -348,7 +348,7 @@ function ProfileTab() {
           <button
             onClick={handleSaveName}
             disabled={updateProfile.isPending || editName.trim() === profile?.name}
-            className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
+            className="px-6 py-2.5 min-h-[44px] rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 w-full sm:w-auto self-stretch sm:self-end hover:opacity-90"
             style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
           >
             {updateProfile.isPending ? '저장 중...' : '이름 저장'}
@@ -390,7 +390,7 @@ function ProfileTab() {
           <button
             onClick={handleChangePassword}
             disabled={!newPassword || !confirmPassword || changePassword.isPending}
-            className="px-6 py-2.5 rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 self-end hover:opacity-90"
+            className="px-6 py-2.5 min-h-[44px] rounded-xl font-semibold transition-all shadow-sm disabled:opacity-50 w-full sm:w-auto self-stretch sm:self-end hover:opacity-90"
             style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
           >
             {changePassword.isPending ? '변경 중...' : '비밀번호 변경'}
@@ -454,7 +454,7 @@ function DisplayTab() {
           {/* Theme mode selector */}
           <div>
             <p className="text-base font-medium leading-normal mb-3" style={{ color: 'var(--color-corthex-text-secondary)' }}>모드</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { value: 'system', label: '시스템' },
                 { value: 'light', label: '라이트' },
@@ -463,7 +463,7 @@ function DisplayTab() {
                 <button
                   key={opt.value}
                   onClick={() => handleThemeChange(opt.value)}
-                  className="py-3 rounded-xl text-sm font-medium transition-all"
+                  className="py-3 min-h-[44px] rounded-xl text-sm font-medium transition-all"
                   style={theme === opt.value
                     ? { backgroundColor: 'var(--color-corthex-accent-muted)', color: 'var(--color-corthex-accent)', border: '2px solid var(--color-corthex-accent)' }
                     : { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)', border: '2px solid transparent' }
@@ -478,11 +478,11 @@ function DisplayTab() {
           {/* Accent color picker */}
           <div>
             <p className="text-base font-medium leading-normal mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>액센트 컬러</p>
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               {ACCENT_COLORS.map((ac, idx) => (
                 <button
                   key={ac.value}
-                  className="w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all cursor-pointer"
                   style={{
                     backgroundColor: ac.color,
                     outline: idx === 0 ? `2px solid ${ac.color}` : undefined,

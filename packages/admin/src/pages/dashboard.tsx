@@ -51,7 +51,7 @@ export function DashboardPage() {
   )
 
   return (
-    <div className="p-8 space-y-8 bg-corthex-bg min-h-screen">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 bg-corthex-bg min-h-screen">
       {/* Stat Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
@@ -78,9 +78,9 @@ export function DashboardPage() {
       </div>
 
       {/* Middle Section: Health + Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
         {/* System Health Meters */}
-        <div className="lg:col-span-1 bg-corthex-bg border border-corthex-border p-6 space-y-8">
+        <div className="lg:col-span-1 bg-corthex-bg border border-corthex-border p-4 md:p-6 space-y-6 md:space-y-8">
           <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent border-b border-corthex-border pb-4 flex items-center justify-between">
             Health Status
             <span className="w-1.5 h-1.5 rounded-full bg-corthex-accent" />
@@ -132,7 +132,7 @@ export function DashboardPage() {
 
         {/* Recent Activity Table */}
         <div className="lg:col-span-3 bg-corthex-bg border border-corthex-border overflow-hidden">
-          <div className="p-6 border-b border-corthex-border flex justify-between items-center">
+          <div className="p-4 md:p-6 border-b border-corthex-border flex justify-between items-center">
             <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Recent Activity</h3>
             <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-colors flex items-center gap-1">
               EXPORT_LOGS <Download size={12} />
@@ -142,10 +142,10 @@ export function DashboardPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-corthex-surface text-[10px] font-mono uppercase text-corthex-text-secondary">
-                  <th className="px-6 py-4 font-normal">Name</th>
-                  <th className="px-6 py-4 font-normal">Type</th>
-                  <th className="px-6 py-4 font-normal">Role</th>
-                  <th className="px-6 py-4 font-normal text-right">Status</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal">Name</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal hidden sm:table-cell">Type</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal hidden md:table-cell">Role</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 font-normal text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-corthex-border">
@@ -168,10 +168,10 @@ export function DashboardPage() {
                   <>
                     {users.map((u) => (
                       <tr key={`user-${u.id}`} className="hover:bg-corthex-surface/50 transition-colors">
-                        <td className="px-6 py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{u.name}</td>
-                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono">USER</td>
-                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono uppercase">{u.role}</td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{u.name}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-corthex-text-secondary font-mono hidden sm:table-cell">USER</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-corthex-text-secondary font-mono uppercase hidden md:table-cell">{u.role}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                           {u.isActive ? (
                             <span className="px-2 py-0.5 bg-corthex-accent/20 text-corthex-accent text-[10px] font-mono border border-corthex-accent/30">
                               ACTIVE
@@ -186,10 +186,10 @@ export function DashboardPage() {
                     ))}
                     {agents.map((a) => (
                       <tr key={`agent-${a.id}`} className="hover:bg-corthex-surface/50 transition-colors">
-                        <td className="px-6 py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{a.name}</td>
-                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono">AGENT</td>
-                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono uppercase">{a.role}</td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{a.name}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-corthex-text-secondary font-mono hidden sm:table-cell">AGENT</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs text-corthex-text-secondary font-mono uppercase hidden md:table-cell">{a.role}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                           {a.status === 'online' ? (
                             <span className="px-2 py-0.5 bg-corthex-accent/20 text-corthex-accent text-[10px] font-mono border border-corthex-accent/30">
                               ONLINE
@@ -218,7 +218,7 @@ export function DashboardPage() {
       {/* Bottom Section: Dept Overview + Agent Efficiency */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Department Overview */}
-        <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col h-[300px]">
+        <div className="bg-corthex-surface border border-corthex-border p-4 md:p-6 flex flex-col h-[250px] md:h-[300px]">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Department Overview</h3>
           </div>
@@ -307,7 +307,7 @@ function StatCard({ icon, label, value, change, isLoading }: {
   isLoading: boolean
 }) {
   return (
-    <div className="bg-corthex-surface p-6 relative overflow-hidden border border-corthex-border">
+    <div className="bg-corthex-surface p-4 md:p-6 relative overflow-hidden border border-corthex-border">
       <div className="absolute top-0 right-0 p-2">{icon}</div>
       <p className="font-mono uppercase tracking-widest text-[10px] text-corthex-text-secondary mb-2">{label}</p>
       <div className="flex items-baseline gap-2">

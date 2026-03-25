@@ -290,14 +290,14 @@ export function ArgosPage() {
   // ── Render ──
 
   return (
-    <div data-testid="argos-page" className="flex-1 bg-corthex-bg p-6 sm:p-8 max-w-5xl overflow-y-auto">
+    <div data-testid="argos-page" className="flex-1 bg-corthex-bg p-4 sm:p-6 lg:p-8 max-w-5xl overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-corthex-accent-deep">ARGOS</h1>
           <p className="text-sm text-corthex-text-secondary mt-1">조건 기반 정보 자동 수집 — 놓치지 않겠습니다</p>
         </div>
-        <button data-testid="add-trigger-btn" onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 transition-colors">
+        <button data-testid="add-trigger-btn" onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm font-medium rounded-lg px-4 py-2 min-h-[44px] transition-colors">
           + 트리거 추가
         </button>
       </div>
@@ -317,7 +317,7 @@ export function ArgosPage() {
           <p className="text-4xl mb-3">🔭</p>
           <p className="text-sm font-medium text-corthex-text-secondary">설정된 감시 트리거가 없습니다</p>
           <p className="text-xs text-corthex-text-secondary mt-1">트리거를 추가하면 조건 충족 시 자동으로 에이전트가 작업합니다</p>
-          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm rounded-lg px-4 py-2 mt-4 transition-colors">트리거 추가</button>
+          <button onClick={openCreate} className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent text-sm rounded-lg px-4 py-2 min-h-[44px] mt-4 transition-colors">트리거 추가</button>
         </div>
       ) : (
         <div className="space-y-3 mt-6">
@@ -368,8 +368,8 @@ export function ArgosPage() {
             <h3 className="text-sm font-semibold text-corthex-accent-deep">트리거 삭제</h3>
             <p className="text-xs text-corthex-text-secondary mt-2">이 트리거와 관련된 이벤트 기록이 모두 삭제됩니다. 계속하시겠습니까?</p>
             <div className="flex justify-end gap-2 mt-4">
-              <button onClick={() => setDeleteTarget(null)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep px-3 py-1.5 rounded-lg">취소</button>
-              <button onClick={() => deleteTarget && deleteTriggerMut.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg">삭제</button>
+              <button onClick={() => setDeleteTarget(null)} className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep px-3 py-1.5 min-h-[44px] rounded-lg">취소</button>
+              <button onClick={() => deleteTarget && deleteTriggerMut.mutate(deleteTarget)} className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 min-h-[44px] rounded-lg">삭제</button>
             </div>
           </div>
         </div>
@@ -439,10 +439,10 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
       }`}
     >
       {/* Row 1 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+        <div className="flex flex-wrap items-center gap-2">
           <span className={`w-2.5 h-2.5 rounded-full ${t.isActive ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-corthex-surface'}`} />
-          <span className="text-sm font-semibold text-corthex-text-primary truncate max-w-[200px]">{t.name || t.instruction.slice(0, 40)}</span>
+          <span className="text-sm font-semibold text-corthex-text-primary truncate max-w-[160px] sm:max-w-[200px]">{t.name || t.instruction.slice(0, 40)}</span>
           <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${typeBadge.classes}`}>{typeBadge.label}</span>
         </div>
         <div className="flex items-center gap-1">
@@ -457,18 +457,18 @@ function TriggerCard({ trigger: t, isSelected, isHighlighted, onSelect, onEdit, 
       <p className="text-xs text-corthex-text-secondary truncate max-w-full mt-1">{t.instruction}</p>
 
       {/* Row 4: Meta + Actions */}
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-3 gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="text-[10px] text-corthex-text-secondary font-mono">쿨다운 {t.cooldownMinutes}분</span>
           {t.lastTriggeredAt && <span className="text-[10px] text-corthex-text-secondary">마지막: {formatRelativeTime(t.lastTriggeredAt)}</span>}
           {t.eventCount !== undefined && <span className="text-[10px] text-corthex-text-secondary">이벤트 {t.eventCount}건</span>}
         </div>
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <button onClick={onEdit} className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep px-2 py-1 rounded hover:bg-corthex-border/50 transition-colors">편집</button>
-          <button onClick={onToggle} className={`text-xs px-2 py-1 rounded transition-colors ${t.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
+          <button onClick={onEdit} className="text-xs text-corthex-text-secondary hover:text-corthex-accent-deep px-2 py-1 min-h-[44px] rounded hover:bg-corthex-border/50 transition-colors">편집</button>
+          <button onClick={onToggle} className={`text-xs px-2 py-1 min-h-[44px] rounded transition-colors ${t.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}>
             {t.isActive ? '중지' : '시작'}
           </button>
-          <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 rounded transition-colors">삭제</button>
+          <button onClick={onDelete} className="text-xs text-red-400 hover:bg-red-500/10 px-2 py-1 min-h-[44px] rounded transition-colors">삭제</button>
         </div>
       </div>
     </div>

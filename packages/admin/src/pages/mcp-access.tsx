@@ -79,11 +79,11 @@ export function McpAccessPage() {
   const grantedCount = accessibleIds.size
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 lg:p-6 space-y-6 lg:space-y-8">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-corthex-text-primary uppercase">Access Control</h2>
+          <h2 className="text-xl lg:text-2xl font-black tracking-tight text-corthex-text-primary uppercase">Access Control</h2>
           <p className="text-corthex-text-secondary text-sm mt-1 max-w-lg">
             에이전트별로 MCP 서버 접근 권한을 설정하세요. 기본값은 모두 OFF입니다. (D22)
           </p>
@@ -93,7 +93,7 @@ export function McpAccessPage() {
           <select
             value={selectedAgentId ?? ''}
             onChange={e => setSelectedAgentId(e.target.value || null)}
-            className="bg-corthex-surface border border-corthex-border rounded px-3 py-2 text-sm text-corthex-text-primary focus:outline-none focus:ring-1 focus:ring-corthex-accent min-w-48"
+            className="bg-corthex-surface border border-corthex-border rounded px-3 py-2 text-base sm:text-sm text-corthex-text-primary focus:outline-none focus:ring-1 focus:ring-corthex-accent min-w-48 min-h-[44px]"
           >
             <option value="">에이전트를 선택하세요</option>
             {agents.map(a => (
@@ -104,21 +104,21 @@ export function McpAccessPage() {
       </div>
 
       {/* Bento Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-corthex-surface border border-corthex-border p-5 flex flex-col justify-between">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-corthex-surface border border-corthex-border p-4 lg:p-5 flex flex-col justify-between">
           <span className="text-corthex-text-disabled text-xs font-bold tracking-widest uppercase">Active Agents</span>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-mono text-corthex-accent">{agents.length}</span>
           </div>
         </div>
-        <div className="bg-corthex-surface border border-corthex-border p-5 flex flex-col justify-between">
+        <div className="bg-corthex-surface border border-corthex-border p-4 lg:p-5 flex flex-col justify-between">
           <span className="text-corthex-text-disabled text-xs font-bold tracking-widest uppercase">MCP Nodes</span>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-mono text-corthex-accent">{mcpServers.length}</span>
             <span className="text-corthex-text-disabled text-xs font-mono">STABLE</span>
           </div>
         </div>
-        <div className="col-span-1 md:col-span-2 bg-corthex-elevated border border-corthex-border p-5 flex items-center justify-between relative overflow-hidden">
+        <div className="col-span-2 md:col-span-2 bg-corthex-elevated border border-corthex-border p-4 lg:p-5 flex items-center justify-between relative overflow-hidden">
           <div className="relative z-10">
             <span className="text-corthex-text-disabled text-xs font-bold tracking-widest uppercase">Security Level</span>
             <div className="mt-4 text-2xl font-mono text-corthex-accent">CLASS-IV</div>
@@ -132,13 +132,13 @@ export function McpAccessPage() {
       {/* Access Control Table */}
       <div className="bg-corthex-surface border border-corthex-border overflow-hidden shadow-2xl">
         {/* Table Toolbar */}
-        <div className="p-4 border-b border-corthex-border bg-corthex-elevated flex items-center justify-between">
+        <div className="p-4 border-b border-corthex-border bg-corthex-elevated flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex items-center gap-4">
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-none">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
               <input
                 disabled
-                className="bg-corthex-surface border border-corthex-border text-xs font-mono pl-10 pr-4 py-2 w-64 focus:ring-1 focus:ring-corthex-accent outline-none text-corthex-text-secondary placeholder-corthex-text-disabled rounded"
+                className="bg-corthex-surface border border-corthex-border text-base sm:text-xs font-mono pl-10 pr-4 py-2 w-full sm:w-64 focus:ring-1 focus:ring-corthex-accent outline-none text-corthex-text-secondary placeholder-corthex-text-disabled rounded min-h-[44px]"
                 placeholder="FILTER BY AGENT OR SERVER..."
                 type="text"
               />
@@ -165,7 +165,9 @@ export function McpAccessPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Desktop Table */}
+          <div className="overflow-x-auto hidden lg:block">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-corthex-elevated/50">
@@ -226,7 +228,7 @@ export function McpAccessPage() {
                           <button
                             onClick={() => handleToggle(server.id, granted)}
                             disabled={isSaving}
-                            className="text-corthex-text-disabled hover:text-red-400 transition-colors disabled:opacity-50"
+                            className="text-corthex-text-disabled hover:text-red-400 transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -238,10 +240,65 @@ export function McpAccessPage() {
               </tbody>
             </table>
           </div>
+          {/* Mobile Cards */}
+          <div className="lg:hidden divide-y divide-corthex-border/50">
+            {mcpServers.map(server => {
+              const granted = accessibleIds.has(server.id)
+              const isSaving = saving[server.id] ?? false
+              return (
+                <div key={server.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${granted ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-corthex-text-disabled'}`} />
+                      <span className="font-mono text-sm font-bold text-corthex-text-secondary">{server.displayName}</span>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded font-mono ${
+                      server.transport === 'stdio'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {server.transport}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={granted}
+                        disabled={isSaving}
+                        onChange={() => handleToggle(server.id, granted)}
+                        className="w-5 h-5 rounded border-corthex-border text-corthex-accent bg-corthex-bg focus:ring-corthex-accent cursor-pointer disabled:cursor-wait"
+                      />
+                      {isSaving ? (
+                        <span className="text-xs text-corthex-text-disabled">저장 중...</span>
+                      ) : granted ? (
+                        <span className="text-xs font-mono text-emerald-400 uppercase tracking-wide">✓ 허용됨</span>
+                      ) : (
+                        <span className="text-xs font-mono text-corthex-text-secondary uppercase tracking-wide">— 차단됨</span>
+                      )}
+                    </div>
+                    {granted && (
+                      <button
+                        onClick={() => handleToggle(server.id, granted)}
+                        disabled={isSaving}
+                        className="text-corthex-text-disabled hover:text-red-400 transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-[10px] font-mono text-corthex-text-disabled">
+                    {selectedAgent?.name ?? '—'} · ID: {selectedAgentId?.slice(0, 8)}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          </>
         )}
 
         {/* Footer */}
-        <div className="p-4 border-t border-corthex-border bg-corthex-bg flex items-center justify-between">
+        <div className="p-4 border-t border-corthex-border bg-corthex-bg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <span className="text-[10px] font-mono text-corthex-text-disabled uppercase">
             {selectedAgentId ? `DISPLAYING ${mcpServers.length} SERVERS · ${grantedCount} GRANTED` : 'SELECT AN AGENT TO VIEW PERMISSIONS'}
           </span>
@@ -267,7 +324,7 @@ export function McpAccessPage() {
               모든 접근 권한은 즉시 적용되며 다음 에이전트 세션부터 반영됩니다. 체크박스 클릭 시 즉시 저장됩니다.
             </p>
           </div>
-          <button className="px-5 py-2.5 border border-corthex-border text-corthex-text-secondary hover:border-corthex-accent hover:text-corthex-accent transition-all flex items-center gap-2 font-mono text-xs tracking-widest uppercase rounded whitespace-nowrap">
+          <button className="px-5 py-2.5 border border-corthex-border text-corthex-text-secondary hover:border-corthex-accent hover:text-corthex-accent transition-all flex items-center gap-2 font-mono text-xs tracking-widest uppercase rounded whitespace-nowrap min-h-[44px]">
             <Terminal className="w-4 h-4" />
             Run Full Audit Trace
           </button>
