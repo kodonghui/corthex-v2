@@ -1,5 +1,5 @@
 /**
- * Admin Departments — Natural Organic Theme
+ * Admin Departments — Industrial Dark Theme (Stitch)
  *
  * API Endpoints:
  *   GET    /admin/departments?companyId={id}
@@ -14,6 +14,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import {
+  Plus, Search, Filter, Download, ChevronLeft, ChevronRight,
+  X, Users, Shield, AlertTriangle, BarChart2, Building2, Key,
+  Pencil, Trash2,
+} from 'lucide-react'
 
 type Department = { id: string; companyId: string; name: string; description: string | null; isActive: boolean; createdAt: string }
 type Agent = { id: string; name: string; role: string; departmentId: string | null; status: string }
@@ -49,8 +54,6 @@ function formatCost(usdMicro: number): string {
   return `$${(usdMicro / 1_000_000).toFixed(2)}`
 }
 
-import { olive, oliveDark, oliveBg, oliveLight, cream } from '../lib/colors'
-
 export function DepartmentsPage() {
   const qc = useQueryClient()
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
@@ -61,6 +64,7 @@ export function DepartmentsPage() {
   const [form, setForm] = useState({ name: '', description: '' })
   const [editId, setEditId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', description: '' })
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Cascade modal state
   const [cascadeTarget, setCascadeTarget] = useState<Department | null>(null)
@@ -83,6 +87,10 @@ export function DepartmentsPage() {
   const depts = deptData?.data || []
   const allAgents = agentData?.data || []
   const agentCountByDept = (deptId: string) => allAgents.filter((a) => a.departmentId === deptId).length
+
+  const filteredDepts = searchQuery
+    ? depts.filter((d) => d.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : depts
 
   const createMutation = useMutation({
     mutationFn: (body: { name: string; description?: string }) => api.post('/admin/departments', body),
@@ -139,33 +147,46 @@ export function DepartmentsPage() {
     setCascadeMode('wait_completion')
   }
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
+  if (!selectedCompanyId) return (
+    <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
+  )
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: cream, fontFamily: "'Inter', sans-serif" }} data-testid="departments-page">
-      {/* Page Content */}
-      <div className="p-8 max-w-7xl mx-auto w-full">
-        {/* Content Header */}
-        <div className="flex items-center justify-between mb-8" data-purpose="page-header">
+    <div className="min-h-screen bg-corthex-bg" data-testid="departments-page">
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <header className="flex justify-between items-end mb-12 relative">
           <div>
-            <h1 className="text-3xl font-bold text-corthex-text-primary mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid="departments-title">부서 관리</h1>
-            <p className="text-corthex-text-secondary">조직 내 부서를 생성하고 팀원 현황을 관리하세요.</p>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 bg-corthex-accent shadow-[0_0_8px_rgba(202,138,4,0.6)]" />
+              <span className="font-mono text-xs tracking-[0.3em] text-corthex-accent uppercase">Registry / Sector</span>
+            </div>
+            <h1 className="text-5xl font-black tracking-tighter uppercase text-corthex-text-primary leading-none" data-testid="departments-title">
+              Departments
+            </h1>
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="text-white px-6 py-3 rounded-2xl font-semibold flex items-center shadow-sm transition-all transform hover:-translate-y-0.5"
-            style={{ backgroundColor: olive }}
-            data-testid="departments-create-btn"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            새 부서 생성
-          </button>
-        </div>
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <p className="font-mono text-[10px] uppercase text-corthex-text-disabled mb-1">Total Sectors</p>
+              <p className="font-mono text-2xl font-bold text-corthex-text-primary">
+                {depts.length}<span className="text-corthex-accent">.00</span>
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-8 py-4 font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 active:scale-95 shadow-[8px_8px_0px_rgba(202,138,4,0.2)]"
+              data-testid="departments-create-btn"
+            >
+              <Plus className="w-5 h-5" />
+              Create Department
+            </button>
+          </div>
+        </header>
 
         {/* Create Form */}
         {showCreate && (
-          <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-slate-100 mb-6" data-testid="departments-create-form">
-            <h3 className="text-xl font-bold text-corthex-text-primary mb-4" style={{ fontFamily: "'Noto Serif KR', serif" }}>새 부서</h3>
+          <div className="bg-corthex-surface border border-corthex-border p-6 mb-8" data-testid="departments-create-form">
+            <h3 className="text-lg font-bold text-corthex-text-primary uppercase tracking-tight mb-4">New Department</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -178,206 +199,307 @@ export function DepartmentsPage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-corthex-text-secondary mb-1">부서명 *</label>
+                  <label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-2">부서명 *</label>
                   <input
                     data-testid="departments-create-name"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-corthex-border rounded-xl bg-corthex-surface text-sm focus:ring-2 focus:outline-none"
-                    style={{ outlineColor: olive }}
-                    placeholder="예: 마케팅부"
+                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
+                    placeholder="e.g. ENGINEERING"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-corthex-text-secondary mb-1">설명</label>
+                  <label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-2">설명</label>
                   <input
                     data-testid="departments-create-desc"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="w-full px-4 py-3 border border-corthex-border rounded-xl bg-corthex-surface text-sm focus:ring-2 focus:outline-none"
+                    className="w-full bg-corthex-bg border-b-2 border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-3 px-0 outline-none transition-colors placeholder:opacity-30"
                     placeholder="부서의 역할과 목적"
                   />
                 </div>
               </div>
-              <div className="flex gap-2 justify-end">
+              <div className="flex gap-2 justify-end pt-4">
                 <button
                   data-testid="departments-create-cancel"
                   type="button"
                   onClick={() => { setShowCreate(false); setForm({ name: '', description: '' }) }}
-                  className="px-4 py-2 text-sm text-corthex-text-secondary hover:text-corthex-text-primary"
+                  className="font-mono text-xs uppercase tracking-[0.2em] text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors px-4 py-2"
                 >
-                  취소
+                  Cancel
                 </button>
                 <button
                   data-testid="departments-create-submit"
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="px-6 py-2 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50"
-                  style={{ backgroundColor: olive }}
+                  className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-black text-xs uppercase tracking-widest px-6 py-2 transition-all disabled:opacity-50 active:scale-95"
                 >
-                  {createMutation.isPending ? '생성 중...' : '생성'}
+                  {createMutation.isPending ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Department Grid */}
-        {isLoading ? (
-          <div data-testid="departments-loading" className="text-center text-corthex-text-disabled py-8">로딩 중...</div>
-        ) : depts.length === 0 ? (
-          <div data-testid="departments-empty-state" className="flex flex-col items-center justify-center py-16">
-            <p className="text-corthex-text-disabled mb-4">등록된 부서가 없습니다</p>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="text-white px-6 py-3 rounded-2xl font-semibold transition-all"
-              style={{ backgroundColor: olive }}
-            >
-              + 새 부서 만들기
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="departments-table" data-purpose="department-grid">
-            {depts.map((d) => {
-              const count = agentCountByDept(d.id)
-              const isEditing = editId === d.id
-
-              if (isEditing) {
-                return (
-                  <div key={d.id} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border-2 border-corthex-border">
-                    <div className="space-y-3">
-                      <input
-                        data-testid={`departments-edit-name-${d.id}`}
-                        value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-corthex-border rounded-xl text-sm focus:ring-2 focus:outline-none"
-                        style={{ outlineColor: olive }}
-                      />
-                      <input
-                        data-testid={`departments-edit-desc-${d.id}`}
-                        value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-corthex-border rounded-xl text-sm focus:ring-2 focus:outline-none"
-                        placeholder="설명"
-                      />
-                      <div className="flex gap-2 justify-end">
-                        <button
-                          data-testid={`departments-edit-save-${d.id}`}
-                          onClick={() => updateMutation.mutate({ id: d.id, name: editForm.name, description: editForm.description || undefined })}
-                          disabled={updateMutation.isPending}
-                          className="text-xs font-medium mr-3"
-                          style={{ color: olive }}
-                        >
-                          저장
-                        </button>
-                        <button
-                          data-testid={`departments-edit-cancel-${d.id}`}
-                          onClick={() => setEditId(null)}
-                          className="text-xs text-corthex-text-disabled hover:text-corthex-text-secondary"
-                        >
-                          취소
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-
-              return (
-                <div key={d.id} data-testid={`departments-row-${d.id}`} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative group">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: oliveLight }}>
-                      <svg className="w-6 h-6" style={{ color: olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                      </svg>
-                    </div>
-                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        data-testid={`departments-edit-${d.id}`}
-                        onClick={() => {
-                          setEditId(d.id)
-                          setEditForm({ name: d.name, description: d.description || '' })
-                        }}
-                        className="p-2 text-corthex-text-disabled hover:bg-corthex-bg rounded-lg transition-colors"
-                        style={{ }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = olive)}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-                      </button>
-                      <button
-                        data-testid={`departments-delete-${d.id}`}
-                        onClick={() => openCascadeModal(d)}
-                        className="p-2 text-corthex-text-disabled hover:text-red-500 hover:bg-corthex-bg rounded-lg transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-corthex-text-primary mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }} data-testid={`departments-name-${d.id}`}>{d.name}</h3>
-                  <p className="text-corthex-text-secondary text-sm mb-6 line-clamp-2">{d.description || '설명이 없습니다.'}</p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm font-medium text-corthex-text-secondary flex items-center" data-testid={`departments-agent-count-${d.id}`}>
-                      <svg className="w-4 h-4 mr-1.5 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-                      {count} Members
-                    </span>
-                    <span
-                      data-testid={`departments-status-${d.id}`}
-                      className="px-2.5 py-1 text-xs font-bold rounded-full uppercase tracking-wider"
-                      style={d.isActive
-                        ? { backgroundColor: '#ecfdf5', color: '#059669' }
-                        : { backgroundColor: '#f1f5f9', color: '#64748b' }
-                      }
-                    >
-                      {d.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-
-            {/* Empty State / CTA Card */}
-            <button
-              onClick={() => setShowCreate(true)}
-              className="border-2 border-dashed border-corthex-border rounded-2xl p-6 flex flex-col items-center justify-center text-corthex-text-disabled transition-all group"
-              style={{}}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = olive; e.currentTarget.style.color = olive }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#94a3b8' }}
-              data-purpose="create-new-card"
-            >
-              <div className="w-12 h-12 bg-corthex-bg rounded-full flex items-center justify-center mb-4 group-hover:transition-colors" style={{}}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+        {/* Department Table */}
+        <section className="bg-corthex-surface border border-corthex-border/20 shadow-2xl overflow-hidden">
+          {/* Table Controls */}
+          <div className="bg-corthex-elevated px-6 py-4 border-b border-corthex-border flex justify-between items-center">
+            <div className="flex gap-4">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
+                <input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-[10px] pl-10 pr-4 py-2 w-64 outline-none transition-all placeholder:opacity-30"
+                  placeholder="FILTER DEPARTMENTS..."
+                  type="text"
+                />
               </div>
-              <span className="font-semibold text-lg">새 부서 생성</span>
-              <p className="text-xs mt-1">새로운 팀과 권한을 설정하세요</p>
-            </button>
+            </div>
+            <div className="flex items-center gap-4 text-corthex-text-disabled">
+              <button className="hover:text-corthex-accent transition-colors"><Filter className="w-5 h-5" /></button>
+              <button className="hover:text-corthex-accent transition-colors"><Download className="w-5 h-5" /></button>
+              <div className="h-4 w-px bg-corthex-border" />
+              <span className="font-mono text-[10px] uppercase tracking-widest">Active nodes: {allAgents.length}</span>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Footer */}
-      <footer className="mt-auto p-8 border-t border-corthex-border text-sm text-corthex-text-disabled text-center">
-        <p>&copy; 2024 CORTHEX v2. All rights reserved.</p>
-      </footer>
+          {/* The Table */}
+          <div className="overflow-x-auto">
+            {isLoading ? (
+              <div className="px-8 py-12 text-center font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled" data-testid="departments-loading">
+                Loading...
+              </div>
+            ) : filteredDepts.length === 0 ? (
+              <div className="px-8 py-12 text-center" data-testid="departments-empty-state">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled mb-4">
+                  {searchQuery ? 'No departments match your search' : 'No departments registered'}
+                </p>
+                {!searchQuery && (
+                  <button
+                    onClick={() => setShowCreate(true)}
+                    className="bg-corthex-accent text-corthex-text-on-accent font-black text-xs uppercase tracking-widest px-6 py-2 transition-all active:scale-95"
+                  >
+                    + Create Department
+                  </button>
+                )}
+              </div>
+            ) : (
+              <table className="w-full text-left border-collapse" data-testid="departments-table">
+                <thead>
+                  <tr className="bg-corthex-elevated border-b border-corthex-border">
+                    <th className="px-8 py-6">
+                      <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
+                        <Building2 className="w-3 h-3" />
+                        Department Name
+                      </span>
+                    </th>
+                    <th className="px-8 py-6">
+                      <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
+                        <Key className="w-3 h-3" />
+                        Description
+                      </span>
+                    </th>
+                    <th className="px-8 py-6">
+                      <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase flex items-center gap-2">
+                        <Users className="w-3 h-3" />
+                        Agent Count
+                      </span>
+                    </th>
+                    <th className="px-8 py-6 text-right">
+                      <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase">Status</span>
+                    </th>
+                    <th className="px-8 py-6 text-right">
+                      <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-corthex-text-disabled uppercase">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-corthex-border/30">
+                  {filteredDepts.map((d) => {
+                    const count = agentCountByDept(d.id)
+                    const isEditing = editId === d.id
+
+                    if (isEditing) {
+                      return (
+                        <tr key={d.id} className="bg-corthex-elevated/50">
+                          <td className="px-8 py-4" colSpan={5}>
+                            <div className="flex items-center gap-4">
+                              <input
+                                data-testid={`departments-edit-name-${d.id}`}
+                                value={editForm.name}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                className="bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-2 px-0 outline-none transition-colors w-48"
+                              />
+                              <input
+                                data-testid={`departments-edit-desc-${d.id}`}
+                                value={editForm.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                className="bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent text-corthex-text-primary font-mono text-sm py-2 px-0 outline-none transition-colors flex-1"
+                                placeholder="설명"
+                              />
+                              <button
+                                data-testid={`departments-edit-save-${d.id}`}
+                                onClick={() => updateMutation.mutate({ id: d.id, name: editForm.name, description: editForm.description || undefined })}
+                                disabled={updateMutation.isPending}
+                                className="font-mono text-xs uppercase tracking-widest text-corthex-accent hover:text-corthex-accent-hover transition-colors disabled:opacity-50"
+                              >
+                                Save
+                              </button>
+                              <button
+                                data-testid={`departments-edit-cancel-${d.id}`}
+                                onClick={() => setEditId(null)}
+                                className="font-mono text-xs uppercase tracking-widest text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    }
+
+                    return (
+                      <tr key={d.id} className="hover:bg-corthex-elevated/40 transition-colors group" data-testid={`departments-row-${d.id}`}>
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col">
+                            <span className="text-corthex-text-primary font-bold tracking-tight uppercase group-hover:text-corthex-accent transition-colors" data-testid={`departments-name-${d.id}`}>
+                              {d.name}
+                            </span>
+                            <span className="font-mono text-[9px] text-corthex-text-disabled opacity-50 uppercase">
+                              ID: {d.id.slice(0, 8).toUpperCase()}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <span className="text-sm text-corthex-text-secondary">{d.description || '—'}</span>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                            <span className="font-mono text-lg font-bold text-corthex-text-primary" data-testid={`departments-agent-count-${d.id}`}>{count}</span>
+                            <div className="flex-1 h-1 bg-corthex-border w-24 relative overflow-hidden">
+                              <div
+                                className="absolute top-0 left-0 h-full bg-corthex-accent"
+                                style={{ width: `${Math.min(count * 10, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div
+                            className={`inline-flex items-center gap-2 px-3 py-1 border-l-2 ${
+                              d.isActive
+                                ? 'bg-corthex-elevated border-corthex-accent'
+                                : 'bg-corthex-elevated border-corthex-text-disabled'
+                            }`}
+                            data-testid={`departments-status-${d.id}`}
+                          >
+                            <span
+                              className={`font-mono text-[10px] font-bold uppercase ${
+                                d.isActive ? 'text-corthex-accent' : 'text-corthex-text-disabled'
+                              }`}
+                            >
+                              {d.isActive ? 'Operational' : 'Inactive'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              data-testid={`departments-edit-${d.id}`}
+                              onClick={() => {
+                                setEditId(d.id)
+                                setEditForm({ name: d.name, description: d.description || '' })
+                              }}
+                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              data-testid={`departments-delete-${d.id}`}
+                              onClick={() => openCascadeModal(d)}
+                              className="p-1.5 text-corthex-text-disabled hover:text-corthex-error hover:bg-corthex-elevated rounded transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Footer Pagination */}
+          <div className="bg-corthex-elevated px-8 py-6 flex justify-between items-center border-t border-corthex-border">
+            <div className="font-mono text-[10px] text-corthex-text-disabled opacity-60 uppercase">
+              Showing {filteredDepts.length} of {depts.length} Registered Departments
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="w-8 h-8 flex items-center justify-center border border-corthex-border text-corthex-text-secondary hover:bg-corthex-accent hover:text-corthex-text-on-accent transition-all">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center bg-corthex-accent text-corthex-text-on-accent font-bold text-[10px] font-mono">
+                01
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center border border-corthex-border text-corthex-text-secondary hover:bg-corthex-accent hover:text-corthex-text-on-accent transition-all">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Cards */}
+        <div className="mt-12 grid grid-cols-4 gap-6">
+          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+            <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Total Departments</p>
+            <div className="flex items-end justify-between">
+              <span className="text-3xl font-black text-corthex-text-primary">{depts.length}</span>
+              <BarChart2 className="w-6 h-6 text-corthex-accent opacity-40" />
+            </div>
+          </div>
+          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+            <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Active Depts</p>
+            <div className="flex items-end justify-between">
+              <span className="text-3xl font-black text-corthex-text-primary">{depts.filter((d) => d.isActive).length}</span>
+              <Shield className="w-6 h-6 text-corthex-accent opacity-40" />
+            </div>
+          </div>
+          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-accent">
+            <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">Total Agents</p>
+            <div className="flex items-end justify-between">
+              <span className="text-3xl font-black text-corthex-text-primary">{allAgents.length}</span>
+              <Users className="w-6 h-6 text-corthex-accent opacity-40" />
+            </div>
+          </div>
+          <div className="bg-corthex-surface p-6 border-l-2 border-corthex-error">
+            <p className="font-mono text-[10px] uppercase text-corthex-text-disabled opacity-50 mb-2">System Alerts</p>
+            <div className="flex items-end justify-between">
+              <span className="text-3xl font-black text-corthex-error">{depts.filter((d) => !d.isActive).length}</span>
+              <AlertTriangle className="w-6 h-6 text-corthex-error opacity-40" />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Cascade Wizard Modal */}
       {cascadeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={closeCascadeModal}>
           <div
             data-testid="departments-cascade-modal"
-            className="bg-corthex-surface rounded-2xl border border-corthex-border shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col"
+            className="bg-corthex-surface border border-corthex-border shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col rounded-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border shrink-0">
-              <h2 className="text-lg font-semibold text-corthex-text-primary" style={{ fontFamily: "'Noto Serif KR', serif" }}>
+              <h2 className="text-lg font-semibold text-corthex-text-primary">
                 부서 삭제 - {cascadeTarget.name}
               </h2>
               <button data-testid="departments-cascade-close" onClick={closeCascadeModal} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -423,13 +545,13 @@ export function DepartmentsPage() {
                               <span className="text-corthex-text-primary">{a.name}</span>
                               <span className="text-xs text-corthex-text-disabled">{tierLabels[a.tier] || a.tier}</span>
                               {a.isSystem && (
-                                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-600">
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-corthex-accent/10 text-corthex-accent">
                                   시스템
                                 </span>
                               )}
                             </div>
                             {a.activeTaskCount > 0 && (
-                              <span className="text-xs" style={{ color: olive }}>작업 {a.activeTaskCount}건</span>
+                              <span className="text-xs text-corthex-accent">작업 {a.activeTaskCount}건</span>
                             )}
                           </div>
                         ))}
@@ -443,11 +565,11 @@ export function DepartmentsPage() {
                     <div className="space-y-2">
                       <label
                         data-testid="departments-mode-wait"
-                        className="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors"
-                        style={cascadeMode === 'wait_completion'
-                          ? { borderColor: olive, backgroundColor: oliveBg }
-                          : { borderColor: '#e2e8f0' }
-                        }
+                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                          cascadeMode === 'wait_completion'
+                            ? 'border-corthex-accent bg-corthex-accent/10'
+                            : 'border-corthex-border'
+                        }`}
                       >
                         <input
                           type="radio"
@@ -455,8 +577,7 @@ export function DepartmentsPage() {
                           value="wait_completion"
                           checked={cascadeMode === 'wait_completion'}
                           onChange={() => setCascadeMode('wait_completion')}
-                          className="mt-0.5"
-                          style={{ accentColor: olive }}
+                          className="mt-0.5 accent-corthex-accent"
                         />
                         <div>
                           <p className="text-sm font-medium text-corthex-text-primary">완료 대기 (권장)</p>
@@ -465,11 +586,11 @@ export function DepartmentsPage() {
                       </label>
                       <label
                         data-testid="departments-mode-force"
-                        className="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors"
-                        style={cascadeMode === 'force'
-                          ? { borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)' }
-                          : { borderColor: '#e2e8f0' }
-                        }
+                        className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                          cascadeMode === 'force'
+                            ? 'border-corthex-error bg-corthex-error/5'
+                            : 'border-corthex-border'
+                        }`}
                       >
                         <input
                           type="radio"

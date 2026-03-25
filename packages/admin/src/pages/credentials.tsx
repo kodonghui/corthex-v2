@@ -1,5 +1,5 @@
 /**
- * CLI Credentials Management — Natural Organic Theme
+ * CLI Credentials Management — Stitch Design
  *
  * API Endpoints:
  *   GET    /api/admin/users?companyId=...
@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { Plus, Filter, ArrowUpDown, MoreVertical, KeyRound, Database, Cloud, Shield, Activity, Lock, Users } from 'lucide-react'
 
 type User = { id: string; name: string; username: string; role: string }
 type CliCredential = { id: string; companyId: string; userId: string; label: string; isActive: boolean; createdAt: string }
@@ -99,389 +100,474 @@ export function CredentialsPage() {
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
 
-  if (!selectedCompanyId) return <div className="p-8 text-center" style={{ color: 'var(--color-corthex-accent)' }}>회사를 선택하세요</div>
+  if (!selectedCompanyId) return (
+    <div className="p-8 text-center font-mono text-corthex-text-disabled">회사를 선택하세요</div>
+  )
 
   return (
-    <div data-testid="credentials-page" className="min-h-screen flex" style={{ backgroundColor: '#f8faf7', fontFamily: "'Inter', 'Noto Sans KR', sans-serif", color: '#263222' }}>
-      {/* BEGIN: Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-auto" style={{ backgroundColor: '#f8faf7' }}>
-        {/* BEGIN: Header Section */}
-        <header className="bg-corthex-surface border-b px-8 py-6 flex items-center justify-between sticky top-0 z-10" style={{ borderColor: 'var(--color-corthex-border)' }}>
+    <div data-testid="credentials-page" className="p-8 bg-corthex-bg min-h-screen">
+      <div className="max-w-7xl mx-auto space-y-8">
+
+        {/* PAGE HEADER & STATS */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-l-4 pl-6"
+          style={{ borderLeftColor: 'var(--color-corthex-accent)' }}>
           <div>
-            <h2 data-testid="credentials-title" className="text-2xl font-bold" style={{ color: '#263222' }}>CLI 인증 관리</h2>
-            <p className="text-sm text-corthex-text-secondary mt-1">시스템 배포 및 CLI 도구 사용을 위한 관리자 인증 토큰을 관리합니다.</p>
+            <h1 className="text-4xl font-black tracking-tighter uppercase font-mono text-corthex-text-primary">
+              Credential Manager
+            </h1>
+            <p className="font-mono text-xs mt-2 uppercase tracking-widest text-corthex-text-disabled">
+              SECURE_STORAGE // ACCESS_CONTROL_v4
+            </p>
           </div>
-          <button
-            data-testid="credentials-cli-add-btn"
-            onClick={() => setShowAddToken(true)}
-            className="text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-sm font-medium"
-            style={{ backgroundColor: '#4a6741' }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-            인증 토큰 추가
-          </button>
-        </header>
-        {/* END: Header Section */}
+          <div className="grid grid-cols-3 gap-8">
+            <div className="text-right">
+              <div className="text-[10px] font-mono text-corthex-text-disabled uppercase">Active_Keys</div>
+              <div className="text-2xl font-mono font-bold" style={{ color: 'var(--color-corthex-accent)' }}>
+                {creds.filter(c => c.isActive).length + apiKeys.length}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-mono text-corthex-text-disabled uppercase">CLI_Tokens</div>
+              <div className="text-2xl font-mono font-bold text-corthex-text-secondary">{creds.length}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-mono text-corthex-text-disabled uppercase">API_Keys</div>
+              <div className="text-2xl font-mono font-bold text-corthex-text-primary">{apiKeys.length}</div>
+            </div>
+          </div>
+        </div>
 
-        <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
-          {/* BEGIN: Info Card */}
-          <section data-testid="credentials-guide-banner" className="bg-corthex-surface rounded-xl border p-6 flex items-start gap-4 shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
-            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--color-corthex-elevated)' }}>
-              <svg className="w-6 h-6" style={{ color: '#4a6741' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-            </div>
-            <div>
-              <h3 className="font-semibold" style={{ color: '#263222' }}>보안 정책 안내</h3>
-              <p className="text-sm text-corthex-text-secondary mt-1 leading-relaxed">
-                모든 CLI 인증 토큰은 <span className="font-bold" style={{ color: '#3d5435' }}>AES-256</span> 알고리즘을 사용하여 강력하게 암호화되어 저장됩니다.
-                토큰은 생성 시 단 한 번만 노출되며, 이후에는 관리자도 값을 확인할 수 없습니다. 유출이 의심되는 경우 즉시 삭제하고 재발급하시기 바랍니다.
-              </p>
-            </div>
-          </section>
-          {/* END: Info Card */}
+        {/* USER SELECTOR + ACTION BAR */}
+        <div className="flex justify-between items-center bg-corthex-surface border border-corthex-border p-4">
+          <div className="flex gap-3 flex-wrap" data-testid="credentials-user-list">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled flex items-center">
+              <Users className="w-3 h-3 mr-2" />
+              Select_User:
+            </span>
+            {users.map((u) => (
+              <button
+                key={u.id}
+                data-testid={`credentials-user-${u.id}`}
+                onClick={() => {
+                  setSelectedUserId(u.id)
+                  setShowAddToken(false)
+                  setShowAddApiKey(false)
+                }}
+                className="px-3 py-1 font-mono text-xs uppercase tracking-widest transition-all"
+                style={selectedUserId === u.id
+                  ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }
+                  : { color: 'var(--color-corthex-text-secondary)' }}
+              >
+                {u.name}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            <button
+              data-testid="credentials-cli-add-btn"
+              onClick={() => setShowAddToken(true)}
+              className="flex items-center gap-2 px-4 py-2 font-mono text-xs tracking-widest uppercase font-bold"
+              style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+            >
+              <Plus className="w-3 h-3" />
+              Add Credential
+            </button>
+          </div>
+        </div>
 
-          {/* BEGIN: User Selection */}
-          <section data-testid="credentials-user-list" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
-            <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-              <h3 className="text-sm font-semibold" style={{ color: '#263222' }}>직원 선택</h3>
-            </div>
-            <div className="p-4 flex flex-wrap gap-2">
-              {users.map((u) => (
+        {!selectedUserId ? (
+          <div data-testid="credentials-no-selection"
+            className="bg-corthex-surface border border-corthex-border p-8 text-center font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">
+            Select a user above to manage credentials
+          </div>
+        ) : (
+          <>
+            {/* CLI CREDENTIALS TABLE */}
+            <section data-testid="credentials-cli-section" className="bg-corthex-bg border border-corthex-border overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 bg-corthex-surface border-b border-corthex-border">
+                <h2 data-testid="credentials-cli-title" className="font-mono text-xs uppercase tracking-widest font-bold text-corthex-text-primary">
+                  CLI OAuth Tokens — {selectedUser?.name}
+                </h2>
                 <button
-                  key={u.id}
-                  data-testid={`credentials-user-${u.id}`}
-                  onClick={() => {
-                    setSelectedUserId(u.id)
-                    setShowAddToken(false)
-                    setShowAddApiKey(false)
-                  }}
-                  className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                    selectedUserId === u.id
-                      ? 'font-semibold text-white'
-                      : 'text-corthex-text-secondary hover:bg-corthex-elevated'
-                  }`}
-                  style={selectedUserId === u.id ? { backgroundColor: '#4a6741' } : {}}
+                  data-testid="credentials-cli-add-btn"
+                  onClick={() => setShowAddToken(!showAddToken)}
+                  className="flex items-center gap-2 px-4 py-2 font-mono text-[10px] tracking-widest uppercase border border-corthex-border hover:bg-corthex-elevated transition-colors text-corthex-text-secondary"
                 >
-                  {u.name} <span className="text-xs opacity-70">@{u.username}</span>
+                  <Plus className="w-3 h-3" />
+                  Add Token
                 </button>
-              ))}
-            </div>
-          </section>
+              </div>
 
-          {!selectedUserId ? (
-            <div data-testid="credentials-no-selection" className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-accent)' }}>
-              좌측에서 직원을 선택하세요
-            </div>
-          ) : (
-            <>
-              {/* BEGIN: CLI Credentials Table Section */}
-              <section data-testid="credentials-cli-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
-                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                  <h3 data-testid="credentials-cli-title" className="font-semibold" style={{ color: '#263222' }}>
-                    CLI OAuth 토큰 — {selectedUser?.name}
-                  </h3>
-                  <button
-                    data-testid="credentials-cli-add-btn"
-                    onClick={() => setShowAddToken(true)}
-                    className="text-xs px-3 py-1.5 text-white font-medium rounded-lg transition-colors"
-                    style={{ backgroundColor: '#4a6741' }}
-                  >
-                    + 토큰 등록
-                  </button>
-                </div>
-
-                {showAddToken && (
-                  <form
-                    data-testid="credentials-cli-add-form"
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      if (!selectedCompanyId || !selectedUserId) return
-                      addTokenMutation.mutate({
-                        companyId: selectedCompanyId,
-                        userId: selectedUserId,
-                        label: tokenForm.label,
-                        token: tokenForm.token,
-                      })
-                    }}
-                    className="mx-6 my-4 p-4 rounded-lg space-y-3"
-                    style={{ backgroundColor: '#f8faf7' }}
-                  >
+              {showAddToken && (
+                <form
+                  data-testid="credentials-cli-add-form"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (!selectedCompanyId || !selectedUserId) return
+                    addTokenMutation.mutate({
+                      companyId: selectedCompanyId,
+                      userId: selectedUserId,
+                      label: tokenForm.label,
+                      token: tokenForm.token,
+                    })
+                  }}
+                  className="p-6 border-b border-corthex-border space-y-4 bg-corthex-surface"
+                >
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#31422b' }}>식별 레이블</label>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">Label</label>
                       <input
                         data-testid="credentials-cli-label-input"
                         value={tokenForm.label}
                         onChange={(e) => setTokenForm({ ...tokenForm, label: e.target.value })}
-                        className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                        style={{ borderColor: 'var(--color-corthex-border)' }}
+                        className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
                         placeholder="예: CI/CD Pipeline A"
                         required
                       />
-                      <p className="text-xs text-corthex-text-disabled mt-1">토큰의 용도를 구분하기 위한 이름입니다.</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#31422b' }}>토큰 문자열 (비밀값)</label>
-                      <div className="relative">
-                        <textarea
-                          data-testid="credentials-cli-token-input"
-                          value={tokenForm.token}
-                          onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
-                          rows={2}
-                          className="w-full rounded-lg border text-sm font-mono resize-none focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: 'var(--color-corthex-border)' }}
-                          placeholder="sk-ant-oat01-..."
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="pt-2 flex gap-3">
-                      <button
-                        data-testid="credentials-cli-cancel"
-                        type="button"
-                        onClick={() => setShowAddToken(false)}
-                        className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium text-corthex-text-secondary hover:bg-corthex-bg transition-colors"
-                        style={{ borderColor: 'var(--color-corthex-border)' }}
-                      >
-                        취소
-                      </button>
-                      <button
-                        data-testid="credentials-cli-submit"
-                        type="submit"
-                        disabled={addTokenMutation.isPending}
-                        className="flex-1 px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50"
-                        style={{ backgroundColor: '#4a6741' }}
-                      >
-                        {addTokenMutation.isPending ? '등록 중...' : '토큰 생성'}
-                      </button>
-                    </div>
-                    {addTokenMutation.isError && (
-                      <p className="text-sm text-red-500">{(addTokenMutation.error as Error).message}</p>
-                    )}
-                  </form>
-                )}
-
-                {creds.length === 0 ? (
-                  <div data-testid="credentials-cli-empty" className="px-6 py-8 text-center text-sm" style={{ color: 'var(--color-corthex-accent)' }}>
-                    등록된 CLI 토큰이 없습니다
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="text-xs uppercase tracking-wider font-semibold border-b" style={{ backgroundColor: '#f8faf7', color: '#31422b', borderColor: 'var(--color-corthex-border)' }}>
-                          <th className="px-6 py-4">사용자 ID / 이름</th>
-                          <th className="px-6 py-4">식별 레이블</th>
-                          <th className="px-6 py-4">생성일</th>
-                          <th className="px-6 py-4">상태</th>
-                          <th className="px-6 py-4 text-right">관리</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y text-sm" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                        {creds.map((c) => (
-                          <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`} className="hover:bg-corthex-bg transition-colors">
-                            <td className="px-6 py-4">
-                              <div className="font-medium" style={{ color: '#263222' }}>{selectedUser?.username || c.userId}</div>
-                              <div className="text-xs text-corthex-text-secondary">{selectedUser?.name}</div>
-                            </td>
-                            <td data-testid={`credentials-cli-token-label-${c.id}`} className="px-6 py-4 text-corthex-text-secondary">{c.label}</td>
-                            <td className="px-6 py-4 text-corthex-text-secondary">{new Date(c.createdAt).toLocaleString('ko')}</td>
-                            <td className="px-6 py-4">
-                              <span
-                                data-testid={`credentials-cli-token-status-${c.id}`}
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  c.isActive
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-corthex-elevated text-corthex-text-primary'
-                                }`}
-                              >
-                                {c.isActive ? '활성' : '비활성'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              {c.isActive && (
-                                <button
-                                  data-testid={`credentials-cli-deactivate-${c.id}`}
-                                  onClick={() => {
-                                    if (confirm('이 토큰을 비활성화하시겠습니까?')) {
-                                      deactivateTokenMutation.mutate(c.id)
-                                    }
-                                  }}
-                                  className="text-red-600 hover:text-red-800 font-medium hover:underline"
-                                >
-                                  삭제
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                <div className="px-6 py-4 bg-corthex-surface border-t flex items-center justify-between text-xs text-corthex-text-secondary" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                  <span>총 {creds.length}개의 인증 토큰이 검색되었습니다.</span>
-                  <div className="flex gap-2">
-                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg disabled:opacity-50" style={{ borderColor: 'var(--color-corthex-border)' }} disabled>이전</button>
-                    <button className="p-1 px-2 border rounded hover:bg-corthex-bg" style={{ borderColor: 'var(--color-corthex-border)' }}>다음</button>
-                  </div>
-                </div>
-              </section>
-              {/* END: CLI Credentials Table Section */}
-
-              {/* BEGIN: API Keys Section */}
-              <section data-testid="credentials-api-section" className="bg-corthex-surface rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>
-                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                  <h3 data-testid="credentials-api-title" className="font-semibold" style={{ color: '#263222' }}>외부 API 키</h3>
-                  <button
-                    data-testid="credentials-api-add-btn"
-                    onClick={() => setShowAddApiKey(true)}
-                    className="text-xs px-3 py-1.5 text-white font-medium rounded-lg transition-colors"
-                    style={{ backgroundColor: '#4a6741' }}
-                  >
-                    + API 키 등록
-                  </button>
-                </div>
-
-                {showAddApiKey && (
-                  <form
-                    data-testid="credentials-api-add-form"
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      if (!selectedCompanyId || !selectedUserId) return
-                      addApiKeyMutation.mutate({
-                        companyId: selectedCompanyId,
-                        userId: selectedUserId,
-                        provider: apiKeyForm.provider,
-                        ...(apiKeyForm.label ? { label: apiKeyForm.label } : {}),
-                        credentials: { key: apiKeyForm.key },
-                        scope: apiKeyForm.scope,
-                      })
-                    }}
-                    className="mx-6 my-4 p-4 rounded-lg space-y-3"
-                    style={{ backgroundColor: '#f8faf7' }}
-                  >
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>제공자</label>
-                        <select
-                          data-testid="credentials-api-provider"
-                          value={apiKeyForm.provider}
-                          onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
-                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: 'var(--color-corthex-border)' }}
-                        >
-                          <option value="kis">KIS (한국투자증권)</option>
-                          <option value="notion">Notion</option>
-                          <option value="email">Email</option>
-                          <option value="telegram">Telegram</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>범위</label>
-                        <select
-                          data-testid="credentials-api-scope"
-                          value={apiKeyForm.scope}
-                          onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
-                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: 'var(--color-corthex-border)' }}
-                        >
-                          <option value="user">개인용</option>
-                          <option value="company">회사 공용</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>라벨</label>
-                        <input
-                          data-testid="credentials-api-label-input"
-                          value={apiKeyForm.label}
-                          onChange={(e) => setApiKeyForm({ ...apiKeyForm, label: e.target.value })}
-                          className="w-full rounded-lg border text-sm focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                          style={{ borderColor: 'var(--color-corthex-border)' }}
-                          placeholder="선택사항"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1" style={{ color: '#31422b' }}>API 키</label>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">Token String</label>
                       <input
-                        data-testid="credentials-api-key-input"
+                        data-testid="credentials-cli-token-input"
+                        value={tokenForm.token}
+                        onChange={(e) => setTokenForm({ ...tokenForm, token: e.target.value })}
                         type="password"
-                        value={apiKeyForm.key}
-                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
-                        className="w-full rounded-lg border text-sm font-mono focus:border-corthex-accent-deep focus:ring-corthex-accent-deep"
-                        style={{ borderColor: 'var(--color-corthex-border)' }}
+                        className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                        placeholder="sk-ant-oat01-..."
                         required
                       />
                     </div>
-                    <div className="flex gap-3 justify-end">
-                      <button
-                        data-testid="credentials-api-cancel"
-                        type="button"
-                        onClick={() => setShowAddApiKey(false)}
-                        className="px-3 py-1.5 text-sm text-corthex-text-secondary"
-                      >
-                        취소
-                      </button>
-                      <button
-                        data-testid="credentials-api-submit"
-                        type="submit"
-                        disabled={addApiKeyMutation.isPending}
-                        className="px-3 py-1.5 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-                        style={{ backgroundColor: '#4a6741' }}
-                      >
-                        {addApiKeyMutation.isPending ? '등록 중...' : '등록'}
-                      </button>
-                    </div>
-                    {addApiKeyMutation.isError && (
-                      <p className="text-sm text-red-500">{(addApiKeyMutation.error as Error).message}</p>
-                    )}
-                  </form>
-                )}
-
-                {apiKeys.length === 0 ? (
-                  <p data-testid="credentials-api-empty" className="px-6 py-8 text-center text-sm" style={{ color: 'var(--color-corthex-accent)' }}>등록된 API 키가 없습니다</p>
-                ) : (
-                  <div className="divide-y" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                    {apiKeys.map((k) => (
-                      <div
-                        key={k.id}
-                        data-testid={`credentials-api-key-${k.id}`}
-                        className="flex items-center justify-between px-6 py-4 hover:bg-corthex-bg transition-colors"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span data-testid={`credentials-api-provider-${k.id}`} className="text-xs px-2 py-0.5 rounded-full uppercase font-medium" style={{ backgroundColor: 'var(--color-corthex-elevated)', color: '#4a6741' }}>
-                              {k.provider}
-                            </span>
-                            <p data-testid={`credentials-api-key-label-${k.id}`} className="text-sm font-medium" style={{ color: '#263222' }}>
-                              {k.label || '(라벨 없음)'}
-                            </p>
-                          </div>
-                          <p className="text-xs text-corthex-text-secondary mt-0.5">
-                            등록: {new Date(k.createdAt).toLocaleDateString('ko')}
-                          </p>
-                        </div>
-                        <button
-                          data-testid={`credentials-api-delete-${k.id}`}
-                          onClick={() => {
-                            if (confirm('이 API 키를 삭제하시겠습니까?')) {
-                              deleteApiKeyMutation.mutate(k.id)
-                            }
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800 font-medium hover:underline"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    ))}
                   </div>
-                )}
-              </section>
-              {/* END: API Keys Section */}
-            </>
-          )}
-        </div>
-      </main>
-      {/* END: Main Content */}
+                  <div className="flex gap-3">
+                    <button
+                      data-testid="credentials-cli-cancel"
+                      type="button"
+                      onClick={() => setShowAddToken(false)}
+                      className="px-6 py-2 font-mono text-xs uppercase tracking-widest border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      data-testid="credentials-cli-submit"
+                      type="submit"
+                      disabled={addTokenMutation.isPending}
+                      className="px-6 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+                    >
+                      {addTokenMutation.isPending ? 'Saving...' : 'Create Token'}
+                    </button>
+                  </div>
+                  {addTokenMutation.isError && (
+                    <p className="text-xs font-mono" style={{ color: 'var(--color-corthex-error)' }}>{(addTokenMutation.error as Error).message}</p>
+                  )}
+                </form>
+              )}
+
+              {creds.length === 0 ? (
+                <div data-testid="credentials-cli-empty"
+                  className="px-6 py-8 text-center font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">
+                  No CLI tokens registered
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-corthex-surface border-b border-corthex-border">
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Provider</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Label</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">User</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Created_At</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled text-center">Status</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-corthex-border">
+                      {creds.map((c) => (
+                        <tr key={c.id} data-testid={`credentials-cli-token-${c.id}`}
+                          className="hover:bg-corthex-surface transition-colors group">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-corthex-elevated border border-corthex-border flex items-center justify-center">
+                                <KeyRound className="w-4 h-4 text-corthex-text-secondary" />
+                              </div>
+                              <span className="font-mono font-bold uppercase text-sm text-corthex-text-primary">CLI_OAUTH</span>
+                            </div>
+                          </td>
+                          <td data-testid={`credentials-cli-token-label-${c.id}`}
+                            className="p-4 font-mono text-xs text-corthex-text-secondary tracking-widest">
+                            {c.label}
+                          </td>
+                          <td className="p-4">
+                            <div className="font-mono text-xs text-corthex-text-primary">{selectedUser?.username || c.userId}</div>
+                            <div className="font-mono text-[10px] text-corthex-text-disabled">{selectedUser?.name}</div>
+                          </td>
+                          <td className="p-4 font-mono text-[10px] text-corthex-text-disabled">
+                            {new Date(c.createdAt).toLocaleDateString('ko')} // {new Date(c.createdAt).toLocaleTimeString('ko')}
+                          </td>
+                          <td className="p-4">
+                            <div className="flex justify-center">
+                              <div
+                                data-testid={`credentials-cli-token-status-${c.id}`}
+                                className="flex items-center gap-2"
+                              >
+                                <div className={`w-1.5 h-1.5 ${c.isActive ? 'bg-corthex-success' : 'bg-corthex-text-disabled'}`} />
+                                <span className="font-mono text-[10px] uppercase tracking-widest"
+                                  style={{ color: c.isActive ? 'var(--color-corthex-success)' : undefined }}>
+                                  {c.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 text-right">
+                            {c.isActive && (
+                              <button
+                                data-testid={`credentials-cli-deactivate-${c.id}`}
+                                onClick={() => {
+                                  if (confirm('이 토큰을 비활성화하시겠습니까?')) {
+                                    deactivateTokenMutation.mutate(c.id)
+                                  }
+                                }}
+                                className="font-mono text-xs uppercase tracking-widest hover:underline"
+                                style={{ color: 'var(--color-corthex-error)' }}
+                              >
+                                Revoke
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="px-6 py-4 bg-corthex-surface border-t border-corthex-border flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase text-corthex-text-disabled">
+                  SHOWING {creds.length} CLI TOKENS
+                </span>
+                <div className="flex gap-2">
+                  <button className="bg-corthex-elevated w-8 h-8 flex items-center justify-center text-corthex-text-disabled hover:bg-corthex-border transition-all" disabled>
+                    <span className="font-mono text-xs">{'<'}</span>
+                  </button>
+                  <button className="w-8 h-8 flex items-center justify-center text-[10px] font-mono"
+                    style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>01</button>
+                </div>
+              </div>
+            </section>
+
+            {/* API KEYS TABLE */}
+            <section data-testid="credentials-api-section" className="bg-corthex-bg border border-corthex-border overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 bg-corthex-surface border-b border-corthex-border">
+                <h2 data-testid="credentials-api-title" className="font-mono text-xs uppercase tracking-widest font-bold text-corthex-text-primary">
+                  External API Keys
+                </h2>
+                <button
+                  data-testid="credentials-api-add-btn"
+                  onClick={() => setShowAddApiKey(!showAddApiKey)}
+                  className="flex items-center gap-2 px-4 py-2 font-mono text-[10px] tracking-widest uppercase border border-corthex-border hover:bg-corthex-elevated transition-colors text-corthex-text-secondary"
+                >
+                  <Plus className="w-3 h-3" />
+                  Add API Key
+                </button>
+              </div>
+
+              {showAddApiKey && (
+                <form
+                  data-testid="credentials-api-add-form"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (!selectedCompanyId || !selectedUserId) return
+                    addApiKeyMutation.mutate({
+                      companyId: selectedCompanyId,
+                      userId: selectedUserId,
+                      provider: apiKeyForm.provider,
+                      ...(apiKeyForm.label ? { label: apiKeyForm.label } : {}),
+                      credentials: { key: apiKeyForm.key },
+                      scope: apiKeyForm.scope,
+                    })
+                  }}
+                  className="p-6 border-b border-corthex-border space-y-4 bg-corthex-surface"
+                >
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">Provider</label>
+                      <select
+                        data-testid="credentials-api-provider"
+                        value={apiKeyForm.provider}
+                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
+                        className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                      >
+                        <option value="kis">KIS (한국투자증권)</option>
+                        <option value="notion">Notion</option>
+                        <option value="email">Email</option>
+                        <option value="telegram">Telegram</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">Scope</label>
+                      <select
+                        data-testid="credentials-api-scope"
+                        value={apiKeyForm.scope}
+                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, scope: e.target.value as 'company' | 'user' })}
+                        className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                      >
+                        <option value="user">개인용</option>
+                        <option value="company">회사 공용</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">Label</label>
+                      <input
+                        data-testid="credentials-api-label-input"
+                        value={apiKeyForm.label}
+                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, label: e.target.value })}
+                        className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                        placeholder="Optional"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">API Key</label>
+                    <input
+                      data-testid="credentials-api-key-input"
+                      type="password"
+                      value={apiKeyForm.key}
+                      onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
+                      className="w-full bg-corthex-bg border border-corthex-border text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      data-testid="credentials-api-cancel"
+                      type="button"
+                      onClick={() => setShowAddApiKey(false)}
+                      className="px-6 py-2 font-mono text-xs uppercase tracking-widest border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      data-testid="credentials-api-submit"
+                      type="submit"
+                      disabled={addApiKeyMutation.isPending}
+                      className="px-6 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+                    >
+                      {addApiKeyMutation.isPending ? 'Saving...' : 'Register'}
+                    </button>
+                  </div>
+                  {addApiKeyMutation.isError && (
+                    <p className="text-xs font-mono" style={{ color: 'var(--color-corthex-error)' }}>{(addApiKeyMutation.error as Error).message}</p>
+                  )}
+                </form>
+              )}
+
+              {apiKeys.length === 0 ? (
+                <p data-testid="credentials-api-empty"
+                  className="px-6 py-8 text-center font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">
+                  No API keys registered
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-corthex-surface border-b border-corthex-border">
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Provider</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Masked_Key</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Label</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Created_At</th>
+                        <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-corthex-border">
+                      {apiKeys.map((k) => (
+                        <tr key={k.id} data-testid={`credentials-api-key-${k.id}`}
+                          className="hover:bg-corthex-surface transition-colors group">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-corthex-elevated border border-corthex-border flex items-center justify-center">
+                                <Shield className="w-4 h-4 text-corthex-text-secondary" />
+                              </div>
+                              <span
+                                data-testid={`credentials-api-provider-${k.id}`}
+                                className="font-mono font-bold uppercase text-sm text-corthex-text-primary"
+                              >
+                                {k.provider.toUpperCase()}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-4 font-mono text-xs text-corthex-text-disabled tracking-widest">
+                            ••••••••••••••{k.id.slice(-4)}
+                          </td>
+                          <td data-testid={`credentials-api-key-label-${k.id}`}
+                            className="p-4 font-mono text-xs text-corthex-text-secondary">
+                            {k.label || '(no label)'}
+                          </td>
+                          <td className="p-4 font-mono text-[10px] text-corthex-text-disabled">
+                            {new Date(k.createdAt).toLocaleDateString('ko')}
+                          </td>
+                          <td className="p-4 text-right">
+                            <button
+                              data-testid={`credentials-api-delete-${k.id}`}
+                              onClick={() => {
+                                if (confirm('이 API 키를 삭제하시겠습니까?')) {
+                                  deleteApiKeyMutation.mutate(k.id)
+                                }
+                              }}
+                              className="font-mono text-xs uppercase tracking-widest hover:underline"
+                              style={{ color: 'var(--color-corthex-error)' }}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            {/* SECONDARY INFO GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-corthex-surface border-l-2 border-corthex-border p-6" style={{ borderLeftColor: 'var(--color-corthex-info)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Activity className="w-4 h-4" style={{ color: 'var(--color-corthex-info)' }} />
+                  <h3 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary">System_Uptime</h3>
+                </div>
+                <div className="text-3xl font-black font-mono tracking-tighter mb-1 text-corthex-text-primary">99.998%</div>
+                <div className="h-1 w-full bg-corthex-bg mt-4">
+                  <div className="h-full w-[99.9%]" style={{ backgroundColor: 'var(--color-corthex-info)' }} />
+                </div>
+              </div>
+              <div className="bg-corthex-surface border-l-2 border-corthex-border p-6" style={{ borderLeftColor: 'var(--color-corthex-accent)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Lock className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
+                  <h3 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary">Encryption_Status</h3>
+                </div>
+                <div className="text-2xl font-black font-mono tracking-tighter mb-1 uppercase text-corthex-text-primary">AES_256_GCM</div>
+                <div className="text-[10px] font-mono uppercase mt-2" style={{ color: 'var(--color-corthex-accent)' }}>Verified_Secure</div>
+              </div>
+              <div className="bg-corthex-surface border-l-2 border-corthex-border p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="w-4 h-4 text-corthex-text-disabled" />
+                  <h3 className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-secondary">Access_Summary</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between font-mono text-[9px] uppercase">
+                    <span className="text-corthex-text-disabled">CLI_Tokens</span>
+                    <span style={{ color: 'var(--color-corthex-accent)' }}>{creds.filter(c => c.isActive).length} Active</span>
+                  </div>
+                  <div className="flex justify-between font-mono text-[9px] uppercase">
+                    <span className="text-corthex-text-disabled">API_Keys</span>
+                    <span className="text-corthex-text-secondary">{apiKeys.length} Registered</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }

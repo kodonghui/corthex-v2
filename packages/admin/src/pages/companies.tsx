@@ -1,5 +1,5 @@
 /**
- * Admin Companies Page — Natural Organic Theme
+ * Admin Companies Page — Stitch Command Theme
  *
  * API Endpoints:
  *   GET    /admin/companies
@@ -13,8 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, SkeletonCard } from '@corthex/ui'
-import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
-import { olive, oliveBg, terracotta, cream, sand, warmBrown, muted, lightMuted } from '../lib/colors'
+import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
@@ -89,54 +88,75 @@ export function CompaniesPage() {
     },
   })
 
-  const inputStyle = { borderColor: sand, color: warmBrown, backgroundColor: '#fbfaf8' }
+  const activeCount = companies.filter((c) => c.isActive).length
+  const throughput = companies.length > 0 ? Math.round((activeCount / companies.length) * 100) : 0
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-      <div className="p-8 max-w-5xl mx-auto w-full" data-testid="companies-page">
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div className="min-h-screen bg-corthex-bg" data-testid="companies-page">
+      <div className="p-8 max-w-7xl mx-auto w-full">
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
-              Company Management
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 bg-corthex-accent" />
+              <span className="font-mono text-xs tracking-[0.3em] text-corthex-accent">ADMIN_OVERRIDE</span>
+            </div>
+            <h1 className="text-5xl font-black tracking-tighter uppercase leading-none text-corthex-text-primary">
+              Companies Management
             </h1>
-            <p className="mt-1" style={{ color: muted }}>
-              {filteredCompanies.length === companies.length
-                ? `${companies.length} companies`
-                : `${filteredCompanies.length} / ${companies.length} companies`}
+            <p className="font-mono text-sm text-corthex-text-secondary mt-2 max-w-xl">
+              Global entity provisioner. Manage infrastructure permissions across the mesh network.
             </p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-all text-white shadow-lg"
-            style={{ backgroundColor: terracotta, boxShadow: '0 10px 15px -3px rgba(196,98,45,0.2)' }}
+            className="bg-corthex-accent text-corthex-text-on-accent font-black py-4 px-8 text-sm tracking-[0.15em] uppercase active:scale-95 transition-transform flex items-center gap-3 hover:bg-corthex-accent-hover"
             data-testid="company-add-btn"
           >
             <Plus size={18} />
-            <span>Add Company</span>
+            Create Company
           </button>
-        </div>
+        </header>
 
-        {/* Search */}
-        <div className="bg-corthex-surface rounded-xl border p-4 mb-6 flex items-center" style={{ borderColor: sand }}>
-          <div className="relative w-full md:w-96">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: lightMuted }} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by company name or slug..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
-              style={{ ...inputStyle, outlineColor: olive }}
-              data-testid="company-search"
-            />
+        {/* Stats + Search Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-1 mb-8">
+          <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Total_Entities</span>
+            <span className="text-4xl font-black tracking-tighter text-corthex-text-primary">{companies.length.toLocaleString()}</span>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Active_Throughput</span>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-black tracking-tighter text-corthex-info">{throughput}</span>
+              <span className="font-mono text-xs mb-1 text-corthex-text-secondary">%</span>
+            </div>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Sync_Status</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-corthex-accent animate-pulse" />
+              <span className="text-xl font-black tracking-tight text-corthex-accent">STABLE</span>
+            </div>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-6 flex items-center justify-center h-32">
+            <div className="relative w-full">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-transparent border-b border-corthex-border focus:border-corthex-accent font-mono text-xs tracking-widest placeholder:text-corthex-text-disabled text-corthex-text-primary focus:ring-0 pb-2"
+                placeholder="FILTER_SEARCH..."
+                data-testid="company-search"
+              />
+              <Search size={14} className="absolute right-0 top-0 text-corthex-text-disabled" />
+            </div>
           </div>
         </div>
 
         {/* Create Form */}
         {showCreate && (
-          <div className="bg-corthex-surface rounded-xl border p-6 mb-6 shadow-sm" style={{ borderColor: sand }} data-testid="company-create-form">
-            <h3 className="text-lg font-bold mb-4" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>New Company</h3>
+          <div className="bg-corthex-surface border border-corthex-border p-6 mb-8" data-testid="company-create-form">
+            <h3 className="font-mono text-xs text-corthex-accent uppercase tracking-widest mb-4">INITIALIZE_NEW_NODE</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -145,169 +165,222 @@ export function CompaniesPage() {
               className="grid grid-cols-2 gap-4"
             >
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Company Name</label>
+                <label className="block font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mb-1.5">Company Name</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-1"
-                  style={{ ...inputStyle, outlineColor: olive }}
+                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: muted }}>Slug</label>
+                <label className="block font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mb-1.5">Slug</label>
                 <input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-1"
-                  style={{ ...inputStyle, outlineColor: olive }}
+                  className="w-full bg-corthex-bg border-b border-corthex-border focus:border-corthex-accent font-mono text-xs text-corthex-text-primary py-3 px-2 focus:ring-0 transition-colors"
                   placeholder="lowercase, numbers, hyphens only"
                   required
                 />
               </div>
               <div className="col-span-2 flex gap-3 justify-end">
-                <button type="button" onClick={() => setShowCreate(false)} className="px-5 py-2 text-sm" style={{ color: muted }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCreate(false)}
+                  className="font-mono text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary uppercase tracking-widest px-4 py-2 transition-colors"
+                >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="px-5 py-2 text-white text-sm font-bold rounded-xl disabled:opacity-50 transition-colors"
-                  style={{ backgroundColor: olive }}
+                  className="bg-corthex-accent text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-widest px-6 py-2.5 disabled:opacity-50 hover:bg-corthex-accent-hover transition-colors"
                 >
                   {createMutation.isPending ? 'Creating...' : 'Create'}
                 </button>
               </div>
               {createMutation.isError && (
-                <p className="col-span-2 text-sm" style={{ color: '#ef4444' }}>{(createMutation.error as Error).message}</p>
+                <p className="col-span-2 font-mono text-xs text-corthex-error">{(createMutation.error as Error).message}</p>
               )}
             </form>
           </div>
         )}
 
-        {/* Company List */}
+        {/* Company Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
           </div>
         ) : (
-          <div className="space-y-4" data-testid="company-list">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" data-testid="company-list">
             {filteredCompanies.map((c) => {
               const s = stats[c.id] || { userCount: 0, agentCount: 0 }
               return (
                 <div
                   key={c.id}
-                  className="bg-corthex-surface rounded-xl border p-6 shadow-sm transition-all hover:shadow-md"
-                  style={{ borderColor: sand }}
+                  className="bg-corthex-bg border border-corthex-border group relative hover:bg-corthex-surface transition-colors duration-300"
                   data-testid={`company-card-${c.slug}`}
                 >
-                  {editId === c.id ? (
-                    <div className="flex items-center gap-4">
-                      <input
-                        value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="flex-1 px-3 py-2.5 border rounded-lg text-sm"
-                        style={inputStyle}
-                      />
-                      <button
-                        onClick={() => updateMutation.mutate({ id: c.id, name: editForm.name })}
-                        className="text-sm font-bold" style={{ color: olive }}
-                      >
-                        Save
-                      </button>
-                      <button onClick={() => setEditId(null)} className="text-sm" style={{ color: muted }}>
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
-                            {c.name.slice(0, 2).toUpperCase()}
-                          </div>
+                  <div className={`absolute top-0 left-0 w-full h-[2px] transition-colors ${c.isActive ? 'bg-corthex-accent' : 'bg-corthex-border'} group-hover:bg-corthex-accent`} />
+                  <div className="p-6">
+                    {editId === c.id ? (
+                      <div className="flex items-center gap-4">
+                        <input
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          className="flex-1 bg-corthex-bg border-b border-corthex-accent font-mono text-xs text-corthex-text-primary py-2 px-2 focus:ring-0"
+                        />
+                        <button
+                          onClick={() => updateMutation.mutate({ id: c.id, name: editForm.name })}
+                          className="font-mono text-[10px] text-corthex-accent uppercase tracking-widest hover:text-corthex-accent-hover transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditId(null)}
+                          className="font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest hover:text-corthex-text-primary transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-start mb-8">
                           <div>
-                            <h3 className="text-lg font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>{c.name}</h3>
-                            <p className="text-xs" style={{ color: lightMuted }}>slug: {c.slug}</p>
+                            <h3 className="text-2xl font-black tracking-tight uppercase mb-1 text-corthex-text-primary">
+                              {c.name.toUpperCase()}
+                            </h3>
+                            <div className="flex items-center gap-4">
+                              <span className={`px-2 py-0.5 text-[10px] font-mono tracking-widest font-bold border ${
+                                c.isActive
+                                  ? 'bg-corthex-accent/10 text-corthex-accent border-corthex-accent/20'
+                                  : 'bg-corthex-error/10 text-corthex-error border-corthex-error/20'
+                              }`}>
+                                {c.isActive ? 'ACTIVE' : 'INACTIVE'}
+                              </span>
+                              <span className="font-mono text-[10px] text-corthex-text-disabled">
+                                ID: {c.id.slice(0, 8).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <button className="text-corthex-text-disabled hover:text-corthex-accent transition-colors">
+                            <MoreVertical size={18} />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-corthex-elevated border border-corthex-border flex items-center justify-center text-corthex-accent">
+                              <Users size={18} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-mono tracking-widest text-corthex-text-secondary uppercase leading-none mb-1">Users</p>
+                              <p className="text-lg font-black leading-none text-corthex-text-primary">{s.userCount.toLocaleString()}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-corthex-elevated border border-corthex-border flex items-center justify-center text-corthex-info">
+                              <Bot size={18} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-mono tracking-widest text-corthex-text-secondary uppercase leading-none mb-1">Agents</p>
+                              <p className="text-lg font-black leading-none text-corthex-text-primary">{s.agentCount.toLocaleString()}</p>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 mt-3 ml-[52px]">
-                          <div className="flex items-center gap-1.5">
-                            <Users size={14} style={{ color: muted }} />
-                            <span className="text-xs font-medium" style={{ color: muted }}>{s.userCount} users</span>
+
+                        <div className="flex items-center justify-between pt-6 border-t border-corthex-border">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-mono text-corthex-text-disabled uppercase">Provisioned_On</span>
+                            <span className="font-mono text-xs text-corthex-text-secondary">
+                              {new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <Bot size={14} style={{ color: muted }} />
-                            <span className="text-xs font-medium" style={{ color: muted }}>{s.agentCount} agents</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setEditId(c.id)
+                                setEditForm({ name: c.name, slug: c.slug })
+                              }}
+                              className="text-corthex-text-disabled hover:text-corthex-accent transition-colors p-1"
+                              title="Edit"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(c)}
+                              className="text-corthex-text-disabled hover:text-corthex-error transition-colors p-1"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                            <button className="font-mono text-[10px] tracking-[0.2em] text-corthex-accent uppercase font-bold hover:underline ml-2">
+                              ACCESS_ROOT
+                            </button>
                           </div>
-                          <span className="text-xs" style={{ color: lightMuted }}>
-                            Created: {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-bold"
-                          style={{
-                            backgroundColor: c.isActive ? oliveBg : 'rgba(239,68,68,0.1)',
-                            color: c.isActive ? olive : '#ef4444',
-                          }}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.isActive ? olive : '#ef4444' }} />
-                          {c.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                        <button
-                          onClick={() => {
-                            setEditId(c.id)
-                            setEditForm({ name: c.name, slug: c.slug })
-                          }}
-                          className="p-1.5 rounded hover:bg-corthex-elevated transition-colors"
-                          title="Edit"
-                        >
-                          <Pencil size={16} style={{ color: muted }} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(c)}
-                          className="p-1.5 rounded hover:bg-red-50 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} style={{ color: '#ef4444' }} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
               )
             })}
+
+            {/* Add New Slot */}
+            <div
+              className="border-2 border-dashed border-corthex-border group hover:border-corthex-accent/50 transition-all cursor-pointer flex flex-col items-center justify-center p-8 text-center min-h-[340px]"
+              onClick={() => setShowCreate(true)}
+            >
+              <div className="w-16 h-16 bg-corthex-elevated border border-corthex-border flex items-center justify-center text-corthex-text-disabled group-hover:text-corthex-accent mb-6 transition-colors">
+                <Plus size={32} />
+              </div>
+              <h3 className="font-black tracking-widest uppercase mb-2 text-corthex-text-primary">Initialize Node</h3>
+              <p className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-[0.1em]">
+                Awaiting infrastructure allocation command...
+              </p>
+            </div>
           </div>
         )}
 
         {/* Pagination */}
         {filteredCompanies.length > 0 && (
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-xs font-medium" style={{ color: lightMuted }}>
+          <div className="mt-8 flex items-center justify-between">
+            <p className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">
               Showing {filteredCompanies.length} of {companies.length} companies
             </p>
             <div className="flex gap-2">
-              <button className="p-1 border rounded bg-corthex-surface transition-colors disabled:opacity-50" style={{ borderColor: sand }} disabled>
-                <ChevronLeft size={18} style={{ color: lightMuted }} />
+              <button className="p-1 border border-corthex-border bg-corthex-surface transition-colors disabled:opacity-50 text-corthex-text-disabled" disabled>
+                <ChevronLeft size={18} />
               </button>
-              <button className="w-8 h-8 flex items-center justify-center rounded text-white font-bold text-xs" style={{ backgroundColor: olive }}>1</button>
-              <button className="p-1 border rounded bg-corthex-surface transition-colors" style={{ borderColor: sand }}>
-                <ChevronRight size={18} style={{ color: lightMuted }} />
+              <button className="w-8 h-8 flex items-center justify-center bg-corthex-accent text-corthex-text-on-accent font-bold text-xs">1</button>
+              <button className="p-1 border border-corthex-border bg-corthex-surface transition-colors text-corthex-text-disabled hover:text-corthex-accent">
+                <ChevronRight size={18} />
               </button>
             </div>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4" style={{ color: lightMuted }}>
-          <p>&copy; 2024 CORTHEX Technologies. All rights reserved.</p>
-          <div className="flex gap-6">
-            <span>System Status: <span style={{ color: olive }}>Healthy</span></span>
-            <span>API v2.4.1</span>
+        {/* Footer Data Stream */}
+        <footer className="mt-16 pt-8 border-t border-corthex-border flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-mono text-corthex-text-disabled uppercase">System_Load</span>
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-1 bg-corthex-elevated">
+                  <div className="w-1/3 h-full bg-corthex-info" />
+                </div>
+                <span className="font-mono text-[10px] text-corthex-info">NOMINAL</span>
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[9px] font-mono text-corthex-text-disabled uppercase">Network_Latency</span>
+              <span className="font-mono text-[10px] text-corthex-accent">STABLE</span>
+            </div>
           </div>
-        </div>
+          <div className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-[0.2em]">
+            SECURE_TERMINAL // CORTHEX_ADMIN
+          </div>
+        </footer>
       </div>
 
       <ConfirmDialog

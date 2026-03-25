@@ -1,5 +1,5 @@
 /**
- * Admin Employees (Employee Assignment) — Natural Organic Theme
+ * Admin Employees Management — Industrial Dark Theme (Stitch)
  *
  * API Endpoints:
  *   GET    /admin/employees?companyId={id}&page=N&limit=N&search=&departmentId=&isActive=
@@ -11,13 +11,15 @@
  *   GET    /admin/departments?companyId={id}
  */
 import { useState, useCallback, useRef } from 'react'
-import { UserPlus, Search, UserSearch, Filter, GripVertical, Plus, PlusCircle, X } from 'lucide-react'
+import {
+  UserPlus, Search, Filter, Users, UserCheck, Briefcase,
+  Pencil, Trash2, ChevronLeft, ChevronRight, X,
+} from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
-import { ConfirmDialog, EmptyState, SkeletonTable } from '@corthex/ui'
-import { olive, oliveBg, cream } from '../lib/colors'
+import { ConfirmDialog } from '@corthex/ui'
 
 type Department = { id: string; name: string }
 type Employee = {
@@ -194,176 +196,266 @@ export function EmployeesPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden" data-testid="employees-page">
-        {/* Content Area */}
-        <div className="flex-1 overflow-hidden flex flex-col p-8 gap-6">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-black text-corthex-text-primary dark:text-white tracking-tight">Employee Assignment</h2>
-                <p className="text-corthex-text-secondary dark:text-corthex-text-disabled">{pagination ? `${pagination.total}명의 직원` : 'Drag and drop users to assign them to their specific departments.'}</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowInvite(true)}
-                  className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md"
-                  style={{ backgroundColor: olive, boxShadow: '0 4px 6px -1px rgba(90,114,71,0.2)' }}
-                  data-testid="invite-btn"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Invite Employee
-                </button>
-              </div>
-            </div>
+    <div className="min-h-screen bg-corthex-bg" data-testid="employees-page">
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-corthex-text-primary tracking-tighter uppercase mb-1">
+              Employees Management
+            </h1>
+            <p className="text-corthex-text-secondary text-sm">
+              {pagination ? `${pagination.total}명의 직원` : 'Manage personnel, roles, and department assignments.'}
+            </p>
           </div>
-
-          {/* Search + Filters */}
-          <div className="space-y-3" data-testid="filters">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Search */}
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
               <input
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder="Global search for employees, IDs, or logs..."
-                className="w-full bg-corthex-elevated dark:bg-corthex-surface border-none rounded-xl pl-10 pr-4 py-2 text-sm transition-all"
-                style={{ outlineColor: olive }}
+                placeholder="Search employees..."
+                className="bg-corthex-surface border border-corthex-border text-corthex-text-secondary text-sm rounded-lg pl-10 pr-4 py-2.5 focus:ring-1 focus:ring-corthex-accent focus:border-corthex-accent outline-none w-56 transition-all"
                 data-testid="search-input"
                 type="text"
               />
             </div>
-
-            {/* Active status filter */}
-            <div className="flex items-center gap-2">
-              {[
-                { label: '전체', value: '' },
-                { label: '활성', value: 'true' },
-                { label: '비활성', value: 'false' },
-              ].map((f) => (
-                <button
-                  key={f.value}
-                  onClick={() => { setActiveFilter(f.value); setPage(1) }}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-                  style={activeFilter === f.value
-                    ? { backgroundColor: olive, color: 'white' }
-                    : { color: '#64748b' }
-                  }
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Department filter */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => { setDepartmentFilter(''); setPage(1) }}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-                style={departmentFilter === ''
-                  ? { backgroundColor: olive, color: 'white' }
-                  : { color: '#64748b' }
-                }
+            {/* Dept Filter */}
+            <div className="relative">
+              <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
+              <select
+                value={departmentFilter}
+                onChange={(e) => { setDepartmentFilter(e.target.value); setPage(1) }}
+                className="bg-corthex-surface border border-corthex-border text-corthex-text-secondary text-xs rounded-lg pl-9 pr-8 py-2.5 focus:ring-1 focus:ring-corthex-accent outline-none appearance-none cursor-pointer hover:bg-corthex-elevated transition-colors"
+                data-testid="filters"
               >
-                전체 부서
-              </button>
-              {departments.map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => { setDepartmentFilter(d.id); setPage(1) }}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-                  style={departmentFilter === d.id
-                    ? { backgroundColor: olive, color: 'white' }
-                    : { color: '#64748b' }
-                  }
-                >
-                  {d.name}
-                </button>
-              ))}
+                <option value="">Department: ALL</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
             </div>
+            {/* Active Filter */}
+            <div className="relative">
+              <Users className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
+              <select
+                value={activeFilter}
+                onChange={(e) => { setActiveFilter(e.target.value); setPage(1) }}
+                className="bg-corthex-surface border border-corthex-border text-corthex-text-secondary text-xs rounded-lg pl-9 pr-8 py-2.5 focus:ring-1 focus:ring-corthex-accent outline-none appearance-none cursor-pointer hover:bg-corthex-elevated transition-colors"
+              >
+                <option value="">Status: ALL</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+            {/* Add Employee */}
+            <button
+              onClick={() => setShowInvite(true)}
+              className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+              data-testid="invite-btn"
+            >
+              <UserPlus className="w-4 h-4" />
+              Add Employee
+            </button>
           </div>
+        </header>
 
-          {/* Assignment Grid */}
-          <div className="flex-1 flex gap-6 overflow-hidden">
-            {/* Left Column: Unassigned Users */}
-            <div className="w-1/3 flex flex-col bg-corthex-surface dark:bg-corthex-bg rounded-xl border border-corthex-border dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-corthex-border dark:border-slate-800 flex items-center justify-between">
-                <h3 className="font-bold flex items-center gap-2">
-                  <UserSearch className="w-5 h-5" style={{ color: olive }} />
-                  Unassigned Users
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: oliveBg, color: olive }}>
-                    {employees.filter((e) => e.departments.length === 0).length}
-                  </span>
-                </h3>
-                <button className="text-corthex-text-disabled hover:text-corthex-text-secondary"><Filter className="w-5 h-5" /></button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Employee Table */}
+        <div className="bg-corthex-surface border border-corthex-border rounded-xl overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-corthex-border bg-corthex-elevated/50">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Name</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Username</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Department</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Status</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled">Hire Date</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-corthex-text-disabled text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-corthex-border/50">
                 {isLoading ? (
-                  <div className="p-5"><SkeletonTable rows={3} /></div>
-                ) : employees.filter((e) => e.departments.length === 0).length === 0 ? (
-                  <p className="text-sm text-center text-corthex-text-disabled py-4 italic">All employees assigned</p>
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-corthex-text-disabled text-sm">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-corthex-text-disabled text-sm">
+                      No employees found
+                    </td>
+                  </tr>
                 ) : (
-                  employees.filter((e) => e.departments.length === 0).map((emp) => (
-                    <div key={emp.id} className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-corthex-bg dark:bg-corthex-surface/50 cursor-move hover:shadow-md transition-all" style={{ borderColor: 'transparent' }} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm" style={{ backgroundColor: oliveBg, color: olive }}>
-                        {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold truncate">{emp.name}</p>
-                        <p className="text-xs text-corthex-text-secondary">ID: @{emp.username}</p>
-                      </div>
-                      <GripVertical className="w-5 h-5 text-corthex-text-disabled group-hover:text-corthex-text-secondary" />
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Right Column: Departments */}
-            <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 content-start pb-8">
-              {departments.map((dept) => {
-                const deptEmployees = employees.filter((e) => e.departments.some((d) => d.id === dept.id))
-                return (
-                  <div key={dept.id} className="bg-corthex-surface dark:bg-corthex-bg rounded-xl border border-corthex-border dark:border-slate-800 shadow-sm flex flex-col">
-                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-corthex-bg/50 dark:bg-corthex-surface/20">
-                      <div>
-                        <h4 className="font-bold text-corthex-text-primary dark:text-white">{dept.name}</h4>
-                        <p className="text-xs text-corthex-text-secondary">{deptEmployees.length} Members</p>
-                      </div>
-                      <button className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: oliveBg, color: olive }}>
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="p-4 space-y-2 min-h-[120px] border-2 border-dashed border-transparent transition-all rounded-b-xl" style={{}} onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(90,114,71,0.2)')} onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'transparent')}>
-                      {deptEmployees.map((emp) => (
-                        <div key={emp.id} className="flex items-center justify-between p-2 bg-corthex-surface dark:bg-corthex-surface rounded-lg shadow-sm">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full text-[10px] flex items-center justify-center font-bold" style={{ backgroundColor: oliveBg, color: olive }}>
+                  employees.map((emp) => (
+                    <tr key={emp.id} className="hover:bg-corthex-elevated/40 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm bg-corthex-elevated text-corthex-accent border border-corthex-border">
                               {emp.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
                             </div>
-                            <span className="text-sm">{emp.name}</span>
+                            <span
+                              className={`absolute -bottom-1 -right-1 w-3 h-3 border-2 border-corthex-surface rounded-full ${
+                                emp.isActive ? 'bg-corthex-success' : 'bg-corthex-text-disabled'
+                              }`}
+                            />
                           </div>
-                          <button className="text-corthex-text-disabled hover:text-red-500">
-                            <X className="w-4 h-4" />
-                          </button>
+                          <div>
+                            <p className="font-bold text-corthex-text-primary">{emp.name}</p>
+                            <p className="text-xs text-corthex-text-disabled">{emp.email}</p>
+                          </div>
                         </div>
-                      ))}
-                      {deptEmployees.length === 0 && (
-                        <p className="text-sm text-center text-corthex-text-disabled py-4 italic">No members assigned</p>
-                      )}
-                      <div className="pt-2 text-center">
-                        <p className="text-[10px] text-corthex-text-disabled uppercase font-bold tracking-widest">Drop here to assign</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+                      </td>
+                      <td className="px-6 py-4 text-corthex-text-secondary text-sm font-medium">
+                        @{emp.username}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {emp.departments.length === 0 ? (
+                            <span className="px-2 py-1 bg-corthex-elevated text-corthex-text-disabled text-[10px] font-bold uppercase tracking-wider border border-corthex-border rounded">
+                              Unassigned
+                            </span>
+                          ) : (
+                            emp.departments.map((d) => (
+                              <span
+                                key={d.id}
+                                className="px-2 py-1 bg-corthex-elevated text-corthex-text-secondary text-[10px] font-bold uppercase tracking-wider border border-corthex-border rounded"
+                              >
+                                {d.name}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`w-2 h-2 rounded-full ${emp.isActive ? 'bg-corthex-success' : 'bg-corthex-text-disabled'}`}
+                          />
+                          <span
+                            className={`text-xs font-medium ${emp.isActive ? 'text-corthex-success' : 'text-corthex-text-disabled'}`}
+                          >
+                            {emp.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-corthex-text-secondary text-sm font-mono italic">
+                        {new Date(emp.createdAt).toLocaleDateString('en-US', {
+                          month: 'short', day: '2-digit', year: 'numeric',
+                        }).toUpperCase()}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => {
+                              setEditTarget(emp)
+                              setEditForm({ name: emp.name, email: emp.email, departmentIds: emp.departments.map((d) => d.id) })
+                            }}
+                            className="p-1.5 text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
+                            data-testid={`edit-btn-${emp.id}`}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          {emp.isActive ? (
+                            <button
+                              onClick={() => setDeactivateTarget(emp)}
+                              className="p-1.5 text-corthex-text-secondary hover:text-corthex-error hover:bg-corthex-elevated rounded transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setReactivateTarget(emp)}
+                              className="p-1.5 text-corthex-text-secondary hover:text-corthex-success hover:bg-corthex-elevated rounded transition-colors"
+                            >
+                              <UserCheck className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-              {/* New Dept Placeholder */}
-              <button className="border-2 border-dashed border-corthex-border dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-8 text-corthex-text-disabled transition-all" style={{}} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(90,114,71,0.5)'; e.currentTarget.style.color = olive }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#94a3b8' }}>
-                <PlusCircle className="w-8 h-8" />
-                <span className="text-sm font-bold mt-2">Create New Department</span>
-              </button>
+          {/* Pagination */}
+          {pagination && (
+            <div className="flex items-center justify-between px-6 py-4 bg-corthex-elevated/30 border-t border-corthex-border">
+              <p className="text-corthex-text-disabled text-xs font-medium">
+                Showing{' '}
+                <span className="text-corthex-text-secondary">{(page - 1) * 20 + 1}</span> to{' '}
+                <span className="text-corthex-text-secondary">{Math.min(page * 20, pagination.total)}</span> of{' '}
+                <span className="text-corthex-text-secondary">{pagination.total}</span> entries
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-corthex-border text-corthex-text-disabled hover:text-corthex-accent hover:border-corthex-accent/50 transition-colors disabled:opacity-40"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-8 h-8 flex items-center justify-center rounded text-xs font-bold transition-colors ${
+                      p === page
+                        ? 'bg-corthex-accent text-corthex-text-on-accent'
+                        : 'border border-corthex-border text-corthex-text-secondary hover:bg-corthex-elevated'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                  disabled={page === pagination.totalPages}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-corthex-border text-corthex-text-disabled hover:text-corthex-accent hover:border-corthex-accent/50 transition-colors disabled:opacity-40"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Stats */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-corthex-surface border border-corthex-border p-5 rounded-xl flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-corthex-accent/10 flex items-center justify-center text-corthex-accent border border-corthex-accent/20">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] text-corthex-text-disabled font-black uppercase tracking-widest">Total Workforce</p>
+              <p className="text-2xl font-black text-corthex-text-primary tracking-tighter">{pagination?.total ?? '--'}</p>
+            </div>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-5 rounded-xl flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-corthex-elevated flex items-center justify-center text-corthex-text-secondary border border-corthex-border">
+              <UserCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] text-corthex-text-disabled font-black uppercase tracking-widest">Active</p>
+              <p className="text-2xl font-black text-corthex-text-primary tracking-tighter">
+                {employees.filter((e) => e.isActive).length}
+              </p>
+            </div>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-5 rounded-xl flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-corthex-elevated flex items-center justify-center text-corthex-text-secondary border border-corthex-border">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] text-corthex-text-disabled font-black uppercase tracking-widest">Unassigned</p>
+              <p className="text-2xl font-black text-corthex-text-primary tracking-tighter">
+                {employees.filter((e) => e.departments.length === 0).length}
+              </p>
             </div>
           </div>
         </div>
@@ -373,8 +465,9 @@ export function EmployeesPage() {
       {showInvite && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowInvite(false)} data-testid="invite-modal">
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-corthex-border">
+            <div className="px-6 py-4 border-b border-corthex-border flex items-center justify-between">
               <h2 className="text-lg font-semibold text-corthex-text-primary">직원 초대</h2>
+              <button onClick={() => setShowInvite(false)} className="text-corthex-text-disabled hover:text-corthex-text-secondary"><X className="w-5 h-5" /></button>
             </div>
             <form
               onSubmit={(e) => {
@@ -389,7 +482,7 @@ export function EmployeesPage() {
                 <input
                   value={inviteForm.username}
                   onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="사용자 아이디"
                   required
                 />
@@ -399,7 +492,7 @@ export function EmployeesPage() {
                 <input
                   value={inviteForm.name}
                   onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="직원 이름"
                   required
                 />
@@ -410,7 +503,7 @@ export function EmployeesPage() {
                   type="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   placeholder="email@example.com"
                   required
                 />
@@ -426,8 +519,7 @@ export function EmployeesPage() {
                         type="checkbox"
                         checked={inviteForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, inviteForm.departmentIds, (ids) => setInviteForm({ ...inviteForm, departmentIds: ids }))}
-                        className="rounded border-corthex-border"
-                        style={{ accentColor: olive }}
+                        className="rounded border-corthex-border accent-corthex-accent"
                       />
                       <span className="text-sm text-corthex-text-primary">{d.name}</span>
                     </label>
@@ -438,15 +530,14 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setShowInvite(false)}
-                  className="bg-corthex-elevated hover:bg-slate-200 text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-corthex-elevated hover:bg-corthex-border text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: olive }}
+                  className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {createMutation.isPending ? '초대 중...' : '초대'}
                 </button>
@@ -460,8 +551,9 @@ export function EmployeesPage() {
       {editTarget && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setEditTarget(null)} data-testid="edit-modal">
           <div className="bg-corthex-surface border border-corthex-border rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-corthex-border">
+            <div className="px-6 py-4 border-b border-corthex-border flex items-center justify-between">
               <h2 className="text-lg font-semibold text-corthex-text-primary">직원 수정 &mdash; {editTarget.name}</h2>
+              <button onClick={() => setEditTarget(null)} className="text-corthex-text-disabled hover:text-corthex-text-secondary"><X className="w-5 h-5" /></button>
             </div>
             <form
               onSubmit={(e) => {
@@ -477,14 +569,14 @@ export function EmployeesPage() {
             >
               <div>
                 <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">아이디</label>
-                <input value={editTarget.username} disabled className="w-full bg-corthex-elevated border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-secondary cursor-not-allowed" />
+                <input value={editTarget.username} disabled className="w-full bg-corthex-elevated border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-disabled cursor-not-allowed" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">이름</label>
                 <input
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                   required
                 />
               </div>
@@ -494,7 +586,7 @@ export function EmployeesPage() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm transition-colors"
+                  className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
                 />
               </div>
               <div>
@@ -508,8 +600,7 @@ export function EmployeesPage() {
                         type="checkbox"
                         checked={editForm.departmentIds.includes(d.id)}
                         onChange={() => toggleDept(d.id, editForm.departmentIds, (ids) => setEditForm({ ...editForm, departmentIds: ids }))}
-                        className="rounded border-corthex-border"
-                        style={{ accentColor: olive }}
+                        className="rounded border-corthex-border accent-corthex-accent"
                       />
                       <span className="text-sm text-corthex-text-primary">{d.name}</span>
                     </label>
@@ -520,15 +611,14 @@ export function EmployeesPage() {
                 <button
                   type="button"
                   onClick={() => setEditTarget(null)}
-                  className="bg-corthex-elevated hover:bg-slate-200 text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="bg-corthex-elevated hover:bg-corthex-border text-corthex-text-primary rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: olive }}
+                  className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {updateMutation.isPending ? '저장 중...' : '저장'}
                 </button>
@@ -548,7 +638,7 @@ export function EmployeesPage() {
             <div className="px-6 py-5 space-y-4">
               <p className="text-sm text-corthex-text-secondary">{passwordModal.name}님의 임시 비밀번호입니다.</p>
               <div className="bg-corthex-bg border border-corthex-border rounded-lg p-3 flex items-center justify-between">
-                <code className="text-lg font-mono tracking-wider select-all" style={{ color: olive }}>{passwordModal.password}</code>
+                <code className="text-lg font-mono tracking-wider select-all text-corthex-accent">{passwordModal.password}</code>
                 <button
                   onClick={copyPassword}
                   className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 rounded hover:bg-corthex-elevated transition-colors"
@@ -556,15 +646,14 @@ export function EmployeesPage() {
                   복사
                 </button>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p className="text-xs text-amber-700">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
+              <div className="bg-corthex-accent/10 border border-corthex-accent/20 rounded-lg p-3">
+                <p className="text-xs text-corthex-accent">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-corthex-border flex justify-end">
               <button
                 onClick={() => setPasswordModal(null)}
-                className="text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                style={{ backgroundColor: olive }}
+                className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 확인
               </button>

@@ -1,5 +1,5 @@
 /**
- * Admin Dashboard — Natural Organic Theme
+ * Admin Dashboard — Stitch Command Theme
  *
  * API Endpoints:
  *   GET /admin/users?companyId={id}
@@ -9,8 +9,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
-import { CheckCircle, Building2, Users, Bot, Activity } from 'lucide-react'
-import { olive, oliveBg, cream, sand, warmBrown } from '../lib/colors'
+import { Building2, Users, Bot, Zap, Download } from 'lucide-react'
 
 type User = { id: string; name: string; username: string; role: string; isActive: boolean }
 type Agent = { id: string; name: string; role: string; status: string; isActive: boolean }
@@ -43,147 +42,285 @@ export function DashboardPage() {
   const isLoading = userLoading || agentLoading
   const activeUsers = users.filter((u) => u.isActive).length
   const onlineAgents = agents.filter((a) => a.status === 'online').length
+  const efficiency = agents.length > 0 ? Math.round((onlineAgents / agents.length) * 100) : 0
 
-  if (!selectedCompanyId) return <div className="p-8 text-center text-corthex-text-secondary">회사를 선택하세요</div>
+  if (!selectedCompanyId) return (
+    <div className="flex items-center justify-center h-64 text-corthex-text-disabled font-mono text-xs uppercase tracking-widest">
+      SELECT_COMPANY_TO_CONTINUE
+    </div>
+  )
 
   return (
-    <div className="min-h-screen p-8 max-w-7xl mx-auto w-full" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="p-8 space-y-8 bg-corthex-bg min-h-screen">
+      {/* Stat Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
-          icon={<Building2 size={20} style={{ color: olive }} />}
-          label="Departments"
+          icon={<Building2 size={64} className="text-corthex-text-primary opacity-10" />}
+          label="DEPARTMENTS"
           value={depts.length}
-          sub={`${depts.length} registered`}
+          change={`${depts.length} registered`}
           isLoading={isLoading}
         />
         <StatCard
-          icon={<Users size={20} style={{ color: olive }} />}
-          label="Users"
+          icon={<Users size={64} className="text-corthex-text-primary opacity-10" />}
+          label="ACTIVE USERS"
           value={users.length}
-          sub={`${activeUsers} active`}
-          badge={`${activeUsers}`}
+          change={`${activeUsers} active`}
           isLoading={isLoading}
         />
         <StatCard
-          icon={<Bot size={20} style={{ color: olive }} />}
-          label="AI Agents"
+          icon={<Bot size={64} className="text-corthex-text-primary opacity-10" />}
+          label="AUTONOMOUS AGENTS"
           value={agents.length}
-          sub={`${onlineAgents} online`}
-          badge={`${agents.length}`}
+          change={`${onlineAgents} online`}
           isLoading={isLoading}
-        />
-        <StatCard
-          icon={<Activity size={20} style={{ color: olive }} />}
-          label="System Health"
-          value={onlineAgents}
-          sub="Online agents"
-          isLoading={isLoading}
-          accent
         />
       </div>
 
-      {/* Recent Activity Table */}
-      <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }}>
-        <div className="p-6 border-b flex items-center justify-between" style={{ borderColor: sand }}>
-          <div>
-            <h4 className="font-bold text-lg leading-none" style={{ color: warmBrown }}>Recent Activity</h4>
-            <p className="text-xs text-corthex-text-disabled mt-2">Users and agents in this workspace</p>
+      {/* Middle Section: Health + Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* System Health Meters */}
+        <div className="lg:col-span-1 bg-corthex-bg border border-corthex-border p-6 space-y-8">
+          <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent border-b border-corthex-border pb-4 flex items-center justify-between">
+            Health Status
+            <span className="w-1.5 h-1.5 rounded-full bg-corthex-accent" />
+          </h3>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
+                <span>USERS_ACTIVE</span>
+                <span>{users.length > 0 ? Math.round((activeUsers / users.length) * 100) : 0}%</span>
+              </div>
+              <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
+                <div
+                  className="h-full bg-corthex-accent"
+                  style={{ width: `${users.length > 0 ? (activeUsers / users.length) * 100 : 0}%` }}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
+                <span>AGENTS_ONLINE</span>
+                <span>{efficiency}%</span>
+              </div>
+              <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
+                <div className="h-full bg-corthex-accent" style={{ width: `${efficiency}%` }} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
+                <span>DEPT_COUNT</span>
+                <span>{depts.length}</span>
+              </div>
+              <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
+                <div className="h-full bg-corthex-info" style={{ width: `${Math.min(depts.length * 10, 100)}%` }} />
+              </div>
+            </div>
+          </div>
+          <div className="pt-6 border-t border-corthex-border">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-corthex-surface border border-corthex-border flex items-center justify-center text-corthex-accent">
+                <Zap size={24} />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono text-corthex-text-secondary">SYSTEM</p>
+                <p className="font-bold text-corthex-text-primary tracking-tight">OPERATIONAL</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-corthex-text-disabled text-[11px] font-bold uppercase tracking-wider" style={{ backgroundColor: cream }}>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4">Role</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y" style={{ borderColor: sand }}>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-corthex-text-disabled">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-corthex-border border-t-transparent rounded-full animate-spin" />
-                      Loading...
-                    </div>
-                  </td>
+
+        {/* Recent Activity Table */}
+        <div className="lg:col-span-3 bg-corthex-bg border border-corthex-border overflow-hidden">
+          <div className="p-6 border-b border-corthex-border flex justify-between items-center">
+            <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Recent Activity</h3>
+            <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-colors flex items-center gap-1">
+              EXPORT_LOGS <Download size={12} />
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-corthex-surface text-[10px] font-mono uppercase text-corthex-text-secondary">
+                  <th className="px-6 py-4 font-normal">Name</th>
+                  <th className="px-6 py-4 font-normal">Type</th>
+                  <th className="px-6 py-4 font-normal">Role</th>
+                  <th className="px-6 py-4 font-normal text-right">Status</th>
                 </tr>
-              ) : users.length === 0 && agents.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-corthex-text-disabled">No users or agents yet</td>
-                </tr>
-              ) : (
-                <>
-                  {users.map((u) => (
-                    <tr key={`user-${u.id}`} className="hover:bg-corthex-bg transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="flex items-center gap-1.5 font-bold text-xs uppercase" style={{ color: u.isActive ? olive : '#94a3b8' }}>
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: u.isActive ? olive : '#94a3b8' }} />
-                          {u.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm font-bold" style={{ color: warmBrown }}>{u.name}</p>
-                        <p className="text-xs text-corthex-text-disabled">@{u.username}</p>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>User</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>{u.role}</td>
-                    </tr>
+              </thead>
+              <tbody className="divide-y divide-corthex-border">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-corthex-text-disabled">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-corthex-border border-t-transparent rounded-full animate-spin" />
+                        <span className="font-mono text-[10px] uppercase tracking-widest">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : users.length === 0 && agents.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest">
+                      NO_RECORDS_FOUND
+                    </td>
+                  </tr>
+                ) : (
+                  <>
+                    {users.map((u) => (
+                      <tr key={`user-${u.id}`} className="hover:bg-corthex-surface/50 transition-colors">
+                        <td className="px-6 py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{u.name}</td>
+                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono">USER</td>
+                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono uppercase">{u.role}</td>
+                        <td className="px-6 py-4 text-right">
+                          {u.isActive ? (
+                            <span className="px-2 py-0.5 bg-corthex-accent/20 text-corthex-accent text-[10px] font-mono border border-corthex-accent/30">
+                              ACTIVE
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-corthex-error/20 text-corthex-error text-[10px] font-mono border border-corthex-error/30">
+                              INACTIVE
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {agents.map((a) => (
+                      <tr key={`agent-${a.id}`} className="hover:bg-corthex-surface/50 transition-colors">
+                        <td className="px-6 py-4 font-bold text-sm text-corthex-text-primary uppercase tracking-tight">{a.name}</td>
+                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono">AGENT</td>
+                        <td className="px-6 py-4 text-xs text-corthex-text-secondary font-mono uppercase">{a.role}</td>
+                        <td className="px-6 py-4 text-right">
+                          {a.status === 'online' ? (
+                            <span className="px-2 py-0.5 bg-corthex-accent/20 text-corthex-accent text-[10px] font-mono border border-corthex-accent/30">
+                              ONLINE
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-corthex-elevated text-corthex-text-secondary text-[10px] font-mono border border-corthex-border">
+                              {a.status.toUpperCase()}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-4 bg-corthex-surface border-t border-corthex-border flex justify-center">
+            <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-all">
+              VIEW_ALL_RECORDS
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section: Dept Overview + Agent Efficiency */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Department Overview */}
+        <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col h-[300px]">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Department Overview</h3>
+          </div>
+          <div className="flex-1 space-y-2 overflow-auto">
+            {depts.length === 0 ? (
+              <p className="font-mono text-[10px] text-corthex-text-disabled uppercase tracking-widest text-center mt-8">
+                NO_DEPARTMENTS_FOUND
+              </p>
+            ) : (
+              depts.map((d, i) => (
+                <div key={d.id} className="flex items-center justify-between p-3 bg-corthex-bg border border-corthex-border">
+                  <span className="font-mono text-xs text-corthex-text-primary uppercase tracking-tight">{d.name}</span>
+                  <span className="font-mono text-[10px] text-corthex-accent">DEPT_{String(i + 1).padStart(2, '0')}</span>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="mt-4 flex items-center gap-4 border-t border-corthex-border pt-4">
+            <div className="w-12 h-12 bg-corthex-bg border border-corthex-border flex items-center justify-center text-corthex-accent">
+              <Building2 size={24} />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono text-corthex-text-secondary">TOTAL_DEPTS</p>
+              <p className="font-bold text-corthex-text-primary tracking-tight">{depts.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Agent Efficiency Readout */}
+        <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col">
+          <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent mb-6">Agent Efficiency Readout</h3>
+          <div className="flex-1 space-y-6">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center border-4 border-corthex-elevated">
+                <span className="font-mono text-xl font-bold text-corthex-text-primary">{efficiency}%</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-corthex-text-primary mb-1 uppercase tracking-tight">Processing Efficiency</p>
+                <p className="text-[11px] text-corthex-text-secondary mb-4">
+                  {onlineAgents} of {agents.length} agents currently online.
+                </p>
+                <div className="flex gap-4">
+                  <div>
+                    <p className="text-[9px] font-mono text-corthex-text-disabled uppercase">Online</p>
+                    <p className="text-sm font-mono text-corthex-text-primary">{onlineAgents}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-mono text-corthex-text-disabled uppercase">Total</p>
+                    <p className="text-sm font-mono text-corthex-text-primary">{agents.length}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {agents.slice(0, 2).map((a) => (
+              <div key={a.id} className="p-4 bg-corthex-bg border border-corthex-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-corthex-text-secondary uppercase tracking-wide">
+                    {a.name.toUpperCase()}_HEALTH
+                  </span>
+                  <span className={`text-[10px] font-mono ${a.status === 'online' ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`}>
+                    {a.status.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-2 flex-1 ${a.status === 'online' ? 'bg-corthex-accent' : 'bg-corthex-text-disabled'} ${i >= (a.status === 'online' ? 5 : 2) ? 'opacity-30' : ''}`}
+                    />
                   ))}
-                  {agents.map((a) => (
-                    <tr key={`agent-${a.id}`} className="hover:bg-corthex-bg transition-colors">
-                      <td className="px-6 py-4">
-                        <span className={`flex items-center gap-1.5 font-bold text-xs uppercase ${a.status === 'online' ? '' : 'text-amber-500'}`} style={a.status === 'online' ? { color: olive } : {}}>
-                          <span className={`w-2 h-2 rounded-full ${a.status === 'online' ? '' : 'bg-amber-500'}`} style={a.status === 'online' ? { backgroundColor: olive } : {}} />
-                          {a.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm font-bold" style={{ color: warmBrown }}>{a.name}</p>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>Agent</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: warmBrown }}>{a.role}</td>
-                    </tr>
-                  ))}
-                </>
-              )}
-            </tbody>
-          </table>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function StatCard({ icon, label, value, sub, badge, isLoading, accent }: {
+function StatCard({ icon, label, value, change, isLoading }: {
   icon: React.ReactNode
   label: string
   value: number
-  sub: string
-  badge?: string
+  change: string
   isLoading: boolean
-  accent?: boolean
 }) {
   return (
-    <div
-      className="bg-corthex-surface p-6 rounded-xl border shadow-sm"
-      style={{ borderColor: sand, ...(accent ? { borderLeftWidth: '4px', borderLeftColor: olive } : {}) }}
-    >
-      <div className="flex justify-between items-start mb-4">
-        <p className="text-sm font-medium text-corthex-text-secondary">{label}</p>
-        {badge ? (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold" style={{ backgroundColor: oliveBg, color: olive }}>{badge}</span>
-        ) : icon}
+    <div className="bg-corthex-surface p-6 relative overflow-hidden border border-corthex-border">
+      <div className="absolute top-0 right-0 p-2">{icon}</div>
+      <p className="font-mono uppercase tracking-widest text-[10px] text-corthex-text-secondary mb-2">{label}</p>
+      <div className="flex items-baseline gap-2">
+        {isLoading ? (
+          <div className="h-10 w-20 bg-corthex-elevated animate-pulse" />
+        ) : (
+          <h2 className="text-4xl font-black text-corthex-text-primary tracking-tighter">{value}</h2>
+        )}
+        <span className="text-corthex-accent font-mono text-xs">{change}</span>
       </div>
-      {isLoading ? (
-        <div className="h-9 w-16 bg-corthex-elevated rounded animate-pulse" />
-      ) : (
-        <h3 className="text-3xl font-bold tracking-tight" style={{ color: warmBrown }}>{value}</h3>
-      )}
-      <p className="text-[10px] text-corthex-text-disabled mt-2">{sub}</p>
+      <div className="mt-4 h-[2px] w-full bg-corthex-elevated">
+        <div className="h-full bg-corthex-accent" style={{ width: `${Math.min(value * 5, 100)}%` }} />
+      </div>
     </div>
   )
 }

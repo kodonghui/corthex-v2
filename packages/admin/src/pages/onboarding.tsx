@@ -1,5 +1,5 @@
 /**
- * Onboarding Wizard Page — Natural Organic Theme
+ * Onboarding Wizard Page — Industrial Dark Theme
  *
  * API Endpoints:
  *   GET   /api/admin/companies/:id
@@ -18,15 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
-
-// -- Natural Organic color tokens --
-const OC = {
-  olive: '#556B2F',
-  oliveDark: '#3E4E22',
-  leaf: '#A3B18A',
-  cream: '#F9F7F2',
-  sand: '#E9E5D6',
-}
+import { ChevronLeft, ChevronRight, Check, Building2, Plus, Key, Users, ArrowRight } from 'lucide-react'
 
 // ============================================================
 // Types
@@ -119,53 +111,64 @@ const PROVIDER_LABELS: Record<string, string> = {
 }
 
 // ============================================================
-// Step Indicator (Organic stepper matching Stitch HTML)
+// Segmented Progress Bar (Industrial)
 // ============================================================
 
-function StepIndicator({ current, completed }: { current: number; completed: Set<number> }) {
+const TOTAL_SEGMENTS = 20
+
+function StepIndicator({ current }: { current: number }) {
+  const activeSegments = Math.round((current / STEPS.length) * TOTAL_SEGMENTS)
   return (
-    <nav className="mb-12">
-      <ul className="flex items-center justify-between w-full relative">
-        {/* Connecting Line */}
-        <div className="absolute top-1/2 left-0 w-full h-0.5 -translate-y-1/2 z-0" style={{ backgroundColor: OC.sand }}></div>
-        {STEPS.map((step) => {
-          const isActive = step.num === current
-          const isDone = completed.has(step.num)
-          return (
-            <li key={step.num} className="relative z-10 flex flex-col items-center group">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center border-4 mb-2"
-                style={{
-                  borderColor: OC.cream,
-                  backgroundColor: isDone || isActive ? OC.olive : 'var(--color-corthex-surface)',
-                  color: isDone || isActive ? 'var(--color-corthex-surface)' : '#94a3b8',
-                  ...(isActive ? { boxShadow: `0 0 0 4px rgba(85,107,47,0.2)` } : {}),
-                  ...(!(isDone || isActive) ? { border: `2px solid ${OC.sand}` } : {}),
-                }}
-              >
-                {isDone ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                  </svg>
-                ) : (
-                  <span className="font-bold">{step.num}</span>
-                )}
-              </div>
-              <span
-                className="text-xs font-medium uppercase tracking-wider"
-                style={{
-                  color: isActive ? OC.olive : '#94a3b8',
-                  fontWeight: isActive ? 700 : 500,
-                  ...(isActive ? { textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '4px' } : {}),
-                }}
-              >
-                {step.label}
-              </span>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+    <div className="w-full mb-12">
+      <div className="flex justify-between items-end mb-3">
+        <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">
+          System Initialization
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-secondary">
+          Step {String(current).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')}
+        </div>
+      </div>
+      <div className="flex gap-1 h-2 w-full">
+        {Array.from({ length: TOTAL_SEGMENTS }).map((_, i) => (
+          <div
+            key={i}
+            className={`flex-1 transition-colors duration-200 ${
+              i < activeSegments ? 'bg-corthex-accent' : 'bg-corthex-elevated'
+            }`}
+          />
+        ))}
+      </div>
+      <div className="flex justify-between mt-3">
+        {STEPS.map((step) => (
+          <div
+            key={step.num}
+            className={`font-mono text-[9px] uppercase tracking-widest transition-colors ${
+              step.num === current
+                ? 'text-corthex-accent'
+                : step.num < current
+                ? 'text-corthex-text-secondary'
+                : 'text-corthex-text-disabled'
+            }`}
+          >
+            {step.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// Card Wrapper (industrial border-l-4 style)
+// ============================================================
+
+function StepCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-full bg-corthex-surface border-l-4 border-corthex-accent relative">
+      {/* Decorative corner bracket */}
+      <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-corthex-border opacity-30 pointer-events-none" />
+      {children}
+    </div>
   )
 }
 
@@ -191,25 +194,23 @@ function FooterNav({
   showSkip?: boolean
 }) {
   return (
-    <div className="p-8 flex justify-between items-center border-t" style={{ backgroundColor: 'rgba(249,247,242,0.5)', borderColor: OC.sand }}>
+    <div className="px-8 py-6 flex justify-between items-center border-t border-corthex-border/40">
       <div>
         {step > 1 && (
           <button
             onClick={onPrev}
-            className="px-6 py-2 text-corthex-text-secondary font-medium hover:text-corthex-text-primary transition-colors flex items-center"
+            className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.15em] text-corthex-text-secondary hover:text-corthex-text-primary transition-colors"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
             Previous
           </button>
         )}
       </div>
-      <div className="flex space-x-4">
+      <div className="flex items-center gap-4">
         {showSkip && onSkip && (
           <button
             onClick={onSkip}
-            className="px-6 py-2 text-corthex-text-disabled font-medium hover:text-corthex-text-secondary"
+            className="font-mono text-xs uppercase tracking-[0.15em] text-corthex-text-disabled hover:text-corthex-text-secondary transition-colors"
           >
             Skip for now
           </button>
@@ -217,15 +218,10 @@ function FooterNav({
         <button
           onClick={onNext}
           disabled={nextDisabled}
-          className="px-10 py-3 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: OC.olive,
-            boxShadow: `0 10px 15px -3px rgba(85,107,47,0.2)`,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = OC.oliveDark)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = OC.olive)}
+          className="flex items-center gap-3 bg-corthex-elevated hover:bg-corthex-accent text-corthex-text-primary hover:text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-8 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed border border-corthex-border hover:border-corthex-accent"
         >
-          {nextLabel || 'Continue to Agents'}
+          {nextLabel || 'Continue'}
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -260,65 +256,73 @@ function WelcomeStep({
   })
 
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-      <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <div className="text-center space-y-3 mb-6">
-          <div className="w-16 h-16 mx-auto rounded-2xl text-white flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: OC.olive }}>
-            C
-          </div>
-          <h1 className="text-2xl font-semibold text-corthex-text-primary">CORTHEX에 오신 것을 환영합니다!</h1>
-          <p className="text-corthex-text-secondary max-w-md mx-auto">
-            AI 조직을 구성하고 운영하기 위한 관리자 콘솔입니다.
-            몇 가지 기본 설정을 완료하면 바로 시작할 수 있습니다.
-          </p>
-        </div>
+    <StepCard>
+      <div className="p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+          Create Company Entity
+        </h1>
+        <p className="text-corthex-text-secondary text-sm max-w-md">
+          Provision a new industrial workspace on the CORTHEX backbone. Define your corporate parameters below.
+        </p>
+      </div>
 
-        <div className="rounded-xl p-5 max-w-md mx-auto" style={{ backgroundColor: `${OC.cream}80` }}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-corthex-text-primary">회사 정보</h3>
-            {!editing && (
-              <button onClick={() => setEditing(true)} className="text-xs" style={{ color: OC.olive }}>
-                수정
-              </button>
-            )}
-          </div>
-
+      <div className="p-10 space-y-8">
+        {/* Company Name */}
+        <div className="space-y-2">
+          <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">
+            Company Name
+          </label>
           {editing ? (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-corthex-text-secondary mb-1">회사명</label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
-                  style={{ borderColor: OC.sand }}
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button onClick={() => { setEditing(false); setName(company.name) }} className="px-3 py-1.5 text-xs text-corthex-text-secondary">
-                  취소
+            <div className="space-y-4">
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono tracking-tight py-3 px-0 placeholder:text-corthex-text-disabled transition-colors duration-150 text-lg"
+                autoFocus
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setEditing(false); setName(company.name) }}
+                  className="font-mono text-xs uppercase tracking-[0.15em] text-corthex-text-secondary hover:text-corthex-text-primary transition-colors"
+                >
+                  Cancel
                 </button>
                 <button
                   onClick={() => saveMutation.mutate(name)}
                   disabled={saveMutation.isPending || !name.trim()}
-                  className="px-3 py-1.5 text-white text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
-                  style={{ backgroundColor: OC.olive }}
+                  className="font-mono text-xs uppercase tracking-[0.15em] text-corthex-text-on-accent bg-corthex-accent px-4 py-2 disabled:opacity-50 transition-colors"
                 >
-                  {saveMutation.isPending ? '저장 중...' : '저장'}
+                  {saveMutation.isPending ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>
           ) : (
-            <div>
-              <p className="text-lg font-semibold text-corthex-text-primary">{company.name}</p>
-              <p className="text-xs text-corthex-text-disabled mt-1">slug: {company.slug}</p>
+            <div className="flex items-center justify-between border-b border-corthex-border py-3">
+              <span className="font-mono text-xl text-corthex-text-primary tracking-tight">{company.name}</span>
+              <button
+                onClick={() => setEditing(true)}
+                className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent hover:text-corthex-accent-hover transition-colors"
+              >
+                Edit
+              </button>
             </div>
           )}
+          <p className="font-mono text-[9px] text-corthex-text-disabled uppercase tracking-widest">
+            slug: {company.slug}
+          </p>
+        </div>
+
+        {/* Welcome message */}
+        <div className="bg-corthex-elevated border-l-2 border-corthex-accent px-5 py-4">
+          <p className="font-mono text-xs uppercase tracking-[0.15em] text-corthex-accent mb-1">System Ready</p>
+          <p className="text-corthex-text-secondary text-sm">
+            AI 조직을 구성하고 운영하기 위한 관리자 콘솔입니다. 몇 가지 기본 설정을 완료하면 바로 시작할 수 있습니다.
+          </p>
         </div>
       </div>
 
-      <FooterNav step={1} onPrev={() => {}} onNext={() => onNext(name)} nextLabel="Continue" />
-    </section>
+      <FooterNav step={1} onPrev={() => {}} onNext={() => onNext(name)} nextLabel="Next: Departments" />
+    </StepCard>
   )
 }
 
@@ -366,72 +370,72 @@ function TemplateStep({
   // Show apply result
   if (applyResult) {
     return (
-      <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-        <div className="p-8">
-          <div className="text-center space-y-2 mb-6">
-            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(85,107,47,0.1)' }}>
-              <svg className="w-6 h-6" style={{ color: OC.olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+      <StepCard>
+        <div className="p-10">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-8 h-8 bg-corthex-accent/20 flex items-center justify-center">
+              <Check className="w-5 h-5 text-corthex-accent" />
             </div>
-            <h3 className="text-lg font-semibold text-corthex-text-primary">
-              &quot;{applyResult.templateName}&quot; 적용 완료
-            </h3>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">Applied</p>
+              <h3 className="font-mono text-lg font-bold text-corthex-text-primary tracking-tighter">
+                &quot;{applyResult.templateName}&quot;
+              </h3>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
-            <div className="rounded-lg px-4 py-3 text-center" style={{ backgroundColor: 'rgba(85,107,47,0.1)' }}>
-              <p className="text-2xl font-bold" style={{ color: OC.olive }}>{applyResult.departmentsCreated}</p>
-              <p className="text-xs" style={{ color: OC.oliveDark }}>부서 생성</p>
+          <div className="grid grid-cols-2 gap-3 max-w-sm">
+            <div className="bg-corthex-elevated border border-corthex-border px-4 py-4">
+              <p className="font-mono text-2xl font-bold text-corthex-accent">{applyResult.departmentsCreated}</p>
+              <p className="font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mt-1">부서 생성</p>
             </div>
-            <div className="rounded-lg px-4 py-3 text-center" style={{ backgroundColor: 'rgba(163,177,138,0.2)' }}>
-              <p className="text-2xl font-bold" style={{ color: OC.oliveDark }}>{applyResult.agentsCreated}</p>
-              <p className="text-xs" style={{ color: OC.olive }}>에이전트 생성</p>
+            <div className="bg-corthex-elevated border border-corthex-border px-4 py-4">
+              <p className="font-mono text-2xl font-bold text-corthex-accent">{applyResult.agentsCreated}</p>
+              <p className="font-mono text-[10px] text-corthex-text-secondary uppercase tracking-widest mt-1">에이전트 생성</p>
             </div>
           </div>
         </div>
         <FooterNav step={2} onPrev={onPrev} onNext={() => onNext(applyResult)} nextLabel="Continue to Agents" />
-      </section>
+      </StepCard>
     )
   }
 
-  // Content card matching Stitch HTML structure
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-      <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-corthex-text-primary">Define Your Departments</h1>
-        <p className="mt-2 text-corthex-text-secondary">Configure the logical structures of your organization. This helps CORTHEX categorize data and agent permissions.</p>
+    <StepCard>
+      <div className="p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+          Define Your Departments
+        </h1>
+        <p className="text-corthex-text-secondary text-sm">
+          Configure the logical structures of your organization. This helps CORTHEX categorize data and agent permissions.
+        </p>
       </div>
-      <div className="p-8">
-        {/* Suggested Departments List */}
-        <div className="space-y-4 mb-10">
-          <h3 className="text-sm font-semibold text-corthex-text-disabled uppercase tracking-widest mb-4">Suggested Departments</h3>
+      <div className="p-10 space-y-6">
+        {/* Template list */}
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary mb-4">
+            Suggested Departments
+          </p>
 
           {isLoading ? (
-            <div className="text-center text-corthex-text-secondary py-8">로딩 중...</div>
+            <div className="text-center text-corthex-text-secondary py-8 font-mono text-sm">로딩 중...</div>
           ) : (
-            <>
+            <div className="space-y-2">
               {templates.map((t) => {
                 const depts = t.templateData?.departments || []
                 return depts.map((dept) => (
                   <div
                     key={`${t.id}-${dept.name}`}
-                    className="flex items-center justify-between p-4 rounded-xl border transition-all"
-                    style={{
-                      backgroundColor: `${OC.cream}80`,
-                      borderColor: OC.sand,
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = OC.leaf)}
-                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = OC.sand)}
+                    className="flex items-center justify-between p-4 border border-corthex-border hover:border-corthex-accent bg-corthex-elevated transition-colors duration-150"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-corthex-surface rounded-full flex items-center justify-center shadow-sm">
-                        <svg className="w-5 h-5" style={{ color: OC.olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                        </svg>
+                    <div className="flex items-center gap-4">
+                      <div className="w-9 h-9 bg-corthex-surface flex items-center justify-center border border-corthex-border">
+                        <Building2 className="w-4 h-4 text-corthex-accent" />
                       </div>
                       <div>
-                        <p className="font-medium text-corthex-text-primary">{dept.name}</p>
-                        <p className="text-xs text-corthex-text-secondary">{dept.agents.length} agents &middot; {dept.description || t.name}</p>
+                        <p className="font-mono text-sm font-bold text-corthex-text-primary">{dept.name}</p>
+                        <p className="font-mono text-[10px] text-corthex-text-secondary">
+                          {dept.agents.length} agents &middot; {dept.description || t.name}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -440,10 +444,9 @@ function TemplateStep({
                         applyMutation.mutate(t.id)
                       }}
                       disabled={applyMutation.isPending}
-                      className="px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors text-white disabled:opacity-50"
-                      style={{ backgroundColor: OC.olive }}
+                      className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-4 py-2 hover:bg-corthex-accent-hover disabled:opacity-50 transition-colors"
                     >
-                      {applyMutation.isPending ? '적용 중...' : 'Apply'}
+                      {applyMutation.isPending && selectedTemplate?.id === t.id ? '적용 중...' : 'Apply'}
                     </button>
                   </div>
                 ))
@@ -451,46 +454,39 @@ function TemplateStep({
 
               {/* Blank org option */}
               <div
-                className="flex items-center justify-between p-4 rounded-xl border-2 border-dashed transition-all cursor-pointer"
-                style={{ borderColor: OC.sand }}
+                className="flex items-center gap-4 p-4 border border-dashed border-corthex-border hover:border-corthex-accent transition-colors cursor-pointer"
                 onClick={() => onNext(null)}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = OC.leaf)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = OC.sand)}
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-corthex-surface rounded-full flex items-center justify-center shadow-sm">
-                    <svg className="w-5 h-5 text-corthex-text-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-medium text-corthex-text-primary">빈 조직으로 시작</p>
-                    <p className="text-xs text-corthex-text-secondary">템플릿 없이 부서와 에이전트를 직접 구성</p>
-                  </div>
+                <div className="w-9 h-9 bg-corthex-surface flex items-center justify-center border border-corthex-border">
+                  <Plus className="w-4 h-4 text-corthex-text-disabled" />
+                </div>
+                <div>
+                  <p className="font-mono text-sm font-bold text-corthex-text-primary">빈 조직으로 시작</p>
+                  <p className="font-mono text-[10px] text-corthex-text-secondary">
+                    템플릿 없이 부서와 에이전트를 직접 구성
+                  </p>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* Custom Department Add */}
-        <div className="mt-8 pt-8 border-t" style={{ borderColor: `${OC.sand}80` }}>
-          <label className="block text-sm font-semibold text-corthex-text-primary mb-3" htmlFor="custom-dept">Add Custom Department</label>
-          <div className="flex gap-4">
+        <div className="pt-6 border-t border-corthex-border/40">
+          <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block mb-3" htmlFor="custom-dept">
+            Add Custom Department
+          </label>
+          <div className="flex gap-2">
             <input
-              className="flex-grow rounded-lg bg-corthex-surface"
-              style={{ borderColor: OC.sand }}
               id="custom-dept"
-              placeholder="e.g. Research & Development"
               type="text"
               value={customDept}
               onChange={(e) => setCustomDept(e.target.value)}
+              className="flex-grow bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 placeholder:text-corthex-text-disabled transition-colors"
+              placeholder="e.g. Research & Development"
             />
             <button
-              className="px-6 py-2 font-semibold rounded-lg transition-colors"
-              style={{ backgroundColor: OC.sand, color: OC.olive }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${OC.leaf}4d`)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = OC.sand)}
+              className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-elevated hover:bg-corthex-accent text-corthex-text-secondary hover:text-corthex-text-on-accent px-5 py-3 border border-corthex-border hover:border-corthex-accent transition-all"
               onClick={() => {
                 if (customDept.trim()) {
                   addToast({ type: 'success', message: `${customDept} 부서가 추가되었습니다.` })
@@ -512,7 +508,7 @@ function TemplateStep({
         onSkip={() => onNext(null)}
         nextLabel="Continue to Agents"
       />
-    </section>
+    </StepCard>
   )
 }
 
@@ -572,14 +568,16 @@ function ApiKeyStep({
   }
 
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-      <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-corthex-text-primary">API Key Setup</h1>
-        <p className="mt-2 text-corthex-text-secondary">
+    <StepCard>
+      <div className="p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+          API Key Setup
+        </h1>
+        <p className="text-corthex-text-secondary text-sm">
           AI 에이전트가 사용할 외부 API 키를 등록합니다. 나중에 설정해도 됩니다.
         </p>
       </div>
-      <div className="p-8 space-y-4">
+      <div className="p-10 space-y-4">
         {ONBOARDING_PROVIDERS.map((provider) => {
           const schemaFields = providerSchemas[provider] || ['api_key']
           const alreadyExists = existingProviders.has(provider)
@@ -587,27 +585,33 @@ function ApiKeyStep({
           return (
             <div
               key={provider}
-              className="rounded-xl border p-4"
-              style={{ borderColor: OC.sand, backgroundColor: `${OC.cream}40` }}
+              className="border border-corthex-border bg-corthex-elevated p-5"
             >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-corthex-text-primary">
-                  {PROVIDER_LABELS[provider]}
-                </h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <Key className="w-4 h-4 text-corthex-accent" />
+                  <h3 className="font-mono text-sm font-bold text-corthex-text-primary uppercase tracking-wider">
+                    {PROVIDER_LABELS[provider]}
+                  </h3>
+                </div>
                 {alreadyExists && (
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(85,107,47,0.1)', color: OC.olive }}>
+                  <span className="font-mono text-[9px] uppercase tracking-widest bg-corthex-accent/10 text-corthex-accent px-2 py-1">
                     등록됨
                   </span>
                 )}
               </div>
 
               {alreadyExists ? (
-                <p className="text-xs text-corthex-text-secondary">이미 등록된 키가 있습니다. 설정 페이지에서 변경할 수 있습니다.</p>
+                <p className="font-mono text-xs text-corthex-text-secondary">
+                  이미 등록된 키가 있습니다. 설정 페이지에서 변경할 수 있습니다.
+                </p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {schemaFields.map((field) => (
-                    <div key={field}>
-                      <label className="block text-xs text-corthex-text-secondary mb-1">{field}</label>
+                    <div key={field} className="space-y-2">
+                      <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">
+                        {field}
+                      </label>
                       <input
                         type="password"
                         value={fields[provider]?.[field] || ''}
@@ -617,8 +621,7 @@ function ApiKeyStep({
                             [provider]: { ...f[provider], [field]: e.target.value },
                           }))
                         }
-                        className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary font-mono"
-                        style={{ borderColor: OC.sand }}
+                        className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 placeholder:text-corthex-text-disabled transition-colors"
                         placeholder={`${PROVIDER_LABELS[provider]} ${field}`}
                       />
                     </div>
@@ -626,8 +629,7 @@ function ApiKeyStep({
                   <button
                     onClick={() => handleSave(provider)}
                     disabled={saveMutation.isPending}
-                    className="px-3 py-1.5 text-white text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
-                    style={{ backgroundColor: OC.olive }}
+                    className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-5 py-2 disabled:opacity-50 hover:bg-corthex-accent-hover transition-colors"
                   >
                     {saveMutation.isPending ? '등록 중...' : '등록'}
                   </button>
@@ -646,7 +648,7 @@ function ApiKeyStep({
         onSkip={() => onNext(savedCount + existingProviders.size)}
         nextLabel={savedCount > 0 || existingProviders.size > 0 ? 'Continue' : 'Set up later'}
       />
-    </section>
+    </StepCard>
   )
 }
 
@@ -711,32 +713,37 @@ function InviteStep({
   }, [addToast])
 
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-      <div className="p-8 border-b" style={{ borderColor: `${OC.sand}80` }}>
-        <h1 className="text-2xl font-semibold text-corthex-text-primary">Invite Team Members</h1>
-        <p className="mt-2 text-corthex-text-secondary">
+    <StepCard>
+      <div className="p-10 border-b border-corthex-border/40">
+        <h1 className="font-mono text-3xl font-extrabold tracking-tighter uppercase text-corthex-text-primary mb-2">
+          Invite Team Members
+        </h1>
+        <p className="text-corthex-text-secondary text-sm">
           팀원을 초대해보세요. 나중에 직원 관리 페이지에서도 추가할 수 있습니다.
         </p>
       </div>
-      <div className="p-8 space-y-6">
+      <div className="p-10 space-y-6">
         {/* Invited list */}
         {invited.length > 0 && (
           <div className="space-y-2">
             {invited.map((emp, idx) => (
-              <div key={idx} className="flex items-center justify-between px-4 py-3 rounded-lg border" style={{ backgroundColor: 'rgba(85,107,47,0.05)', borderColor: OC.leaf }}>
+              <div
+                key={idx}
+                className="flex items-center justify-between px-4 py-3 bg-corthex-elevated border border-corthex-accent/30"
+              >
                 <div>
-                  <p className="text-sm font-medium text-corthex-text-primary">{emp.name}</p>
-                  <p className="text-xs text-corthex-text-secondary">{emp.email}</p>
+                  <p className="font-mono text-sm font-bold text-corthex-text-primary">{emp.name}</p>
+                  <p className="font-mono text-[10px] text-corthex-text-secondary">{emp.email}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <code className="text-xs bg-corthex-surface px-2 py-1 rounded border font-mono" style={{ borderColor: OC.sand }}>
+                <div className="flex items-center gap-3">
+                  <code className="font-mono text-xs bg-corthex-bg border border-corthex-border px-2 py-1 text-corthex-text-secondary">
                     {emp.initialPassword}
                   </code>
                   <button
                     onClick={() => copyPassword(emp.initialPassword, idx)}
-                    className="text-xs" style={{ color: OC.olive }}
+                    className="font-mono text-[10px] uppercase tracking-[0.15em] text-corthex-accent hover:text-corthex-accent-hover transition-colors"
                   >
-                    {copiedIdx === idx ? '복사됨!' : '복사'}
+                    {copiedIdx === idx ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -745,48 +752,48 @@ function InviteStep({
         )}
 
         {/* Invite form */}
-        <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: OC.sand }}>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-corthex-text-secondary mb-1">아이디</label>
+        <div className="border border-corthex-border bg-corthex-elevated p-6 space-y-5">
+          <div className="flex items-center gap-3 mb-2">
+            <Users className="w-4 h-4 text-corthex-accent" />
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">Add Member</p>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">아이디</label>
               <input
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
-                style={{ borderColor: OC.sand }}
+                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 placeholder:text-corthex-text-disabled transition-colors"
                 placeholder="user01"
               />
             </div>
-            <div>
-              <label className="block text-xs text-corthex-text-secondary mb-1">이름</label>
+            <div className="space-y-2">
+              <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">이름</label>
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
-                style={{ borderColor: OC.sand }}
+                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 placeholder:text-corthex-text-disabled transition-colors"
                 placeholder="홍길동"
               />
             </div>
           </div>
-          <div>
-            <label className="block text-xs text-corthex-text-secondary mb-1">이메일</label>
+          <div className="space-y-2">
+            <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">이메일</label>
             <input
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
-              style={{ borderColor: OC.sand }}
+              className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 placeholder:text-corthex-text-disabled transition-colors"
               placeholder="hong@company.com"
             />
           </div>
           {departments.length > 0 && (
-            <div>
-              <label className="block text-xs text-corthex-text-secondary mb-1">부서 (선택)</label>
+            <div className="space-y-2">
+              <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary block">부서 (선택)</label>
               <select
                 value={form.departmentIds[0] || ''}
                 onChange={(e) => setForm({ ...form, departmentIds: e.target.value ? [e.target.value] : [] })}
-                className="w-full px-3 py-2 border rounded-lg bg-corthex-surface text-sm text-corthex-text-primary"
-                style={{ borderColor: OC.sand }}
+                className="w-full bg-corthex-bg border-0 border-b-2 border-corthex-border focus:border-corthex-accent focus:ring-0 text-corthex-text-primary font-mono py-3 px-0 transition-colors"
               >
                 <option value="">부서 선택 (선택사항)</option>
                 {departments.map((d) => (
@@ -795,12 +802,11 @@ function InviteStep({
               </select>
             </div>
           )}
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <button
               onClick={handleInvite}
               disabled={inviteMutation.isPending}
-              className="px-4 py-2 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-              style={{ backgroundColor: OC.olive }}
+              className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-6 py-2.5 disabled:opacity-50 hover:bg-corthex-accent-hover transition-colors"
             >
               {inviteMutation.isPending ? '초대 중...' : '초대하기'}
             </button>
@@ -816,7 +822,7 @@ function InviteStep({
         onSkip={() => onNext([])}
         nextLabel={invited.length > 0 ? 'Continue' : 'Skip for now'}
       />
-    </section>
+    </StepCard>
   )
 }
 
@@ -874,48 +880,54 @@ function SummaryStep({
   ]
 
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border overflow-hidden" style={{ borderColor: OC.sand }}>
-      <div className="p-8">
-        <div className="text-center space-y-3 mb-8">
-          <div className="w-16 h-16 mx-auto rounded-2xl text-white flex items-center justify-center" style={{ backgroundColor: OC.olive }}>
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+    <StepCard>
+      <div className="p-10">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-10 h-10 bg-corthex-accent flex items-center justify-center">
+            <Check className="w-6 h-6 text-corthex-text-on-accent" />
           </div>
-          <h2 className="text-2xl font-bold text-corthex-text-primary">Setup Complete!</h2>
-          <p className="text-sm text-corthex-text-secondary">아래 설정이 완료되었습니다. 관리자 콘솔에서 조직을 관리하세요.</p>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-accent">Setup Complete</p>
+            <h2 className="font-mono text-2xl font-extrabold tracking-tighter uppercase text-corthex-text-primary">
+              CORTHEX 준비 완료
+            </h2>
+          </div>
         </div>
+        <p className="text-corthex-text-secondary text-sm mb-8">
+          아래 설정이 완료되었습니다. 관리자 콘솔에서 조직을 관리하세요.
+        </p>
 
-        <div className="max-w-md mx-auto space-y-3">
+        <div className="space-y-2 mb-10">
           {summaryItems.map((item) => (
-            <div key={item.label} className="flex items-center justify-between px-4 py-3 rounded-lg" style={{ backgroundColor: `${OC.cream}80` }}>
-              <span className="text-sm text-corthex-text-secondary">{item.label}</span>
-              <span className="text-sm font-medium text-corthex-text-primary">{item.value}</span>
+            <div
+              key={item.label}
+              className="flex items-center justify-between px-5 py-3 bg-corthex-elevated border border-corthex-border"
+            >
+              <span className="font-mono text-xs text-corthex-text-secondary uppercase tracking-widest">{item.label}</span>
+              <span className="font-mono text-sm font-bold text-corthex-text-primary">{item.value}</span>
             </div>
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-3 pt-8">
+        <div className="flex flex-col items-start gap-3">
           <button
             onClick={() => completeMutation.mutate()}
             disabled={completeMutation.isPending}
-            className="px-10 py-3 text-white text-sm font-bold rounded-xl transition-all transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 shadow-lg"
-            style={{
-              backgroundColor: OC.olive,
-              boxShadow: `0 10px 15px -3px rgba(85,107,47,0.2)`,
-            }}
+            className="flex items-center gap-3 bg-corthex-accent text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-[0.15em] py-4 px-10 hover:bg-corthex-accent-hover disabled:opacity-50 active:scale-95 transition-all duration-150"
           >
             {completeMutation.isPending ? '저장 중...' : 'CORTHEX 사용 시작하기'}
+            <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={onPrev}
-            className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary"
+            className="font-mono text-xs text-corthex-text-secondary hover:text-corthex-text-primary transition-colors flex items-center gap-1"
           >
-            &larr; 이전 단계로 돌아가기
+            <ChevronLeft className="w-3 h-3" />
+            이전 단계로 돌아가기
           </button>
         </div>
       </div>
-    </section>
+    </StepCard>
   )
 }
 
@@ -954,13 +966,12 @@ export function OnboardingWizardPage() {
 
   if (!selectedCompanyId) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="text-center space-y-3">
-          <p className="text-sm text-corthex-text-secondary">사이드바에서 회사를 선택해주세요.</p>
+      <div className="min-h-screen bg-corthex-bg flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="font-mono text-sm text-corthex-text-secondary">사이드바에서 회사를 선택해주세요.</p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 text-white text-sm rounded-lg transition-colors"
-            style={{ backgroundColor: OC.olive }}
+            className="font-mono text-xs uppercase tracking-[0.15em] bg-corthex-accent text-corthex-text-on-accent px-6 py-3 hover:bg-corthex-accent-hover transition-colors"
           >
             대시보드로 이동
           </button>
@@ -971,32 +982,36 @@ export function OnboardingWizardPage() {
 
   if (isLoading || !company) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="text-center text-corthex-text-secondary">로딩 중...</div>
+      <div className="min-h-screen bg-corthex-bg flex items-center justify-center">
+        <div className="font-mono text-sm text-corthex-text-secondary">로딩 중...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: OC.cream, fontFamily: "'Public Sans', sans-serif", color: '#1e293b' }}>
+    <div className="min-h-screen bg-corthex-bg" data-testid="onboarding-page">
+      {/* dot grid overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage: 'radial-gradient(#44403C 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+
       {/* Navigation Header */}
-      <header className="w-full py-6 px-8 border-b bg-corthex-surface/50 backdrop-blur-md sticky top-0 z-50" style={{ borderColor: OC.sand }}>
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: OC.olive }}>
-              <span className="text-white font-bold text-xl">C</span>
-            </div>
-            <span className="text-xl font-semibold tracking-tight" style={{ color: OC.olive }}>
-              CORTHEX <span className="text-corthex-text-disabled font-light">v2</span>
-            </span>
-          </div>
-          <div className="text-sm text-corthex-text-secondary italic">Admin Onboarding Experience</div>
+      <header className="relative z-10 w-full bg-corthex-surface border-b-2 border-corthex-accent flex justify-between items-center px-8 py-4">
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-xl font-black text-corthex-accent tracking-tighter">CORTHEX</span>
+        </div>
+        <div className="font-mono text-xs uppercase tracking-[0.2em] text-corthex-text-secondary">
+          Admin Onboarding
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12" data-testid="onboarding-page">
-        {/* Step Indicator */}
-        <StepIndicator current={currentStep} completed={completedSteps} />
+      <main className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-20">
+        {/* Industrial Progress Bar */}
+        <StepIndicator current={currentStep} />
 
         {/* Step content */}
         {currentStep === 1 && (
@@ -1058,10 +1073,22 @@ export function OnboardingWizardPage() {
           />
         )}
 
-        <p className="text-center mt-8 text-xs text-corthex-text-disabled">
-          Need help? Check our <span className="underline" style={{ color: OC.olive }}>Onboarding Documentation</span>
-        </p>
+        {/* Technical metadata footer */}
+        <div className="mt-12 flex justify-between items-center opacity-30">
+          <div className="flex items-center gap-3">
+            <div className="h-px w-10 bg-corthex-border" />
+            <span className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled">
+              Node: Admin-Primary-01
+            </span>
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled">
+            v2 // Industrial Authority Protocol
+          </span>
+        </div>
       </main>
     </div>
   )
 }
+
+// Suppress unused import warning for TIER_LABELS (used by future agent tier display)
+void TIER_LABELS

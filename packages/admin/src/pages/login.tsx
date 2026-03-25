@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { api } from '../lib/api'
+import { Shield, AtSign, Lock, LogIn } from 'lucide-react'
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
@@ -46,68 +47,108 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-corthex-bg dark:bg-zinc-950">
-      <div className="w-full max-w-sm">
-        <div className="bg-corthex-surface dark:bg-corthex-bg rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-corthex-accent-deep text-white text-lg font-bold mb-4">
-              C
+    <div className="min-h-screen flex flex-col bg-corthex-bg text-corthex-text-primary">
+      <main className="flex-grow flex items-center justify-center p-6">
+        <div className="relative w-full max-w-md">
+          {/* Decorative blur orbs */}
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-corthex-accent/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-corthex-info/5 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Login card */}
+          <div className="relative overflow-hidden rounded-xl p-8 md:p-10 bg-corthex-surface border border-corthex-border/20">
+            {/* Top accent line */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-corthex-accent to-transparent opacity-50" />
+
+            {/* Header */}
+            <div className="flex flex-col items-center mb-10">
+              <div
+                className="w-16 h-16 bg-corthex-accent flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(202,138,4,0.3)]"
+                style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}
+              >
+                <Shield className="w-8 h-8 text-corthex-text-on-accent" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-corthex-text-primary">CORTHEX ADMIN</h1>
+              <p className="text-corthex-text-secondary text-sm mt-1 font-mono tracking-widest uppercase">Central Command Access</p>
             </div>
-            <h1 className="text-xl font-bold text-corthex-text-primary dark:text-corthex-text-primary">CORTHEX ADMIN</h1>
-            <p className="mt-1 text-sm text-corthex-text-secondary dark:text-corthex-text-disabled">관리자 콘솔</p>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold uppercase tracking-widest text-corthex-accent font-mono">관리자 ID</label>
+                <div className="relative">
+                  <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-secondary" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
+                    placeholder="admin"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold uppercase tracking-widest text-corthex-accent font-mono">비밀번호</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-corthex-text-secondary" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black/30 border border-corthex-border/40 text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="px-3 py-2 rounded-lg bg-corthex-error/10 border border-corthex-error/30">
+                  <p className="text-sm text-corthex-error">{error}</p>
+                </div>
+              )}
+
+              {countdown > 0 && (
+                <div className="px-3 py-2 rounded-lg bg-corthex-warning/10 border border-corthex-warning/30">
+                  <p className="text-sm text-corthex-warning">잠시 후 다시 시도하세요 ({countdown}초 후 잠금 해제)</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || countdown > 0}
+                className="w-full bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent font-bold py-4 rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-sm disabled:opacity-50"
+              >
+                {loading ? '로그인 중...' : countdown > 0 ? `${countdown}초 후 재시도` : '세션 시작'}
+                {!loading && countdown <= 0 && <LogIn className="w-5 h-5" />}
+              </button>
+            </form>
+
+            {/* Status indicators */}
+            <div className="mt-8 flex justify-between items-center border-t border-corthex-border/30 pt-6">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-corthex-success animate-pulse" />
+                <span className="text-[10px] text-corthex-text-secondary font-mono uppercase tracking-widest">Mainframe Online</span>
+              </div>
+              <span className="text-[10px] text-corthex-text-secondary font-mono uppercase tracking-widest">v4.2.0-secure</span>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-corthex-text-primary dark:text-corthex-text-disabled mb-1.5">
-                아이디
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-corthex-surface dark:bg-corthex-surface text-corthex-text-primary dark:text-corthex-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-corthex-accent-deep focus:border-transparent transition"
-                placeholder="admin"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-corthex-text-primary dark:text-corthex-text-disabled mb-1.5">
-                비밀번호
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-corthex-surface dark:bg-corthex-surface text-corthex-text-primary dark:text-corthex-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-corthex-accent-deep focus:border-transparent transition"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
-
-            {countdown > 0 && (
-              <div className="px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  잠시 후 다시 시도하세요 ({countdown}초 후 잠금 해제)
-                </p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || countdown > 0}
-              className="w-full py-2.5 px-4 bg-corthex-accent-deep hover:bg-corthex-accent-deep disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
-            >
-              {loading ? '로그인 중...' : countdown > 0 ? `${countdown}초 후 재시도` : '로그인'}
-            </button>
-          </form>
+          {/* System message */}
+          <div className="mt-6 text-center">
+            <p className="text-[10px] text-corthex-text-disabled font-mono tracking-[0.2em] uppercase">Authorized Personnel Only. Unauthorized access is monitored and logged.</p>
+          </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="fixed bottom-0 w-full flex justify-center items-center gap-6 py-6">
+        <span className="text-corthex-text-disabled text-xs tracking-wide">© 2024 CORTHEX. All rights reserved.</span>
+        <div className="flex gap-4">
+          <a className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Privacy Policy</a>
+          <a className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Terms of Service</a>
+        </div>
+      </footer>
     </div>
   )
 }

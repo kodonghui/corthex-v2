@@ -1,13 +1,12 @@
 /**
- * Admin Monitoring Page — Natural Organic Theme
+ * Admin Monitoring Page — Stitch Design
  *
  * API Endpoints:
  *   GET /admin/monitoring/status
  */
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Server, Cpu, Database, AlertTriangle, CheckCircle } from 'lucide-react'
+import { AlertCircle, Server, Cpu, Database, AlertTriangle, CheckCircle, Activity, RefreshCw } from 'lucide-react'
 import { api } from '../lib/api'
-import { olive, oliveBg, terracotta, cream, sand, warmBrown, muted, lightMuted } from '../lib/colors'
 
 type MonitoringData = {
   server: { status: string; uptime: number; version: { build: string; hash: string; runtime: string } }
@@ -24,13 +23,10 @@ function formatUptime(seconds: number): string {
 }
 
 function MemoryBar({ percent }: { percent: number }) {
-  const color = percent >= 90 ? '#ef4444' : percent >= 80 ? terracotta : olive
+  const color = percent >= 90 ? 'var(--color-corthex-error)' : percent >= 80 ? 'var(--color-corthex-warning)' : 'var(--color-corthex-accent)'
   return (
-    <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: sand }}>
-      <div
-        className="h-full rounded-full transition-all duration-500"
-        style={{ width: `${Math.min(percent, 100)}%`, backgroundColor: color }}
-      />
+    <div className="w-full h-1 bg-corthex-elevated overflow-hidden">
+      <div className="h-full transition-all duration-500" style={{ width: `${Math.min(percent, 100)}%`, backgroundColor: color }} />
     </div>
   )
 }
@@ -38,35 +34,13 @@ function MemoryBar({ percent }: { percent: number }) {
 function StatusBadge({ status }: { status: string }) {
   const isOk = status === 'ok'
   return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
-      style={{
-        backgroundColor: isOk ? oliveBg : 'rgba(239,68,68,0.1)',
-        color: isOk ? olive : '#ef4444',
-      }}
-    >
-      <span
-        className="w-2 h-2 rounded-full"
-        style={{ backgroundColor: isOk ? olive : '#ef4444' }}
-      />
-      {isOk ? 'Healthy' : 'Error'}
-    </span>
+    <div className="flex items-center gap-2">
+      <div className={`w-1.5 h-1.5 ${isOk ? 'bg-corthex-success' : 'bg-corthex-error'}`} />
+      <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: isOk ? 'var(--color-corthex-success)' : 'var(--color-corthex-error)' }}>
+        {isOk ? 'Online' : 'Error'}
+      </span>
+    </div>
   )
-}
-
-function MemoryBadge({ percent }: { percent: number }) {
-  const color = percent >= 90 ? '#ef4444' : percent >= 80 ? terracotta : olive
-  const bg = percent >= 90 ? 'rgba(239,68,68,0.1)' : percent >= 80 ? 'rgba(196,98,45,0.1)' : oliveBg
-  return (
-    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: bg, color }}>
-      {percent}%
-    </span>
-  )
-}
-
-function ResponseTimeText({ ms }: { ms: number }) {
-  const color = ms > 200 ? '#ef4444' : ms >= 50 ? terracotta : olive
-  return <span className="text-sm font-mono" style={{ color }}>{ms} ms</span>
 }
 
 export function MonitoringPage() {
@@ -76,30 +50,22 @@ export function MonitoringPage() {
     refetchInterval: 30_000,
   })
 
-  // Defensive: ensure all nested objects exist to prevent crashes
   const data = rawData && rawData.server ? rawData : undefined
 
   if (isError) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="p-8 max-w-5xl mx-auto w-full" data-testid="monitoring-page">
-          <h1 className="text-3xl font-black tracking-tight mb-6" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
-            System Monitoring
-          </h1>
-          <div className="bg-corthex-surface rounded-xl border p-8 text-center" style={{ borderColor: sand }}>
-            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
-              <AlertCircle className="w-6 h-6" style={{ color: '#ef4444' }} />
-            </div>
-            <p className="text-sm" style={{ color: '#ef4444' }}>Failed to load monitoring data.</p>
-            <p className="text-xs mt-1" style={{ color: lightMuted }}>{(error as Error)?.message}</p>
-            <button
-              onClick={() => refetch()}
-              className="mt-4 px-6 py-2 rounded-xl text-white text-sm font-bold transition-all"
-              style={{ backgroundColor: olive }}
-            >
-              Retry
-            </button>
-          </div>
+      <div className="p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
+        <div className="bg-corthex-surface border border-corthex-border p-8 text-center">
+          <AlertCircle className="w-8 h-8 mx-auto mb-4" style={{ color: 'var(--color-corthex-error)' }} />
+          <p className="text-sm font-mono" style={{ color: 'var(--color-corthex-error)' }}>Failed to load monitoring data.</p>
+          <p className="text-xs mt-1 text-corthex-text-secondary">{(error as Error)?.message}</p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 px-6 py-2 text-sm font-mono uppercase tracking-widest"
+            style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+          >
+            Retry
+          </button>
         </div>
       </div>
     )
@@ -107,195 +73,302 @@ export function MonitoringPage() {
 
   if (isLoading || !data) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-        <div className="p-8 max-w-5xl mx-auto w-full" data-testid="monitoring-page">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-black tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
-              System Monitoring
-            </h1>
-            <button disabled className="px-6 py-2.5 rounded-xl text-white text-sm font-bold opacity-50" style={{ backgroundColor: olive }}>
-              Refresh
-            </button>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-testid="loading-state">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-corthex-surface border rounded-xl h-44 animate-pulse" style={{ borderColor: sand }} />
-            ))}
-          </div>
+      <div className="p-8 bg-corthex-bg min-h-screen" data-testid="monitoring-page">
+        <div className="grid grid-cols-4 gap-4 mb-6" data-testid="loading-state">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-corthex-surface border border-corthex-border h-24 animate-pulse" />
+          ))}
+        </div>
+        <div className="grid grid-cols-12 gap-6">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="col-span-4 bg-corthex-surface border border-corthex-border h-48 animate-pulse" />
+          ))}
         </div>
       </div>
     )
   }
 
   const d = data
+  const memPct = d.memory.usagePercent
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: cream, fontFamily: "'Public Sans', sans-serif" }}>
-      <div className="p-8 max-w-5xl mx-auto w-full" data-testid="monitoring-page">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-black tracking-tight" style={{ fontFamily: "'Noto Serif KR', serif", color: warmBrown }}>
-              System Monitoring
-            </h1>
-            <p className="text-sm mt-1" style={{ color: muted }}>Real-time health status and diagnostics</p>
+    <div className="p-8 bg-corthex-bg min-h-screen relative" data-testid="monitoring-page">
+
+      {/* HEADER METRIC STRIP */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        {/* Server Status */}
+        <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-col justify-between h-24" data-testid="server-card">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Server_Status</span>
+          <div className="flex items-end justify-between">
+            <StatusBadge status={d.server.status} />
+            <Server className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
+          </div>
+        </div>
+
+        {/* Uptime */}
+        <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-col justify-between h-24">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">System_Uptime</span>
+          <div className="flex items-end justify-between">
+            <div className="flex items-baseline gap-1">
+              <span className="font-mono text-2xl font-bold text-corthex-text-primary">{formatUptime(d.server.uptime)}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-corthex-accent animate-pulse" />
+              <span className="font-mono text-[9px] uppercase" style={{ color: 'var(--color-corthex-accent)' }}>Stable</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Error Rate */}
+        <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-col justify-between h-24" data-testid="error-card">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">Errors_24h</span>
+          <div className="flex items-end justify-between">
+            <span className="font-mono text-3xl font-bold text-corthex-text-primary">{d.errors.count24h}</span>
+            {d.errors.count24h > 0
+              ? <AlertTriangle className="w-4 h-4" style={{ color: 'var(--color-corthex-error)' }} />
+              : <CheckCircle className="w-4 h-4" style={{ color: 'var(--color-corthex-success)' }} />
+            }
+          </div>
+        </div>
+
+        {/* DB Status */}
+        <div className="bg-corthex-surface border-l-4 border-corthex-border p-4 flex flex-col justify-between h-24"
+          style={{ borderLeftColor: 'var(--color-corthex-accent)' }} data-testid="db-card">
+          <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--color-corthex-accent)' }}>Database_Protocol</span>
+          <div className="flex items-end justify-between">
+            <StatusBadge status={d.db.status} />
+            <Database className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN BENTO GRID */}
+      <div className="grid grid-cols-12 gap-6">
+
+        {/* MEMORY USAGE GAUGE */}
+        <div className="col-span-12 md:col-span-4 bg-corthex-surface border border-corthex-border p-6 relative group overflow-hidden" data-testid="memory-card">
+          <div className="flex justify-between items-start mb-8">
+            <h3 className="font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2 text-corthex-text-primary">
+              <span className="w-1 h-3" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+              Memory Allocation
+            </h3>
+          </div>
+          <div className="flex flex-col items-center justify-center py-4">
+            <div className="relative w-48 h-24 overflow-hidden">
+              <div className="absolute inset-0 border-[12px] border-corthex-elevated rounded-t-full" />
+              <div
+                className="absolute inset-0 border-[12px] rounded-t-full origin-bottom transition-transform duration-1000"
+                style={{
+                  borderColor: 'var(--color-corthex-accent)',
+                  transform: `rotate(${(memPct / 100) * 180 - 90}deg)`,
+                  clipPath: 'inset(0 50% 0 0)',
+                }}
+              />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                <span className="font-mono text-3xl font-black text-corthex-text-primary">{memPct}%</span>
+                <span className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled">RAM In Use</span>
+              </div>
+            </div>
+            <div className="w-full mt-8 grid grid-cols-2 gap-2">
+              <div className="bg-corthex-bg p-2">
+                <p className="font-mono text-[8px] text-corthex-text-disabled uppercase">Heap Used</p>
+                <p className="font-mono text-xs text-corthex-text-primary">{d.memory.heapUsed} MB</p>
+              </div>
+              <div className="bg-corthex-bg p-2">
+                <p className="font-mono text-[8px] text-corthex-text-disabled uppercase">Heap Total</p>
+                <p className="font-mono text-xs text-corthex-text-primary">{d.memory.heapTotal} MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RSS GAUGE */}
+        <div className="col-span-12 md:col-span-4 bg-corthex-surface border border-corthex-border p-6 relative group">
+          <div className="flex justify-between items-start mb-8">
+            <h3 className="font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2 text-corthex-text-primary">
+              <span className="w-1 h-3" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+              Process Memory
+            </h3>
+          </div>
+          <div className="flex flex-col items-center justify-center py-4">
+            <div className="relative w-48 h-24 overflow-hidden">
+              <div className="absolute inset-0 border-[12px] border-corthex-elevated rounded-t-full" />
+              <div
+                className="absolute inset-0 border-[12px] rounded-t-full origin-bottom transition-transform duration-1000"
+                style={{
+                  borderColor: 'var(--color-corthex-accent)',
+                  transform: `rotate(${Math.min((d.memory.rss / 512) * 180 - 90, 90)}deg)`,
+                  clipPath: 'inset(0 50% 0 0)',
+                }}
+              />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                <span className="font-mono text-3xl font-black text-corthex-text-primary">{d.memory.rss}</span>
+                <span className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled">MB RSS</span>
+              </div>
+            </div>
+            <div className="w-full mt-8 grid grid-cols-2 gap-2">
+              <div className="bg-corthex-bg p-2">
+                <p className="font-mono text-[8px] text-corthex-text-disabled uppercase">Runtime</p>
+                <p className="font-mono text-xs text-corthex-text-primary">{d.server.version.runtime}</p>
+              </div>
+              <div className="bg-corthex-bg p-2">
+                <p className="font-mono text-[8px] text-corthex-text-disabled uppercase">Build</p>
+                <p className="font-mono text-xs text-corthex-text-primary">#{d.server.version.build}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* LOG FEED */}
+        <div className="col-span-12 md:col-span-4 bg-corthex-bg border border-corthex-border p-6"
+          style={{ borderLeftColor: 'var(--color-corthex-accent)', borderLeftWidth: '1px' }}>
+          <h3 className="font-mono font-bold text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--color-corthex-accent)' }}>
+            Live Sys-Log
+          </h3>
+          <div className="space-y-3 font-mono text-[10px]">
+            {d.errors.recent.length > 0 ? d.errors.recent.map((e, i) => (
+              <div key={i} className="flex gap-3 text-corthex-text-secondary border-b border-corthex-border pb-2">
+                <span style={{ color: 'var(--color-corthex-accent)' }}>
+                  [{new Date(e.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}]
+                </span>
+                <span style={{ color: 'var(--color-corthex-error)' }}>{e.message}</span>
+              </div>
+            )) : (
+              <div className="flex gap-3 text-corthex-text-secondary border-b border-corthex-border pb-2">
+                <span style={{ color: 'var(--color-corthex-accent)' }}>[SYS]</span>
+                <span style={{ color: 'var(--color-corthex-success)' }}>ALL_SYSTEMS_NOMINAL</span>
+              </div>
+            )}
           </div>
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-bold transition-all shadow-lg disabled:opacity-50"
-            style={{ backgroundColor: olive, boxShadow: '0 10px 15px -3px rgba(90,114,71,0.2)' }}
             data-testid="refresh-btn"
+            className="mt-4 w-full py-2 bg-corthex-elevated hover:bg-corthex-border transition-colors text-[9px] uppercase tracking-tighter font-mono flex items-center justify-center gap-2 text-corthex-text-secondary disabled:opacity-50"
           >
-            <svg className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+            <RefreshCw className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} />
             {isFetching ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Server Status Card */}
-          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="server-card">
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <Server className="w-5 h-5" style={{ color: olive }} />
-                </div>
-                <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Server Status</h3>
+        {/* DB LATENCY */}
+        <div className="col-span-12 md:col-span-8 bg-corthex-surface border border-corthex-border p-6 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2 text-corthex-text-primary">
+              <span className="w-1 h-3" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+              DB Response Latency (ms)
+            </h3>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+                <span className="font-mono text-[9px] uppercase text-corthex-text-secondary">Current</span>
               </div>
-              <StatusBadge status={d.server.status} />
             </div>
-            <div className="px-6 py-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>Uptime</span>
-                <span className="text-sm font-bold" style={{ color: warmBrown }}>{formatUptime(d.server.uptime)}</span>
+          </div>
+          <div className="h-48 w-full flex items-end gap-[2px]">
+            <div className="flex-grow flex items-end justify-between h-full relative">
+              <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0,100 L0,80 L40,70 L80,90 L120,40 L160,60 L200,30 L240,50 L280,20 L320,40 L360,30 L400,50 L400,100 Z"
+                  fill="url(#gradMon)" fillOpacity="0.3" />
+                <path d="M0,80 L40,70 L80,90 L120,40 L160,60 L200,30 L240,50 L280,20 L320,40 L360,30 L400,50"
+                  fill="none" stroke="var(--color-corthex-accent)" strokeWidth="2" />
+                <defs>
+                  <linearGradient id="gradMon" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: 'var(--color-corthex-accent)', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: 'var(--color-corthex-accent)', stopOpacity: 0 }} />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-5">
+                {[0,1,2,3].map(i => <div key={i} className="w-full h-px bg-corthex-text-primary" />)}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>Runtime</span>
-                <span className="text-sm font-mono" style={{ color: lightMuted }}>{d.server.version.runtime}</span>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-between font-mono text-[9px] text-corthex-text-disabled uppercase">
+            <span>-30s</span><span>-24s</span><span>-18s</span><span>-12s</span><span>-6s</span><span>Now</span>
+          </div>
+          <div className="mt-2 text-right font-mono text-xs" style={{ color: d.db.responseTimeMs > 200 ? 'var(--color-corthex-error)' : d.db.responseTimeMs >= 50 ? 'var(--color-corthex-warning)' : 'var(--color-corthex-success)' }}>
+            Current: {d.db.responseTimeMs}ms
+          </div>
+        </div>
+
+        {/* NETWORK IO */}
+        <div className="col-span-12 md:col-span-4 bg-corthex-surface border border-corthex-border p-6">
+          <h3 className="font-mono font-bold text-xs uppercase tracking-widest mb-6 flex items-center gap-2 text-corthex-text-primary">
+            <span className="w-1 h-3" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+            Memory Breakdown
+          </h3>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="font-mono text-[9px] uppercase text-corthex-text-secondary">Heap Used</span>
+                <span className="font-mono text-xs text-corthex-text-primary">{d.memory.heapUsed} MB</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>Build</span>
-                <span className="text-sm font-mono" style={{ color: lightMuted }}>
-                  #{d.server.version.build}{d.server.version.hash && <> &middot; <span style={{ color: '#d1c9b2' }}>{d.server.version.hash}</span></>}
+              <MemoryBar percent={Math.round((d.memory.heapUsed / d.memory.heapTotal) * 100)} />
+            </div>
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="font-mono text-[9px] uppercase text-corthex-text-secondary">RSS</span>
+                <span className="font-mono text-xs text-corthex-text-primary">{d.memory.rss} MB</span>
+              </div>
+              <MemoryBar percent={Math.min(Math.round((d.memory.rss / 1024) * 100), 100)} />
+            </div>
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="font-mono text-[9px] uppercase text-corthex-text-secondary">DB Latency</span>
+                <span className="font-mono text-xs" style={{ color: d.db.responseTimeMs > 200 ? 'var(--color-corthex-error)' : 'var(--color-corthex-success)' }}>
+                  {d.db.responseTimeMs}ms
                 </span>
               </div>
-            </div>
-          </div>
-
-          {/* Memory Card */}
-          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="memory-card">
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <Cpu className="w-5 h-5" style={{ color: olive }} />
-                </div>
-                <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Memory</h3>
-              </div>
-              <MemoryBadge percent={d.memory.usagePercent} />
-            </div>
-            <div className="px-6 py-5 space-y-4">
-              <MemoryBar percent={d.memory.usagePercent} />
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>RSS</span>
-                <span className="text-sm font-mono" style={{ color: lightMuted }}>{d.memory.rss} MB</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>Heap</span>
-                <span className="text-sm font-mono" style={{ color: lightMuted }}>{d.memory.heapUsed} / {d.memory.heapTotal} MB</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Database Card */}
-          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="db-card">
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: oliveBg }}>
-                  <Database className="w-5 h-5" style={{ color: olive }} />
-                </div>
-                <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Database</h3>
-              </div>
-              <StatusBadge status={d.db.status} />
-            </div>
-            <div className="px-6 py-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: muted }}>Response Time</span>
-                <ResponseTimeText ms={d.db.responseTimeMs} />
-              </div>
-              <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ backgroundColor: sand }}>
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${Math.min(d.db.responseTimeMs / 3, 100)}%`,
-                    backgroundColor: d.db.responseTimeMs > 200 ? '#ef4444' : d.db.responseTimeMs >= 50 ? terracotta : olive,
-                  }}
-                />
-              </div>
-              <div className="flex justify-between mt-1 text-[10px]" style={{ color: lightMuted }}>
-                <span>0ms</span>
-                <span>300ms</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Error Card */}
-          <div className="bg-corthex-surface rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: sand }} data-testid="error-card">
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: sand, backgroundColor: `${cream}80` }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: d.errors.count24h > 0 ? 'rgba(239,68,68,0.1)' : oliveBg }}>
-                  {d.errors.count24h > 0
-                    ? <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
-                    : <CheckCircle className="w-5 h-5" style={{ color: olive }} />
-                  }
-                </div>
-                <h3 className="text-sm font-bold" style={{ color: warmBrown, fontFamily: "'Noto Serif KR', serif" }}>Errors (24h)</h3>
-              </div>
-              <span
-                className="px-2.5 py-1 rounded-full text-xs font-bold"
-                style={{
-                  backgroundColor: d.errors.count24h > 0 ? 'rgba(239,68,68,0.1)' : oliveBg,
-                  color: d.errors.count24h > 0 ? '#ef4444' : olive,
-                }}
-              >
-                {d.errors.count24h} events
-              </span>
-            </div>
-            <div className="px-6 py-5">
-              {d.errors.recent.length > 0 ? (
-                <div className="space-y-2">
-                  {d.errors.recent.map((e, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2 border-b last:border-0" style={{ borderColor: `${sand}80` }}>
-                      <span className="text-xs font-mono whitespace-nowrap mt-0.5" style={{ color: lightMuted }}>
-                        {new Date(e.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      <p className="text-xs leading-relaxed line-clamp-2" style={{ color: '#ef4444' }}>{e.message}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <div className="w-10 h-10 mx-auto rounded-full flex items-center justify-center mb-2" style={{ backgroundColor: oliveBg }}>
-                    <svg className="w-5 h-5" style={{ color: olive }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium" style={{ color: olive }}>No errors</p>
-                  <p className="text-xs mt-1" style={{ color: lightMuted }}>All systems operational</p>
-                </div>
-              )}
+              <MemoryBar percent={Math.min(d.db.responseTimeMs / 3, 100)} />
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 flex justify-between items-center text-xs" style={{ color: lightMuted }}>
-          <p>Auto-refresh every 30 seconds</p>
-          <div className="flex gap-6">
-            <span>System Status: <span style={{ color: olive }}>Healthy</span></span>
-            <span>API v2.4.1</span>
+        {/* SUB-TELEMETRY CARDS */}
+        <div className="col-span-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1">
+            <span className="font-mono text-[8px] uppercase text-corthex-text-disabled">Heap_Used</span>
+            <span className="font-mono text-lg text-corthex-text-primary" style={{ color: 'var(--color-corthex-accent)' }}>{d.memory.heapUsed}<span className="text-[10px]">MB</span></span>
           </div>
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1">
+            <span className="font-mono text-[8px] uppercase text-corthex-text-disabled">Heap_Total</span>
+            <span className="font-mono text-lg text-corthex-text-primary">{d.memory.heapTotal}<span className="text-[10px]">MB</span></span>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1">
+            <span className="font-mono text-[8px] uppercase text-corthex-text-disabled">RSS</span>
+            <span className="font-mono text-lg text-corthex-text-primary">{d.memory.rss}<span className="text-[10px]">MB</span></span>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1">
+            <span className="font-mono text-[8px] uppercase text-corthex-text-disabled">DB_Latency</span>
+            <span className="font-mono text-lg text-corthex-text-primary">{d.db.responseTimeMs}<span className="text-[10px]">ms</span></span>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1">
+            <span className="font-mono text-[8px] uppercase text-corthex-text-disabled">Build</span>
+            <span className="font-mono text-lg text-corthex-text-primary">#{d.server.version.build}</span>
+          </div>
+          <div className="bg-corthex-surface border border-corthex-border p-3 flex flex-col gap-1"
+            style={{ borderColor: d.errors.count24h > 0 ? 'var(--color-corthex-error)' : 'var(--color-corthex-accent)' }}>
+            <span className="font-mono text-[8px] uppercase" style={{ color: d.errors.count24h > 0 ? 'var(--color-corthex-error)' : 'var(--color-corthex-accent)' }}>System_Health</span>
+            <span className="font-mono text-lg uppercase" style={{ color: d.errors.count24h > 0 ? 'var(--color-corthex-error)' : 'var(--color-corthex-accent)' }}>
+              {d.errors.count24h > 0 ? 'Warning' : 'Optimal'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* DECORATIVE FOOTER */}
+      <div className="mt-12 flex justify-between items-center opacity-20 pointer-events-none">
+        <div className="flex gap-12 font-mono text-[9px] uppercase text-corthex-text-disabled">
+          <span>Runtime: {d.server.version.runtime}</span>
+          <span>Hash: {d.server.version.hash || 'N/A'}</span>
+          <span>Auto-refresh: 30s</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-32 h-1 bg-corthex-elevated relative overflow-hidden">
+            <div className="absolute inset-y-0 left-0 w-1/4 animate-pulse" style={{ backgroundColor: 'var(--color-corthex-accent)' }} />
+          </div>
+          <span className="font-mono text-[9px] text-corthex-text-disabled">ENCRYPTED_LINK_ACTIVE</span>
         </div>
       </div>
     </div>

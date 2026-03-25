@@ -1,5 +1,5 @@
 /**
- * Cost & Budget Management — Natural Organic Theme
+ * Cost & Budget Management — Stitch Terminal Theme
  *
  * API Endpoints:
  *   GET   /api/admin/costs/summary?startDate=...&endDate=...
@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
+import { TrendingUp, TrendingDown, PieChart, BarChart2, FileText, Download } from 'lucide-react'
 
 // === Types ===
 
@@ -61,63 +62,63 @@ function SummaryCards({ data }: { data: CostSummary | undefined }) {
   if (!data) return <SummaryCardsSkeleton />
 
   const trend = data.trendPercent
-  const remaining = 15000_000_000 - data.totalCostMicro // placeholder budget
-  const projected = data.totalCostMicro * 1.19 // placeholder projection
-
-  const cards = [
-    {
-      label: '이번 달 총 지출',
-      value: `$${microToUsd(data.totalCostMicro)}`,
-      trend: trend > 0 ? `+${trend}%` : `${trend}%`,
-      trendLabel: 'vs 전월',
-      trendUp: trend > 0,
-      color: 'var(--color-corthex-accent)',
-    },
-    {
-      label: '잔여 예산',
-      value: `$${microToUsd(remaining > 0 ? remaining : 0)}`,
-      trend: '-5.2%',
-      trendLabel: 'vs 전주',
-      trendUp: false,
-      color: '#c4622d',
-    },
-    {
-      label: '예상 월말 비용',
-      value: `$${microToUsd(projected)}`,
-      trend: '',
-      trendLabel: '신규 모델 사용 증가 반영',
-      trendUp: false,
-      color: '#d4a843',
-    },
-  ]
+  const remaining = 15000_000_000 - data.totalCostMicro
+  const projected = data.totalCostMicro * 1.19
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="costs-summary-cards">
-      {cards.map((c) => (
-        <div key={c.label} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
-          <p className="text-stone-500 text-sm font-medium mb-2 uppercase tracking-wider">{c.label}</p>
-          <h3 className="text-4xl font-bold" style={{ color: c.color, fontFamily: "'Playfair Display', serif" }}>{c.value}</h3>
-          <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: c.trendUp ? '#16a34a' : c.trend ? '#ef4444' : 'var(--color-corthex-accent)' }}>
-            {c.trend && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d={c.trendUp ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-              </svg>
-            )}
-            <span>{c.trend} {c.trendLabel}</span>
-          </div>
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" data-testid="costs-summary-cards">
+      {/* Total Spend */}
+      <div className="bg-corthex-bg p-6 border-l-2 border-corthex-accent">
+        <div className="font-mono text-[10px] text-corthex-text-disabled uppercase mb-2 tracking-widest">Total System Spend (MTD)</div>
+        <div className="font-mono text-4xl font-black text-corthex-text-primary tracking-tighter">${microToUsd(data.totalCostMicro)}</div>
+        <div className="mt-4 flex items-center gap-2 text-[10px] font-mono">
+          {trend > 0 ? (
+            <>
+              <TrendingUp className="w-3 h-3 text-corthex-accent" />
+              <span className="text-corthex-accent">+{trend}%</span>
+            </>
+          ) : (
+            <>
+              <TrendingDown className="w-3 h-3 text-corthex-success" />
+              <span className="text-corthex-success">{trend}%</span>
+            </>
+          )}
+          <span className="text-corthex-text-disabled">VS LAST MONTH</span>
         </div>
-      ))}
+      </div>
+
+      {/* Remaining Budget */}
+      <div className="bg-corthex-bg p-6 border-l-2 border-corthex-border/20">
+        <div className="font-mono text-[10px] text-corthex-text-disabled uppercase mb-2 tracking-widest">Remaining Budget</div>
+        <div className="font-mono text-4xl font-black text-corthex-text-primary tracking-tighter">${microToUsd(remaining > 0 ? remaining : 0)}</div>
+        <div className="mt-4 flex items-center gap-2 text-[10px] font-mono">
+          <TrendingDown className="w-3 h-3 text-corthex-warning" />
+          <span className="text-corthex-warning">-5.2%</span>
+          <span className="text-corthex-text-disabled">VS LAST WEEK</span>
+        </div>
+      </div>
+
+      {/* Projected Cost */}
+      <div className="bg-corthex-bg p-6 border-l-2 border-corthex-border/20 relative overflow-hidden group">
+        <div className="font-mono text-[10px] text-corthex-text-disabled uppercase mb-2 tracking-widest">Projected Month-End</div>
+        <div className="font-mono text-4xl font-black text-corthex-text-primary tracking-tighter">${microToUsd(projected)}</div>
+        <div className="mt-4 flex items-center gap-2 text-[10px] font-mono">
+          <span className="text-corthex-accent-deep">NEW MODEL USAGE</span>
+          <span className="text-corthex-text-disabled">FACTORED IN</span>
+        </div>
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-corthex-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
     </section>
   )
 }
 
 function SummaryCardsSkeleton() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
-          <div className="h-4 w-24 bg-stone-100 rounded animate-pulse mb-4" />
-          <div className="h-10 w-40 bg-stone-100 rounded animate-pulse" />
+        <div key={i} className="bg-corthex-bg p-6 border-l-2 border-corthex-border/20">
+          <div className="h-3 w-24 bg-corthex-elevated rounded animate-pulse mb-4" />
+          <div className="h-10 w-40 bg-corthex-elevated rounded animate-pulse" />
         </div>
       ))}
     </section>
@@ -132,7 +133,7 @@ function SortableHeader({ label, field, sort, onSort }: { label: string; field: 
   const arrow = sort.field === field ? (sort.dir === 'desc' ? ' ↓' : ' ↑') : ''
   return (
     <th
-      className="pb-3 font-medium cursor-pointer hover:text-stone-700 select-none"
+      className="px-6 py-4 font-mono font-normal text-[10px] tracking-widest text-corthex-text-disabled uppercase cursor-pointer hover:text-corthex-accent select-none"
       onClick={() => onSort(field)}
     >
       {label}{arrow}
@@ -150,7 +151,7 @@ function sortByField<T extends Record<string, unknown>>(items: T[], sort: SortCo
   })
 }
 
-// === Department Table (Stitch HTML style) ===
+// === Department Table ===
 
 function DepartmentTable({ items }: { items: CostByDepartment[] }) {
   const [sort, setSort] = useState<SortConfig>({ field: 'totalCostMicro', dir: 'desc' })
@@ -159,26 +160,26 @@ function DepartmentTable({ items }: { items: CostByDepartment[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-left font-mono">
         <thead>
-          <tr className="text-stone-400 border-b border-stone-100">
+          <tr className="border-b border-corthex-border/10">
             <SortableHeader label="부서명" field="departmentName" sort={sort} onSort={toggle} />
-            <SortableHeader label="사용량 (tokens)" field="callCount" sort={sort} onSort={toggle} />
+            <SortableHeader label="사용량" field="callCount" sort={sort} onSort={toggle} />
             <SortableHeader label="비용 (USD)" field="totalCostMicro" sort={sort} onSort={toggle} />
-            <th className="pb-3 font-medium text-right">증감률</th>
+            <th className="px-6 py-4 font-mono font-normal text-[10px] tracking-widest text-corthex-text-disabled uppercase text-right">증감률</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-50">
+        <tbody className="text-[11px]">
           {sorted.map((r) => (
-            <tr key={r.departmentId} className="hover:bg-corthex-bg/50 transition-colors">
-              <td className="py-4 font-bold">{r.departmentName}</td>
-              <td className="py-4">{formatNumber(r.callCount)}</td>
-              <td className="py-4" style={{ fontFamily: 'serif' }}>${microToUsd(r.totalCostMicro)}</td>
-              <td className="py-4 text-right text-green-600 font-medium">-</td>
+            <tr key={r.departmentId} className="border-b border-corthex-border/5 hover:bg-corthex-elevated transition-colors">
+              <td className="px-6 py-4 text-corthex-text-primary font-bold">{r.departmentName}</td>
+              <td className="px-6 py-4 text-corthex-text-secondary">{formatNumber(r.callCount)}</td>
+              <td className="px-6 py-4 text-corthex-accent">${microToUsd(r.totalCostMicro)}</td>
+              <td className="px-6 py-4 text-right text-corthex-success font-medium">-</td>
             </tr>
           ))}
           {sorted.length === 0 && (
-            <tr><td colSpan={4} className="py-8 text-center text-stone-400">데이터가 없습니다</td></tr>
+            <tr><td colSpan={4} className="px-6 py-8 text-center text-corthex-text-disabled">데이터가 없습니다</td></tr>
           )}
         </tbody>
       </table>
@@ -195,9 +196,9 @@ function AgentTable({ items }: { items: CostByAgent[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full font-mono">
         <thead>
-          <tr className="border-b border-stone-100 text-stone-400">
+          <tr className="border-b border-corthex-border/10">
             <SortableHeader label="에이전트" field="agentName" sort={sort} onSort={toggle} />
             <SortableHeader label="비용 (USD)" field="totalCostMicro" sort={sort} onSort={toggle} />
             <SortableHeader label="입력 토큰" field="inputTokens" sort={sort} onSort={toggle} />
@@ -205,17 +206,17 @@ function AgentTable({ items }: { items: CostByAgent[] }) {
             <SortableHeader label="호출 수" field="callCount" sort={sort} onSort={toggle} />
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-[11px]">
           {sorted.map(r => (
-            <tr key={r.agentId} className="border-b border-stone-50 hover:bg-corthex-bg/50">
-              <td className="py-3 font-medium">{r.agentName}</td>
-              <td className="py-3 font-mono" style={{ color: 'var(--color-corthex-accent)' }}>${microToUsd(r.totalCostMicro)}</td>
-              <td className="py-3 text-stone-500">{formatNumber(r.inputTokens)}</td>
-              <td className="py-3 text-stone-500">{formatNumber(r.outputTokens)}</td>
-              <td className="py-3 text-stone-500">{formatNumber(r.callCount)}</td>
+            <tr key={r.agentId} className="border-b border-corthex-border/5 hover:bg-corthex-elevated transition-colors">
+              <td className="px-6 py-3 text-corthex-text-primary font-medium">{r.agentName}</td>
+              <td className="px-6 py-3 text-corthex-accent">${microToUsd(r.totalCostMicro)}</td>
+              <td className="px-6 py-3 text-corthex-text-secondary">{formatNumber(r.inputTokens)}</td>
+              <td className="px-6 py-3 text-corthex-text-secondary">{formatNumber(r.outputTokens)}</td>
+              <td className="px-6 py-3 text-corthex-text-secondary">{formatNumber(r.callCount)}</td>
             </tr>
           ))}
-          {sorted.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-stone-400">데이터가 없습니다</td></tr>}
+          {sorted.length === 0 && <tr><td colSpan={5} className="px-6 py-8 text-center text-corthex-text-disabled">데이터가 없습니다</td></tr>}
         </tbody>
       </table>
     </div>
@@ -231,25 +232,25 @@ function ModelTable({ items }: { items: CostByModel[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full font-mono">
         <thead>
-          <tr className="border-b border-stone-100 text-stone-400">
+          <tr className="border-b border-corthex-border/10">
             <SortableHeader label="모델" field="displayName" sort={sort} onSort={toggle} />
             <SortableHeader label="프로바이더" field="provider" sort={sort} onSort={toggle} />
             <SortableHeader label="비용 (USD)" field="totalCostMicro" sort={sort} onSort={toggle} />
             <SortableHeader label="호출 수" field="callCount" sort={sort} onSort={toggle} />
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-[11px]">
           {sorted.map(r => (
-            <tr key={`${r.provider}-${r.model}`} className="border-b border-stone-50 hover:bg-corthex-bg/50">
-              <td className="py-3 font-medium">{r.displayName}</td>
-              <td className="py-3 text-stone-500 capitalize">{r.provider}</td>
-              <td className="py-3 font-mono" style={{ color: 'var(--color-corthex-accent)' }}>${microToUsd(r.totalCostMicro)}</td>
-              <td className="py-3 text-stone-500">{formatNumber(r.callCount)}</td>
+            <tr key={`${r.provider}-${r.model}`} className="border-b border-corthex-border/5 hover:bg-corthex-elevated transition-colors">
+              <td className="px-6 py-3 text-corthex-text-primary font-medium">{r.displayName}</td>
+              <td className="px-6 py-3 text-corthex-text-secondary capitalize">{r.provider}</td>
+              <td className="px-6 py-3 text-corthex-accent">${microToUsd(r.totalCostMicro)}</td>
+              <td className="px-6 py-3 text-corthex-text-secondary">{formatNumber(r.callCount)}</td>
             </tr>
           ))}
-          {sorted.length === 0 && <tr><td colSpan={4} className="py-8 text-center text-stone-400">데이터가 없습니다</td></tr>}
+          {sorted.length === 0 && <tr><td colSpan={4} className="px-6 py-8 text-center text-corthex-text-disabled">데이터가 없습니다</td></tr>}
         </tbody>
       </table>
     </div>
@@ -287,26 +288,22 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
   ]
 
   return (
-    <div className="lg:col-span-2 bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
-      <div className="flex items-center justify-between mb-6">
-        <h4 className="font-bold text-lg flex items-center gap-2">
-          <svg className="w-5 h-5" style={{ color: 'var(--color-corthex-accent)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-            <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-          </svg>
-          부서별 사용 현황
-        </h4>
-        <div className="flex gap-1" data-testid="costs-axis-tabs">
+    <div className="bg-corthex-surface border border-corthex-border/10 h-full">
+      <div className="p-6 border-b border-corthex-border/10 flex items-center justify-between">
+        <h3 className="font-mono text-xs font-bold tracking-widest text-corthex-text-disabled uppercase flex items-center gap-2">
+          <PieChart className="w-4 h-4 text-corthex-accent" />
+          사용 현황
+        </h3>
+        <div className="flex gap-px bg-corthex-border/20 p-px" data-testid="costs-axis-tabs">
           {tabs.map((t) => (
             <button
               key={t.value}
               onClick={() => setTab(t.value)}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors ${
                 tab === t.value
-                  ? 'text-white'
-                  : 'text-stone-500 hover:bg-stone-100'
+                  ? 'bg-corthex-accent text-corthex-text-on-accent font-bold'
+                  : 'bg-corthex-surface text-corthex-text-disabled hover:text-corthex-accent'
               }`}
-              style={tab === t.value ? { backgroundColor: 'var(--color-corthex-accent)' } : {}}
             >
               {t.label}
             </button>
@@ -315,15 +312,15 @@ function CostTabs({ startDate, endDate, companyId }: { startDate: string; endDat
       </div>
       <div>
         {tab === 'department' && (deptLoading
-          ? <div className="h-32 bg-stone-50 rounded animate-pulse" />
+          ? <div className="h-32 m-6 bg-corthex-elevated rounded animate-pulse" />
           : <DepartmentTable items={deptData?.data?.items ?? []} />
         )}
         {tab === 'agent' && (agentLoading
-          ? <div className="h-32 bg-stone-50 rounded animate-pulse" />
+          ? <div className="h-32 m-6 bg-corthex-elevated rounded animate-pulse" />
           : <AgentTable items={agentData?.data?.items ?? []} />
         )}
         {tab === 'model' && (modelLoading
-          ? <div className="h-32 bg-stone-50 rounded animate-pulse" />
+          ? <div className="h-32 m-6 bg-corthex-elevated rounded animate-pulse" />
           : <ModelTable items={modelData?.data?.items ?? []} />
         )}
       </div>
@@ -405,32 +402,29 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
 
   if (isLoading) {
     return (
-      <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100">
-        <div className="h-40 bg-stone-50 rounded animate-pulse" />
+      <div className="bg-corthex-surface border border-corthex-border/10 p-6 h-full">
+        <div className="h-40 bg-corthex-elevated rounded animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className="bg-corthex-surface p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between">
+    <div className="bg-corthex-surface border border-corthex-border/10 p-6 flex flex-col justify-between h-full">
       <div>
-        <h4 className="font-bold text-lg mb-4 flex items-center gap-2" data-testid="budget-panel-title">
-          <svg className="w-5 h-5" style={{ color: '#d4a843' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-          </svg>
+        <h4 className="font-mono font-bold text-xs tracking-widest text-corthex-text-disabled uppercase flex items-center gap-2 mb-4" data-testid="budget-panel-title">
+          <BarChart2 className="w-4 h-4 text-corthex-accent" />
           예산 설정
         </h4>
-        <p className="text-sm text-stone-500 mb-6">월간 최대 지출 한도를 설정하고 알림을 받습니다.</p>
+        <p className="text-xs text-corthex-text-disabled font-mono mb-6">월간 최대 지출 한도를 설정하고 알림을 받습니다.</p>
 
         {activeForm && (
           <>
-            <label className="block text-xs font-bold text-stone-400 uppercase mb-2">월간 예산 한도 (USD)</label>
+            <label className="block font-mono font-bold text-[10px] text-corthex-text-disabled uppercase tracking-widest mb-2">월간 예산 한도 (USD)</label>
             <div className="flex gap-3">
               <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-secondary font-mono">$</span>
                 <input
-                  className="w-full pl-8 pr-4 py-3 border-stone-200 rounded-xl focus:border-corthex-accent focus:ring-corthex-accent transition-all"
-                  style={{ backgroundColor: 'var(--color-corthex-bg)' }}
+                  className="w-full pl-8 pr-4 py-3 bg-corthex-bg border border-corthex-border/20 text-corthex-text-primary font-mono text-sm focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent outline-none transition-all"
                   type="number"
                   value={activeForm.monthlyBudget}
                   onChange={(e) => setField('monthlyBudget', e.target.value)}
@@ -439,8 +433,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
               <button
                 onClick={handleSave}
                 disabled={mutation.isPending}
-                className="text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm disabled:opacity-50"
-                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+                className="bg-corthex-accent text-corthex-text-on-accent px-6 py-3 font-mono font-bold text-xs uppercase tracking-widest disabled:opacity-50 hover:bg-corthex-accent-hover transition-colors"
                 data-testid="budget-save-btn"
               >
                 {mutation.isPending ? '...' : '저장'}
@@ -450,13 +443,13 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
         )}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-stone-100">
-        <div className="flex justify-between text-sm mb-2">
-          <span className="text-stone-500">현재 사용량 ({Math.round(usagePercent)}%)</span>
-          <span className="font-bold">{`$${microToUsd(currentSpendMicro)}`} / {activeForm ? `$${Number(activeForm.monthlyBudget).toLocaleString()}` : '$0'}</span>
+      <div className="mt-8 pt-6 border-t border-corthex-border/10">
+        <div className="flex justify-between font-mono text-xs mb-2">
+          <span className="text-corthex-text-secondary">현재 사용량 ({Math.round(usagePercent)}%)</span>
+          <span className="text-corthex-text-primary font-bold">{`$${microToUsd(currentSpendMicro)}`} / {activeForm ? `$${Number(activeForm.monthlyBudget).toLocaleString()}` : '$0'}</span>
         </div>
-        <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-          <div className="h-full rounded-full" style={{ width: `${usagePercent}%`, backgroundColor: '#d4a843' }} />
+        <div className="w-full h-1 bg-corthex-elevated overflow-hidden">
+          <div className="h-full bg-corthex-accent shadow-[0_0_10px_rgba(202,138,4,0.5)]" style={{ width: `${usagePercent}%` }} />
         </div>
       </div>
     </div>
@@ -475,42 +468,44 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
   const items = data?.data?.items ?? []
 
   return (
-    <section className="bg-corthex-surface rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
-      <div className="p-6 border-b border-stone-100 flex items-center justify-between">
-        <h4 className="font-bold text-lg flex items-center gap-2">
-          <svg className="w-5 h-5" style={{ color: '#c4622d' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-          </svg>
-          최근 비용 기록
+    <section className="bg-corthex-surface border border-corthex-border/10 overflow-hidden">
+      <div className="p-6 border-b border-corthex-border/10 flex items-center justify-between">
+        <h4 className="font-mono font-bold text-xs tracking-widest text-corthex-text-disabled uppercase flex items-center gap-2">
+          <FileText className="w-4 h-4 text-corthex-accent" />
+          Top Consumption Records
         </h4>
+        <button className="flex items-center gap-2 px-4 py-2 bg-corthex-accent-deep text-corthex-text-on-accent font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-corthex-accent transition-colors">
+          <Download className="w-3 h-3" />
+          Export CSV
+        </button>
       </div>
 
       {isLoading ? (
         <div className="p-8">
-          <div className="h-40 bg-stone-50 rounded animate-pulse" />
+          <div className="h-40 bg-corthex-elevated rounded animate-pulse" />
         </div>
       ) : items.length === 0 ? (
-        <div className="p-8 text-center text-stone-400 text-sm">데이터가 없습니다</div>
+        <div className="p-8 text-center text-corthex-text-disabled font-mono text-sm">데이터가 없습니다</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-stone-50/50">
-              <tr className="text-stone-400">
-                <th className="px-6 py-4 font-medium">일시</th>
-                <th className="px-6 py-4 font-medium">입력 토큰</th>
-                <th className="px-6 py-4 font-medium">출력 토큰</th>
-                <th className="px-6 py-4 font-medium">호출 수</th>
-                <th className="px-6 py-4 font-medium text-right">비용</th>
+          <table className="w-full text-left font-mono">
+            <thead>
+              <tr className="text-[10px] text-corthex-text-disabled uppercase border-b border-corthex-border/10">
+                <th className="px-6 py-4 font-normal tracking-widest">일시</th>
+                <th className="px-6 py-4 font-normal tracking-widest">입력 토큰</th>
+                <th className="px-6 py-4 font-normal tracking-widest">출력 토큰</th>
+                <th className="px-6 py-4 font-normal tracking-widest">호출 수</th>
+                <th className="px-6 py-4 font-normal tracking-widest text-right">비용</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-50">
+            <tbody className="text-[11px]">
               {items.slice(0, 10).map((d) => (
-                <tr key={d.date} className="hover:bg-corthex-bg/50 transition-colors">
-                  <td className="px-6 py-4 text-stone-500">{d.date}</td>
-                  <td className="px-6 py-4">{formatNumber(d.inputTokens)}</td>
-                  <td className="px-6 py-4">{formatNumber(d.outputTokens)}</td>
-                  <td className="px-6 py-4">{formatNumber(d.callCount)}</td>
-                  <td className="px-6 py-4 text-right font-bold" style={{ fontFamily: 'serif', color: 'var(--color-corthex-accent)' }}>${microToUsd(d.costMicro)}</td>
+                <tr key={d.date} className="border-b border-corthex-border/5 hover:bg-corthex-elevated transition-colors">
+                  <td className="px-6 py-4 text-corthex-text-secondary">{d.date}</td>
+                  <td className="px-6 py-4 text-corthex-text-primary">{formatNumber(d.inputTokens)}</td>
+                  <td className="px-6 py-4 text-corthex-text-primary">{formatNumber(d.outputTokens)}</td>
+                  <td className="px-6 py-4 text-corthex-text-primary">{formatNumber(d.callCount)}</td>
+                  <td className="px-6 py-4 text-right font-bold text-corthex-accent">${microToUsd(d.costMicro)}</td>
                 </tr>
               ))}
             </tbody>
@@ -518,17 +513,12 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
         </div>
       )}
 
-      <div className="p-4 border-t border-stone-100 bg-stone-50/30 flex justify-center">
-        <nav className="flex gap-1">
-          <button className="w-8 h-8 rounded flex items-center justify-center text-stone-400 hover:bg-stone-100">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-          </button>
-          <button className="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: 'var(--color-corthex-accent)' }}>1</button>
-          <button className="w-8 h-8 rounded flex items-center justify-center text-stone-600 hover:bg-stone-100 text-xs font-medium">2</button>
-          <button className="w-8 h-8 rounded flex items-center justify-center text-stone-400 hover:bg-stone-100">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
-          </button>
-        </nav>
+      <div className="p-4 bg-corthex-bg/50 border-t border-corthex-border/10 flex justify-between items-center font-mono text-[9px] text-corthex-text-disabled">
+        <div>SHOWING {Math.min(items.length, 10)} OF {items.length} ENTRIES</div>
+        <div className="flex gap-4">
+          <button className="hover:text-corthex-accent transition-colors cursor-pointer uppercase tracking-widest">PREVIOUS_PAGE</button>
+          <button className="hover:text-corthex-accent transition-colors cursor-pointer uppercase tracking-widest">NEXT_PAGE</button>
+        </div>
       </div>
     </section>
   )
@@ -536,11 +526,30 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
 
 // === Main Page ===
 
+type Period = '24H' | '7D' | '30D' | 'ALL'
+
 export function CostsPage() {
   const companyId = useAdminStore(s => s.selectedCompanyId)
   const defaults = useMemo(() => defaultDates(), [])
   const [startDate, setStartDate] = useState(defaults.start)
   const [endDate, setEndDate] = useState(defaults.end)
+  const [period, setPeriod] = useState<Period>('30D')
+
+  const handlePeriod = (p: Period) => {
+    setPeriod(p)
+    const now = new Date()
+    const end = now.toISOString().split('T')[0]
+    if (p === '24H') {
+      setStartDate(new Date(now.getTime() - 86400000).toISOString().split('T')[0])
+    } else if (p === '7D') {
+      setStartDate(new Date(now.getTime() - 7 * 86400000).toISOString().split('T')[0])
+    } else if (p === '30D') {
+      setStartDate(new Date(now.getTime() - 30 * 86400000).toISOString().split('T')[0])
+    } else {
+      setStartDate('2020-01-01')
+    }
+    setEndDate(end)
+  }
 
   const { data: summaryData, isLoading: summaryLoading } = useQuery({
     queryKey: ['costs-summary', companyId, startDate, endDate],
@@ -552,59 +561,92 @@ export function CostsPage() {
 
   if (!companyId) {
     return (
-      <div data-testid="costs-page" className="p-8" style={{ backgroundColor: 'var(--color-corthex-bg)' }}>
-        <h1 className="text-xl font-semibold" style={{ fontFamily: "'Playfair Display', serif" }}>비용 관리</h1>
-        <div className="bg-corthex-surface rounded-2xl border border-stone-100 p-8 mt-4">
-          <p data-testid="costs-no-company" className="text-sm text-stone-500 text-center">회사를 먼저 선택해주세요.</p>
+      <div data-testid="costs-page" className="p-8 bg-corthex-bg min-h-screen">
+        <h1 className="font-mono text-xl font-bold text-corthex-text-primary">비용 관리</h1>
+        <div className="bg-corthex-surface border border-corthex-border/10 p-8 mt-4">
+          <p data-testid="costs-no-company" className="text-sm text-corthex-text-disabled font-mono text-center">회사를 먼저 선택해주세요.</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div data-testid="costs-page" style={{ backgroundColor: 'var(--color-corthex-bg)', fontFamily: "'Public Sans', sans-serif", color: 'var(--color-corthex-text-secondary)' }}>
-      <main className="flex-1 overflow-y-auto">
-        {/* Top Bar */}
-        <header className="h-16 bg-corthex-surface border-b border-stone-200 flex items-center justify-between px-8 sticky top-0 z-10">
-          <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>비용 및 예산 관리</h2>
+    <div data-testid="costs-page" className="bg-corthex-bg min-h-screen">
+      <div className="p-8">
+
+        {/* Header */}
+        <header className="mb-10 flex justify-between items-end border-b border-corthex-border/30 pb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-corthex-accent shadow-[0_0_8px_rgba(202,138,4,0.5)]" />
+              <span className="font-mono text-[10px] tracking-[0.3em] text-corthex-text-disabled">TERMINAL_ID: 0x882A_COST</span>
+            </div>
+            <h1 className="font-mono text-3xl font-bold tracking-tight text-corthex-text-primary">
+              COST MANAGEMENT // <span className="text-corthex-accent-deep">SYSTEM_OVERVIEW</span>
+            </h1>
+          </div>
           <div className="flex items-center gap-4">
+            {/* Period quick-select */}
+            <div className="flex gap-px bg-corthex-border/20 p-px">
+              {(['24H', '7D', '30D', 'ALL'] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handlePeriod(p)}
+                  className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                    period === p
+                      ? 'bg-corthex-accent text-corthex-text-on-accent font-bold'
+                      : 'bg-corthex-surface text-corthex-text-disabled hover:text-corthex-accent'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            {/* Date range */}
             <div className="flex items-center gap-2">
               <input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="px-3 py-2 border-none rounded-full text-sm w-36"
-                style={{ backgroundColor: 'var(--color-corthex-bg)' }}
+                onChange={(e) => { setStartDate(e.target.value); setPeriod('ALL') }}
+                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
-              <span className="text-stone-400 text-xs">~</span>
+              <span className="font-mono text-xs text-corthex-text-disabled">~</span>
               <input
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="px-3 py-2 border-none rounded-full text-sm w-36"
-                style={{ backgroundColor: 'var(--color-corthex-bg)' }}
+                onChange={(e) => { setEndDate(e.target.value); setPeriod('ALL') }}
+                className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
             </div>
           </div>
         </header>
 
-        <div className="p-8 space-y-8 max-w-7xl mx-auto">
-          {/* Summary Section */}
-          {summaryLoading ? <SummaryCardsSkeleton /> : <SummaryCards data={summary} />}
+        {/* Summary cards */}
+        {summaryLoading ? <SummaryCardsSkeleton /> : <SummaryCards data={summary} />}
 
-          {/* Budget + Department Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Budget Setting Card */}
-            <BudgetPanel companyId={companyId} summaryData={summary} />
-
-            {/* Cost by Department */}
+        {/* Charts + Budget grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+          <div className="lg:col-span-8">
             <CostTabs startDate={startDate} endDate={endDate} companyId={companyId} />
           </div>
-
-          {/* Cost Records Table */}
-          <RecentCostRecords startDate={startDate} endDate={endDate} companyId={companyId} />
+          <div className="lg:col-span-4">
+            <BudgetPanel companyId={companyId} summaryData={summary} />
+          </div>
         </div>
-      </main>
+
+        {/* Recent records */}
+        <RecentCostRecords startDate={startDate} endDate={endDate} companyId={companyId} />
+
+        {/* Footer meta */}
+        <footer className="mt-12 pt-6 border-t border-corthex-border/10 flex justify-between items-center font-mono text-[9px] text-corthex-text-disabled/30">
+          <div className="flex gap-8">
+            <span>SYSTEM_VERSION: 4.2.0-STABLE</span>
+            <span>LAST_SYNC: {new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC</span>
+          </div>
+          <div>© 2024 CORTHEX_SYSTEMS_GLOBAL</div>
+        </footer>
+
+      </div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 /**
- * Agent Management — Natural Organic Theme
+ * Agent Management — Stitch Design
  *
  * API Endpoints:
  *   GET    /api/admin/agents?companyId=...
@@ -16,6 +16,7 @@ import { api, ApiError } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useToastStore } from '../stores/toast-store'
+import { Bot, Search, Plus, X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 type Agent = {
   id: string
@@ -286,377 +287,407 @@ export function AgentsPage() {
 
   if (!selectedCompanyId) {
     return (
-      <div className="flex items-center justify-center h-64" style={{ backgroundColor: '#f7f8f4', color: '#363d2a' }}>
-        <p className="text-sm font-medium">회사를 선택하세요</p>
+      <div className="flex items-center justify-center h-64 bg-corthex-bg">
+        <p className="font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">회사를 선택하세요</p>
       </div>
     )
   }
 
-  return (
-    <div data-testid="agents-page" className="h-screen overflow-hidden flex" style={{ backgroundColor: '#f7f8f4', fontFamily: "'Inter', sans-serif", color: '#363d2a' }}>
-      {/* BEGIN: Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-corthex-surface">
-        {/* BEGIN: Header */}
-        <header className="h-16 border-b flex items-center justify-between px-8 bg-corthex-surface/80 backdrop-blur-sm sticky top-0 z-10" style={{ borderColor: 'var(--color-corthex-border)' }}>
-          <h1 className="text-lg font-bold" style={{ color: 'var(--color-corthex-accent-deep)' }}>Agent Management</h1>
-          <div className="flex items-center gap-4">
-            <button
-              data-testid="agents-create-btn"
-              onClick={() => setShowCreate(true)}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors border"
-              style={{ color: 'var(--color-corthex-accent-deep)', backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)' }}
-            >
-              New Agent Template
-            </button>
-          </div>
-        </header>
-        {/* END: Header */}
+  const onlineCount = agents.filter(a => a.status === 'online' || a.status === 'working').length
+  const errorCount = agents.filter(a => a.status === 'error' || !a.isActive).length
 
-        <div className="flex-1 flex overflow-hidden">
-          {/* BEGIN: Left Column (Agent List) */}
-          <section className="w-80 border-r overflow-y-auto" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: '#f7f8f4' }} data-testid="agents-table">
-            <div className="p-4 space-y-3">
-              {/* Search Box */}
+  return (
+    <div data-testid="agents-page" className="flex h-screen overflow-hidden bg-corthex-bg">
+      {/* MAIN TABLE AREA */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* SCROLLABLE CONTENT */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+          {/* SUMMARY STATS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-corthex-surface border-l-4 p-6 flex flex-col justify-between relative group overflow-hidden"
+              style={{ borderLeftColor: 'var(--color-corthex-accent)' }}>
+              <div className="font-mono text-[10px] tracking-widest text-corthex-text-disabled mb-2 uppercase">TOTAL_AGENTS</div>
+              <div className="text-4xl font-black font-mono tracking-tighter text-corthex-text-primary">{agents.length}</div>
+              <div className="absolute right-[-10px] bottom-[-10px] opacity-5 group-hover:opacity-10 transition-opacity">
+                <Bot className="w-20 h-20" />
+              </div>
+            </div>
+            <div className="bg-corthex-surface border-l-4 p-6 flex flex-col justify-between"
+              style={{ borderLeftColor: 'var(--color-corthex-success)' }}>
+              <div className="font-mono text-[10px] tracking-widest text-corthex-text-disabled mb-2 uppercase">ONLINE_AGENTS</div>
+              <div className="text-4xl font-black font-mono tracking-tighter" style={{ color: 'var(--color-corthex-success)' }}>{onlineCount}</div>
+              <div className="font-mono text-[10px] mt-2" style={{ color: 'var(--color-corthex-success)' }}>ACTIVE_IN_NETWORK</div>
+            </div>
+            <div className="bg-corthex-surface border-l-4 p-6 flex flex-col justify-between"
+              style={{ borderLeftColor: errorCount > 0 ? 'var(--color-corthex-error)' : 'var(--color-corthex-accent)' }}>
+              <div className="font-mono text-[10px] tracking-widest text-corthex-text-disabled mb-2 uppercase">ERROR / INACTIVE</div>
+              <div className="flex items-end gap-3">
+                <div className="text-4xl font-black font-mono tracking-tighter text-corthex-text-primary">{errorCount}</div>
+                {errorCount > 0 && <div className="h-8 w-1 mb-1 animate-pulse" style={{ backgroundColor: 'var(--color-corthex-error)' }} />}
+              </div>
+              <div className="font-mono text-[10px] mt-2 text-corthex-text-disabled uppercase">
+                {errorCount === 0 ? 'ALL_SYSTEMS_NOMINAL' : 'ATTENTION_REQUIRED'}
+              </div>
+            </div>
+          </div>
+
+          {/* FILTERS */}
+          <div className="bg-corthex-surface border border-corthex-border p-4 flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Search_Registry</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg className="w-4 h-4" style={{ color: 'var(--color-corthex-accent-hover)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </span>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-corthex-text-disabled" />
                 <input
                   data-testid="agents-search-input"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-sm rounded-lg focus:ring-corthex-accent focus:border-corthex-accent bg-corthex-surface"
-                  style={{ borderColor: 'var(--color-corthex-border)' }}
-                  placeholder="Search agents..."
+                  className="w-full bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 text-xs font-mono text-corthex-text-primary placeholder:text-corthex-text-disabled focus:outline-none focus:border-corthex-accent"
+                  placeholder="AGENT_NAME..."
                   type="text"
                 />
               </div>
-
-              {/* Agent Cards */}
-              {isLoading ? (
-                <div data-testid="agents-loading" className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-corthex-surface p-4 rounded-xl border animate-pulse" style={{ borderColor: 'var(--color-corthex-border)' }}>
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 w-24 rounded" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-                          <div className="h-3 w-32 rounded" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : filteredAgents.length === 0 ? (
-                <div data-testid="agents-empty-state" className="text-center py-8">
-                  <p className="text-sm" style={{ color: 'var(--color-corthex-accent-hover)' }}>
-                    {agents.length === 0 ? '등록된 에이전트가 없습니다' : '필터 조건에 맞는 에이전트가 없습니다'}
-                  </p>
-                </div>
-              ) : (
-                filteredAgents.map((a) => {
-                  const isSelected = selectedAgent?.id === a.id
-                  const statusColor = STATUS_COLORS[a.status] || STATUS_COLORS.offline
-                  const tierBadge = TIER_BADGE[a.tier] || TIER_BADGE.worker
-
-                  return (
-                    <div
-                      key={a.id}
-                      data-testid={`agents-row-${a.id}`}
-                      onClick={() => openDetail(a)}
-                      className={`bg-corthex-surface p-4 rounded-xl shadow-sm cursor-pointer transition-all group ${
-                        isSelected
-                          ? 'border-2'
-                          : 'border hover:border-corthex-border'
-                      }`}
-                      style={{
-                        borderColor: isSelected ? 'var(--color-corthex-accent-hover)' : 'var(--color-corthex-border)',
-                      }}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="relative">
-                          <div
-                            className="w-10 h-10 rounded-full border flex items-center justify-center text-sm font-bold"
-                            style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-accent-deep)' }}
-                          >
-                            {a.name.charAt(0)}
-                          </div>
-                          <span className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white ${statusColor}`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 data-testid={`agents-name-${a.id}`} className="text-sm font-bold truncate" style={{ color: '#363d2a' }}>
-                            {a.name}
-                            {a.isSystem && <span data-testid={`agents-system-badge-${a.id}`} className="ml-1 text-[10px] text-amber-600">[SYS]</span>}
-                            {!a.isActive && <span data-testid={`agents-inactive-badge-${a.id}`} className="ml-1 text-[10px] text-corthex-text-disabled">[OFF]</span>}
-                          </h3>
-                          <p className="text-xs truncate mb-2" style={{ color: 'var(--color-corthex-accent)' }}>{a.role || 'No role'}</p>
-                          <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded border ${tierBadge}`}>
-                            {a.tier}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })
-              )}
             </div>
-          </section>
-          {/* END: Left Column */}
+            <div className="w-48">
+              <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Tier</label>
+              <select className="w-full bg-corthex-bg border border-corthex-border text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option>ALL_TIERS</option>
+                <option>MANAGER</option>
+                <option>SPECIALIST</option>
+                <option>WORKER</option>
+              </select>
+            </div>
+            <div className="w-48">
+              <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Status</label>
+              <select className="w-full bg-corthex-bg border border-corthex-border text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option>ALL_STATES</option>
+                <option>ONLINE</option>
+                <option>WORKING</option>
+                <option>OFFLINE</option>
+                <option>ERROR</option>
+              </select>
+            </div>
+            <button
+              data-testid="agents-create-btn"
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 px-6 py-2 font-mono text-[10px] tracking-widest uppercase font-bold"
+              style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+            >
+              <Plus className="w-3 h-3" />
+              NEW_AGENT
+            </button>
+          </div>
 
-          {/* BEGIN: Right Column (Soul Editor & Details) */}
-          {selectedAgent ? (
-            <section className="flex-1 flex flex-col min-w-0 overflow-hidden" data-testid="agents-detail-panel">
-              {/* Editor Tabs/Header */}
-              <div className="flex items-center justify-between px-8 py-4 border-b bg-corthex-surface" style={{ borderColor: 'var(--color-corthex-elevated)' }}>
-                <div className="flex items-center gap-6">
-                  <button
-                    data-testid="agents-tab-soul"
-                    onClick={() => setDetailTab('soul')}
-                    className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
-                      detailTab === 'soul'
-                        ? 'font-bold'
-                        : 'hover:text-corthex-accent'
-                    }`}
-                    style={{
-                      borderColor: detailTab === 'soul' ? '#667447' : 'transparent',
-                      color: detailTab === 'soul' ? '#363d2a' : 'var(--color-corthex-accent-hover)',
-                    }}
-                  >
-                    Soul Markdown
-                  </button>
-                  <button
-                    data-testid="agents-tab-info"
-                    onClick={() => setDetailTab('config')}
-                    className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
-                      detailTab === 'config'
-                        ? 'font-bold'
-                        : 'hover:text-corthex-accent'
-                    }`}
-                    style={{
-                      borderColor: detailTab === 'config' ? '#667447' : 'transparent',
-                      color: detailTab === 'config' ? '#363d2a' : 'var(--color-corthex-accent-hover)',
-                    }}
-                  >
-                    Configuration
-                  </button>
-                  <button
-                    onClick={() => setDetailTab('memory')}
-                    className={`pb-4 border-b-2 text-sm font-medium transition-colors ${
-                      detailTab === 'memory'
-                        ? 'font-bold'
-                        : 'hover:text-corthex-accent'
-                    }`}
-                    style={{
-                      borderColor: detailTab === 'memory' ? '#667447' : 'transparent',
-                      color: detailTab === 'memory' ? '#363d2a' : 'var(--color-corthex-accent-hover)',
-                    }}
-                  >
-                    Memory Snapshots
-                  </button>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs italic" style={{ color: 'var(--color-corthex-accent-hover)' }}>Auto-saved 2m ago</span>
-                </div>
+          {/* TABLE */}
+          <div className="bg-corthex-surface border border-corthex-border overflow-x-auto" data-testid="agents-table">
+            {isLoading ? (
+              <div data-testid="agents-loading" className="p-8 space-y-3">
+                {[1,2,3].map(i => <div key={i} className="h-16 bg-corthex-elevated animate-pulse" />)}
               </div>
+            ) : filteredAgents.length === 0 ? (
+              <div data-testid="agents-empty-state" className="p-12 text-center font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">
+                {agents.length === 0 ? 'NO_AGENTS_REGISTERED' : 'NO_AGENTS_MATCH_FILTER'}
+              </div>
+            ) : (
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-corthex-elevated font-mono text-[10px] tracking-widest uppercase text-corthex-text-disabled">
+                    <th className="px-6 py-4 font-normal">Agent_Identity</th>
+                    <th className="px-6 py-4 font-normal">Role</th>
+                    <th className="px-6 py-4 font-normal">Core_Model</th>
+                    <th className="px-6 py-4 font-normal text-center">Protocol_Tier</th>
+                    <th className="px-6 py-4 font-normal">Status</th>
+                    <th className="px-6 py-4 font-normal text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {filteredAgents.map((a) => {
+                    const isSelected = selectedAgent?.id === a.id
+                    const statusDotColor =
+                      a.status === 'online' ? 'var(--color-corthex-success)' :
+                      a.status === 'working' ? 'var(--color-corthex-accent)' :
+                      a.status === 'error' ? 'var(--color-corthex-error)' :
+                      'var(--color-corthex-text-disabled)'
+                    const tierColor =
+                      a.tier === 'manager' ? 'var(--color-corthex-accent)' :
+                      a.tier === 'specialist' ? 'var(--color-corthex-info)' :
+                      'var(--color-corthex-text-secondary)'
 
-              <div className="flex-1 flex overflow-hidden">
-                {/* Editor Section */}
-                {detailTab === 'soul' && (
-                  <div className="flex-1 flex flex-col p-6 bg-corthex-surface overflow-hidden">
-                    <div className="flex-1 flex flex-col rounded-xl border overflow-hidden shadow-inner" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: '#f7f8f4' }}>
-                      <div className="flex items-center justify-between px-4 py-2 border-b bg-corthex-surface/50" style={{ borderColor: 'var(--color-corthex-border)' }}>
-                        <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded-full bg-red-400/20 border border-red-400/50" />
-                          <span className="w-3 h-3 rounded-full bg-amber-400/20 border border-amber-400/50" />
-                          <span className="w-3 h-3 rounded-full bg-green-400/20 border border-green-400/50" />
-                        </div>
-                        <div className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-corthex-accent-hover)' }}>SOUL_FABRIC_CORE</div>
-                        <div className={`text-[10px] font-mono ${charCount > 45000 ? 'text-red-500' : ''}`} style={charCount <= 45000 ? { color: 'var(--color-corthex-accent-hover)' } : {}}>
-                          {charCount.toLocaleString()} / 50,000 chars
-                        </div>
-                      </div>
-                      <textarea
-                        data-testid="agents-soul-editor"
-                        value={editForm.soul || ''}
-                        onChange={(e) => setEditForm({ ...editForm, soul: e.target.value })}
-                        className="flex-1 w-full p-6 font-mono text-sm bg-transparent border-none focus:ring-0 resize-none overflow-y-auto"
-                        style={{ color: 'var(--color-corthex-accent-deep)' }}
-                        maxLength={50000}
-                        placeholder="# Describe the essence of the agent here..."
-                        spellCheck={false}
-                      />
-                    </div>
-                    <div className="flex gap-3 justify-end pt-4">
-                      <button
-                        onClick={handleSaveSoul}
-                        disabled={updateMutation.isPending}
-                        className="px-4 py-2 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
-                        style={{ backgroundColor: '#707a52' }}
+                    return (
+                      <tr
+                        key={a.id}
+                        data-testid={`agents-row-${a.id}`}
+                        onClick={() => openDetail(a)}
+                        className="border-b border-corthex-border hover:bg-corthex-elevated transition-colors cursor-pointer"
+                        style={isSelected ? { backgroundColor: 'var(--color-corthex-elevated)' } : {}}
                       >
-                        {updateMutation.isPending ? 'Saving...' : 'Save Soul'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {detailTab === 'config' && (
-                  <div className="flex-1 overflow-y-auto p-6 bg-corthex-surface">
-                    {/* Settings Panel matching Stitch HTML structure */}
-                    <div className="max-w-lg space-y-8">
-                      {/* Core Identity */}
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-accent-hover)' }}>Core Identity</h4>
-                        <div>
-                          <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--color-corthex-accent-deep)' }}>Agent Name</label>
-                          <input type="text" value={editForm.name || ''} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className={inputCls} />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--color-corthex-accent-deep)' }}>Primary Role</label>
-                          <input type="text" value={editForm.role || ''} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className={inputCls} />
-                        </div>
-                      </div>
-                      {/* Intelligence Configuration */}
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-accent-hover)' }}>Intelligence</h4>
-                        <div>
-                          <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--color-corthex-accent-deep)' }}>Tier Level</label>
-                          <select
-                            value={editForm.tier || 'specialist'}
-                            onChange={(e) => setEditForm({ ...editForm, tier: e.target.value as Agent['tier'] })}
-                            className={selectCls}
-                          >
-                            {TIER_OPTIONS.map((t) => (
-                              <option key={t.value} value={t.value}>{t.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--color-corthex-accent-deep)' }}>Foundation Model</label>
-                          <select
-                            value={editForm.modelName || ''}
-                            onChange={(e) => setEditForm({ ...editForm, modelName: e.target.value })}
-                            className={selectCls}
-                          >
-                            {MODEL_OPTIONS.map((m) => (
-                              <option key={m.value} value={m.value}>{m.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      {/* Permissions & Tools */}
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-corthex-accent-hover)' }}>Permissions &amp; Tools</h4>
-                        <div className="space-y-2">
-                          {(selectedAgent.allowedTools || []).map((tool) => (
-                            <label key={tool} className="flex items-center gap-3 group cursor-pointer">
-                              <input defaultChecked type="checkbox" className="rounded text-corthex-accent focus:ring-corthex-accent" style={{ borderColor: '#c2ccaa' }} />
-                              <span className="text-sm font-medium transition-colors group-hover:text-corthex-accent-deep" style={{ color: 'var(--color-corthex-accent-deep)' }}>{tool}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <div className="pt-2 border-t" style={{ borderColor: 'var(--color-corthex-border)' }}>
-                          <label className="flex items-center justify-between cursor-pointer">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-corthex-elevated border border-corthex-border flex items-center justify-center shrink-0">
+                              <Bot className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
+                            </div>
                             <div>
-                              <span className="text-sm font-bold" style={{ color: 'var(--color-corthex-accent-deep)' }}>isSecretary</span>
-                              <p className="text-xs" style={{ color: 'var(--color-corthex-accent)' }}>Auto-organizes workspace</p>
+                              <div data-testid={`agents-name-${a.id}`} className="font-bold tracking-tight text-corthex-text-primary">
+                                {a.name}
+                                {a.isSystem && <span data-testid={`agents-system-badge-${a.id}`} className="ml-2 font-mono text-[10px]" style={{ color: 'var(--color-corthex-accent)' }}>[SYS]</span>}
+                                {!a.isActive && <span data-testid={`agents-inactive-badge-${a.id}`} className="ml-2 font-mono text-[10px] text-corthex-text-disabled">[OFF]</span>}
+                              </div>
+                              <div className="font-mono text-[10px] text-corthex-text-disabled">ID: {a.id.slice(0, 8)}</div>
                             </div>
-                            <div className="relative inline-flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={editForm.enableSemanticCache ?? false}
-                                onChange={(e) => handleCacheToggle(e.target.checked)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-surface after:border-corthex-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-corthex-accent" style={{ backgroundColor: editForm.enableSemanticCache ? '#667447' : 'var(--color-corthex-border)' }} />
-                            </div>
-                          </label>
-                        </div>
-                      </div>
-                      {/* Action Buttons */}
-                      <div className="pt-6 space-y-3">
-                        <button
-                          onClick={handleSaveInfo}
-                          disabled={updateMutation.isPending}
-                          className="w-full py-3 px-4 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
-                          style={{ backgroundColor: '#707a52' }}
-                        >
-                          {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
-                        </button>
-                        <button
-                          className="w-full py-2 px-4 bg-transparent font-semibold rounded-xl text-xs transition-colors"
-                          style={{ color: 'var(--color-corthex-accent)' }}
-                        >
-                          Reset to Admin Soul
-                        </button>
-                        <button
-                          data-testid="agents-deactivate-btn"
-                          onClick={() => openDeactivateModal(selectedAgent)}
-                          disabled={!selectedAgent.isActive}
-                          className="w-full py-2 px-4 border border-red-200 text-red-600 font-semibold rounded-xl text-xs transition-colors hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-[11px] text-corthex-text-secondary">{a.role || '—'}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-[11px] bg-corthex-elevated border border-corthex-border px-2 py-1 text-corthex-text-secondary">
+                            {a.modelName}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="font-mono text-[10px] font-bold border px-2 py-0.5 uppercase"
+                            style={{ borderColor: tierColor, color: tierColor }}>
+                            {a.tier.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5" style={{ backgroundColor: statusDotColor }} />
+                            <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: statusDotColor }}>
+                              {STATUS_LABELS[a.status] || a.status}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openDetail(a) }}
+                            className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled hover:text-corthex-text-primary transition-colors"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
 
-                {detailTab === 'memory' && (
-                  <div className="flex-1 overflow-y-auto p-6 bg-corthex-surface">
-                    <div className="text-center py-16" style={{ color: 'var(--color-corthex-accent-hover)' }}>
-                      <p className="text-sm">Memory snapshots will appear here</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          ) : (
-            <section className="flex-1 flex items-center justify-center bg-corthex-surface">
-              <p className="text-sm" style={{ color: 'var(--color-corthex-accent-hover)' }}>Select an agent from the list</p>
-            </section>
-          )}
-          {/* END: Right Column */}
+          {/* PAGINATION */}
+          <div className="flex justify-between items-center bg-corthex-surface border border-corthex-border px-6 py-4">
+            <div className="font-mono text-[10px] tracking-widest text-corthex-text-disabled uppercase">
+              SHOWING {filteredAgents.length} OF {agents.length} AGENTS
+            </div>
+            <div className="flex gap-2">
+              <button className="bg-corthex-elevated w-8 h-8 flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center font-mono text-[10px]"
+                style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>01</button>
+              <button className="bg-corthex-elevated w-8 h-8 flex items-center justify-center hover:bg-corthex-border transition-all text-corthex-text-secondary">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
+
+      {/* DETAIL SIDE PANEL */}
+      {selectedAgent && (
+        <section
+          data-testid="agents-detail-panel"
+          className="w-96 shrink-0 border-l border-corthex-border flex flex-col overflow-hidden bg-corthex-surface"
+        >
+          {/* Panel Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border bg-corthex-elevated">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-corthex-surface border border-corthex-border flex items-center justify-center">
+                <Bot className="w-4 h-4" style={{ color: 'var(--color-corthex-accent)' }} />
+              </div>
+              <div>
+                <div className="font-mono text-xs font-bold text-corthex-text-primary uppercase tracking-widest">
+                  {selectedAgent.name}
+                </div>
+                <div className="font-mono text-[10px] text-corthex-text-disabled">
+                  {selectedAgent.tier.toUpperCase()}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedAgent(null)}
+              className="text-corthex-text-disabled hover:text-corthex-text-primary transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex border-b border-corthex-border">
+            {(['soul', 'config', 'memory'] as DetailTab[]).map((tab) => (
+              <button
+                key={tab}
+                data-testid={tab === 'config' ? 'agents-tab-info' : `agents-tab-${tab}`}
+                onClick={() => setDetailTab(tab)}
+                className="flex-1 py-3 font-mono text-[10px] uppercase tracking-widest transition-colors border-b-2"
+                style={{
+                  borderBottomColor: detailTab === tab ? 'var(--color-corthex-accent)' : 'transparent',
+                  color: detailTab === tab ? 'var(--color-corthex-accent)' : 'var(--color-corthex-text-disabled)',
+                }}
+              >
+                {tab === 'soul' ? 'Soul' : tab === 'config' ? 'Config' : 'Memory'}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {detailTab === 'soul' && (
+              <div className="flex-1 flex flex-col p-4 overflow-hidden">
+                <div className="flex items-center justify-between px-3 py-2 border border-corthex-border bg-corthex-bg mb-2">
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-corthex-text-disabled">SOUL_FABRIC_CORE</div>
+                  <div className={`font-mono text-[10px] ${charCount > 45000 ? 'text-red-500' : 'text-corthex-text-disabled'}`}>
+                    {charCount.toLocaleString()} / 50k
+                  </div>
+                </div>
+                <textarea
+                  data-testid="agents-soul-editor"
+                  value={editForm.soul || ''}
+                  onChange={(e) => setEditForm({ ...editForm, soul: e.target.value })}
+                  className="flex-1 w-full p-4 font-mono text-xs bg-corthex-bg border border-corthex-border text-corthex-text-primary focus:outline-none focus:border-corthex-accent resize-none overflow-y-auto"
+                  maxLength={50000}
+                  placeholder="# Describe the essence of the agent..."
+                  spellCheck={false}
+                />
+                <button
+                  onClick={handleSaveSoul}
+                  disabled={updateMutation.isPending}
+                  className="mt-3 w-full py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+                >
+                  {updateMutation.isPending ? 'Saving...' : 'Save Soul'}
+                </button>
+              </div>
+            )}
+
+            {detailTab === 'config' && (
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                <div className="space-y-3">
+                  <div className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled border-b border-corthex-border pb-1">Core Identity</div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Agent Name</label>
+                    <input type="text" value={editForm.name || ''} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent" />
+                  </div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Primary Role</label>
+                    <input type="text" value={editForm.role || ''} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                      className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled border-b border-corthex-border pb-1">Intelligence</div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Tier Level</label>
+                    <select value={editForm.tier || 'specialist'} onChange={(e) => setEditForm({ ...editForm, tier: e.target.value as Agent['tier'] })}
+                      className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                      {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Foundation Model</label>
+                    <select value={editForm.modelName || ''} onChange={(e) => setEditForm({ ...editForm, modelName: e.target.value })}
+                      className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                      {MODEL_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled border-b border-corthex-border pb-1">Permissions</div>
+                  {(selectedAgent.allowedTools || []).map((tool) => (
+                    <label key={tool} className="flex items-center gap-3 cursor-pointer">
+                      <input defaultChecked type="checkbox" className="rounded" />
+                      <span className="font-mono text-xs text-corthex-text-secondary">{tool}</span>
+                    </label>
+                  ))}
+                  <div className="pt-2 border-t border-corthex-border">
+                    <label className="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <span className="font-mono text-xs text-corthex-text-primary">Semantic Cache</span>
+                        <p className="font-mono text-[10px] text-corthex-text-disabled">Faster repeated queries</p>
+                      </div>
+                      <div className="relative inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={editForm.enableSemanticCache ?? false}
+                          onChange={(e) => handleCacheToggle(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-corthex-border peer-checked:bg-corthex-accent rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-corthex-text-primary after:rounded-full after:h-5 after:w-5 after:transition-all" />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div className="space-y-2 pt-2">
+                  <button onClick={handleSaveInfo} disabled={updateMutation.isPending}
+                    className="w-full py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>
+                    {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button
+                    data-testid="agents-deactivate-btn"
+                    onClick={() => openDeactivateModal(selectedAgent)}
+                    disabled={!selectedAgent.isActive}
+                    className="w-full py-2 border font-mono text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
+                    {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {detailTab === 'memory' && (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="font-mono text-xs uppercase tracking-widest text-corthex-text-disabled">Memory snapshots will appear here</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Deactivate Modal */}
       {deactivateTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border" style={{ borderColor: 'var(--color-corthex-border)' }}>
-            <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-elevated)', backgroundColor: '#f7f8f4' }}>
-              <h3 className="text-lg font-bold" style={{ color: '#363d2a' }}>에이전트 비활성화</h3>
-              <button onClick={() => setDeactivateTarget(null)} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-corthex-surface border border-corthex-border w-full max-w-md mx-4 overflow-hidden">
+            <div className="px-6 py-4 border-b border-corthex-border flex items-center justify-between bg-corthex-elevated">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-corthex-text-primary">에이전트 비활성화</h3>
+              <button onClick={() => setDeactivateTarget(null)} className="text-corthex-text-disabled hover:text-corthex-text-primary">
+                <X className="w-4 h-4" />
               </button>
             </div>
             <div className="p-6 space-y-4">
-              <p className="text-sm" style={{ color: 'var(--color-corthex-accent-deep)' }}>
-                <strong>{deactivateTarget.name}</strong>을(를) 비활성화하시겠습니까?
+              <p className="font-mono text-xs text-corthex-text-secondary">
+                <strong className="text-corthex-text-primary">{deactivateTarget.name}</strong>을(를) 비활성화하시겠습니까?
               </p>
               {activeSessionCount !== null && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-sm text-amber-800">
-                    현재 {activeSessionCount}개의 활성 세션이 있습니다.
+                <div className="p-3 border border-corthex-border bg-corthex-bg">
+                  <p className="font-mono text-xs text-corthex-text-secondary">
+                    현재 <span style={{ color: 'var(--color-corthex-warning)' }}>{activeSessionCount}</span>개의 활성 세션이 있습니다.
                   </p>
                   <label className="flex items-center gap-2 mt-2">
                     <input type="checkbox" checked={forceDeactivate} onChange={(e) => setForceDeactivate(e.target.checked)} className="rounded" />
-                    <span className="text-sm text-amber-700">강제 비활성화</span>
+                    <span className="font-mono text-xs text-corthex-text-secondary">강제 비활성화</span>
                   </label>
                 </div>
               )}
               <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setDeactivateTarget(null)}
-                  className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium transition-colors"
-                  style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-accent-deep)' }}
-                >
+                <button onClick={() => setDeactivateTarget(null)}
+                  className="flex-1 px-4 py-2 border border-corthex-border font-mono text-xs uppercase tracking-widest text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
                   취소
                 </button>
-                <button
-                  onClick={handleDeactivateConfirm}
-                  disabled={deactivateMutation.isPending}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
-                >
+                <button onClick={handleDeactivateConfirm} disabled={deactivateMutation.isPending}
+                  className="flex-1 px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--color-corthex-error)', color: 'white' }}>
                   {deactivateMutation.isPending ? '처리 중...' : '비활성화'}
                 </button>
               </div>
@@ -667,64 +698,71 @@ export function AgentsPage() {
 
       {/* Create Agent Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border max-h-[80vh] flex flex-col" style={{ borderColor: 'var(--color-corthex-border)' }}>
-            <div className="px-6 py-4 border-b flex items-center justify-between shrink-0" style={{ borderColor: 'var(--color-corthex-elevated)', backgroundColor: '#f7f8f4' }}>
-              <h3 className="text-lg font-bold" style={{ color: '#363d2a' }}>New Agent Template</h3>
-              <button onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }} className="text-corthex-text-disabled hover:text-corthex-text-secondary">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} /></svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-corthex-surface border border-corthex-border w-full max-w-lg mx-4 max-h-[80vh] flex flex-col overflow-hidden">
+            <div className="px-6 py-4 border-b border-corthex-border flex items-center justify-between bg-corthex-elevated shrink-0">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-corthex-text-primary">New Agent</h3>
+              <button onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }}
+                className="text-corthex-text-disabled hover:text-corthex-text-primary">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <form data-testid="agents-create-form" onSubmit={handleCreate} className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
+            <form data-testid="agents-create-form" onSubmit={handleCreate} className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Agent Name *</label>
-                <input data-testid="agents-create-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="예: 마케팅 매니저" required />
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Agent Name *</label>
+                <input data-testid="agents-create-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                  placeholder="예: 마케팅 매니저" required />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Role</label>
-                <input data-testid="agents-create-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputCls} placeholder="예: SNS 콘텐츠 제작" />
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Role</label>
+                <input data-testid="agents-create-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent"
+                  placeholder="예: SNS 콘텐츠 제작" />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Tier Level</label>
-                <select data-testid="agents-create-tier" value={form.tier} onChange={(e) => handleTierChange(e.target.value as 'manager' | 'specialist' | 'worker')} className={selectCls}>
-                  {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label} - {t.desc}</option>)}
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Tier Level</label>
+                <select data-testid="agents-create-tier" value={form.tier} onChange={(e) => handleTierChange(e.target.value as 'manager' | 'specialist' | 'worker')}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                  {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label} — {t.desc}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Foundation Model</label>
-                <select data-testid="agents-create-model" value={form.modelName} onChange={(e) => setForm({ ...form, modelName: e.target.value })} className={selectCls}>
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Foundation Model</label>
+                <select data-testid="agents-create-model" value={form.modelName} onChange={(e) => setForm({ ...form, modelName: e.target.value })}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
                   {MODEL_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Department</label>
-                <select data-testid="agents-create-dept" value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={selectCls}>
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Department</label>
+                <select data-testid="agents-create-dept" value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
                   <option value="">미배정</option>
                   {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--color-corthex-accent-deep)' }}>Soul (Persona)</label>
+                <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-1">Soul (Persona)</label>
                 {soulTemplates.length > 0 && (
-                  <select
-                    value=""
-                    onChange={(e) => {
-                      const tpl = soulTemplates.find((t) => t.id === e.target.value)
-                      if (tpl) setForm({ ...form, soul: tpl.content })
-                    }}
-                    className="w-full mb-2 border-corthex-border rounded-lg text-xs py-1.5 focus:ring-corthex-accent focus:border-corthex-accent"
-                  >
+                  <select value="" onChange={(e) => { const tpl = soulTemplates.find((t) => t.id === e.target.value); if (tpl) setForm({ ...form, soul: tpl.content }) }}
+                    className="w-full bg-corthex-bg border border-corthex-border px-3 py-1.5 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent mb-2">
                     <option value="">템플릿 불러오기...</option>
                     {soulTemplates.map((t) => <option key={t.id} value={t.id}>{t.isBuiltin ? '[기본] ' : ''}{t.name}</option>)}
                   </select>
                 )}
-                <textarea data-testid="agents-create-soul" value={form.soul} onChange={(e) => setForm({ ...form, soul: e.target.value })} rows={3} className={`${inputCls} resize-none`} placeholder="에이전트의 성격과 행동 방식을 정의합니다..." />
+                <textarea data-testid="agents-create-soul" value={form.soul} onChange={(e) => setForm({ ...form, soul: e.target.value })} rows={3}
+                  className="w-full bg-corthex-bg border border-corthex-border px-3 py-2 text-xs font-mono text-corthex-text-primary focus:outline-none focus:border-corthex-accent resize-none"
+                  placeholder="에이전트의 성격과 행동 방식을 정의합니다..." />
               </div>
-              <div className="pt-4 flex gap-3">
-                <button data-testid="agents-create-cancel" type="button" onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }} className="flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium transition-colors" style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-accent-deep)' }}>
+              <div className="pt-2 flex gap-3">
+                <button data-testid="agents-create-cancel" type="button" onClick={() => { setShowCreate(false); setForm({ ...defaultCreateForm }) }}
+                  className="flex-1 px-4 py-2 border border-corthex-border font-mono text-xs uppercase tracking-widest text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
                   취소
                 </button>
-                <button data-testid="agents-create-submit" type="submit" disabled={createMutation.isPending} className="flex-1 px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50" style={{ backgroundColor: '#667447' }}>
+                <button data-testid="agents-create-submit" type="submit" disabled={createMutation.isPending}
+                  className="flex-1 px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>
                   {createMutation.isPending ? '생성 중...' : '만들기'}
                 </button>
               </div>
@@ -735,13 +773,20 @@ export function AgentsPage() {
 
       {/* Cache Disable Confirmation Modal */}
       {showCacheDisableModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-corthex-surface rounded-2xl shadow-xl w-full max-w-sm mx-4 p-6 border" style={{ borderColor: 'var(--color-corthex-border)' }}>
-            <h3 className="text-lg font-bold mb-3" style={{ color: '#363d2a' }}>Semantic Cache 비활성화</h3>
-            <p className="text-sm mb-4" style={{ color: 'var(--color-corthex-accent-deep)' }}>캐시를 비활성화하면 응답 속도가 느려질 수 있습니다.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-corthex-surface border border-corthex-border w-full max-w-sm mx-4 p-6">
+            <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-corthex-text-primary mb-3">Semantic Cache 비활성화</h3>
+            <p className="font-mono text-xs text-corthex-text-secondary mb-4">캐시를 비활성화하면 응답 속도가 느려질 수 있습니다.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowCacheDisableModal(false)} className="flex-1 px-4 py-2 border rounded-lg text-sm" style={{ borderColor: 'var(--color-corthex-border)' }}>취소</button>
-              <button onClick={confirmCacheDisable} className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg text-sm">확인</button>
+              <button onClick={() => setShowCacheDisableModal(false)}
+                className="flex-1 px-4 py-2 border border-corthex-border font-mono text-xs uppercase tracking-widest text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+                취소
+              </button>
+              <button onClick={confirmCacheDisable}
+                className="flex-1 px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold"
+                style={{ backgroundColor: 'var(--color-corthex-error)', color: 'white' }}>
+                확인
+              </button>
             </div>
           </div>
         </div>
