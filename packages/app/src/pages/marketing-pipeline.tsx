@@ -219,77 +219,125 @@ export function MarketingPipelinePage() {
   const preset = presetData?.data
   const executions = execData?.data?.data ?? []
 
+  // Group executions by status for Kanban columns
+  const kanbanColumns = [
+    { id: 'waiting' as const, label: 'Queued', dotStyle: { backgroundColor: 'var(--color-corthex-text-secondary)' }, items: executions.filter(e => e.status === 'waiting') },
+    { id: 'running' as const, label: 'Running', dotStyle: { backgroundColor: 'var(--color-corthex-accent)' }, items: executions.filter(e => e.status === 'running') },
+    { id: 'success' as const, label: 'Completed', dotStyle: { backgroundColor: '#22c55e' }, items: executions.filter(e => e.status === 'success') },
+    { id: 'error' as const, label: 'Failed', dotStyle: { backgroundColor: '#ef4444' }, items: executions.filter(e => e.status === 'error') },
+  ]
+
   return (
-    <div className="space-y-6">
+    <div
+      data-testid="marketing-pipeline-page"
+      className="font-sans min-h-screen flex flex-col"
+      style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
+    >
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <GitBranch className="h-6 w-6 text-olive-600" />
-        <div>
-          <h1 className="text-xl font-semibold text-stone-800">마케팅 파이프라인</h1>
-          <p className="text-sm text-stone-500">콘텐츠 자동 생성 워크플로우 실행 현황</p>
+      <header className="px-8 py-6 border-b border-corthex-border flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <GitBranch className="h-6 w-6 text-corthex-accent" />
+          <div>
+            <h1 className="text-2xl font-black text-corthex-text-primary tracking-tight flex items-center gap-3">
+              CONTENT PIPELINE
+              {preset && (
+                <span className="text-[10px] px-2 py-0.5 border rounded uppercase font-black text-corthex-accent" style={{ backgroundColor: 'rgba(96,108,56,0.1)', borderColor: 'rgba(96,108,56,0.2)' }}>
+                  {preset.name}
+                </span>
+              )}
+            </h1>
+            <p className="text-sm text-corthex-text-secondary mt-1">
+              {preset?.description || '콘텐츠 자동 생성 워크플로우 실행 현황'}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Kanban Board */}
+      <div className="flex-1 overflow-x-auto p-8">
+        <div className="flex gap-6 h-full min-w-max">
+          {kanbanColumns.map(col => {
+            const config = EXEC_STATUS[col.id]
+            return (
+              <div key={col.id} className="flex flex-col gap-4 w-72">
+                {/* Column Header */}
+                <div className="flex items-center gap-2 px-1">
+                  <span
+                    className={`w-2 h-2 rounded-full ${col.id === 'running' ? 'animate-pulse' : ''}`}
+                    style={col.dotStyle}
+                  />
+                  <h2 className="text-sm font-black text-corthex-text-primary uppercase tracking-widest">{col.label}</h2>
+                  <span className="text-[10px] font-bold text-corthex-text-secondary bg-corthex-elevated px-1.5 rounded">
+                    {col.items.length}
+                  </span>
+                </div>
+
+                {/* Cards */}
+                <div className="flex flex-col gap-3 overflow-y-auto">
+                  {execLoading ? (
+                    Array.from({ length: 2 }).map((_, i) => (
+                      <div key={i} className="h-24 rounded-xl animate-pulse bg-corthex-elevated border border-corthex-border" />
+                    ))
+                  ) : col.items.length === 0 ? (
+                    <div className="border border-dashed border-corthex-border rounded-xl p-6 text-center">
+                      <p className="text-xs text-corthex-text-secondary">비어 있음</p>
+                    </div>
+                  ) : (
+                    col.items.map(exec => {
+                      const StatusIcon = config.icon
+                      return (
+                        <div
+                          key={exec.id}
+                          className="bg-corthex-surface border border-corthex-border p-4 rounded-xl hover:border-corthex-border transition-all"
+                          style={{ cursor: 'default' }}
+                        >
+                          <div className="flex justify-between items-start mb-3">
+                            <div className={`p-1 rounded ${config.bg}`}>
+                              <StatusIcon className={`w-3 h-3 ${config.color}`} />
+                            </div>
+                            <span className="text-[10px] font-mono text-corthex-text-secondary uppercase">{exec.mode}</span>
+                          </div>
+                          <h3 className="text-sm font-semibold text-corthex-text-primary mb-3 leading-tight line-clamp-2">
+                            {exec.workflowData?.name || `실행 #${exec.id.slice(-6)}`}
+                          </h3>
+                          <div className="flex items-center justify-between pt-3 border-t border-corthex-border">
+                            <span className="text-[10px] font-mono text-corthex-text-secondary">{formatDate(exec.startedAt)}</span>
+                            <span className={`text-[10px] font-bold ${config.color}`}>
+                              {formatDuration(exec.startedAt, exec.stoppedAt)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* DAG Pipeline View (UXR101) */}
-      <section>
-        <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
-          파이프라인 구조
-        </h2>
-        <div className="rounded-xl border border-sand-200 bg-corthex-surface">
-          {presetLoading ? (
-            <div className="p-8 text-center text-stone-400">
-              <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />
-              <p>로딩 중...</p>
-            </div>
-          ) : preset?.stages ? (
-            <PipelineDAG stages={preset.stages} />
-          ) : (
-            <div className="p-8 text-center text-stone-400">
-              <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>파이프라인 구조를 불러올 수 없습니다</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Pipeline info */}
+      {/* Pipeline Info Footer */}
       {preset && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
-            <p className="text-xs text-stone-500">단계</p>
-            <p className="text-lg font-semibold text-stone-800">{preset.stages.length}단계</p>
+        <div className="px-8 py-4 border-t border-corthex-border grid grid-cols-4 gap-4">
+          <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg">
+            <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">단계</p>
+            <p className="text-xl font-mono text-corthex-text-primary">{preset.stages.length}단계</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
-            <p className="text-xs text-stone-500">게시 플랫폼</p>
-            <p className="text-lg font-semibold text-stone-800">{preset.platforms.length}개</p>
+          <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg">
+            <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">게시 플랫폼</p>
+            <p className="text-xl font-mono text-corthex-text-primary">{preset.platforms.length}개</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
-            <p className="text-xs text-stone-500">버전</p>
-            <p className="text-lg font-semibold text-stone-800">{preset.version}</p>
+          <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg">
+            <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">버전</p>
+            <p className="text-xl font-mono text-corthex-text-primary">{preset.version}</p>
           </div>
-          <div className="rounded-lg border border-sand-200 bg-corthex-surface p-3">
-            <p className="text-xs text-stone-500">최근 실행</p>
-            <p className="text-lg font-semibold text-stone-800">{executions.length}건</p>
+          <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg">
+            <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">총 실행</p>
+            <p className="text-xl font-mono text-corthex-text-primary">{executions.length}건</p>
           </div>
         </div>
       )}
-
-      {/* Execution History */}
-      <section>
-        <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
-          실행 이력
-        </h2>
-        <div className="rounded-xl border border-sand-200 bg-corthex-surface overflow-hidden">
-          {execLoading ? (
-            <div className="p-8 text-center text-stone-400">
-              <RefreshCw className="h-6 w-6 mx-auto mb-2 animate-spin" />
-              <p>로딩 중...</p>
-            </div>
-          ) : (
-            <ExecutionHistory executions={executions} />
-          )}
-        </div>
-      </section>
     </div>
   )
 }

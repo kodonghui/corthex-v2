@@ -8,6 +8,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { Download, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { api } from '../lib/api'
 import { toast } from '@corthex/ui'
 import { MarkdownRenderer } from '../components/markdown-renderer'
@@ -348,21 +349,84 @@ export function OpsLogPage() {
     <div
       data-testid="ops-log-page"
       className="font-sans min-h-screen flex flex-col"
-      style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)', fontFamily: "'Inter', sans-serif" }}
+      style={{ backgroundColor: 'var(--color-corthex-bg)', color: 'var(--color-corthex-text-primary)' }}
     >
       {/* Header */}
-      <header className="border-b px-8 py-6" style={{ backgroundColor: 'var(--color-corthex-surface)', borderColor: 'var(--color-corthex-border)' }}>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="p-8 pb-0">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-semibold" style={{ color: 'var(--color-corthex-text-primary)' }}>Ops Log</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-corthex-text-secondary)' }}>Operation history and performance tracking.</p>
+            <h2 className="text-3xl font-black text-corthex-text-primary tracking-tighter">Operations Log</h2>
+            <p className="text-corthex-text-secondary mt-1 max-w-2xl">Real-time execution records for the CORTHEX core processing unit and distributed resource network.</p>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg min-w-[120px]">
+              <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">Total Events</p>
+              <p className="text-xl font-mono text-corthex-text-primary">{total.toLocaleString()}</p>
+            </div>
+            <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg min-w-[120px]">
+              <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">Errors (24h)</p>
+              <p className="text-xl font-mono" style={{ color: '#dc2626' }}>
+                {String(items.filter(i => i.status === 'failed').length).padStart(2, '0')}
+              </p>
+            </div>
+            <div className="bg-corthex-surface border border-corthex-border p-3 rounded-lg min-w-[120px]">
+              <p className="text-[10px] text-corthex-text-secondary uppercase tracking-tighter">Avg Quality</p>
+              <p className="text-xl font-mono text-corthex-accent">
+                {items.filter(i => i.qualityScore != null).length > 0
+                  ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length).toFixed(1)
+                  : '--'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters & Actions */}
+        <div className="flex items-center justify-between border-b border-corthex-border pb-4" data-testid="filters-row">
+          <div className="flex gap-1 bg-corthex-surface p-1 rounded-lg border border-corthex-border">
+            <button
+              onClick={() => { setStatusFilter(''); setPage(1) }}
+              className="px-4 py-1.5 rounded-md text-xs font-semibold transition-all"
+              style={statusFilter === '' ? { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-primary)' } : { color: 'var(--color-corthex-text-secondary)' }}
+            >
+              ALL
+            </button>
+            {Object.entries(STATUS_LABELS).slice(0, 4).map(([k, v]) => (
+              <button
+                key={k}
+                onClick={() => { setStatusFilter(k); setPage(1) }}
+                className="px-4 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-2"
+                style={statusFilter === k ? { backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-primary)' } : { color: 'var(--color-corthex-text-secondary)' }}
+                data-testid="bookmark-filter"
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: STATUS_BADGE_STYLES[k]?.dotColor || 'var(--color-corthex-text-secondary)' }} />
+                {v.toUpperCase()}
+              </button>
+            ))}
           </div>
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <input
+                placeholder="검색..."
+                value={searchInput}
+                onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
+                className="py-1.5 px-3 border border-corthex-border rounded-lg text-xs text-corthex-text-primary bg-corthex-bg w-40"
+                data-testid="search-input"
+              />
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
+                className="py-1.5 px-3 border border-corthex-border rounded-lg text-xs text-corthex-text-primary bg-corthex-bg"
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
             {selectedIds.size === 2 && (
               <button
                 onClick={() => setCompareOpen(true)}
-                className="px-4 py-2 text-sm font-bold rounded transition-colors"
-                style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-colors"
+                style={{ backgroundColor: 'var(--color-corthex-accent)' }}
                 data-testid="compare-btn"
               >
                 비교
@@ -370,281 +434,165 @@ export function OpsLogPage() {
             )}
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 border rounded text-sm font-medium transition-colors"
-              style={{ backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
+              className="text-xs text-corthex-text-secondary flex items-center gap-2 border border-corthex-border px-3 py-1.5 rounded-lg hover:bg-corthex-surface transition-colors"
               data-testid="export-btn"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-              내보내기
+              <Download className="w-3.5 h-3.5" /> Export CSV
             </button>
-          </div>
-        </div>
-      </header>
-
-      {/* KPI Stats Cards */}
-      <div className="px-8 pt-6 pb-2">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: 'var(--color-corthex-border)', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>Daily Operations</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-primary)' }}>{total}</p>
-          </div>
-          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: 'var(--color-corthex-border)', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>Avg Quality Score</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: 'var(--color-corthex-accent)' }}>
-              {items.length > 0
-                ? (items.reduce((sum, i) => sum + (i.qualityScore ?? 0), 0) / items.filter(i => i.qualityScore != null).length || 0).toFixed(1)
-                : '-'}
-              <span className="text-xl" style={{ color: 'var(--color-corthex-text-secondary)' }}>/5</span>
-            </p>
-          </div>
-          <div className="bg-corthex-surface rounded-2xl p-6 border" style={{ borderColor: 'var(--color-corthex-border)', boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>Total Op Cost</p>
-            <p className="text-3xl font-bold font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-primary)' }}>
-              {items.length > 0
-                ? formatCost(items.reduce((sum, i) => sum + (i.totalCostMicro ?? 0), 0))
-                : '-'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters Row */}
-      <div className="px-8 py-3 border-b flex flex-wrap gap-2 items-center" style={{ borderColor: 'var(--color-corthex-border)' }} data-testid="filters-row">
-        <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--color-corthex-text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" strokeWidth="2" /><path d="m21 21-4.35-4.35" strokeLinecap="round" strokeWidth="2" /></svg>
-          <input
-            placeholder="검색..."
-            value={searchInput}
-            onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
-            className="pl-10 pr-4 py-2 border rounded text-sm w-48 transition-all focus:ring-1"
-            style={{ ...inputStyle, outline: 'none' }}
-            data-testid="search-input"
-          />
-        </div>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
-          className="py-2 px-3 border rounded text-sm"
-          style={inputStyle}
-        />
-        <span className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>~</span>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
-          className="py-2 px-3 border rounded text-sm"
-          style={inputStyle}
-        />
-        <select
-          value={typeFilter}
-          onChange={(e) => { setTypeFilter(e.target.value); setPage(1) }}
-          className="py-2 px-3 border rounded text-sm"
-          style={inputStyle}
-        >
-          <option value="">전체 유형</option>
-          {Object.entries(TYPE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-          className="py-2 px-3 border rounded text-sm"
-          style={inputStyle}
-        >
-          <option value="">전체 상태</option>
-          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-          className="py-2 px-3 border rounded text-sm"
-          style={inputStyle}
-        >
-          {SORT_OPTIONS.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        <button
-          onClick={() => { setBookmarkedOnly(!bookmarkedOnly); setPage(1) }}
-          className="text-sm px-3 py-2 rounded border transition-colors"
-          style={bookmarkedOnly
-            ? { backgroundColor: 'rgba(180,83,9,0.1)', borderColor: 'rgba(180,83,9,0.3)', color: '#b45309' }
-            : { backgroundColor: 'transparent', borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }
-          }
-          data-testid="bookmark-filter"
-        >
-          &#9733; 북마크
-        </button>
-      </div>
-
-      {/* Filter chips */}
-      {filterChips.length > 0 && (
-        <div className="px-8 py-2 border-b flex flex-wrap gap-1.5" style={{ borderColor: '#e5e1d350' }}>
-          {filterChips.map(chip => (
-            <span
-              key={chip.key}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-full"
-              style={{ backgroundColor: 'rgba(96,108,56,0.1)', color: 'var(--color-corthex-accent)' }}
-            >
-              {chip.label}
-              <button
-                onClick={chip.onRemove}
-                className="ml-0.5 hover:opacity-70"
-                style={{ color: 'var(--color-corthex-accent)' }}
-              >
-                &times;
-              </button>
-            </span>
-          ))}
-          <button
-            onClick={() => {
-              setSearchInput(''); setStartDate(''); setEndDate('')
-              setTypeFilter(''); setStatusFilter(''); setBookmarkedOnly(false)
-              setPage(1)
-            }}
-            className="text-[11px] px-2 py-1 hover:opacity-70"
-            style={{ color: 'var(--color-corthex-text-secondary)' }}
-          >
-            전체 초기화
-          </button>
-        </div>
-      )}
-
-      {/* Selection info */}
-      {selectedIds.size > 0 && (
-        <div className="px-8 py-2 border-b flex items-center justify-between" style={{ backgroundColor: 'rgba(96,108,56,0.06)', borderColor: 'rgba(96,108,56,0.15)' }}>
-          <span className="text-xs" style={{ color: 'var(--color-corthex-accent)' }}>
-            {selectedIds.size}개 선택됨 {selectedIds.size < 2 && '(비교하려면 2개를 선택하세요)'}
-          </span>
-          <button
-            onClick={() => setSelectedIds(new Set())}
-            className="text-xs hover:opacity-70"
-            style={{ color: 'var(--color-corthex-accent)' }}
-          >
-            선택 해제
-          </button>
-        </div>
-      )}
-
-      {/* Main Content: Timeline / Table */}
-      <section className="flex-1 overflow-auto p-8" data-testid="ops-table">
-        {listQuery.isLoading ? (
-          <div className="max-w-5xl mx-auto space-y-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-20 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-            ))}
-          </div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-16" data-testid="ops-empty">
-            <p className="text-sm font-medium mb-2" style={{ color: 'var(--color-corthex-text-secondary)' }}>보고된 작전이 없습니다</p>
-            <p className="text-xs mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }}>허브에서 명령을 내리면 작전일지가 기록됩니다.</p>
             <button
-              onClick={() => navigate('/hub')}
-              className="px-4 py-2 text-sm text-white rounded-lg font-medium hover:opacity-90 transition-colors"
-              style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+              onClick={() => { setBookmarkedOnly(!bookmarkedOnly); setPage(1) }}
+              className="text-xs flex items-center gap-2 border px-3 py-1.5 rounded-lg transition-colors"
+              style={bookmarkedOnly
+                ? { borderColor: 'rgba(180,83,9,0.3)', color: '#b45309', backgroundColor: 'rgba(180,83,9,0.05)' }
+                : { borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }
+              }
             >
-              허브로 이동
+              <Trash2 className="w-3.5 h-3.5" /> 북마크
             </button>
           </div>
-        ) : (
-          <div className="max-w-5xl mx-auto">
-            {/* Timeline list */}
-            <div className="relative">
-              {/* Vertical timeline line */}
-              <div className="absolute left-5 top-0 bottom-0 w-px" style={{ backgroundColor: 'var(--color-corthex-border)' }} />
+        </div>
 
-              <div className="space-y-4">
-                {items.map(item => {
-                  const statusInfo = STATUS_BADGE_STYLES[item.status] || STATUS_BADGE_STYLES.cancelled
-                  return (
-                    <article
-                      key={item.id}
-                      onClick={() => setDetailId(item.id)}
-                      className="relative flex gap-4 pl-12 cursor-pointer group"
-                      data-testid={`ops-row-${item.id}`}
-                    >
-                      {/* Timeline dot */}
-                      <div
-                        className="absolute left-3.5 top-6 w-3 h-3 rounded-full border-4"
-                        style={{ backgroundColor: statusInfo.dotColor, borderColor: 'var(--color-corthex-bg)' }}
-                      />
-
-                      <div
-                        className="flex-1 bg-corthex-surface p-5 rounded-2xl border transition-all group-hover:border-l-4"
-                        style={{
-                          borderColor: 'var(--color-corthex-border)',
-                          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                          borderLeftColor: selectedIds.has(item.id) ? 'var(--color-corthex-accent)' : undefined,
-                        }}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex items-center gap-2">
-                            {/* Checkbox for comparison */}
-                            <input
-                              type="checkbox"
-                              checked={selectedIds.has(item.id)}
-                              onChange={(e) => { e.stopPropagation(); toggleSelect(item.id) }}
-                              disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
-                              className="w-3.5 h-3.5 rounded accent-corthex-accent"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <StatusBadge status={item.status} />
-                            <span className="text-[10px] px-2 py-0.5 rounded font-medium uppercase tracking-wider" style={{ backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)' }}>
-                              {TYPE_LABELS[item.type] || item.type}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(item.createdAt)}</span>
-                            <button
-                              className="text-sm hover:scale-110 transition-transform"
-                              style={{ color: item.isBookmarked ? '#b45309' : 'var(--color-corthex-text-secondary)' }}
-                              onClick={(e) => handleBookmarkToggle(item, e)}
-                            >
-                              {item.isBookmarked ? '\u2605' : '\u2606'}
-                            </button>
-                          </div>
-                        </div>
-
-                        {item.targetAgentName && (
-                          <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-corthex-accent)' }}>{item.targetAgentName}</p>
-                        )}
-                        <p className="text-sm leading-relaxed line-clamp-2 mb-3" style={{ color: 'var(--color-corthex-text-primary)' }}>{item.text}</p>
-
-                        <div className="flex items-center gap-4">
-                          <span className="font-mono tabular-nums text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatDuration(item.durationMs)}</span>
-                          <span className="font-mono tabular-nums text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatCost(item.totalCostMicro)}</span>
-                          {item.qualityScore != null && (
-                            <div className="flex-1 max-w-[100px]">
-                              <QualityBar score={item.qualityScore} />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
-            </div>
+        {/* Filter chips */}
+        {filterChips.length > 0 && (
+          <div className="py-2 flex flex-wrap gap-1.5">
+            {filterChips.map(chip => (
+              <span
+                key={chip.key}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-full"
+                style={{ backgroundColor: 'rgba(96,108,56,0.1)', color: 'var(--color-corthex-accent)' }}
+              >
+                {chip.label}
+                <button onClick={chip.onRemove} className="ml-0.5 hover:opacity-70">&times;</button>
+              </span>
+            ))}
+            <button
+              onClick={() => { setSearchInput(''); setStartDate(''); setEndDate(''); setTypeFilter(''); setStatusFilter(''); setBookmarkedOnly(false); setPage(1) }}
+              className="text-[11px] px-2 py-1 hover:opacity-70 text-corthex-text-secondary"
+            >
+              전체 초기화
+            </button>
           </div>
         )}
-      </section>
+
+        {/* Selection info */}
+        {selectedIds.size > 0 && (
+          <div className="py-2 flex items-center justify-between" style={{ backgroundColor: 'rgba(96,108,56,0.06)' }}>
+            <span className="text-xs text-corthex-accent">
+              {selectedIds.size}개 선택됨 {selectedIds.size < 2 && '(비교하려면 2개를 선택하세요)'}
+            </span>
+            <button onClick={() => setSelectedIds(new Set())} className="text-xs text-corthex-accent hover:opacity-70">선택 해제</button>
+          </div>
+        )}
+      </div>
+
+      {/* Table Container */}
+      <div className="flex-1 mx-8 my-4 bg-corthex-bg rounded-xl border border-corthex-border overflow-hidden flex flex-col" data-testid="ops-table">
+        <div className="overflow-x-auto flex-1">
+          <table className="w-full text-left border-collapse">
+            <thead className="sticky top-0 bg-corthex-elevated border-b border-corthex-border z-10">
+              <tr>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest w-8">
+                  <input type="checkbox" className="rounded accent-corthex-accent" />
+                </th>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">Time</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">Operation</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">Agent / Target</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">Result</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest text-right">Duration</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-corthex-border">
+              {listQuery.isLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan={6} className="px-6 py-4">
+                      <div className="h-4 rounded animate-pulse bg-corthex-elevated" />
+                    </td>
+                  </tr>
+                ))
+              ) : items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center" data-testid="ops-empty">
+                    <p className="text-sm font-medium mb-2 text-corthex-text-secondary">보고된 작전이 없습니다</p>
+                    <p className="text-xs mb-4 text-corthex-text-secondary">허브에서 명령을 내리면 작전일지가 기록됩니다.</p>
+                    <button
+                      onClick={() => navigate('/hub')}
+                      className="px-4 py-2 text-sm text-white rounded-lg font-medium hover:opacity-90 transition-colors"
+                      style={{ backgroundColor: 'var(--color-corthex-accent)' }}
+                    >
+              허브로 이동
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                items.map(item => (
+                  <tr
+                    key={item.id}
+                    onClick={() => setDetailId(item.id)}
+                    className="cursor-pointer border-b transition-colors hover:bg-corthex-elevated/30"
+                    style={{ borderColor: 'var(--color-corthex-border)' }}
+                    data-testid={`ops-row-${item.id}`}
+                  >
+                    <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(item.id)}
+                        onChange={() => toggleSelect(item.id)}
+                        disabled={!selectedIds.has(item.id) && selectedIds.size >= 2}
+                        className="w-3.5 h-3.5 rounded"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(item.createdAt)}</span>
+                    </td>
+                    <td className="px-6 py-4 max-w-xs">
+                      <p className="text-sm line-clamp-2 mb-1" style={{ color: 'var(--color-corthex-text-primary)' }}>{item.text}</p>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider" style={{ backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-text-secondary)' }}>
+                        {TYPE_LABELS[item.type] || item.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.targetAgentName && (
+                        <code className="text-xs font-mono" style={{ color: 'var(--color-corthex-accent)' }}>{item.targetAgentName}</code>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={item.status} />
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatDuration(item.durationMs)}</span>
+                        <span className="text-xs font-mono tabular-nums" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatCost(item.totalCostMicro)}</span>
+                        {item.qualityScore != null && <div className="w-20"><QualityBar score={item.qualityScore} /></div>}
+                        <button
+                          className="text-sm hover:scale-110 transition-transform"
+                          style={{ color: item.isBookmarked ? 'var(--color-corthex-accent)' : 'var(--color-corthex-text-secondary)' }}
+                          onClick={(e) => { e.stopPropagation(); handleBookmarkToggle(item, e) }}
+                        >
+                          {item.isBookmarked ? '★' : '☆'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="px-8 py-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-border)', backgroundColor: 'var(--color-corthex-surface)' }} data-testid="pagination">
+        <div className="px-6 py-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--color-corthex-border)' }} data-testid="pagination">
           <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>{total.toLocaleString()}건</span>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
-              className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
+              className="border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors"
               style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
             >
-              이전
+              <ChevronLeft className="h-3.5 w-3.5" />
             </button>
             <span className="text-xs" style={{ color: 'var(--color-corthex-text-secondary)' }}>
               {page} / {totalPages}
@@ -652,10 +600,10 @@ export function OpsLogPage() {
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="border rounded px-3 py-1.5 text-xs disabled:opacity-30 hover:opacity-70 transition-colors"
+              className="border rounded p-1.5 disabled:opacity-30 hover:opacity-70 transition-colors"
               style={{ borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
             >
-              다음
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>

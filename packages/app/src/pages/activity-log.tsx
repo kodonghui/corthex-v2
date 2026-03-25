@@ -8,7 +8,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { Search, ChevronDown, FileText, ArrowRight, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react'
+import { Search, ChevronDown, FileText, ArrowRight, CheckCircle, XCircle, AlertTriangle, Info, Download, RefreshCw } from 'lucide-react'
 import { api } from '../lib/api'
 import { useActivityWs } from '../hooks/use-activity-ws'
 import { WsStatusIndicator } from '../components/ws-status-indicator'
@@ -351,220 +351,380 @@ export function ActivityLogPage() {
 
   return (
     <div className="flex-1 flex flex-col bg-corthex-bg overflow-hidden" data-testid="activity-log-page">
-      {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
-        {/* Header Section */}
-        <header className="border-b border-corthex-border px-8 py-6 bg-corthex-surface shrink-0" data-purpose="page-header">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-corthex-accent-deep">Activity Log</h1>
-              <p className="text-sm mt-1 text-corthex-text-secondary">Audit trail for workspace events and operations.</p>
+        <section className="flex-1 overflow-y-auto p-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-end justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-corthex-text-primary tracking-tighter uppercase mb-1">Activity Log</h2>
+                <p className="text-corthex-text-secondary font-medium">Real-time system event monitoring and audit trails.</p>
+              </div>
+              <div className="flex gap-3">
+                <button className="px-4 py-2 bg-corthex-elevated border border-corthex-border text-corthex-text-secondary text-sm font-semibold rounded flex items-center gap-2 hover:bg-corthex-surface transition-colors">
+                  <Download className="w-4 h-4" />
+                  Export CSV
+                </button>
+                <div className="px-4 py-2 bg-corthex-accent text-white text-sm font-bold rounded flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4" />
+                  <WsStatusIndicator />
+                  Live Update
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <WsStatusIndicator />
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
-                </span>
+          </div>
+
+          {/* Filters Bar */}
+          <div className="bg-corthex-surface border border-corthex-border rounded-lg p-4 mb-6 flex flex-wrap items-center gap-6">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Date Range</label>
+              <div className="flex items-center gap-2">
                 <input
-                  className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-corthex-accent w-64 transition-all"
-                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
-                  placeholder="Search events..."
-                  type="text"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => { setStartDate(e.target.value); setPage(1) }}
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                />
+                <span className="text-corthex-text-secondary text-xs">~</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => { setEndDate(e.target.value); setPage(1) }}
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Agent Selector</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-corthex-text-secondary" />
+                <input
+                  className="bg-corthex-bg border border-corthex-border pl-8 pr-3 py-2 rounded text-sm text-corthex-text-primary w-44"
+                  placeholder="All Agents"
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); setPage(1) }}
                   data-testid="search-input"
                 />
               </div>
-              {tab === 'tools' && (
-                <input
-                  placeholder="Tool name filter..."
-                  value={toolNameFilter}
-                  onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
-                  className="py-2 px-3 border rounded-lg text-sm w-40 transition-colors focus:ring-1 focus:ring-corthex-accent"
-                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
-                  data-testid="tool-name-filter"
-                />
-              )}
-              {tab === 'quality' && (
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Action Type</label>
+              <div className="flex p-1 bg-corthex-bg border border-corthex-border rounded">
+                {TAB_ITEMS.map(item => (
+                  <button
+                    key={item.value}
+                    onClick={() => setTab(item.value)}
+                    className="px-4 py-1.5 rounded text-xs font-bold transition-colors"
+                    style={tab === item.value
+                      ? { backgroundColor: 'var(--color-corthex-surface)', color: 'var(--color-corthex-accent)' }
+                      : { color: 'var(--color-corthex-text-secondary)' }
+                    }
+                    data-testid={`tab-${item.value}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {tab === 'quality' && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Conclusion</label>
                 <select
                   value={conclusionFilter}
                   onChange={(e) => { setConclusionFilter(e.target.value); setPage(1) }}
-                  className="py-2 px-3 border rounded-lg text-sm"
-                  style={{ backgroundColor: 'var(--color-corthex-bg)', borderColor: '#908a78', color: 'var(--color-corthex-text-primary)' }}
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
                   data-testid="conclusion-filter"
                 >
                   <option value="">All</option>
                   <option value="pass">PASS</option>
                   <option value="fail">FAIL</option>
                 </select>
-              )}
-              <button
-                className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-corthex-elevated"
-                style={{ backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                Filters
-              </button>
-              <button className="p-2 rounded-lg transition-colors hover:bg-corthex-accent-deep" style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)' }}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              </button>
-            </div>
-          </div>
-          {/* Navigation Tabs */}
-          <div className="flex border-b mt-8 gap-8" style={{ borderColor: 'var(--color-corthex-border)' }} data-purpose="content-tabs">
-            {TAB_ITEMS.map(item => (
-              <button
-                key={item.value}
-                onClick={() => setTab(item.value)}
-                className="pb-3 text-sm transition-colors"
-                style={tab === item.value
-                  ? { fontWeight: 600, borderBottom: '2px solid #606C38', color: 'var(--color-corthex-text-primary)' }
-                  : { fontWeight: 500, color: 'var(--color-corthex-text-secondary)', borderBottom: '2px solid transparent' }
-                }
-                data-testid={`tab-${item.value}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </header>
+              </div>
+            )}
 
-        {/* Security Alert Banner (QA tab only) */}
-        {tab === 'quality' && alertCount24h > 0 && (
-          <div
-            className="mx-8 mt-4 px-4 py-3 rounded-lg cursor-pointer flex items-center justify-between transition-colors"
-            style={{ backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}
-            onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
-            role="alert"
-            data-testid="security-alert-banner"
-          >
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" style={{ color: '#dc2626' }} />
-              <span className="text-sm font-medium" style={{ color: '#dc2626' }}>
-                보안 알림: 최근 24시간 {alertCount24h}건 차단
-              </span>
-            </div>
-            <span className="text-xs" style={{ color: '#dc2626' }}>{showSecurityAlerts ? '접기' : '상세 보기'}</span>
-          </div>
-        )}
-
-        {/* Security Alerts Detail */}
-        {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
-          <div className="mx-8 mb-4 p-3 rounded-b-lg" style={{ backgroundColor: 'rgba(220,38,38,0.03)', border: '1px solid rgba(220,38,38,0.15)' }} data-testid="security-alerts-detail">
-            <table className="w-full text-xs">
-              <thead>
-                <tr style={{ color: 'var(--color-corthex-text-secondary)', borderBottom: '1px solid rgba(220,38,38,0.15)' }}>
-                  <th className="text-left py-1 pr-2 font-medium">시간</th>
-                  <th className="text-left py-1 pr-2 font-medium">유형</th>
-                  <th className="text-left py-1 pr-2 font-medium">심각도</th>
-                  <th className="text-left py-1 font-medium">상세</th>
-                </tr>
-              </thead>
-              <tbody>
-                {securityQuery.data.data.items.slice(0, 10).map((alert) => {
-                  const meta = alert.metadata as Record<string, unknown> | null
-                  const sevStyle = SEVERITY_STYLES[(meta?.severity as string) || 'major'] || SEVERITY_STYLES.major
-                  return (
-                    <tr key={alert.id} style={{ borderBottom: '1px solid rgba(220,38,38,0.08)' }}>
-                      <td className="py-1.5 pr-2 whitespace-nowrap font-mono" style={{ color: 'var(--color-corthex-text-secondary)' }}>{formatTime(alert.createdAt)}</td>
-                      <td className="py-1.5 pr-2">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: '#dc2626' }}>
-                          {SECURITY_ACTION_LABELS[alert.action] || alert.action}
-                        </span>
-                      </td>
-                      <td className="py-1.5 pr-2">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: sevStyle.bg, color: sevStyle.text }}>
-                          {(meta?.severity as string) || 'major'}
-                        </span>
-                      </td>
-                      <td className="py-1.5 truncate max-w-[300px]" style={{ color: 'var(--color-corthex-text-secondary)' }}>
-                        {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Activity Content */}
-        <section className="flex-1 overflow-y-auto p-8" data-purpose="activity-timeline">
-          {activeQuery.isLoading ? (
-            <div className="max-w-5xl mx-auto space-y-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-20 rounded-xl animate-pulse" style={{ backgroundColor: 'var(--color-corthex-elevated)' }} />
-              ))}
-            </div>
-          ) : !activeQuery.data?.data?.items?.length ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="activity-empty">
-              <FileText className="w-10 h-10 mb-4" style={{ color: 'var(--color-corthex-text-secondary)' }} />
-              <h3 className="text-base font-medium mb-2" style={{ color: 'var(--color-corthex-text-primary)' }}>데이터가 없습니다</h3>
-              <p className="text-sm" style={{ color: 'var(--color-corthex-text-secondary)' }}>선택한 기간에 해당하는 기록이 없습니다</p>
-            </div>
-          ) : (
-            <div className="max-w-5xl mx-auto space-y-12">
-              {tab === 'agents' && (
-                <TimelineView items={agentsQuery.data!.data.items} />
-              )}
-
-              {tab === 'delegations' && (
-                <DelegationTimeline items={delegationsQuery.data!.data.items} />
-              )}
-
-              {tab === 'quality' && (
-                <QualityTable
-                  items={qualityQuery.data!.data.items}
-                  expandedId={expandedQaId}
-                  onToggle={(id) => setExpandedQaId(expandedQaId === id ? null : id)}
+            {tab === 'tools' && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase font-bold text-corthex-text-secondary tracking-wider">Tool Name</label>
+                <input
+                  placeholder="Filter by tool..."
+                  value={toolNameFilter}
+                  onChange={(e) => { setToolNameFilter(e.target.value); setPage(1) }}
+                  className="bg-corthex-bg border border-corthex-border px-3 py-2 rounded text-sm text-corthex-text-primary"
+                  data-testid="tool-name-filter"
                 />
-              )}
+              </div>
+            )}
 
-              {tab === 'tools' && <ToolsTable items={toolsQuery.data!.data.items} />}
+            <div className="ml-auto">
+              <button
+                onClick={() => { setSearchInput(''); setStartDate(''); setEndDate(''); setToolNameFilter(''); setConclusionFilter(''); setPage(1) }}
+                className="text-xs font-bold text-corthex-accent hover:opacity-70 underline underline-offset-4"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          </div>
+
+          {/* Security Alert Banner (QA tab only) */}
+          {tab === 'quality' && alertCount24h > 0 && (
+            <div
+              className="mb-4 px-4 py-3 rounded-lg cursor-pointer flex items-center justify-between transition-colors"
+              style={{ backgroundColor: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.2)' }}
+              onClick={() => setShowSecurityAlerts(!showSecurityAlerts)}
+              role="alert"
+              data-testid="security-alert-banner"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" style={{ color: '#dc2626' }} />
+                <span className="text-sm font-medium" style={{ color: '#dc2626' }}>
+                  보안 알림: 최근 24시간 {alertCount24h}건 차단
+                </span>
+              </div>
+              <ChevronDown className="w-4 h-4" style={{ color: '#dc2626' }} />
             </div>
           )}
-        </section>
 
-        {/* Footer Pagination */}
-        {totalCount > 0 && (
-          <footer className="border-t px-8 py-3 flex items-center justify-between" style={{ backgroundColor: 'var(--color-corthex-elevated)', borderColor: 'var(--color-corthex-border)' }} data-purpose="list-pagination">
-            <span className="text-xs font-medium" style={{ color: 'var(--color-corthex-text-secondary)' }}>
-              Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} activities
-            </span>
-            <div className="flex gap-1">
-              <button
-                className="p-1 rounded disabled:opacity-30"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-                style={{ color: 'var(--color-corthex-text-secondary)' }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              </button>
-              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map(p => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className="w-6 h-6 flex items-center justify-center text-xs font-medium rounded transition-colors"
-                  style={page === p
-                    ? { backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-surface)', fontWeight: 700 }
-                    : { color: 'var(--color-corthex-text-secondary)' }
-                  }
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                className="p-1 rounded disabled:opacity-30"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                style={{ color: 'var(--color-corthex-text-secondary)' }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              </button>
+          {/* Security Alerts Detail */}
+          {tab === 'quality' && showSecurityAlerts && securityQuery.data?.data?.items && (
+            <div className="mb-4 p-3 rounded-lg bg-corthex-elevated border border-corthex-border" data-testid="security-alerts-detail">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-corthex-text-secondary border-b border-corthex-border">
+                    <th className="text-left py-1 pr-2 font-medium">시간</th>
+                    <th className="text-left py-1 pr-2 font-medium">유형</th>
+                    <th className="text-left py-1 pr-2 font-medium">심각도</th>
+                    <th className="text-left py-1 font-medium">상세</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {securityQuery.data.data.items.slice(0, 10).map((alert) => {
+                    const meta = alert.metadata as Record<string, unknown> | null
+                    const sevStyle = SEVERITY_STYLES[(meta?.severity as string) || 'major'] || SEVERITY_STYLES.major
+                    return (
+                      <tr key={alert.id} className="border-b border-corthex-border">
+                        <td className="py-1.5 pr-2 whitespace-nowrap font-mono text-corthex-text-secondary">{formatTime(alert.createdAt)}</td>
+                        <td className="py-1.5 pr-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: 'rgba(220,38,38,0.12)', color: '#dc2626' }}>
+                            {SECURITY_ACTION_LABELS[alert.action] || alert.action}
+                          </span>
+                        </td>
+                        <td className="py-1.5 pr-2">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: sevStyle.bg, color: sevStyle.text }}>
+                            {(meta?.severity as string) || 'major'}
+                          </span>
+                        </td>
+                        <td className="py-1.5 truncate max-w-[300px] text-corthex-text-secondary">
+                          {(meta?.pattern as string) || (meta?.threatType as string) || '-'}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
-          </footer>
-        )}
+          )}
+
+          {/* Data Table */}
+          <div className="bg-corthex-surface border border-corthex-border rounded-lg overflow-hidden">
+            {tab === 'agents' && (
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-corthex-border bg-corthex-elevated">
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Timestamp</th>
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Agent</th>
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Action Verb</th>
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Target Resource</th>
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest">Status</th>
+                    <th className="px-6 py-4 text-[11px] font-black text-corthex-text-secondary uppercase tracking-widest text-right">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-corthex-border" data-purpose="activity-timeline">
+                  {activeQuery.isLoading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i}>
+                        <td colSpan={6} className="px-6 py-4">
+                          <div className="h-4 rounded animate-pulse bg-corthex-elevated" />
+                        </td>
+                      </tr>
+                    ))
+                  ) : !agentsQuery.data?.data?.items?.length ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center" data-testid="activity-empty">
+                        <FileText className="w-8 h-8 mx-auto mb-2 text-corthex-text-secondary opacity-50" />
+                        <p className="text-sm text-corthex-text-secondary">데이터가 없습니다</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    agentsQuery.data.data.items.map(item => (
+                      <tr key={item.id} className="hover:bg-corthex-elevated transition-colors group" data-purpose="event-card">
+                        <td className="px-6 py-4 font-mono text-xs text-corthex-text-secondary whitespace-nowrap">
+                          {new Date(item.createdAt).toISOString().replace('T', ' ').slice(0, 23)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded bg-corthex-elevated flex items-center justify-center text-[10px] font-bold text-corthex-accent border border-corthex-border">
+                              {(item.agentName || 'S')[0].toUpperCase()}
+                            </div>
+                            <span className="text-sm font-semibold text-corthex-text-primary">{item.agentName || 'System'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-bold text-corthex-accent tracking-wider uppercase">{item.action}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.detail && (
+                            <span className="px-2 py-1 bg-corthex-elevated border border-corthex-border text-corthex-text-secondary text-[10px] font-mono rounded">
+                              {String(item.detail).slice(0, 40)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadgeEl status={item.phase} />
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <ArrowRight className="w-4 h-4 text-corthex-text-secondary group-hover:text-corthex-accent transition-colors ml-auto" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
+
+            {tab === 'delegations' && (
+              <div className="p-6" data-purpose="activity-timeline">
+                {activeQuery.isLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-20 rounded-xl animate-pulse bg-corthex-elevated" />
+                    ))}
+                  </div>
+                ) : !delegationsQuery.data?.data?.items?.length ? (
+                  <div className="py-12 text-center" data-testid="activity-empty">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-corthex-text-secondary opacity-50" />
+                    <p className="text-sm text-corthex-text-secondary">데이터가 없습니다</p>
+                  </div>
+                ) : (
+                  <DelegationTimeline items={delegationsQuery.data.data.items} />
+                )}
+              </div>
+            )}
+
+            {tab === 'quality' && (
+              <div className="p-6">
+                {activeQuery.isLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-12 rounded animate-pulse bg-corthex-elevated" />
+                    ))}
+                  </div>
+                ) : !qualityQuery.data?.data?.items?.length ? (
+                  <div className="py-12 text-center" data-testid="activity-empty">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-corthex-text-secondary opacity-50" />
+                    <p className="text-sm text-corthex-text-secondary">데이터가 없습니다</p>
+                  </div>
+                ) : (
+                  <QualityTable
+                    items={qualityQuery.data.data.items}
+                    expandedId={expandedQaId}
+                    onToggle={(id) => setExpandedQaId(expandedQaId === id ? null : id)}
+                  />
+                )}
+              </div>
+            )}
+
+            {tab === 'tools' && (
+              <div className="p-6">
+                {activeQuery.isLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-12 rounded animate-pulse bg-corthex-elevated" />
+                    ))}
+                  </div>
+                ) : !toolsQuery.data?.data?.items?.length ? (
+                  <div className="py-12 text-center" data-testid="activity-empty">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-corthex-text-secondary opacity-50" />
+                    <p className="text-sm text-corthex-text-secondary">데이터가 없습니다</p>
+                  </div>
+                ) : (
+                  <ToolsTable items={toolsQuery.data.data.items} />
+                )}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalCount > 0 && (
+              <div className="px-6 py-4 border-t border-corthex-border flex items-center justify-between" data-purpose="list-pagination">
+                <p className="text-[10px] font-bold text-corthex-text-secondary uppercase tracking-widest">
+                  Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} events
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
+                    disabled={page <= 1}
+                    onClick={() => setPage(p => p - 1)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                  </button>
+                  {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className="w-8 h-8 rounded border flex items-center justify-center text-xs font-bold transition-colors"
+                      style={page === p
+                        ? { borderColor: 'var(--color-corthex-accent)', backgroundColor: 'var(--color-corthex-elevated)', color: 'var(--color-corthex-accent)' }
+                        : { borderColor: 'var(--color-corthex-border)', color: 'var(--color-corthex-text-secondary)' }
+                      }
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  <button
+                    className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center text-corthex-text-secondary hover:text-corthex-accent transition-colors disabled:opacity-30"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage(p => p + 1)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Insight Cards */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-corthex-surface border border-corthex-border rounded-lg p-5 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-corthex-elevated flex items-center justify-center">
+                <Info className="w-5 h-5 text-corthex-accent" />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-corthex-text-secondary">Total Events</p>
+                <p className="text-xl font-mono text-corthex-text-primary">{totalCount.toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="bg-corthex-surface border border-corthex-border rounded-lg p-5 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(220,38,38,0.1)' }}>
+                <AlertTriangle className="w-5 h-5" style={{ color: '#dc2626' }} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-corthex-text-secondary">Active Errors</p>
+                <p className="text-xl font-mono" style={{ color: alertCount24h > 0 ? '#dc2626' : undefined }}>{alertCount24h}</p>
+              </div>
+            </div>
+            <div className="bg-corthex-surface border border-corthex-border rounded-lg p-5 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-corthex-elevated flex items-center justify-center">
+                <FileText className="w-5 h-5 text-corthex-text-secondary" />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-corthex-text-secondary">Log Retention</p>
+                <p className="text-xl font-mono text-corthex-text-primary">90 Days</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   )
