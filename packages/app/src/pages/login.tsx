@@ -110,7 +110,7 @@ export function LoginPage() {
             {/* Login Button */}
             <div className="pt-2">
               <button
-                className="w-full text-corthex-text-on-accent font-semibold py-3 px-6 rounded-xl bg-corthex-accent hover:bg-corthex-accent-hover transition-all duration-300 transform active:scale-[0.98] shadow-md disabled:opacity-50 cursor-pointer"
+                className="w-full text-corthex-text-on-accent font-semibold py-3 px-6 rounded-xl bg-corthex-btn-bg hover:bg-corthex-accent-hover transition-all duration-300 transform active:scale-[0.98] shadow-md disabled:opacity-50 cursor-pointer"
                 type="submit"
                 disabled={loading || countdown > 0}
               >

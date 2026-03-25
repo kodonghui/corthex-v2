@@ -34,6 +34,7 @@
   --color-corthex-text-secondary: #A8A29E;
   --color-corthex-text-disabled: #57534E;
   --color-corthex-text-on-accent: #0C0A09;
+  --color-corthex-btn-bg: #CA8A04;
   --color-corthex-focus-ring: #CA8A04;
 
   /* Sidebar */
@@ -92,6 +93,8 @@
   --color-corthex-text-secondary: #0E7490;
   --color-corthex-text-disabled: #9CA3AF;     /* was #67E8F9 — 1.2:1 → ~3.3:1 on #F9FAFB */
   --color-corthex-text-on-accent: #FFFFFF;    /* white on cyan #0891B2 = 4.54:1 PASS: was #FFFFFF (2.18:1 on #22C55E — FAIL) */
+  --color-corthex-btn-bg: #0E7490;     /* white on #0E7490 = 5.36:1 PASS */
+  --color-corthex-focus-ring: #FFFFFF;
 
   /* Sidebar */
   --color-corthex-sidebar-bg: #0E7490;
@@ -146,6 +149,7 @@
   --color-corthex-text-secondary: #64748B;
   --color-corthex-text-disabled: #CBD5E1;
   --color-corthex-text-on-accent: #FFFFFF;
+  --color-corthex-btn-bg: #2563EB;
   --color-corthex-focus-ring: #FFFFFF;
 
   /* Sidebar */
