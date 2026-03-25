@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth-store'
 import { api } from '../lib/api'
 import { RateLimitError } from '../lib/api'
+import { Hexagon } from 'lucide-react'
 
 /* API: POST /api/auth/login */
 
@@ -54,32 +55,26 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#faf8f5', fontFamily: "'Pretendard', sans-serif" }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-corthex-bg">
       {/* API: POST /api/auth/login */}
       <main className="w-full max-w-md">
         {/* Header */}
         <header className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4"
-            style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)' }}
-          >
-            <span className="text-2xl font-bold" style={{ color: '#5a7247', fontFamily: "'Noto Serif KR', serif" }}>C</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-corthex-surface rounded-full mb-4 shadow-lg border border-corthex-border">
+            <Hexagon className="w-8 h-8 text-corthex-accent" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>CORTHEX v2</h1>
-          <p className="text-gray-500 mt-2">자연스러운 연결의 시작</p>
+          <h1 className="text-2xl font-bold text-corthex-text-primary">CORTHEX</h1>
+          <p className="text-corthex-text-secondary mt-2">AI Virtual Office Platform</p>
         </header>
 
         {/* Login Form Card */}
-        <section
-          className="bg-white rounded-2xl p-8"
-          style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)' }}
-        >
+        <section className="bg-corthex-surface rounded-2xl p-8 shadow-lg border border-corthex-border">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Username Field */}
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700" htmlFor="username">사용자 아이디</label>
+              <label className="block text-sm font-medium text-corthex-text-primary" htmlFor="username">사용자 아이디</label>
               <input
-                className="w-full px-4 py-3 rounded-xl border-gray-200 transition-colors duration-200"
+                className="w-full px-4 py-3 rounded-xl bg-corthex-elevated border border-corthex-border text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors duration-200"
                 id="username"
                 placeholder="아이디를 입력하세요"
                 required
@@ -87,15 +82,14 @@ export function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
-                style={{ borderColor: '#e5e7eb' }}
               />
             </div>
 
             {/* Password Field */}
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700" htmlFor="password">비밀번호</label>
+              <label className="block text-sm font-medium text-corthex-text-primary" htmlFor="password">비밀번호</label>
               <input
-                className="w-full px-4 py-3 rounded-xl border-gray-200 transition-colors duration-200"
+                className="w-full px-4 py-3 rounded-xl bg-corthex-elevated border border-corthex-border text-corthex-text-primary placeholder:text-corthex-text-disabled focus:border-corthex-accent focus:ring-1 focus:ring-corthex-accent focus:outline-none transition-colors duration-200"
                 id="password"
                 placeholder="비밀번호를 입력하세요"
                 required
@@ -108,7 +102,7 @@ export function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(196, 98, 45, 0.05)', border: '1px solid rgba(196, 98, 45, 0.2)', color: '#c4622d' }}>
+              <div className="p-3 rounded-lg text-sm bg-corthex-error/10 border border-corthex-error/20 text-corthex-error">
                 <p>{error}</p>
               </div>
             )}
@@ -116,10 +110,9 @@ export function LoginPage() {
             {/* Login Button */}
             <div className="pt-2">
               <button
-                className="w-full text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform active:scale-[0.98] shadow-md disabled:opacity-50"
+                className="w-full text-corthex-text-on-accent font-semibold py-3 px-6 rounded-xl bg-corthex-accent hover:bg-corthex-accent-hover transition-all duration-300 transform active:scale-[0.98] shadow-md disabled:opacity-50 cursor-pointer"
                 type="submit"
                 disabled={loading || countdown > 0}
-                style={{ backgroundColor: '#5a7247' }}
               >
                 {countdown > 0
                   ? `${countdown}초 후 재시도`
@@ -130,22 +123,22 @@ export function LoginPage() {
             </div>
 
             {/* Links */}
-            <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+            <div className="flex items-center justify-between text-xs text-corthex-text-secondary pt-2">
               <label className="flex items-center space-x-2 cursor-pointer">
-                <input className="rounded border-gray-300" type="checkbox" style={{ color: '#5a7247' }} />
+                <input className="rounded border-corthex-border accent-corthex-accent" type="checkbox" />
                 <span>아이디 저장</span>
               </label>
               <div className="space-x-3">
-                <span className="text-gray-400">아이디 찾기</span>
-                <span className="text-gray-300">|</span>
-                <span className="text-gray-400">비밀번호 찾기</span>
+                <span className="text-corthex-text-disabled cursor-pointer hover:text-corthex-text-secondary transition-colors">아이디 찾기</span>
+                <span className="text-corthex-border">|</span>
+                <span className="text-corthex-text-disabled cursor-pointer hover:text-corthex-text-secondary transition-colors">비밀번호 찾기</span>
               </div>
             </div>
           </form>
         </section>
 
         {/* Footer */}
-        <footer className="mt-8 text-center text-sm text-gray-400">
+        <footer className="mt-8 text-center text-sm text-corthex-text-disabled">
           <p>© 2026 CORTHEX. All rights reserved.</p>
           <div className="mt-2 space-x-4">
             <span>개인정보처리방침</span>
