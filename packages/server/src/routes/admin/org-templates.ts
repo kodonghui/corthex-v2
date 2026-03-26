@@ -91,7 +91,7 @@ orgTemplatesRoute.post('/org-templates', zValidator('json', createTemplateSchema
       isActive: true,
       isPublished: false,
       tags: body.tags || null,
-      createdBy: tenant.userId,
+      createdBy: tenant.isAdminUser ? null : tenant.userId,
     })
     .returning()
 
