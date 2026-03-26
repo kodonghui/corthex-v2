@@ -58,7 +58,7 @@ Viewport: 390x844 (iPhone 14 Pro), Playwright MCP headless
 | agora | PASS | Categories list, thread cards stack |
 | memories | PASS | Search, filters, empty state centered |
 | messenger | PASS | Conversation list full-width, avatars fit |
-| knowledge | PASS | Sidebar+content minor overlap at 390px |
+| knowledge | PASS | Sidebar default closed on mobile, overlay on open |
 | files | PASS | Upload button, grid/list toggle, drop zone |
 | classified | PASS | Security clearance nav, archive list |
 | reports | PASS | Table adapts, new report button |
@@ -77,7 +77,7 @@ Viewport: 390x844 (iPhone 14 Pro), Playwright MCP headless
 - 0 horizontal overflow
 - 0 missing mobile headers
 - 0 broken pages
-- 1 minor: Knowledge sidebar/content overlap at 390px
+- 0 issues remaining (Knowledge sidebar overlap FIXED)
 - Korean text □□□□ in Playwright headless (font not installed — real browser OK)
 - onboarding: redirects to /hub for existing users (expected behavior)
 
@@ -116,8 +116,7 @@ Deferred to next session — Party Mode requires full Playwright MCP availabilit
 | Broken pages | 0 |
 | API smoke | 4/6 OK |
 | Critical bugs | 0 |
-| Minor issues | 1 (Knowledge sidebar overlap) |
+| Minor issues | 0 |
 
 ## Remaining
 1. Phase 5-3 Accessibility Party Mode (deferred)
-2. Knowledge page sidebar overlap fix at 390px

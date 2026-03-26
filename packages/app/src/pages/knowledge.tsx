@@ -202,7 +202,7 @@ function findFolderName(folders: KnowledgeFolder[], id: string): string | null {
 export function KnowledgePage() {
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'docs' | 'memories'>('docs')
-  const [showFolderTree, setShowFolderTree] = useState(true)
+  const [showFolderTree, setShowFolderTree] = useState(() => window.innerWidth >= 1024)
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-corthex-bg" data-testid="knowledge-page">
@@ -396,14 +396,18 @@ function DocsTab({ showFolderTree, queryClient, setShowFolderTree, activeTab, se
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel: Library Tree */}
         {showFolderTree && (
-          <aside className="absolute lg:relative z-20 lg:z-0 w-64 flex-shrink-0 bg-corthex-surface flex flex-col p-4 overflow-y-auto h-full" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
-            <FolderTree
-              folders={folders}
-              selectedFolderId={selectedFolderId}
-              onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailDoc(null) }}
-              queryClient={queryClient}
-            />
-          </aside>
+          <>
+            {/* Mobile overlay backdrop */}
+            <div className="fixed inset-0 z-10 bg-black/50 lg:hidden" onClick={() => setShowFolderTree(false)} />
+            <aside className="absolute lg:relative z-20 lg:z-0 w-64 flex-shrink-0 bg-corthex-surface flex flex-col p-4 overflow-y-auto h-full" style={{ borderRight: `1px solid ${borderColor}` }} data-testid="folder-sidebar">
+              <FolderTree
+                folders={folders}
+                selectedFolderId={selectedFolderId}
+                onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); setDetailDoc(null); if (window.innerWidth < 1024) setShowFolderTree(false) }}
+                queryClient={queryClient}
+              />
+            </aside>
+          </>
         )}
 
         {/* Center Panel: Document List */}
