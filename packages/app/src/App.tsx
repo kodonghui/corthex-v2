@@ -156,6 +156,13 @@ export function App() {
             <Route path="argos" element={<Navigate to="/jobs" replace />} />
             <Route path="workflows" element={<Navigate to="/n8n-workflows" replace />} />
             <Route path="home" element={<Navigate to="/hub" replace />} />
+            <Route path="*" element={
+              <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <p className="text-6xl font-mono font-black text-corthex-text-disabled">404</p>
+                <p className="text-sm font-mono text-corthex-text-secondary">페이지를 찾을 수 없습니다</p>
+                <a href="/hub" className="text-xs font-mono text-corthex-accent hover:underline">허브로 돌아가기</a>
+              </div>
+            } />
           </Route>
         </Routes>
       </BrowserRouter>
