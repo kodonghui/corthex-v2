@@ -125,6 +125,7 @@ export function MarketingSettingsPage() {
 
   const handleModelChange = (category: EngineCategory, model: string) => {
     const current = config.engines[category]
+    if (!current) return
     updateEngine.mutate({ category, provider: current.provider, model })
   }
 

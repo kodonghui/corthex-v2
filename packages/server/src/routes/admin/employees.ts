@@ -25,6 +25,7 @@ const createEmployeeSchema = z.object({
   username: z.string().min(2).max(50),
   name: z.string().min(1).max(100),
   email: z.string().email(),
+  role: z.enum(['admin', 'user']).optional(),
   departmentIds: z.array(z.string().uuid()).optional().default([]),
 })
 

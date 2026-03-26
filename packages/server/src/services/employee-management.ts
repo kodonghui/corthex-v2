@@ -10,6 +10,7 @@ export interface CreateEmployeeInput {
   username: string
   name: string
   email: string
+  role?: 'admin' | 'user'
   departmentIds?: string[]
 }
 
@@ -122,7 +123,7 @@ export async function createEmployee(
       passwordHash,
       name: input.name,
       email: input.email,
-      role: 'user', // Human employee
+      role: input.role ?? 'user',
     })
     .returning({
       id: users.id,

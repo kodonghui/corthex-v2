@@ -351,6 +351,17 @@ function TemplateStep({
     enabled: !!companyId,
   })
 
+  const createDeptMutation = useMutation({
+    mutationFn: (name: string) =>
+      api.post<{ data: { id: string; name: string } }>('/admin/departments', { name }),
+    onSuccess: (_result, name) => {
+      qc.invalidateQueries({ queryKey: ['departments'] })
+      addToast({ type: 'success', message: `${name} 부서가 추가되었습니다.` })
+      setCustomDept('')
+    },
+    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+  })
+
   const applyMutation = useMutation({
     mutationFn: (templateId: string) =>
       api.post<{ data: ApplyResult }>(`/admin/org-templates/${templateId}/apply`, {}),
@@ -489,8 +500,7 @@ function TemplateStep({
               className="font-mono text-[10px] uppercase tracking-[0.15em] bg-corthex-elevated hover:bg-corthex-accent text-corthex-text-secondary hover:text-corthex-text-on-accent px-5 py-3 border border-corthex-border hover:border-corthex-accent transition-all"
               onClick={() => {
                 if (customDept.trim()) {
-                  addToast({ type: 'success', message: `${customDept} 부서가 추가되었습니다.` })
-                  setCustomDept('')
+                  createDeptMutation.mutate(customDept.trim())
                 }
               }}
             >
@@ -698,6 +708,7 @@ function InviteStep({
       username: form.username,
       name: form.name,
       email: form.email,
+      ...(invited.length === 0 ? { role: 'admin' as const } : {}),
       ...(form.departmentIds.length > 0 ? { departmentIds: form.departmentIds } : {}),
     })
   }
