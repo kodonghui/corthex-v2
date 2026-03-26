@@ -22,6 +22,8 @@ export function ReportLinesPage() {
   const addToast = useToastStore((s) => s.addToast)
   const [lines, setLines] = useState<Record<string, string>>({})
   const [hasChanges, setHasChanges] = useState(false)
+  const [newReporter, setNewReporter] = useState('')
+  const [newSupervisor, setNewSupervisor] = useState('')
 
   const { data: userData, isLoading: usersLoading } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -69,11 +71,21 @@ export function ReportLinesPage() {
 
   const handleSave = () => {
     if (!selectedCompanyId) return
-    const payload = users.map((u) => ({
-      userId: u.id,
-      reportsToUserId: lines[u.id] || null,
-    }))
+    const payload = users
+      .filter((u) => lines[u.id])
+      .map((u) => ({
+        userId: u.id,
+        reportsToUserId: lines[u.id],
+      }))
     saveMutation.mutate({ companyId: selectedCompanyId, lines: payload })
+  }
+
+  const handleAddLine = () => {
+    if (!newReporter || !newSupervisor || newReporter === newSupervisor) return
+    setLines((prev) => ({ ...prev, [newReporter]: newSupervisor }))
+    setHasChanges(true)
+    setNewReporter('')
+    setNewSupervisor('')
   }
 
   if (!selectedCompanyId) return <div className="p-8 text-xs font-mono text-corthex-text-disabled uppercase tracking-widest">회사를 선택하세요</div>
@@ -103,7 +115,7 @@ export function ReportLinesPage() {
             </label>
             <div className="relative">
               <UserSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
-              <select className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
+              <select value={newReporter} onChange={(e) => setNewReporter(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
                 <option value="">사용자 선택</option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
@@ -117,7 +129,7 @@ export function ReportLinesPage() {
             </label>
             <div className="relative">
               <UserCog className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-corthex-text-disabled" />
-              <select className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
+              <select value={newSupervisor} onChange={(e) => setNewSupervisor(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-corthex-bg border border-corthex-border text-corthex-text-primary font-mono text-xs focus:ring-2 focus:ring-corthex-accent/30 focus:border-corthex-border-strong focus:outline-none appearance-none">
                 <option value="">상사 선택</option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>{u.name} (@{u.username})</option>
@@ -127,12 +139,12 @@ export function ReportLinesPage() {
           </div>
           <div className="flex items-end">
             <button
-              onClick={handleSave}
-              disabled={!hasChanges || saveMutation.isPending}
+              onClick={handleAddLine}
+              disabled={!newReporter || !newSupervisor || newReporter === newSupervisor}
               className="px-4 py-2 min-h-[44px] text-xs font-bold uppercase tracking-widest bg-corthex-accent text-corthex-text-on-accent hover:bg-corthex-accent-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors w-full md:w-auto"
             >
               <Plus className="w-3.5 h-3.5" />
-              {saveMutation.isPending ? '저장 중...' : '추가'}
+              추가
             </button>
           </div>
         </div>

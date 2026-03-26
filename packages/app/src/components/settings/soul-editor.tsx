@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useBlocker } from 'react-router-dom'
 import { ConfirmDialog, Select } from '@corthex/ui'
 import { api } from '../../lib/api'
 import { MarkdownRenderer } from '../markdown-renderer'
@@ -98,11 +97,13 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
     }
   }, [detailId, detailSoul])
 
-  // 이탈 방지
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isDirty && currentLocation.pathname !== nextLocation.pathname,
-  )
+  // 이탈 방지 (beforeunload — BrowserRouter에서는 useBlocker 사용 불가)
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
 
   const handleAgentChange = useCallback((agentId: string) => {
     if (isDirty && !confirm('저장하지 않은 변경사항이 있습니다. 다른 에이전트로 변경하시겠어요?')) {
@@ -283,17 +284,6 @@ export function SoulEditor({ onDirtyChange }: { onDirtyChange?: (dirty: boolean)
         variant="danger"
       />
 
-      {/* 이탈 방지 다이얼로그 */}
-      <ConfirmDialog
-        isOpen={blocker.state === 'blocked'}
-        onConfirm={() => blocker.proceed?.()}
-        onCancel={() => blocker.reset?.()}
-        title="저장하지 않은 변경사항"
-        description="저장하지 않은 변경사항이 있습니다. 나가시겠어요?"
-        confirmText="나가기"
-        cancelText="계속 편집"
-        variant="danger"
-      />
     </section>
   )
 }
