@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ALL-COMMANDS-GUIDE</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ALL-COMMANDS-GUIDE</h1>
+</header>
+<h1 id="ecc-전체-명령어-가이드-114개">ECC 전체 명령어 가이드 (114개)</h1>
+<blockquote>
+<p><strong>이 문서 사용법</strong></p>
+<p>명령어는 “버튼”이라고 생각하시면 됩니다. Claude Code에서 <code>/명령어이름</code>을 입력하면 해당 기능이 실행됩니다. 예를 들어 <code>/save-session</code>을 입력하면 현재 작업 상태가 저장되고, <code>/verify</code>를 입력하면 코드에 문제가 없는지 검사합니다. 매일 쓸 것, 가끔 쓸 것, 특수 상황에만 쓸 것으로 나누어 설명드리겠습니다.</p>
+</blockquote>
+<hr />
+<h1 id="매일-쓸-명령어">1. 매일 쓸 명령어</h1>
+<p>가장 자주 사용하게 될 핵심 명령어들입니다.</p>
+<hr />
+<h2 id="save-session">/save-session</h2>
+<p><strong>한 줄 요약</strong>: 현재 작업 상태를 파일로 저장합니다. 다음에 이어서 할 수 있도록.</p>
+<p><strong>사용 예시</strong>: “오늘 작업 끝! 내일 이어서 하려면” <code>/save-session</code> 입력. 뭘 했는지, 뭐가 성공했는지, 뭐가 실패했는지, 다음에 할 일이 뭔지 전부 기록됩니다.</p>
+<hr />
+<h2 id="resume-session">/resume-session</h2>
+<p><strong>한 줄 요약</strong>: 이전에 저장한 작업을 불러와서 이어서 합니다.</p>
+<p><strong>사용 예시</strong>: “어제 하던 작업 이어서 하자” <code>/resume-session</code> 입력. 마지막으로 저장한 세션 파일을 읽고 어디까지 했는지 브리핑해줍니다.</p>
+<hr />
+<h2 id="verify">/verify</h2>
+<p><strong>한 줄 요약</strong>: 코드에 문제가 없는지 전체 점검합니다. 건강검진과 같습니다.</p>
+<p><strong>사용 예시</strong>: “PR 올리기 전에 괜찮은지 확인하자” <code>/verify</code> 또는 <code>/verify pre-pr</code> 입력. 빌드, 타입, 린트, 테스트, 보안 전부 검사하고 “PR 준비 완료: 예/아니오”로 알려줍니다.</p>
+<hr />
+<h2 id="checkpoint">/checkpoint</h2>
+<p><strong>한 줄 요약</strong>: 현재 코드 상태에 “표시”를 남겨두고, 나중에 비교할 수 있습니다.</p>
+<p><strong>사용 예시</strong>: “리팩토링 시작 전에 현재 상태 저장하자” <code>/checkpoint create "리팩토링-전"</code> 입력. 나중에 <code>/checkpoint verify "리팩토링-전"</code>으로 뭐가 바뀌었는지 비교합니다.</p>
+<hr />
+<h2 id="learn">/learn</h2>
+<p><strong>한 줄 요약</strong>: 이번 세션에서 배운 유용한 패턴을 기록으로 남깁니다.</p>
+<p><strong>사용 예시</strong>: “이 에러 해결 방법 다음에도 쓸 거 같은데” <code>/learn</code> 입력. 어떤 문제를 어떻게 해결했는지를 스킬 파일로 저장해서 다음에 같은 상황에서 자동으로 활용됩니다.</p>
+<hr />
+<h2 id="learn-eval">/learn-eval</h2>
+<p><strong>한 줄 요약</strong>: <code>/learn</code>의 고급 버전. 패턴을 저장하기 전에 품질 평가를 합니다.</p>
+<p><strong>사용 예시</strong>: “이 패턴 진짜 저장할 가치가 있을까?” <code>/learn-eval</code> 입력. 기존 스킬과 중복되는지, 재사용 가능한지 체크하고 “저장/개선 후 저장/기존에 합치기/버리기” 중 판정합니다.</p>
+<hr />
+<h2 id="plan">/plan</h2>
+<p><strong>한 줄 요약</strong>: 코드를 쓰기 전에 먼저 계획을 세웁니다. 사용자 확인 전까지 코드를 건드리지 않습니다.</p>
+<p><strong>사용 예시</strong>: “실시간 알림 기능을 추가하고 싶어” <code>/plan 실시간 알림 기능 추가</code> 입력. 요구사항 분석, 단계 분할, 위험도 평가를 한 후 “이 계획대로 할까요?”라고 물어봅니다.</p>
+<hr />
+<h2 id="aside">/aside</h2>
+<p><strong>한 줄 요약</strong>: 작업 중에 잠깐 질문하고 바로 원래 작업으로 돌아옵니다.</p>
+<p><strong>사용 예시</strong>: “이 함수가 뭐 하는 건지 궁금한데 작업 흐름을 끊고 싶지 않아” <code>/aside 이 함수가 뭐 하는 거야?</code> 입력. 질문에 답한 후 자동으로 하던 작업을 이어갑니다.</p>
+<hr />
+<h2 id="discuss-mode">/discuss-mode</h2>
+<p><strong>한 줄 요약</strong>: 코드 실행 없이 논의만 합니다. “어떻게 할까?”를 같이 고민합니다.</p>
+<p><strong>사용 예시</strong>: “A 방법이랑 B 방법 중 뭐가 나을까?” <code>/discuss-mode</code> 입력 또는 그냥 “논의해보자”라고 말하면 됩니다. 선택지를 비교하고 의견을 내고 추천까지 해줍니다. 코드는 절대 건드리지 않습니다.</p>
+<hr />
+<h2 id="docs">/docs</h2>
+<p><strong>한 줄 요약</strong>: 라이브러리의 최신 공식 문서를 찾아줍니다.</p>
+<p><strong>사용 예시</strong>: “Next.js 미들웨어 설정법이 궁금해” <code>/docs Next.js middleware 설정</code> 입력. Context7 MCP를 통해 최신 공식 문서에서 답과 코드 예시를 찾아줍니다.</p>
+<hr />
+<h2 id="sessions">/sessions</h2>
+<p><strong>한 줄 요약</strong>: 저장된 세션 목록을 보거나, 별명을 붙이거나, 상세 정보를 확인합니다.</p>
+<p><strong>사용 예시</strong>: “이번 주에 저장한 세션들 보고 싶어” <code>/sessions list</code> 입력. <code>/sessions alias abc123 "결제-기능"</code> 같이 별명을 붙일 수도 있습니다.</p>
+<hr />
+<h2 id="context-budget">/context-budget</h2>
+<p><strong>한 줄 요약</strong>: AI가 사용하는 컨텍스트 창(기억 용량)이 얼마나 차 있는지 분석합니다.</p>
+<p><strong>사용 예시</strong>: “요즘 응답이 느린 것 같은데” <code>/context-budget</code> 입력. 에이전트, 스킬, MCP 서버 등이 얼마나 메모리를 차지하는지 분석하고 최적화 방법을 알려줍니다.</p>
+<hr />
+<h2 id="prompt-optimize">/prompt-optimize</h2>
+<p><strong>한 줄 요약</strong>: 프롬프트(명령문)를 분석해서 최적화된 버전을 만들어줍니다.</p>
+<p><strong>사용 예시</strong>: “이 명령을 더 효과적으로 쓰고 싶어” <code>/prompt-optimize 실시간 채팅 기능 만들어줘</code> 입력. 프롬프트를 분석하고, 어떤 스킬/에이전트를 쓰면 좋을지 추천하고, 최적화된 프롬프트를 제안합니다. 실행은 하지 않습니다.</p>
+<hr />
+<h1 id="코딩-도구">2. 코딩 도구</h1>
+<p>코드를 작성하고, 테스트하고, 검토하는 도구들입니다.</p>
+<hr />
+<h2 id="tdd">/tdd</h2>
+<p><strong>한 줄 요약</strong>: 테스트를 먼저 쓰고 코드를 나중에 쓰는 TDD 방식으로 개발합니다.</p>
+<p><strong>사용 예시</strong>: “이 기능을 TDD로 만들자” <code>/tdd</code> 입력. 테스트 먼저 작성 -&gt; 실행해서 실패 확인 -&gt; 최소 코드 작성 -&gt; 테스트 통과 확인 -&gt; 리팩토링 순서로 진행합니다.</p>
+<hr />
+<h2 id="code-review">/code-review</h2>
+<p><strong>한 줄 요약</strong>: 커밋 안 된 변경사항을 보안과 품질 관점에서 검토합니다.</p>
+<p><strong>사용 예시</strong>: “방금 작성한 코드 괜찮은지 봐줘” <code>/code-review</code> 입력. git diff를 보고 보안 위험, 코드 품질, 성능 문제를 보고합니다.</p>
+<hr />
+<h2 id="build-fix">/build-fix</h2>
+<p><strong>한 줄 요약</strong>: 빌드 에러를 점진적으로 고칩니다.</p>
+<p><strong>사용 예시</strong>: “빌드가 깨졌어” <code>/build-fix</code> 입력. 자동으로 빌드 시스템(TypeScript, Go, Rust 등)을 감지하고, 에러를 하나씩 최소한의 수정으로 고칩니다.</p>
+<hr />
+<h2 id="e2e">/e2e</h2>
+<p><strong>한 줄 요약</strong>: Playwright로 E2E 테스트를 생성하고 실행합니다.</p>
+<p><strong>사용 예시</strong>: “로그인 -&gt; 대시보드 -&gt; 설정 흐름을 테스트하자” <code>/e2e</code> 입력. Playwright 테스트를 만들고, 실행하고, 스크린샷/영상/추적 파일을 저장합니다.</p>
+<hr />
+<h2 id="test-coverage">/test-coverage</h2>
+<p><strong>한 줄 요약</strong>: 테스트 커버리지를 분석하고 빠진 부분의 테스트를 생성합니다.</p>
+<p><strong>사용 예시</strong>: “테스트가 부족한 부분이 어딘지 알고 싶어” <code>/test-coverage</code> 입력. 현재 커버리지를 분석하고 80% 이상이 되도록 부족한 테스트를 생성합니다.</p>
+<hr />
+<h2 id="refactor-clean">/refactor-clean</h2>
+<p><strong>한 줄 요약</strong>: 사용하지 않는 코드를 안전하게 찾아서 제거합니다.</p>
+<p><strong>사용 예시</strong>: “코드가 지저분해. 안 쓰는 거 정리하자” <code>/refactor-clean</code> 입력. 죽은 코드를 찾아서 한 번에 한 종류씩 제거하며, 매번 테스트로 안전을 확인합니다.</p>
+<hr />
+<h2 id="eval">/eval</h2>
+<p><strong>한 줄 요약</strong>: 평가 기반 개발 워크플로우를 관리합니다.</p>
+<p><strong>사용 예시</strong>: “이 기능의 품질을 수치로 측정하고 싶어” <code>/eval</code> 입력. 기능 평가와 회귀 평가를 정의하고, 구현 전후의 점수를 비교합니다.</p>
+<hr />
+<h2 id="quality-gate">/quality-gate</h2>
+<p><strong>한 줄 요약</strong>: 코드 품질 파이프라인을 수동으로 실행합니다.</p>
+<p><strong>사용 예시</strong>: “이 파일이 품질 기준을 통과하는지 확인하자” <code>/quality-gate src/</code> 입력. 포맷, 린트, 타입 체크를 순서대로 실행하고 고쳐야 할 목록을 알려줍니다.</p>
+<hr />
+<h2 id="model-route">/model-route</h2>
+<p><strong>한 줄 요약</strong>: 현재 작업에 가장 적합한 AI 모델을 추천합니다.</p>
+<p><strong>사용 예시</strong>: “이 작업에 Opus를 써야 할까, Sonnet으로 충분할까?” <code>/model-route 데이터베이스 스키마 설계</code> 입력. 작업 복잡도와 예산에 따라 haiku(단순)/sonnet(일반)/opus(복잡) 중 추천합니다.</p>
+<hr />
+<h2 id="harness-audit">/harness-audit</h2>
+<p><strong>한 줄 요약</strong>: 에이전트 시스템의 건강 상태를 점수로 평가합니다.</p>
+<p><strong>사용 예시</strong>: “우리 설정이 잘 되어 있는지 확인하자” <code>/harness-audit</code> 입력. hooks, 평가, 라우팅, 컨텍스트, 안전장치 등을 점검하고 점수표를 보여줍니다.</p>
+<hr />
+<h1 id="프로젝트-관리">3. 프로젝트 관리</h1>
+<p>프로젝트의 큰 그림을 관리하는 도구들입니다.</p>
+<hr />
+<h2 id="update-codemaps">/update-codemaps</h2>
+<p><strong>한 줄 요약</strong>: 코드베이스 구조를 분석해서 아키텍처 문서를 생성합니다.</p>
+<p><strong>사용 예시</strong>: “프로젝트 구조를 문서로 정리하자” <code>/update-codemaps</code> 입력. 프론트엔드, 백엔드, 데이터베이스, 외부 서비스별로 구조 문서를 만듭니다.</p>
+<hr />
+<h2 id="update-docs">/update-docs</h2>
+<p><strong>한 줄 요약</strong>: 코드 변경에 맞춰 문서(README, 가이드 등)를 업데이트합니다.</p>
+<p><strong>사용 예시</strong>: “새 API를 추가했으니 문서도 갱신하자” <code>/update-docs</code> 입력. JSDoc, API 엔드포인트, 환경 변수 등을 코드에서 추출해서 문서를 업데이트합니다.</p>
+<hr />
+<h2 id="pm2">/pm2</h2>
+<p><strong>한 줄 요약</strong>: 프로젝트를 분석해서 PM2(프로세스 매니저) 서비스 명령어를 자동 생성합니다.</p>
+<p><strong>사용 예시</strong>: “이 프로젝트를 서비스로 등록하고 싶어” <code>/pm2</code> 입력. 프로젝트 구조를 분석하고 PM2 설정을 자동으로 만들어줍니다.</p>
+<hr />
+<h2 id="setup-pm">/setup-pm</h2>
+<p><strong>한 줄 요약</strong>: 선호하는 패키지 매니저(npm/pnpm/yarn/bun)를 설정합니다.</p>
+<p><strong>사용 예시</strong>: “이 프로젝트에서 pnpm을 쓰게 설정해줘” <code>/setup-pm</code> 입력.</p>
+<hr />
+<h1 id="bmad-파이프라인">4. BMAD 파이프라인</h1>
+<p>BMAD는 프로젝트 기획부터 개발까지의 전체 과정을 체계적으로 관리하는 시스템입니다. “기획서 작성 -&gt; 요구사항 정리 -&gt; 설계 -&gt; 개발 -&gt; 테스트 -&gt; 검토”의 전체 흐름을 자동화합니다.</p>
+<hr />
+<h2 id="kdh-full-auto-pipeline">/kdh-full-auto-pipeline</h2>
+<p><strong>한 줄 요약</strong>: BMAD 기반 전체 자동화 파이프라인입니다. 기획부터 개발까지 전부 자동으로.</p>
+<p><strong>사용 예시</strong>: “새 기능을 처음부터 끝까지 만들자” <code>/kdh-full-auto-pipeline planning</code> (기획) 또는 <code>/kdh-full-auto-pipeline story-1</code> (스토리 개발) 입력. planning 모드에서는 기획서-PRD-아키텍처-UX-에픽을 파티 모드(3명의 크리틱이 검토)로 만들고, story 모드에서는 스토리 생성-개발-테스트-QA-코드리뷰까지 자동 실행합니다.</p>
+<hr />
+<h2 id="kdh-uxui-redesign-full-auto-pipeline">/kdh-uxui-redesign-full-auto-pipeline</h2>
+<p><strong>한 줄 요약</strong>: UXUI 리디자인 전용 자동화 파이프라인입니다. 디자인 시스템부터 구현까지.</p>
+<p><strong>사용 예시</strong>: “앱 디자인을 전면 개편하자” <code>/kdh-uxui-redesign-full-auto-pipeline</code> 입력. 6단계(디자인 시스템 DB -&gt; Playwright 시각 리서치 -&gt; Stitch MCP -&gt; 파티 모드 검토)로 진행하며, 여러 테마를 지원하고 하드코딩 색상을 0으로 만듭니다.</p>
+<hr />
+<h2 id="kdh-code-review-full-auto">/kdh-code-review-full-auto</h2>
+<p><strong>한 줄 요약</strong>: 전자동 코드 리뷰 파이프라인입니다. 8단계로 코드를 철저히 검토합니다.</p>
+<p><strong>사용 예시</strong>: “PR을 철저하게 리뷰하자” <code>/kdh-code-review-full-auto PR-URL</code> 입력. 정적 분석 -&gt; 시각/E2E -&gt; 리스크 분석 -&gt; 3명 크리틱 파티 -&gt; 판정 -&gt; 자동 수정 -&gt; 재검토 -&gt; 최종 판정 순서로 진행합니다.</p>
+<hr />
+<h2 id="bmad-full-pipeline">/bmad-full-pipeline</h2>
+<p><strong>한 줄 요약</strong>: BMAD 기본 파이프라인입니다 (v3). 기획이나 스토리 개발을 체계적으로 진행합니다.</p>
+<p><strong>사용 예시</strong>: “/bmad-full-pipeline planning” (기획 모드) 또는 “/bmad-full-pipeline story-3” (스토리 개발 모드)</p>
+<hr />
+<h2 id="bmad-party-mode">/bmad-party-mode</h2>
+<p><strong>한 줄 요약</strong>: 설치된 모든 BMAD 에이전트들이 토론을 벌입니다. 다양한 관점에서 검토.</p>
+<p><strong>사용 예시</strong>: “이 PRD를 여러 전문가 관점에서 검토하자” <code>/bmad-party-mode</code> 입력. PM, 개발자, QA, UX 디자이너 등이 각자 관점에서 의견을 냅니다.</p>
+<hr />
+<h2 id="bmad-help">/bmad-help</h2>
+<p><strong>한 줄 요약</strong>: 현재 상태를 분석하고 다음에 뭘 해야 하는지 조언합니다.</p>
+<p><strong>사용 예시</strong>: “지금 뭘 해야 할지 모르겠어” <code>/bmad-help</code> 입력.</p>
+<hr />
+<h2 id="bmad-brainstorming">/bmad-brainstorming</h2>
+<p><strong>한 줄 요약</strong>: 창의적 아이디어 발상 세션을 진행합니다.</p>
+<p><strong>사용 예시</strong>: “새로운 기능 아이디어를 모으자” <code>/bmad-brainstorming</code> 입력.</p>
+<hr />
+<h3 id="bmad-에이전트-명령어-10개">BMAD 에이전트 명령어 (10개)</h3>
+<p>특정 BMAD 역할을 직접 불러서 대화하는 명령어들입니다.</p>
+<hr />
+<h2 id="bmad-master">/bmad-master</h2>
+<p><strong>한 줄 요약</strong>: BMAD 마스터 에이전트를 호출합니다. 전체 프로세스를 총괄하는 역할입니다.</p>
+<hr />
+<h2 id="analyst">/analyst</h2>
+<p><strong>한 줄 요약</strong>: 비즈니스 분석가를 호출합니다. 시장 조사, 도메인 분석을 담당합니다.</p>
+<hr />
+<h2 id="architect">/architect</h2>
+<p><strong>한 줄 요약</strong>: 기술 아키텍트를 호출합니다. 시스템 설계와 기술 결정을 담당합니다.</p>
+<hr />
+<h2 id="dev">/dev</h2>
+<p><strong>한 줄 요약</strong>: 개발자 에이전트를 호출합니다. 실제 코드 구현을 담당합니다.</p>
+<hr />
+<h2 id="pm">/pm</h2>
+<p><strong>한 줄 요약</strong>: 프로젝트 매니저를 호출합니다. 프로젝트 일정과 진행을 관리합니다.</p>
+<hr />
+<h2 id="qa">/qa</h2>
+<p><strong>한 줄 요약</strong>: QA(품질 보증) 담당자를 호출합니다. 테스트와 품질 검증을 담당합니다.</p>
+<hr />
+<h2 id="quick-flow-solo-dev">/quick-flow-solo-dev</h2>
+<p><strong>한 줄 요약</strong>: 혼자서 빠르게 개발하는 모드입니다. 작은 작업에 적합합니다.</p>
+<hr />
+<h2 id="sm">/sm</h2>
+<p><strong>한 줄 요약</strong>: 스크럼 마스터를 호출합니다. 스프린트 관리를 담당합니다.</p>
+<hr />
+<h2 id="tech-writer">/tech-writer</h2>
+<p><strong>한 줄 요약</strong>: 기술 문서 작성자를 호출합니다. 문서화를 담당합니다.</p>
+<hr />
+<h2 id="ux-designer">/ux-designer</h2>
+<p><strong>한 줄 요약</strong>: UX 디자이너를 호출합니다. 사용자 경험 설계를 담당합니다.</p>
+<hr />
+<h3 id="bmad-작업-명령어-25개">BMAD 작업 명령어 (25개)</h3>
+<p>기획, 설계, 개발의 구체적인 단계를 실행하는 명령어들입니다.</p>
+<hr />
+<h2 id="create-product-brief">/create-product-brief</h2>
+<p><strong>한 줄 요약</strong>: 제품 기획서를 대화하면서 만듭니다. “이런 거 만들고 싶어”에서 시작합니다.</p>
+<p><strong>사용 예시</strong>: “새 프로젝트 아이디어를 정리하자” <code>/create-product-brief</code> 입력.</p>
+<hr />
+<h2 id="create-prd">/create-prd</h2>
+<p><strong>한 줄 요약</strong>: PRD(제품 요구사항 문서)를 처음부터 만듭니다.</p>
+<p><strong>사용 예시</strong>: “요구사항을 체계적으로 정리하자” <code>/create-prd</code> 입력.</p>
+<hr />
+<h2 id="edit-prd">/edit-prd</h2>
+<p><strong>한 줄 요약</strong>: 기존 PRD를 수정합니다.</p>
+<p><strong>사용 예시</strong>: “PRD에 새 요구사항을 추가하자” <code>/edit-prd</code> 입력.</p>
+<hr />
+<h2 id="validate-prd">/validate-prd</h2>
+<p><strong>한 줄 요약</strong>: PRD가 표준을 충족하는지 검증합니다.</p>
+<p><strong>사용 예시</strong>: “이 PRD가 완성도가 충분한지 확인” <code>/validate-prd</code> 입력.</p>
+<hr />
+<h2 id="create-architecture">/create-architecture</h2>
+<p><strong>한 줄 요약</strong>: 기술 아키텍처를 설계합니다.</p>
+<p><strong>사용 예시</strong>: “시스템 구조를 잡자” <code>/create-architecture</code> 입력.</p>
+<hr />
+<h2 id="create-ux-design">/create-ux-design</h2>
+<p><strong>한 줄 요약</strong>: UX 디자인 사양서를 만듭니다.</p>
+<p><strong>사용 예시</strong>: “화면 흐름을 설계하자” <code>/create-ux-design</code> 입력.</p>
+<hr />
+<h2 id="create-epics-and-stories">/create-epics-and-stories</h2>
+<p><strong>한 줄 요약</strong>: 요구사항을 에픽과 스토리로 쪼갭니다.</p>
+<p><strong>사용 예시</strong>: “PRD를 개발 단위로 나누자” <code>/create-epics-and-stories</code> 입력.</p>
+<hr />
+<h2 id="create-story">/create-story</h2>
+<p><strong>한 줄 요약</strong>: 개별 스토리 파일을 만듭니다. 나중에 개발할 때 필요한 모든 정보를 담습니다.</p>
+<p><strong>사용 예시</strong>: “다음 스토리를 만들자” <code>/create-story story-3</code> 입력.</p>
+<hr />
+<h2 id="dev-story">/dev-story</h2>
+<p><strong>한 줄 요약</strong>: 스토리 파일을 따라 실제 구현을 합니다.</p>
+<p><strong>사용 예시</strong>: “이 스토리를 개발하자” <code>/dev-story story-3.md</code> 입력.</p>
+<hr />
+<h2 id="quick-spec">/quick-spec</h2>
+<p><strong>한 줄 요약</strong>: 작은 변경 사항용 빠른 기술 사양서를 만듭니다.</p>
+<p><strong>사용 예시</strong>: “간단한 기능이니 빠르게 스펙 정리하자” <code>/quick-spec</code> 입력.</p>
+<hr />
+<h2 id="quick-dev">/quick-dev</h2>
+<p><strong>한 줄 요약</strong>: 빠른 기술 사양서를 기반으로 바로 구현합니다.</p>
+<p><strong>사용 예시</strong>: “이 Quick Spec대로 바로 만들자” <code>/quick-dev</code> 입력.</p>
+<hr />
+<h2 id="sprint-planning">/sprint-planning</h2>
+<p><strong>한 줄 요약</strong>: 에픽에서 스프린트 계획을 생성합니다.</p>
+<p><strong>사용 예시</strong>: “이번 스프린트 계획을 세우자” <code>/sprint-planning</code> 입력.</p>
+<hr />
+<h2 id="sprint-status">/sprint-status</h2>
+<p><strong>한 줄 요약</strong>: 스프린트 진행 상황을 요약하고 위험을 표시합니다.</p>
+<p><strong>사용 예시</strong>: “이번 스프린트 진행률 확인” <code>/sprint-status</code> 입력.</p>
+<hr />
+<h2 id="correct-course">/correct-course</h2>
+<p><strong>한 줄 요약</strong>: 스프린트 도중 큰 변경이 필요할 때 방향을 수정합니다.</p>
+<p><strong>사용 예시</strong>: “계획을 바꿔야 할 것 같아” <code>/correct-course</code> 입력.</p>
+<hr />
+<h2 id="retrospective">/retrospective</h2>
+<p><strong>한 줄 요약</strong>: 에픽 완료 후 회고를 진행합니다. 잘한 점과 개선할 점을 정리합니다.</p>
+<p><strong>사용 예시</strong>: “에픽 5 끝났으니 회고하자” <code>/retrospective</code> 입력.</p>
+<hr />
+<h2 id="check-implementation-readiness">/check-implementation-readiness</h2>
+<p><strong>한 줄 요약</strong>: PRD, UX, 아키텍처, 에픽이 구현을 시작할 준비가 되었는지 검증합니다.</p>
+<p><strong>사용 예시</strong>: “기획이 다 끝났는지 확인” <code>/check-implementation-readiness</code> 입력.</p>
+<hr />
+<h2 id="document-project">/document-project</h2>
+<p><strong>한 줄 요약</strong>: 기존 프로젝트를 AI가 이해할 수 있도록 문서화합니다.</p>
+<p><strong>사용 예시</strong>: “이 프로젝트를 처음 보는 사람도 이해하게 문서화” <code>/document-project</code> 입력.</p>
+<hr />
+<h2 id="generate-project-context">/generate-project-context</h2>
+<p><strong>한 줄 요약</strong>: AI용 프로젝트 컨텍스트 파일을 생성합니다.</p>
+<p><strong>사용 예시</strong>: “AI가 이 프로젝트를 잘 이해하도록 컨텍스트 만들자” <code>/generate-project-context</code> 입력.</p>
+<hr />
+<h2 id="domain-research">/domain-research</h2>
+<p><strong>한 줄 요약</strong>: 도메인/산업 리서치 보고서를 작성합니다.</p>
+<p><strong>사용 예시</strong>: “핀테크 도메인을 조사해줘” <code>/domain-research</code> 입력.</p>
+<hr />
+<h2 id="market-research">/market-research</h2>
+<p><strong>한 줄 요약</strong>: 시장 조사 보고서를 작성합니다. 경쟁사와 고객을 분석합니다.</p>
+<p><strong>사용 예시</strong>: “AI 학습 플랫폼 시장을 조사해줘” <code>/market-research</code> 입력.</p>
+<hr />
+<h2 id="technical-research">/technical-research</h2>
+<p><strong>한 줄 요약</strong>: 기술과 아키텍처에 대한 기술 리서치 보고서를 작성합니다.</p>
+<p><strong>사용 예시</strong>: “Vector DB 옵션을 비교해줘” <code>/technical-research</code> 입력.</p>
+<hr />
+<h2 id="qa-generate-e2e-tests">/qa-generate-e2e-tests</h2>
+<p><strong>한 줄 요약</strong>: 기존 기능에 대한 E2E 자동 테스트를 생성합니다.</p>
+<p><strong>사용 예시</strong>: “로그인 기능의 E2E 테스트 만들어줘” <code>/qa-generate-e2e-tests</code> 입력.</p>
+<hr />
+<h2 id="bmad-bmm-code-review">/bmad-bmm-code-review</h2>
+<p><strong>한 줄 요약</strong>: BMAD 방식의 적대적(adversarial) 코드 리뷰를 실행합니다.</p>
+<p><strong>사용 예시</strong>: “이 코드를 엄격하게 검토해줘” <code>/bmad-bmm-code-review</code> 입력.</p>
+<hr />
+<h2 id="tea-automate">/tea-automate</h2>
+<p><strong>한 줄 요약</strong>: TEA(Test Architect)가 리스크 기반으로 자동 테스트를 생성합니다.</p>
+<p><strong>사용 예시</strong>: “위험도가 높은 부분부터 테스트를 만들자” <code>/tea-automate</code> 입력.</p>
+<hr />
+<h3 id="bmad-리뷰편집-명령어-7개">BMAD 리뷰/편집 명령어 (7개)</h3>
+<hr />
+<h2 id="review-adversarial-general">/review-adversarial-general</h2>
+<p><strong>한 줄 요약</strong>: 냉소적 관점에서 비판적 리뷰를 수행합니다.</p>
+<p><strong>사용 예시</strong>: “이 설계를 가장 비판적으로 봐줘” <code>/review-adversarial-general</code> 입력.</p>
+<hr />
+<h2 id="review-edge-case-hunter">/review-edge-case-hunter</h2>
+<p><strong>한 줄 요약</strong>: 모든 분기와 경계 조건을 걸어보면서 처리 안 된 예외를 찾습니다.</p>
+<p><strong>사용 예시</strong>: “빠진 예외 상황이 있는지 찾아줘” <code>/review-edge-case-hunter</code> 입력.</p>
+<hr />
+<h2 id="editorial-review-prose">/editorial-review-prose</h2>
+<p><strong>한 줄 요약</strong>: 문서의 글쓰기 품질(문법, 표현, 명확성)을 검토합니다.</p>
+<p><strong>사용 예시</strong>: “이 문서의 문장을 다듬어줘” <code>/editorial-review-prose</code> 입력.</p>
+<hr />
+<h2 id="editorial-review-structure">/editorial-review-structure</h2>
+<p><strong>한 줄 요약</strong>: 문서의 구조(순서, 중복, 불필요한 부분)를 개선합니다.</p>
+<p><strong>사용 예시</strong>: “이 문서 구조를 정리해줘” <code>/editorial-review-structure</code> 입력.</p>
+<hr />
+<h2 id="shard-doc">/shard-doc</h2>
+<p><strong>한 줄 요약</strong>: 큰 마크다운 문서를 섹션별로 작은 파일들로 나눕니다.</p>
+<p><strong>사용 예시</strong>: “이 100페이지 문서를 섹션별로 쪼개줘” <code>/shard-doc</code> 입력.</p>
+<hr />
+<h2 id="index-docs">/index-docs</h2>
+<p><strong>한 줄 요약</strong>: 폴더 내 모든 문서의 인덱스(목차)를 생성합니다.</p>
+<p><strong>사용 예시</strong>: “이 폴더의 문서 목록을 만들어줘” <code>/index-docs</code> 입력.</p>
+<hr />
+<h1 id="언어별-도구">5. 언어별 도구</h1>
+<p>프로그래밍 언어별 전용 빌드/리뷰/테스트 명령어입니다. 각 언어의 전문 에이전트를 호출합니다.</p>
+<hr />
+<h3 id="c">C++</h3>
+<h2 id="cpp-build">/cpp-build</h2>
+<p><strong>한 줄 요약</strong>: C++ 빌드 에러를 고칩니다. cpp-build-resolver 에이전트를 호출합니다.</p>
+<h2 id="cpp-review">/cpp-review</h2>
+<p><strong>한 줄 요약</strong>: C++ 코드를 리뷰합니다. 메모리 안전성, 현대적 패턴, 동시성을 검토합니다.</p>
+<h2 id="cpp-test">/cpp-test</h2>
+<p><strong>한 줄 요약</strong>: C++ TDD 워크플로우를 실행합니다. GoogleTest로 테스트를 먼저 작성합니다.</p>
+<hr />
+<h3 id="go">Go</h3>
+<h2 id="go-build">/go-build</h2>
+<p><strong>한 줄 요약</strong>: Go 빌드 에러를 고칩니다. go-build-resolver 에이전트를 호출합니다.</p>
+<h2 id="go-review">/go-review</h2>
+<p><strong>한 줄 요약</strong>: Go 코드를 리뷰합니다. 관용적 패턴, 동시성, 에러 처리를 검토합니다.</p>
+<h2 id="go-test">/go-test</h2>
+<p><strong>한 줄 요약</strong>: Go TDD 워크플로우를 실행합니다. 테이블 기반 테스트를 먼저 작성합니다.</p>
+<hr />
+<h3 id="kotlin">Kotlin</h3>
+<h2 id="kotlin-build">/kotlin-build</h2>
+<p><strong>한 줄 요약</strong>: Kotlin 빌드 에러를 고칩니다. kotlin-build-resolver 에이전트를 호출합니다.</p>
+<h2 id="kotlin-review">/kotlin-review</h2>
+<p><strong>한 줄 요약</strong>: Kotlin 코드를 리뷰합니다. 코루틴 안전성, Compose 패턴을 검토합니다.</p>
+<h2 id="kotlin-test">/kotlin-test</h2>
+<p><strong>한 줄 요약</strong>: Kotlin TDD 워크플로우를 실행합니다. Kotest로 테스트를 먼저 작성합니다.</p>
+<hr />
+<h3 id="rust">Rust</h3>
+<h2 id="rust-build">/rust-build</h2>
+<p><strong>한 줄 요약</strong>: Rust 빌드 에러를 고칩니다. rust-build-resolver 에이전트를 호출합니다.</p>
+<h2 id="rust-review">/rust-review</h2>
+<p><strong>한 줄 요약</strong>: Rust 코드를 리뷰합니다. 소유권, 수명, 에러 처리, unsafe 사용을 검토합니다.</p>
+<h2 id="rust-test">/rust-test</h2>
+<p><strong>한 줄 요약</strong>: Rust TDD 워크플로우를 실행합니다. cargo-llvm-cov로 커버리지를 확인합니다.</p>
+<hr />
+<h3 id="python">Python</h3>
+<h2 id="python-review">/python-review</h2>
+<p><strong>한 줄 요약</strong>: Python 코드를 리뷰합니다. PEP 8, 타입 힌트, 보안, Pythonic 패턴을 검토합니다.</p>
+<hr />
+<h3 id="javagradle">Java/Gradle</h3>
+<h2 id="gradle-build">/gradle-build</h2>
+<p><strong>한 줄 요약</strong>: Gradle(Android/KMP) 빌드 에러를 고칩니다.</p>
+<hr />
+<h1 id="멀티-에이전트-도구">6. 멀티 에이전트 도구</h1>
+<p>여러 AI 에이전트를 동시에 활용하는 고급 도구들입니다.</p>
+<hr />
+<h2 id="devfleet">/devfleet</h2>
+<p><strong>한 줄 요약</strong>: 여러 Claude 에이전트를 병렬로 작업시킵니다. 프로젝트를 자동으로 분할하고 배분합니다.</p>
+<p><strong>사용 예시</strong>: “이 프로젝트를 여러 에이전트가 나눠서 동시에 하자” <code>/devfleet</code> 입력. 사용자가 설명하면 자동으로 작업을 나누고, 각 에이전트를 독립된 작업 공간에 배치해서 동시에 실행하고, 결과를 자동 병합합니다.</p>
+<hr />
+<h2 id="orchestrate">/orchestrate</h2>
+<p><strong>한 줄 요약</strong>: 에이전트들을 순서대로 실행합니다. 기획자 -&gt; TDD -&gt; 코드리뷰 -&gt; 보안검토 순서 등.</p>
+<p><strong>사용 예시</strong>: “인증 기능을 전문가 체인으로 만들자” <code>/orchestrate feature "사용자 인증 추가"</code> 입력. planner -&gt; tdd-guide -&gt; code-reviewer -&gt; security-reviewer 순서로 실행하며, 각 에이전트가 다음 에이전트에게 인수인계 문서를 넘깁니다.</p>
+<hr />
+<h2 id="multi-workflow">/multi-workflow</h2>
+<p><strong>한 줄 요약</strong>: 여러 AI 모델(Claude, Codex, Gemini)이 협업하는 6단계 워크플로우입니다.</p>
+<p><strong>사용 예시</strong>: “이 기능을 여러 AI가 협력해서 만들자” <code>/multi-workflow 실시간 채팅 기능</code> 입력. 리서치 -&gt; 아이디어 -&gt; 계획 -&gt; 실행 -&gt; 최적화 -&gt; 리뷰 6단계로 진행하며, 백엔드는 Codex, 프론트엔드는 Gemini, 전체 조율은 Claude가 담당합니다.</p>
+<hr />
+<h2 id="multi-plan">/multi-plan</h2>
+<p><strong>한 줄 요약</strong>: 여러 모델이 협력해서 구현 계획을 만듭니다.</p>
+<p><strong>사용 예시</strong>: “이 기능의 계획을 여러 AI 관점에서 세우자” <code>/multi-plan 결제 시스템</code> 입력.</p>
+<hr />
+<h2 id="multi-execute">/multi-execute</h2>
+<p><strong>한 줄 요약</strong>: 계획을 기반으로 여러 모델이 협력해서 실제 구현합니다.</p>
+<p><strong>사용 예시</strong>: “세운 계획대로 구현 시작하자” <code>/multi-execute</code> 입력.</p>
+<hr />
+<h2 id="multi-frontend">/multi-frontend</h2>
+<p><strong>한 줄 요약</strong>: 프론트엔드 특화 워크플로우입니다. Gemini가 주도합니다.</p>
+<p><strong>사용 예시</strong>: “프론트엔드 작업을 AI가 주도하게” <code>/multi-frontend 대시보드 리디자인</code> 입력.</p>
+<hr />
+<h2 id="multi-backend">/multi-backend</h2>
+<p><strong>한 줄 요약</strong>: 백엔드 특화 워크플로우입니다. Codex가 주도합니다.</p>
+<p><strong>사용 예시</strong>: “백엔드 API를 AI가 주도하게” <code>/multi-backend REST API 설계</code> 입력.</p>
+<hr />
+<h2 id="loop-start">/loop-start</h2>
+<p><strong>한 줄 요약</strong>: 자율 반복 작업을 안전하게 시작합니다.</p>
+<p><strong>사용 예시</strong>: “자동으로 반복해서 테스트 실행해” <code>/loop-start</code> 입력. 정지 조건, 관찰 포인트, 롤백 경로를 설정한 후 시작합니다.</p>
+<hr />
+<h2 id="loop-status">/loop-status</h2>
+<p><strong>한 줄 요약</strong>: 실행 중인 자율 반복 작업의 진행 상황을 확인합니다.</p>
+<p><strong>사용 예시</strong>: “자동 작업이 잘 돌아가고 있는지 확인” <code>/loop-status</code> 입력.</p>
+<hr />
+<h1 id="libreuiux-도구">7. LibreUIUX 도구</h1>
+<p>UI/UX 디자인을 분석하고 개선하는 전문 도구들입니다.</p>
+<hr />
+<h2 id="libre-ui-review">/libre-ui-review</h2>
+<p><strong>한 줄 요약</strong>: 기존 UI를 LibreUIUX 프레임워크로 전면 분석합니다.</p>
+<p><strong>사용 예시</strong>: “이 화면의 디자인을 분석해줘” <code>/libre-ui-review</code> 입력.</p>
+<hr />
+<h2 id="libre-ui-critique">/libre-ui-critique</h2>
+<p><strong>한 줄 요약</strong>: UI 컴포넌트에 대한 디자인 피드백과 개선안을 제시합니다.</p>
+<p><strong>사용 예시</strong>: “이 버튼 디자인 어떤지 봐줘” <code>/libre-ui-critique</code> 입력.</p>
+<hr />
+<h2 id="libre-ui-modern">/libre-ui-modern</h2>
+<p><strong>한 줄 요약</strong>: 현대적인 UI 컴포넌트를 모범 사례에 맞게 생성합니다.</p>
+<p><strong>사용 예시</strong>: “현대적인 가격 테이블 컴포넌트를 만들어줘” <code>/libre-ui-modern</code> 입력.</p>
+<hr />
+<h2 id="libre-ui-responsive">/libre-ui-responsive</h2>
+<p><strong>한 줄 요약</strong>: 반응형 디자인 문제를 확인하고 수정합니다.</p>
+<p><strong>사용 예시</strong>: “모바일에서 레이아웃이 깨지는지 확인” <code>/libre-ui-responsive</code> 입력.</p>
+<hr />
+<h2 id="libre-a11y-audit">/libre-a11y-audit</h2>
+<p><strong>한 줄 요약</strong>: 접근성(장애인도 사용 가능한지) 전문 감사를 실행합니다.</p>
+<p><strong>사용 예시</strong>: “WCAG 기준으로 접근성 점검해줘” <code>/libre-a11y-audit</code> 입력.</p>
+<hr />
+<h2 id="libre-ui-synth">/libre-ui-synth</h2>
+<p><strong>한 줄 요약</strong>: 모든 LibreUIUX 도구를 종합해서 프로덕션 레디 UI를 만드는 마스터 명령어입니다.</p>
+<p><strong>사용 예시</strong>: “이 컴포넌트를 디자인+접근성+보안+성능 전부 갖추게 만들어줘” <code>/libre-ui-synth</code> 입력.</p>
+<hr />
+<h1 id="학습진화-도구">8. 학습/진화 도구</h1>
+<p>ECC가 자체적으로 학습하고 진화하는 도구들입니다.</p>
+<hr />
+<h2 id="instinct-status">/instinct-status</h2>
+<p><strong>한 줄 요약</strong>: 학습된 본능(패턴)들의 목록과 확신도를 보여줍니다.</p>
+<p><strong>사용 예시</strong>: “지금까지 뭘 배웠는지 보고 싶어” <code>/instinct-status</code> 입력. 프로젝트별/전역 본능을 도메인별로 정리해서 보여줍니다.</p>
+<hr />
+<h2 id="instinct-export">/instinct-export</h2>
+<p><strong>한 줄 요약</strong>: 학습된 본능을 파일로 내보냅니다.</p>
+<p><strong>사용 예시</strong>: “학습된 패턴을 백업하자” <code>/instinct-export</code> 입력.</p>
+<hr />
+<h2 id="instinct-import">/instinct-import</h2>
+<p><strong>한 줄 요약</strong>: 파일이나 URL에서 본능을 가져옵니다.</p>
+<p><strong>사용 예시</strong>: “다른 프로젝트의 패턴을 가져오자” <code>/instinct-import</code> 입력.</p>
+<hr />
+<h2 id="evolve">/evolve</h2>
+<p><strong>한 줄 요약</strong>: 학습된 본능들을 분석해서 더 큰 구조(스킬, 명령어, 에이전트)로 진화시킵니다.</p>
+<p><strong>사용 예시</strong>: “비슷한 패턴들을 하나의 스킬로 합치자” <code>/evolve</code> 입력. 관련된 본능들을 묶어서 스킬(자동 발동), 명령어(수동 호출), 에이전트(복잡한 작업) 중 적합한 형태로 진화시킵니다.</p>
+<hr />
+<h2 id="promote">/promote</h2>
+<p><strong>한 줄 요약</strong>: 프로젝트 전용 본능을 전역(모든 프로젝트)으로 승격합니다.</p>
+<p><strong>사용 예시</strong>: “이 패턴은 다른 프로젝트에서도 유용하니까 전역으로 올리자” <code>/promote</code> 입력.</p>
+<hr />
+<h2 id="prune">/prune</h2>
+<p><strong>한 줄 요약</strong>: 30일 이상 방치된 미승격 본능을 삭제합니다.</p>
+<p><strong>사용 예시</strong>: “오래된 미사용 패턴을 정리하자” <code>/prune</code> 입력.</p>
+<hr />
+<h2 id="projects">/projects</h2>
+<p><strong>한 줄 요약</strong>: 등록된 프로젝트 목록과 각 프로젝트의 본능 통계를 보여줍니다.</p>
+<p><strong>사용 예시</strong>: “어떤 프로젝트들이 등록되어 있는지 보고 싶어” <code>/projects</code> 입력.</p>
+<hr />
+<h2 id="skill-create">/skill-create</h2>
+<p><strong>한 줄 요약</strong>: git 이력을 분석해서 코딩 패턴을 추출하고 SKILL.md 파일을 생성합니다.</p>
+<p><strong>사용 예시</strong>: “최근 커밋들에서 반복되는 패턴을 스킬로 만들자” <code>/skill-create</code> 입력.</p>
+<hr />
+<h2 id="skill-health">/skill-health</h2>
+<p><strong>한 줄 요약</strong>: 스킬 포트폴리오의 건강 상태를 차트로 보여줍니다.</p>
+<p><strong>사용 예시</strong>: “내 스킬들이 얼마나 잘 관리되고 있는지 보고 싶어” <code>/skill-health</code> 입력.</p>
+<hr />
+<h2 id="rules-distill">/rules-distill</h2>
+<p><strong>한 줄 요약</strong>: 스킬들에서 공통 원칙을 추출해서 규칙으로 정리합니다.</p>
+<p><strong>사용 예시</strong>: “여러 스킬에서 반복되는 원칙을 규칙으로 만들자” <code>/rules-distill</code> 입력.</p>
+<hr />
+<h1 id="기타-유틸리티">9. 기타 유틸리티</h1>
+<hr />
+<h2 id="claw">/claw</h2>
+<p><strong>한 줄 요약</strong>: NanoClaw v2 – 대화형 AI 세션을 시작합니다. 모델 전환, 스킬 로드, 분기, 압축, 내보내기 기능이 있습니다.</p>
+<p><strong>사용 예시</strong>: “대화형 AI 세션을 시작하자” <code>/claw</code> 입력. <code>/model opus</code>로 모델을 바꾸거나, <code>/load skill-name</code>으로 스킬을 로드하거나, <code>/branch new-session</code>으로 대화를 분기할 수 있습니다.</p>
+</body>
+</html>
