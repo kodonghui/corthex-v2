@@ -1,9 +1,9 @@
 ---
 name: 'kdh-uxui-redesign-full-auto-pipeline'
-description: 'UXUI Redesign Pipeline v6.0 (ProMax). 6 Phases. promax design-system DB + Playwright visual research + Stitch 2 MCP + KDH party mode. Multi-theme support. Zero hardcoded colors.'
+description: 'UXUI Redesign Pipeline v7.0 (ProMax). 6 Phases. promax design-system DB + Playwright visual research + Stitch 2 MCP + KDH party mode. BMAD real agent names (sally/winston/quinn). Step Grade system. Multi-theme support. Zero hardcoded colors.'
 ---
 
-# UXUI Redesign Pipeline v6.0 — ProMax Edition
+# UXUI Redesign Pipeline v7.0 — ProMax Edition
 
 6 Phase fully automated. **promax** for design system generation, **Playwright MCP** for visual research, **Stitch 2 MCP** for screen generation, **KDH party mode** for quality gates.
 Works on ANY frontend project — auto-detects framework, router, design tokens, and app shell.
@@ -75,7 +75,7 @@ Step 0: Project Auto-Scan
   10. Detect ALL packages (monorepo: app, admin, landing, etc.)
   11. Save to _uxui_redesign/project-context.yaml
 
-  ADDITION for v6.0:
+  ADDITION for v7.0:
   12. Count total pages across ALL packages (app + admin + landing)
   13. Map page → package (which page belongs to which package)
   14. Detect existing theme system (CSS variables, theme files, etc.)
@@ -83,7 +83,7 @@ Step 0: Project Auto-Scan
 
 ## Scope: All Packages
 
-Unlike v5.1 which only covered the CEO app, v6.0 covers ALL frontend packages:
+Unlike v5.1 which only covered the CEO app, v7.0 covers ALL frontend packages:
 
 ```yaml
 packages:
@@ -109,23 +109,104 @@ Each package gets its own Stitch generation batch in Phase 3, but shares the sam
 
 Output folders: `phase-0-scan/`, `phase-1-research/`, `phase-2-design-system/`, `phase-3-generated/`, `phase-4-integration/`, `phase-5-verification/`, `context-snapshots/`, `party-logs/`, `pipeline-status.yaml`
 
+## Step Grade System (from kdh-full-auto-pipeline v9.2)
+
+Each step has a grade that determines retry count, Party Mode depth, and agent model.
+
+| Phase | Step | Grade |
+|-------|------|-------|
+| Phase 1 | 1-1 Benchmark Selection | C |
+| Phase 1 | 1-2 Screenshot Capture | B |
+| Phase 1 | 1-3 Visual Analysis | B |
+| Phase 2 | 2-1 promax Generation | A |
+| Phase 2 | 2-2 Party Review | A |
+| Phase 3 | 3-1 Create Stitch Project | C |
+| Phase 3 | 3-2 Generate Screens | B |
+| Phase 3 | 3-3 Coverage Verification | B |
+| Phase 3 | 3-4 Visual Review | B |
+| Phase 4 | 4-0 App Shell | A |
+| Phase 4 | 4-1 Page Rebuild | B |
+| Phase 4 | 4-2 API Binding | A |
+| Phase 4 | 4-3 Completeness Gate | B |
+| Phase 4 | 4-4 Landing Page | B |
+| Phase 5 | 5-1 Visual Verification | B |
+| Phase 5 | 5-2 E2E Functional | A |
+| Phase 5 | 5-3 Accessibility | B |
+
+**Grade definitions:**
+- **Grade A (critical):** 3 retries, minimum 2 Party Mode cycles, Devil's Advocate on cycle 2
+- **Grade B (important):** 2 retries, minimum 1 cycle + cross-talk verified
+- **Grade C (setup):** 1 retry, Writer Solo (no Party Mode)
+
 ## Model Strategy
 
 - **Orchestrator**: Opus (always)
-- **Writer/Critics**: Sonnet (default)
-- **Opus overrides for critics**: Phase 2 (design system selection), Phase 4-2 (API binding)
+- **Writer**: Opus for Grade A steps, Sonnet for Grade B/C
+- **Critics**: Opus for Phase 2 (design decisions) + Phase 4-2 (API binding) + Phase 5-2 (E2E). Sonnet for others.
 
 ## Party Mode (from kdh-full-auto-pipeline v9.2)
 
 - TeamCreate mandatory for all party mode phases. No standalone subagents.
 - 3R = Write → Review × 3 critics → Fix → Verify → Score
-- Pass: avg score >= 7/10. Fail: retry (max 2) → escalate → continue.
+- Pass: avg score >= 7/10. Fail: retry (max per Grade) → escalate → continue.
 - Orchestrator relays ALL messages (no Writer↔Critic direct). Idle agents don't auto-wake.
 
-**Critics:**
-- **Critic-A (UX Practicality):** Does this actually work for users? Fitts's Law, cognitive load, click depth.
-- **Critic-B (Visual Consistency):** Does every page look like it belongs to the same product? Color ratio 60-30-10, spacing rhythm, typography hierarchy.
-- **Critic-C (Technical Reality):** Can this be built? Bundle size, render performance, CSS complexity, framework compatibility.
+**Critics (BMAD Real Agents):**
+- **sally (UX Practicality):** Does this actually work for users? Fitts's Law, cognitive load, click depth.
+  - Persona: load `_bmad/bmm/agents/ux-designer.md` at team creation
+- **winston (Visual Consistency):** Does every page look like it belongs to the same product? Color ratio 60-30-10, spacing rhythm, typography hierarchy.
+  - Persona: load `_bmad/bmm/agents/architect.md` at team creation
+- **quinn (Technical Reality):** Can this be built? Bundle size, render performance, CSS complexity, framework compatibility.
+  - Persona: load `_bmad/bmm/agents/qa.md` at team creation
+
+**Persona loading is MANDATORY.** Each critic agent MUST be initialized with its persona file. If the persona file is missing, log a warning but still create the critic with the role description above.
+
+### Cross-talk Protocol (mandatory)
+
+After critic reviews (parallel), a cross-talk round MUST happen:
+- **sally ↔ winston:** "UX comfort vs technical feasibility?"
+- **winston ↔ quinn:** "Architecture concerns vs implementation reality?"
+- **quinn ↔ sally:** "QA gaps vs user experience tradeoffs?"
+
+Cross-talk MUST happen. Each critic updates their party-log with a `## Cross-talk` section.
+
+### Minimum Cycle Check (from v9.2)
+
+- **Grade A steps:** MINIMUM 2 full Party Mode cycles regardless of scores
+  - Cycle 1: normal review
+  - Cycle 2: Devil's Advocate — 1 designated critic MUST find >= 3 issues
+  - If Devil's Advocate finds 0 issues → suspicious, Orchestrator reviews directly
+- **Grade B steps:** MINIMUM 1 cycle + cross-talk verified
+- **Grade C steps:** Writer Solo, no Party Mode
+
+### Score Variance Check (from v9.2)
+
+- Calculate standard deviation of all critic scores
+- If stdev < 0.5: Orchestrator flags "Suspiciously High Agreement"
+- At least 1 critic MUST independently re-score without seeing others' scores
+
+### Party-log Verification
+
+Orchestrator validates ALL critic logs exist before accepting phase completion:
+1. `party-logs/phase-{N}-{step}-sally.md` EXISTS
+2. `party-logs/phase-{N}-{step}-winston.md` EXISTS
+3. `party-logs/phase-{N}-{step}-quinn.md` EXISTS
+4. `party-logs/phase-{N}-{step}-fixes.md` EXISTS
+5. Each critic log contains `## Cross-talk` section
+
+Missing file = REJECT, do NOT proceed.
+
+### Orchestrator Phase Completion Checklist (BLOCKING)
+
+Before accepting [Phase Complete], Orchestrator MUST verify ALL:
+- [ ] All critic party-log files exist (not just messages)
+- [ ] Each critic log has `## Cross-talk` section
+- [ ] Score stdev >= 0.5 (no rubber-stamp)
+- [ ] Grade A phases: 2nd cycle completed with Devil's Advocate
+- [ ] grep hardcoded hex in changed files → 0 matches
+- [ ] Context snapshot saved
+
+ANY item unchecked → REJECT
 
 ---
 
@@ -235,14 +316,15 @@ FOR EACH theme in themes list:
 ### Step 2-2: Party Mode Review (per theme)
 
 ```
-Spawn team: Writer + Critic-A + Critic-B + Critic-C
+Spawn team: Writer + sally + winston + quinn
+(Load persona files: _bmad/bmm/agents/ux-designer.md, architect.md, qa.md)
 
 FOR EACH theme:
   Writer presents: MASTER.md + DESIGN.md + Phase 1 benchmark comparison
 
-  Critic-A: "Will users find this comfortable for 8-hour daily use?"
-  Critic-B: "Is the 60-30-10 ratio correct? Typography hierarchy clear at all sizes?"
-  Critic-C: "Can Tailwind express all these tokens? Any CSS performance issues?"
+  sally: "Will users find this comfortable for 8-hour daily use?"
+  winston: "Is the 60-30-10 ratio correct? Typography hierarchy clear at all sizes?"
+  quinn: "Can Tailwind express all these tokens? Any CSS performance issues?"
 
   Score >= 7 → PASS. Score < 7 → adjust promax keywords and re-run Step 2-1.
 
@@ -306,6 +388,18 @@ FOR EACH theme:
 Output: phase-3-generated/stitch-review.md
 git commit "docs(uxui): Phase 3 complete — all screens generated and reviewed"
 ```
+
+---
+
+## User Gate Protocol (from v9.2)
+
+| # | Phase | Step | Question |
+|---|-------|------|----------|
+| 1 | Phase 2 | 2-2 Design System | 디자인 시스템 방향 확정 — 테마별 색상/폰트 맞는지? |
+| 2 | Phase 3 | 3-4 Visual Review | Stitch 생성 결과 확인 — 마음에 드는지? 수정할 페이지? |
+| 3 | Phase 4 | 4-0 App Shell | App Shell 리빌드 결과 — 사이드바/레이아웃 맞는지? |
+
+GATE steps pause for user input. Never auto-proceed.
 
 ---
 
@@ -471,16 +565,19 @@ git commit "docs(uxui): Phase 5 complete — all verification passed"
 
 ## Anti-Patterns (ranked by v5.1 failure frequency)
 
-1. **Hardcoded colors in pipeline file** — v5.1 had `#283618`, `#faf8f5` baked in. v6.0 has ZERO. All colors from promax at runtime.
-2. **Text-only research** — v5.1 used WebFetch text. v6.0 requires Playwright screenshots (HARD GATE).
+1. **Hardcoded colors in pipeline file** — v5.1 had `#283618`, `#faf8f5` baked in. v7.0 has ZERO. All colors from promax at runtime.
+2. **Text-only research** — v5.1 used WebFetch text. v7.0 requires Playwright screenshots (HARD GATE).
 3. **"Add classes" instead of "rebuild"** — Phase 4 = REWRITE render output, not add utility classes.
 4. **Stitch sidebar treated as authoritative** — IGNORE Stitch nav/sidebar. Content area only.
-5. **promax not invoked** — v5.1 had promax installed but never called. v6.0 makes it Phase 2 core.
-6. **Single theme assumption** — v6.0 generates N themes. CSS variables enable runtime switching.
-7. **Admin/Landing ignored** — v5.1 only covered CEO app. v6.0 covers ALL packages.
+5. **promax not invoked** — v5.1 had promax installed but never called. v7.0 makes it Phase 2 core.
+6. **Single theme assumption** — v7.0 generates N themes. CSS variables enable runtime switching.
+7. **Admin/Landing ignored** — v5.1 only covered CEO app. v7.0 covers ALL packages.
 8. **Screenshot-only QA** — Every interactive element must be tested.
 9. **Missing files shipped** — Phase 4-3 completeness gate: 0 missing files.
-10. **No blast radius analysis** — v6.0 uses code-review-graph for structural verification.
+10. **No blast radius analysis** — v7.0 uses code-review-graph for structural verification.
+11. **Knowledge sidebar default open on mobile** — Sidebar initializes as open on all screen sizes, overlaps content on 390px. FIX: `useState(() => window.innerWidth >= 1024)` for panels with sidebar.
+12. **CI lockfile mismatch** — Self-hosted runner has stale node_modules, bun.lock differs between local and CI. FIX: After dependency updates, regenerate lockfile in runner workdir AND local, commit from runner environment.
+13. **Inactive DB entities block login** — CEO user or company `is_active=false` blocks E2E verification login. FIX: Phase 0 Pre-flight verifies test user + company active status before Playwright tests.
 
 ## Safeguards & Timeouts
 
@@ -533,3 +630,11 @@ git commit "docs(uxui): Phase 5 complete — all verification passed"
 10. **Every interactive element tested.** "Looks fine" ≠ "works fine".
 11. **code-review-graph for structural verification.** Orphans, circular deps, missing connections.
 12. **pipeline-status.yaml is single source of truth.** On resume: read it first.
+
+## Non-BMAD Fallback
+
+If `_bmad/` directory doesn't exist:
+- Use 3 generic critics: "UX Reviewer", "Tech Reviewer", "QA Reviewer"
+- Skip persona file loading
+- All other protocols (Party Mode, Cross-talk, Score Variance) still apply
+- Output to `_uxui_redesign/` (same structure)
