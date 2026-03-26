@@ -65,6 +65,7 @@ export function DepartmentsPage() {
   const [editId, setEditId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: '', description: '' })
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedDept, setSelectedDept] = useState<Department | null>(null)
 
   // Cascade modal state
   const [cascadeTarget, setCascadeTarget] = useState<Department | null>(null)
@@ -169,7 +170,7 @@ export function DepartmentsPage() {
             <div className="text-right">
               <p className="font-mono text-[10px] uppercase text-corthex-text-disabled mb-1">Total Sectors</p>
               <p className="font-mono text-2xl font-bold text-corthex-text-primary">
-                {depts.length}<span className="text-corthex-accent">.00</span>
+                {depts.length}
               </p>
             </div>
             <button
@@ -362,7 +363,7 @@ export function DepartmentsPage() {
                     }
 
                     return (
-                      <tr key={d.id} className="hover:bg-corthex-elevated/40 transition-colors group" data-testid={`departments-row-${d.id}`}>
+                      <tr key={d.id} onClick={() => setSelectedDept(d)} className="hover:bg-corthex-elevated/40 transition-colors group cursor-pointer" data-testid={`departments-row-${d.id}`}>
                         <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6">
                           <div className="flex flex-col">
                             <span className="text-corthex-text-primary font-bold tracking-tight uppercase group-hover:text-corthex-accent transition-colors" data-testid={`departments-name-${d.id}`}>
@@ -409,7 +410,8 @@ export function DepartmentsPage() {
                           <div className="flex justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               data-testid={`departments-edit-${d.id}`}
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation()
                                 setEditId(d.id)
                                 setEditForm({ name: d.name, description: d.description || '' })
                               }}
@@ -419,7 +421,7 @@ export function DepartmentsPage() {
                             </button>
                             <button
                               data-testid={`departments-delete-${d.id}`}
-                              onClick={() => openCascadeModal(d)}
+                              onClick={(e) => { e.stopPropagation(); openCascadeModal(d) }}
                               className="p-2 sm:p-1.5 text-corthex-text-disabled hover:text-corthex-error hover:bg-corthex-elevated rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -485,6 +487,60 @@ export function DepartmentsPage() {
           </div>
         </div>
       </div>
+
+      {/* Department Detail Panel */}
+      {selectedDept && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedDept(null)}>
+          <div
+            data-testid="departments-detail-panel"
+            className="bg-corthex-surface border border-corthex-border shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-corthex-border">
+              <div>
+                <h3 className="text-lg font-bold text-corthex-text-primary uppercase tracking-tight">{selectedDept.name}</h3>
+                <p className="font-mono text-[10px] text-corthex-text-disabled uppercase">ID: {selectedDept.id.slice(0, 8).toUpperCase()}</p>
+              </div>
+              <button onClick={() => setSelectedDept(null)} className="text-corthex-text-disabled hover:text-corthex-text-primary transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-4 overflow-y-auto flex-1 space-y-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-1">Description</p>
+                <p className="text-sm text-corthex-text-secondary">{selectedDept.description || '—'}</p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-1">Status</p>
+                <span className={`font-mono text-xs font-bold uppercase ${selectedDept.isActive ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`}>
+                  {selectedDept.isActive ? 'Operational' : 'Inactive'}
+                </span>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-2">
+                  Assigned Agents ({allAgents.filter((a) => a.departmentId === selectedDept.id).length})
+                </p>
+                {allAgents.filter((a) => a.departmentId === selectedDept.id).length === 0 ? (
+                  <p className="font-mono text-xs text-corthex-text-disabled">No agents assigned</p>
+                ) : (
+                  <div className="space-y-2">
+                    {allAgents.filter((a) => a.departmentId === selectedDept.id).map((a) => (
+                      <div key={a.id} className="flex items-center justify-between bg-corthex-bg px-3 py-2 border border-corthex-border/30">
+                        <span className="text-sm font-bold text-corthex-text-primary">{a.name}</span>
+                        <span className="font-mono text-[10px] text-corthex-text-disabled uppercase">{a.role}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-corthex-text-disabled mb-1">Created</p>
+                <p className="font-mono text-xs text-corthex-text-secondary">{new Date(selectedDept.createdAt).toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cascade Wizard Modal */}
       {cascadeTarget && (
