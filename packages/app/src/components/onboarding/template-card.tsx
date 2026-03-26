@@ -28,7 +28,7 @@ export function TemplateCard({ title, recommended, selected, features, onClick }
                     {selected && <CheckCircle2 className="text-corthex-accent w-5 h-5" />}
                 </h2>
                 {recommended && (
-                    <span className="text-[#020617] text-xs font-bold leading-none tracking-wide uppercase rounded-full bg-corthex-accent px-3 py-1.5 text-center">
+                    <span className="text-corthex-text-on-accent text-xs font-bold leading-none tracking-wide uppercase rounded-full bg-corthex-accent px-3 py-1.5 text-center">
                         추천
                     </span>
                 )}

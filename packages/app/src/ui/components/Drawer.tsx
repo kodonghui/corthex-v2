@@ -50,7 +50,7 @@ const DrawerRoot = React.forwardRef<HTMLDivElement, DrawerRootProps>(
       <SubframeCore.Drawer.Root asChild={true} {...otherProps}>
         <div
           className={SubframeUtils.twClassNames(
-            "flex h-full w-full flex-col items-end justify-center gap-2 bg-[#00000066]",
+            "flex h-full w-full flex-col items-end justify-center gap-2 bg-black/40",
             className
           )}
           ref={ref}

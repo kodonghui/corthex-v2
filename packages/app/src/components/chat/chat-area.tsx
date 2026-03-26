@@ -422,7 +422,7 @@ export function ChatArea({
       )}
 
       {/* 헤더 -- Stitch style */}
-      <header data-testid="chat-header" className="flex items-center justify-between whitespace-nowrap border-b border-solid border-stone-200 px-6 py-4 bg-[#111827]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+      <header data-testid="chat-header" className="flex items-center justify-between whitespace-nowrap border-b border-solid border-stone-200 px-6 py-4 bg-corthex-bg/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
@@ -823,7 +823,7 @@ export function ChatArea({
           </div>
 
           {/* 입력 영역 -- Stitch style */}
-          <div data-testid="chat-input" className="p-4 bg-[#111827] border-t border-stone-200 shrink-0">
+          <div data-testid="chat-input" className="p-4 bg-corthex-bg border-t border-stone-200 shrink-0">
             {/* 첨부 파일 미리보기 */}
             {pendingAttachments.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
@@ -840,7 +840,7 @@ export function ChatArea({
                 ))}
               </div>
             )}
-            <div className="flex items-end gap-2 bg-[#1E293B] rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-corthex-accent/50 transition-all">
+            <div className="flex items-end gap-2 bg-corthex-surface rounded-2xl p-2 border border-stone-200/50 shadow-inner focus-within:ring-1 focus-within:ring-corthex-accent/50 transition-all">
               <input
                 ref={fileInputRef}
                 type="file"

@@ -37,7 +37,7 @@ export function AgentDetail({
                 <div className="flex items-center gap-6">
                     <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-corthex-accent to-cyan-600 flex items-center justify-center shadow-lg relative">
                         <Headset className="text-white w-10 h-10" />
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#102022] rounded-full flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-corthex-bg rounded-full flex items-center justify-center">
                             <div className="w-4 h-4 rounded-full bg-green-500"></div>
                         </div>
                     </div>

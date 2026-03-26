@@ -84,6 +84,7 @@
 ## Context Memory
 - Auto-save to `.claude/memory/working-state.md` on key decisions
 - **"컴팩대비"** = update working-state + MEMORY.md + git commit+push all
+- **컴팩대비 시 MEMORY.md 필수 업데이트**: Current Status 섹션의 날짜·Epic 상태·잔여 이슈를 코드 기준으로 최신화. 오래된 정보 방치 금지.
 - New session: read working-state.md first
 
 ## Hooks (자동 강제 — `.claude/hooks.json`)

@@ -51,7 +51,7 @@ const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
           {
             "h-6 w-6": size === "small",
             "h-10 w-10": size === "large",
-            "hover:bg-[#ffffff29] active:bg-[#ffffff3d]": variant === "inverse",
+            "hover:bg-corthex-sidebar-hover active:bg-corthex-sidebar-active": variant === "inverse",
             "hover:bg-error-50 active:bg-error-100":
               variant === "destructive-tertiary",
             "bg-error-50 hover:bg-error-100 active:bg-error-50":

@@ -13,12 +13,12 @@ export function AvatarGroup({ avatars, maxCount = 3 }: AvatarGroupProps) {
                 <img
                     key={i}
                     alt={`Avatar ${i}`}
-                    className="inline-block h-8 w-8 rounded-full ring-2 ring-[#0f171a] object-cover"
+                    className="inline-block h-8 w-8 rounded-full ring-2 ring-corthex-bg object-cover"
                     src={url}
                 />
             ))}
             {remainingCount > 0 && (
-                <div className="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-[#0f171a] bg-stone-100 text-xs font-medium text-stone-600">
+                <div className="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-corthex-bg bg-stone-100 text-xs font-medium text-stone-600">
                     +{remainingCount}
                 </div>
             )}

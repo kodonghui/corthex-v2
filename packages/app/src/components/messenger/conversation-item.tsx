@@ -27,7 +27,7 @@ export function ConversationItem({ name, time, previewMessage, icon, imageUrl, a
                     </div>
                 )}
                 {status === 'online' && (
-                    <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-[#0b1416]"></div>
+                    <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-corthex-surface"></div>
                 )}
             </div>
             <div className="flex-1 min-w-0">

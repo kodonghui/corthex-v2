@@ -54,7 +54,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
           {
             "h-6 w-auto flex-row flex-nowrap gap-1 px-2 py-0": size === "small",
             "h-10 w-auto px-4 py-0": size === "large",
-            "bg-transparent hover:bg-[#ffffff29] active:bg-[#ffffff3d]":
+            "bg-transparent hover:bg-corthex-sidebar-hover active:bg-corthex-sidebar-active":
               variant === "inverse",
             "bg-transparent hover:bg-error-50 active:bg-error-100":
               variant === "destructive-tertiary",

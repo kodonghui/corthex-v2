@@ -498,7 +498,7 @@ function AgentDetailPanel({
           <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-corthex-border hover:bg-corthex-elevated transition-colors font-medium text-sm text-corthex-text-primary">
             <Pencil className="w-4 h-4" /> 수정
           </button>
-          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-[#b91c1c] transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
+          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
             <Trash2 className="w-4 h-4" /> 비활성화
           </button>
         </div>
