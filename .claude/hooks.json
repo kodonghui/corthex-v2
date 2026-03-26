@@ -8,6 +8,11 @@
             "type": "command",
             "command": "/home/ubuntu/corthex-v2/.claude/hooks/cleanup.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "cd /home/ubuntu/corthex-v2 && git submodule update --remote kodonghui_full_pipeline 2>/dev/null && echo '[submodule] kdh-pipelines updated' || true",
+            "timeout": 15
           }
         ]
       },
