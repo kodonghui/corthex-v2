@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.filter.outputs.code == 'true'
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Security audit (NFR-S14)
         if: steps.filter.outputs.code == 'true'
