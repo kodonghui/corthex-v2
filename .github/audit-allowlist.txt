@@ -12,3 +12,6 @@ GHSA-8gc5-j5rx-235r
 # hono via @modelcontextprotocol/sdk (transitive, MCP SDK pins ^4.11.4 → resolves 4.12.3)
 # Our direct hono is 4.12.9 (patched). Remove when MCP SDK updates to >=4.12.4.
 GHSA-q5qw-h33p-qvwr
+# picomatch via rollup-plugin-visualizer (transitive, updated to 4.0.4 but bun audit cache lag)
+# Remove after CI confirms picomatch@4.0.4 resolves cleanly.
+GHSA-c2c7-rcm5-vvqj
