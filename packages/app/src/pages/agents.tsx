@@ -598,7 +598,7 @@ function AgentDetailPanel({
               </div>
               <div>
                 <p className="text-xs font-bold text-corthex-text-secondary uppercase tracking-widest mb-1">허용 도구</p>
-                <p className="text-sm font-medium text-corthex-accent-deep">{agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '제한 없음'}</p>
+                <p className="text-sm font-medium text-corthex-accent-deep">{(agent.allowedTools ?? []).length > 0 ? `${agent.allowedTools.length}개` : '제한 없음'}</p>
               </div>
             </div>
           </section>
@@ -633,7 +633,7 @@ function AgentDetailPanel({
                 { label: '등급', value: tierLabels[agent.tier] || agent.tier },
                 { label: '자동 학습', value: agent.autoLearn ? 'ON' : 'OFF' },
                 { label: '비서 에이전트', value: agent.isSecretary ? 'YES' : 'NO' },
-                { label: '허용된 도구', value: agent.allowedTools.length > 0 ? `${agent.allowedTools.length}개` : '없음' },
+                { label: '허용된 도구', value: (agent.allowedTools ?? []).length > 0 ? `${agent.allowedTools.length}개` : '없음' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-corthex-border last:border-b-0">
                   <span className="text-corthex-text-secondary text-sm">{item.label}</span>
