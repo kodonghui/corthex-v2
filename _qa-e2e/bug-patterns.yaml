@@ -1,0 +1,79 @@
+# Bug Pattern Registry — Known failure patterns from E2E testing
+# Used by: pipeline agent prompts (injected as "Known Failure Patterns")
+# Updated by: E2E cycle reports, manual additions after bug discovery
+# Date: 2026-03-26
+
+patterns:
+  - id: PHANTOM_SUCCESS_TOAST
+    severity: CRITICAL
+    description: "Success toast displayed but no API call made — data not persisted"
+    detection:
+      file_pattern: "*.tsx"
+      code_pattern: "addToast.*success"
+      negative_pattern: "api\\.(post|put|delete|patch)|mutation\\.mutate"
+      scope: "nearest_function_block (20 lines)"
+    examples:
+      - file: "packages/admin/src/pages/onboarding.tsx"
+        date: "2026-03-26"
+        description: "Custom department Add button showed success toast but never called POST /admin/departments"
+        fix: "Added useMutation with api.post('/admin/departments', { name })"
+    prevention: "Writer prompt API Wiring Checklist + toast-without-api-check.sh blocking hook"
+    autofix_hint: "Wrap in useMutation with api.post/put/delete, move toast to onSuccess callback"
+
+  - id: UNDEFINED_TO_NUMBER
+    severity: HIGH
+    description: "Number(undefined) produces NaN, displayed as $NaN in UI"
+    detection:
+      file_pattern: "*.tsx"
+      code_pattern: "Number\\([^)]*\\)\\.toLocaleString|Number\\([^)]*\\)\\s*[+\\-*/]"
+    examples:
+      - file: "packages/admin/src/pages/costs.tsx"
+        date: "2026-03-26"
+        description: "Budget display showed $NaN when monthlyBudget was undefined"
+        fix: "Added || 0 fallback: (Number(value) || 0).toLocaleString()"
+    prevention: "TypeScript strict mode + runtime null checks"
+    autofix_hint: "Add || 0 or ?? 0 fallback before Number() conversion"
+
+  - id: UNDEFINED_PROPERTY_ACCESS
+    severity: HIGH
+    description: "Accessing property on potentially undefined object causes crash"
+    detection:
+      file_pattern: "*.tsx"
+      code_pattern: "config\\[.*\\]\\.|data\\.\\w+\\.(?!\\?)"
+    examples:
+      - file: "packages/admin/src/pages/marketing-settings.tsx"
+        date: "2026-03-26"
+        description: "config.engines[category] was undefined on cold load, causing crash"
+        fix: "Added guard: if (!current) return"
+    prevention: "Optional chaining + early return guards"
+    autofix_hint: "Add if (!variable) return guard or use optional chaining (?.) operator"
+
+  - id: ROLE_CHAIN_MISMATCH
+    severity: CRITICAL
+    description: "UI assigns role that maps to wrong RBAC permission level"
+    detection:
+      file_pattern: "*.ts"
+      code_pattern: "role:\\s*['\"](?:user|employee)['\"]"
+      context: "create.*user|onboard|register|invite"
+    examples:
+      - file: "packages/server/src/services/employee-management.ts"
+        date: "2026-03-26"
+        description: "First onboarding user got role 'user' (RBAC 'employee') instead of 'admin' (RBAC 'ceo')"
+        fix: "Added optional role parameter, first user gets role: 'admin'"
+    prevention: "Full-chain tracing: UI action → API → middleware → DB → response"
+    autofix_hint: "Trace role value through auth.ts RBAC mapping, verify expected permission level"
+
+  - id: MISSING_404_ROUTE
+    severity: MEDIUM
+    description: "SPA has no catch-all route, unknown paths show blank page"
+    detection:
+      file_pattern: "App.tsx"
+      code_pattern: "Route"
+      negative_pattern: "path=\"\\*\""
+    examples:
+      - file: "packages/app/src/App.tsx"
+        date: "2026-03-26"
+        description: "Navigating to /nonexistent showed blank page"
+        fix: "Added <Route path='*' element={<NotFound />} />"
+    prevention: "Route coverage check in E2E Gate"
+    autofix_hint: "Add catch-all Route with path='*' rendering a 404 component"

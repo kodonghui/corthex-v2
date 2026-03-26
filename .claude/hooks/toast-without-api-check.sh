@@ -47,8 +47,8 @@ if [ "$VIOLATIONS" -gt 0 ]; then
   echo "Toast-Without-API Check: ${VIOLATIONS} potential issue(s) found"
   echo -e "$REPORT"
   echo ""
-  echo "These might be false positives — review manually."
+  echo "BLOCKING: Fix violations before committing. If false positive, add to exclusion patterns above."
   echo "True positives = UI shows success but no actual API call (like the onboarding dept bug)"
 fi
 
-exit 0  # Don't block, just warn
+exit 2  # BLOCK on violations — Phantom Success is a critical bug class
