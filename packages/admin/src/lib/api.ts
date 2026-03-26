@@ -55,7 +55,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
 
   if (res.status === 401) {
-    const isLoginRequest = url.includes('/auth/admin/login')
+    const isLoginRequest = path.includes('/auth/admin/login')
     if (!isLoginRequest) {
       localStorage.removeItem('corthex_admin_token')
       localStorage.removeItem('corthex_admin_user')
