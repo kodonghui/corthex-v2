@@ -181,7 +181,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/evaluate-session.js",
+            "command": "bash $HOME/.claude/skills/dream/should-dream.sh && touch $HOME/.claude/.dream-pending || true",
             "timeout": 10
           }
         ]

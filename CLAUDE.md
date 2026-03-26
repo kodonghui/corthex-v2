@@ -83,9 +83,11 @@
 
 ## Context Memory
 - Auto-save to `.claude/memory/working-state.md` on key decisions
-- **"컴팩대비"** = update working-state + MEMORY.md + git commit+push all
-- **컴팩대비 시 MEMORY.md 필수 업데이트**: Current Status 섹션의 날짜·Epic 상태·잔여 이슈를 코드 기준으로 최신화. 오래된 정보 방치 금지.
+- **메모리 자동 관리**: dream skill이 3시간마다 MEMORY.md 자동 정리/통합 (수동 컴팩대비 불필요)
+- **PostCompact hook**: 컨텍스트 압축 시 uncommitted 코드 자동 커밋+푸시
+- **dream Stop hook**: 세션 종료 시 3시간 경과 체크 → 다음 세션에서 자동 메모리 정리
 - New session: read working-state.md first
+- If `~/.claude/.dream-pending` exists at session start: run `/dream` as background subagent, then `rm ~/.claude/.dream-pending`
 
 ## Hooks (자동 강제 — `.claude/hooks.json`)
 다음 규칙들은 hooks로 자동 실행됨. CLAUDE.md에 적을 필요 없음:
