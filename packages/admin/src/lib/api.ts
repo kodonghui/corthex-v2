@@ -55,11 +55,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
 
   if (res.status === 401) {
-    localStorage.removeItem('corthex_admin_token')
-    localStorage.removeItem('corthex_admin_user')
-    const currentPath = window.location.pathname.replace(/^\/admin/, '') || '/'
-    window.location.href = `/admin/login?redirect=${encodeURIComponent(currentPath)}`
-    throw new Error('인증이 만료되었습니다')
+    const isLoginRequest = url.includes('/auth/admin/login')
+    if (!isLoginRequest) {
+      localStorage.removeItem('corthex_admin_token')
+      localStorage.removeItem('corthex_admin_user')
+      const currentPath = window.location.pathname.replace(/^\/admin/, '') || '/'
+      window.location.href = `/admin/login?redirect=${encodeURIComponent(currentPath)}`
+    }
+    const body = await res.json().catch(() => ({ error: { message: '인증 실패' } }))
+    throw new Error(body.error?.message || '아이디 또는 비밀번호가 올바르지 않습니다')
   }
 
   if (res.status === 429) {

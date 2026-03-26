@@ -32,8 +32,8 @@ export function LoginPage() {
       }>('/auth/admin/login', { username, password })
 
       login(res.data.token, { ...res.data.user, role: res.data.user.role as 'admin' | 'user' })
-      const redirect = searchParams.get('redirect') || '/'
-      navigate(redirect)
+      const redirect = (searchParams.get('redirect') || '/').replace(/^\/admin/, '')
+      navigate(redirect || '/')
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'retryAfter' in err) {
         setCountdown((err as { retryAfter: number }).retryAfter)
