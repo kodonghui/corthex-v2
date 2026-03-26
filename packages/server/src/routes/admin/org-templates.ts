@@ -154,3 +154,4 @@ orgTemplatesRoute.post('/org-templates/:id/unpublish', async (c) => {
 
   return c.json({ data: updated })
 })
+
