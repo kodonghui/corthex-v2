@@ -87,6 +87,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/continuous-learning-v2/hooks/observe.sh",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreCompact": [
@@ -131,6 +141,16 @@
             "type": "command",
             "command": "node /home/ubuntu/corthex-v2/.claude/hooks/ecc/hooks/governance-capture.js",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/continuous-learning-v2/hooks/observe.sh",
+            "timeout": 5
           }
         ]
       }
