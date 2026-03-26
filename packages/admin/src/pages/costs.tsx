@@ -350,10 +350,10 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
   } | null>(null)
 
   const activeForm = form ?? (budget ? {
-    monthlyBudget: String(budget.monthlyBudget),
-    dailyBudget: String(budget.dailyBudget),
-    warningThreshold: String(budget.warningThreshold),
-    autoBlock: budget.autoBlock,
+    monthlyBudget: String(budget.monthlyBudget ?? 0),
+    dailyBudget: String(budget.dailyBudget ?? 0),
+    warningThreshold: String(budget.warningThreshold ?? 80),
+    autoBlock: budget.autoBlock ?? true,
   } : null)
 
   const mutation = useMutation({
@@ -446,7 +446,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
       <div className="mt-8 pt-6 border-t border-corthex-border/10">
         <div className="flex justify-between font-mono text-xs mb-2">
           <span className="text-corthex-text-secondary">현재 사용량 ({Math.round(usagePercent)}%)</span>
-          <span className="text-corthex-text-primary font-bold">{`$${microToUsd(currentSpendMicro)}`} / {activeForm ? `$${(Number(activeForm.monthlyBudget) || 0).toLocaleString()}` : '$0'}</span>
+          <span className="text-corthex-text-primary font-bold">{`$${microToUsd(currentSpendMicro)}`} / {activeForm ? `$${(isFinite(Number(activeForm.monthlyBudget)) ? Number(activeForm.monthlyBudget) : 0).toLocaleString()}` : '$0'}</span>
         </div>
         <div className="w-full h-1 bg-corthex-elevated overflow-hidden">
           <div className="h-full bg-corthex-accent shadow-[0_0_10px_rgba(202,138,4,0.5)]" style={{ width: `${usagePercent}%` }} />
