@@ -363,7 +363,7 @@ export function DepartmentsPage() {
                     }
 
                     return (
-                      <tr key={d.id} onClick={() => setSelectedDept(d)} className="hover:bg-corthex-elevated/40 transition-colors group cursor-pointer" data-testid={`departments-row-${d.id}`}>
+                      <tr key={d.id} onClick={() => setSelectedDept(d)} className="hover:bg-corthex-elevated/60 transition-colors group cursor-pointer border-l-2 border-transparent hover:border-corthex-accent" data-testid={`departments-row-${d.id}`}>
                         <td className="px-4 sm:px-6 md:px-8 py-4 md:py-6">
                           <div className="flex flex-col">
                             <span className="text-corthex-text-primary font-bold tracking-tight uppercase group-hover:text-corthex-accent transition-colors" data-testid={`departments-name-${d.id}`}>

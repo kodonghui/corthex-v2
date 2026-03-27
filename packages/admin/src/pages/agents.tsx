@@ -264,6 +264,7 @@ export function AgentsPage() {
 
   function handleSaveInfo() {
     if (!selectedAgent) return
+    setSelectedAgent({ ...selectedAgent, name: editForm.name, role: editForm.role, tier: editForm.tier, modelName: editForm.modelName })
     updateMutation.mutate({
       id: selectedAgent.id,
       name: editForm.name,
@@ -653,14 +654,34 @@ export function AgentsPage() {
                     style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>
                     {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </button>
-                  <button
-                    data-testid="agents-deactivate-btn"
-                    onClick={() => openDeactivateModal(selectedAgent)}
-                    disabled={!selectedAgent.isActive}
-                    className="w-full py-2 border font-mono text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
-                    style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
-                    {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
-                  </button>
+                  {selectedAgent.isActive && selectedAgent.status === 'offline' && (
+                    <button
+                      data-testid="agents-go-online-btn"
+                      onClick={() => updateMutation.mutate({ id: selectedAgent.id, status: 'online' })}
+                      disabled={updateMutation.isPending}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ borderColor: '#22c55e', color: '#22c55e' }}>
+                      {updateMutation.isPending ? 'Activating...' : 'Go Online'}
+                    </button>
+                  )}
+                  {selectedAgent.isActive ? (
+                    <button
+                      data-testid="agents-deactivate-btn"
+                      onClick={() => openDeactivateModal(selectedAgent)}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest"
+                      style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
+                      Deactivate Agent
+                    </button>
+                  ) : (
+                    <button
+                      data-testid="agents-reactivate-btn"
+                      onClick={() => updateMutation.mutate({ id: selectedAgent.id, status: 'online', isActive: true })}
+                      disabled={updateMutation.isPending}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ borderColor: '#22c55e', color: '#22c55e' }}>
+                      {updateMutation.isPending ? 'Reactivating...' : 'Reactivate Agent'}
+                    </button>
+                  )}
                   {!selectedAgent.isActive && !selectedAgent.isSystem && !selectedAgent.isSecretary && (
                     <button
                       onClick={() => setHardDeleteTarget(selectedAgent)}

@@ -410,7 +410,7 @@ export function CompaniesPage() {
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         onCancel={() => setDeleteTarget(null)}
         title={`Delete ${deleteTarget?.name}`}
-        description="이 회사를 삭제하면 소속 직원의 로그인이 차단됩니다. 이 작업은 되돌릴 수 없습니다."
+        description="회사를 비활성화하면 소속 직원의 로그인이 차단됩니다. 비활성화 후 영구 삭제가 가능합니다."
         confirmText="Delete"
         variant="danger"
       />

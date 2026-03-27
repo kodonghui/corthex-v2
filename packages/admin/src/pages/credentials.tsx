@@ -21,6 +21,14 @@ type User = { id: string; name: string; username: string; role: string }
 type CliCredential = { id: string; companyId: string; userId: string; label: string; isActive: boolean; createdAt: string }
 type ApiKey = { id: string; companyId: string; userId: string; provider: string; label: string | null; createdAt: string }
 
+const PROVIDER_LABELS: Record<string, string> = {
+  anthropic: 'Anthropic', openai: 'OpenAI', google_ai: 'Google AI',
+  voyage_ai: 'Voyage AI', serper: 'Serper', notion: 'Notion',
+  google_calendar: 'Google Calendar', tts: 'TTS',
+  kis: 'KIS (한국투자증권)', email: 'Email (SMTP)',
+  smtp: 'SMTP', telegram: 'Telegram', instagram: 'Instagram',
+}
+
 const PROVIDER_FIELDS: Record<string, { fields: string[]; labels: Record<string, string> }> = {
   anthropic: { fields: ['api_key'], labels: { api_key: 'API Key' } },
   openai: { fields: ['api_key'], labels: { api_key: 'API Key' } },
@@ -107,11 +115,22 @@ export function CredentialsPage() {
 
   const deleteApiKeyMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/api-keys/${id}`),
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: ['api-keys'] })
+      const previous = qc.getQueryData<{ data: ApiKey[] }>(['api-keys'])
+      qc.setQueryData<{ data: ApiKey[] } | undefined>(['api-keys'], (old) =>
+        old ? { ...old, data: old.data.filter((k) => k.id !== id) } : old
+      )
+      return { previous }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['api-keys'] })
       addToast({ type: 'success', message: 'API 키가 삭제되었습니다' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (err: Error, _id, context) => {
+      if (context?.previous) qc.setQueryData(['api-keys'], context.previous)
+      addToast({ type: 'error', message: err.message })
+    },
   })
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
@@ -453,10 +472,9 @@ export function CredentialsPage() {
                         onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value, fields: {} })}
                         className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent min-h-[44px]"
                       >
-                        <option value="kis">KIS (한국투자증권)</option>
-                        <option value="notion">Notion</option>
-                        <option value="email">Email</option>
-                        <option value="telegram">Telegram</option>
+                        {Object.keys(PROVIDER_FIELDS).map((key) => (
+                          <option key={key} value={key}>{PROVIDER_LABELS[key] || key}</option>
+                        ))}
                       </select>
                     </div>
                     <div>

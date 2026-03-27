@@ -701,6 +701,8 @@ function InviteStep({
   const [form, setForm] = useState({ username: '', name: '', email: '', departmentIds: [] as string[] })
   const [invited, setInvited] = useState<InvitedEmployee[]>([])
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
+  const [passwordModal, setPasswordModal] = useState<{ name: string; password: string } | null>(null)
+  const [modalCopied, setModalCopied] = useState(false)
 
   const { data: deptData } = useQuery({
     queryKey: ['departments', companyId],
@@ -715,6 +717,7 @@ function InviteStep({
       api.post<{ data: { employee: { id: string }; initialPassword: string } }>('/admin/employees', body),
     onSuccess: (result) => {
       setInvited((prev) => [...prev, { name: form.name, email: form.email, initialPassword: result.data.initialPassword }])
+      setPasswordModal({ name: form.name, password: result.data.initialPassword })
       setForm({ username: '', name: '', email: '', departmentIds: [] })
       addToast({ type: 'success', message: `${form.name}님을 초대했습니다` })
     },
@@ -855,6 +858,43 @@ function InviteStep({
         onSkip={() => onNext([])}
         nextLabel={invited.length > 0 ? 'Continue' : 'Skip for now'}
       />
+
+      {/* Password Modal */}
+      {passwordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-corthex-surface border border-corthex-accent/40 w-full max-w-md p-6 space-y-4">
+            <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-corthex-accent">Temporary Password</h3>
+            <p className="text-sm text-corthex-text-secondary">
+              <strong className="text-corthex-text-primary">{passwordModal.name}</strong>님의 임시 비밀번호입니다.
+            </p>
+            <div className="flex items-center gap-3 bg-corthex-bg border border-corthex-border p-3">
+              <code className="flex-1 font-mono text-lg text-corthex-text-primary tracking-wider">{passwordModal.password}</code>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(passwordModal.password)
+                    setModalCopied(true)
+                    setTimeout(() => setModalCopied(false), 2000)
+                  } catch { /* ignore */ }
+                }}
+                className="font-mono text-[10px] uppercase tracking-widest text-corthex-accent hover:text-corthex-accent-hover transition-colors px-3 py-1 border border-corthex-accent/40"
+              >
+                {modalCopied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <p className="text-xs text-corthex-text-disabled">
+              직원이 첫 로그인하면 이 비밀번호는 사라집니다. 반드시 메모해두세요.
+            </p>
+            <button
+              onClick={() => { setPasswordModal(null); setModalCopied(false) }}
+              className="w-full py-2 font-mono text-xs uppercase tracking-widest font-bold"
+              style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      )}
     </StepCard>
   )
 }
