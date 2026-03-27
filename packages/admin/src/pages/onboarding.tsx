@@ -345,6 +345,12 @@ function TemplateStep({
   const addToast = useToastStore((s) => s.addToast)
   const qc = useQueryClient()
 
+  const { data: deptListData } = useQuery({
+    queryKey: ['departments'],
+    queryFn: () => api.get<{ data: Array<{ id: string; name: string }> }>('/admin/departments'),
+  })
+  const createdDepts = deptListData?.data || []
+
   const { data, isLoading } = useQuery({
     queryKey: ['org-templates', companyId],
     queryFn: () => api.get<{ data: OrgTemplate[] }>(`/admin/org-templates?companyId=${companyId}`),
@@ -508,6 +514,22 @@ function TemplateStep({
             </button>
           </div>
         </div>
+
+        {createdDepts.length > 0 && (
+          <div className="pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-corthex-text-secondary mb-3">
+              Current Departments ({createdDepts.length})
+            </p>
+            <div className="space-y-1">
+              {createdDepts.map((d) => (
+                <div key={d.id} className="flex items-center gap-3 px-4 py-2 border border-corthex-border bg-corthex-elevated">
+                  <Building2 className="w-4 h-4 text-corthex-accent" />
+                  <span className="font-mono text-sm text-corthex-text-primary">{d.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <FooterNav
@@ -653,9 +675,9 @@ function ApiKeyStep({
       <FooterNav
         step={3}
         onPrev={onPrev}
-        onNext={() => onNext(savedCount + existingProviders.size)}
+        onNext={() => onNext(existingProviders.size)}
         showSkip
-        onSkip={() => onNext(savedCount + existingProviders.size)}
+        onSkip={() => onNext(existingProviders.size)}
         nextLabel={savedCount > 0 || existingProviders.size > 0 ? 'Continue' : 'Set up later'}
       />
     </StepCard>
