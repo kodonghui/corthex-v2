@@ -88,7 +88,7 @@ export function DashboardPage() {
           <div className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
-                <span>USERS_ACTIVE</span>
+                <span>활성 사용자</span>
                 <span>{users.length > 0 ? Math.round((activeUsers / users.length) * 100) : 0}%</span>
               </div>
               <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
@@ -100,7 +100,7 @@ export function DashboardPage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
-                <span>AGENTS_ONLINE</span>
+                <span>온라인 에이전트</span>
                 <span>{efficiency}%</span>
               </div>
               <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
@@ -109,7 +109,7 @@ export function DashboardPage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-[10px] font-mono text-corthex-text-secondary">
-                <span>DEPT_COUNT</span>
+                <span>부서 수</span>
                 <span>{depts.length}</span>
               </div>
               <div className="h-4 bg-corthex-surface p-0.5 border border-corthex-border">
@@ -135,7 +135,7 @@ export function DashboardPage() {
           <div className="p-4 md:p-6 border-b border-corthex-border flex justify-between items-center">
             <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Recent Activity</h3>
             <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-colors flex items-center gap-1">
-              EXPORT_LOGS <Download size={12} />
+              로그 내보내기 <Download size={12} />
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -209,7 +209,7 @@ export function DashboardPage() {
           </div>
           <div className="p-4 bg-corthex-surface border-t border-corthex-border flex justify-center">
             <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-all">
-              VIEW_ALL_RECORDS
+              전체 기록 보기
             </button>
           </div>
         </div>
@@ -241,7 +241,7 @@ export function DashboardPage() {
               <Building2 size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-mono text-corthex-text-secondary">TOTAL_DEPTS</p>
+              <p className="text-[10px] font-mono text-corthex-text-secondary">전체 부서</p>
               <p className="font-bold text-corthex-text-primary tracking-tight">{depts.length}</p>
             </div>
           </div>
@@ -256,7 +256,7 @@ export function DashboardPage() {
                 <span className="font-mono text-xl font-bold text-corthex-text-primary">{efficiency}%</span>
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-corthex-text-primary mb-1 uppercase tracking-tight">Processing Efficiency</p>
+                <p className="text-xs font-bold text-corthex-text-primary mb-1 uppercase tracking-tight">처리 효율</p>
                 <p className="text-[11px] text-corthex-text-secondary mb-4">
                   {onlineAgents} of {agents.length} agents currently online.
                 </p>

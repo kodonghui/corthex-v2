@@ -137,11 +137,11 @@ export function CompaniesPage() {
         {/* Stats + Search Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-8">
           <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
-            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Total_Entities</span>
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">전체 회사</span>
             <span className="text-4xl font-black tracking-tighter text-corthex-text-primary">{companies.length.toLocaleString()}</span>
           </div>
           <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
-            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Active_Throughput</span>
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">활성률</span>
             <div className="flex items-end gap-2">
               <span className="text-4xl font-black tracking-tighter text-corthex-info">{throughput}</span>
               <span className="font-mono text-xs mb-1 text-corthex-text-secondary">%</span>
@@ -340,7 +340,7 @@ export function CompaniesPage() {
                               </button>
                             )}
                             <button className="font-mono text-[10px] tracking-[0.2em] text-corthex-accent uppercase font-bold hover:underline ml-2">
-                              ACCESS_ROOT
+                              선택
                             </button>
                           </div>
                         </div>

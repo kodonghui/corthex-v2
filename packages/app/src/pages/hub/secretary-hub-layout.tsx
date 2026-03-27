@@ -156,6 +156,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
   const { isConnected } = useWsStore()
   const [reconnectBanner, setReconnectBanner] = useState(false)
   const prevConnected = useRef(true)
+  const [navSidebarOpen, setNavSidebarOpen] = useState(false)
 
   const {
     streamState,
@@ -326,8 +327,25 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
     <div data-testid="secretary-hub-layout" className="flex h-screen overflow-hidden" style={{ fontFamily: "'Pretendard', 'Inter', sans-serif" }}>
       <style>{customStyles}</style>
 
-      {/* Left Sidebar */}
-      <aside className="w-64 border-r flex flex-col z-20" style={{ borderColor: C.border, backgroundColor: C.bgSecondary }} data-purpose="navigation-sidebar">
+      {/* Mobile overlay for nav sidebar */}
+      {navSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setNavSidebarOpen(false)}
+        />
+      )}
+
+      {/* Left Sidebar — hidden on mobile, slide-in drawer */}
+      <aside
+        className={`
+          fixed lg:relative inset-y-0 left-0 z-40 lg:z-20
+          w-64 border-r flex flex-col
+          transition-transform duration-200 lg:translate-x-0
+          ${navSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+        style={{ borderColor: C.border, backgroundColor: C.bgSecondary }}
+        data-purpose="navigation-sidebar"
+      >
         <div className="p-6">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: C.accentOlive }}>
@@ -366,16 +384,26 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
       {/* Main View Area */}
       <main className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: C.bgPrimary }}>
         {/* Header */}
-        <header className="h-16 border-b px-8 flex items-center justify-between z-10" style={{ borderColor: C.border, backgroundColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)' }}>
-          <div className="flex items-center gap-4">
-            <h2 className="text-lg font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workspace Hub</h2>
-            <span className="px-2 py-0.5 text-[10px] uppercase tracking-widest font-bold rounded-full border" style={{ backgroundColor: C.bgSecondary, color: C.accentOlive, borderColor: C.border }}>v2.0.4-live</span>
+        <header className="h-14 lg:h-16 border-b px-4 lg:px-8 flex items-center justify-between z-10" style={{ borderColor: C.border, backgroundColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)' }}>
+          <div className="flex items-center gap-3 lg:gap-4">
+            {/* Mobile hamburger */}
+            <button
+              className="lg:hidden p-1.5 rounded-lg hover:bg-stone-100 transition-colors"
+              onClick={() => setNavSidebarOpen(true)}
+              aria-label="Open navigation"
+            >
+              <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
+            </button>
+            <h2 className="text-base lg:text-lg font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workspace Hub</h2>
+            <span className="hidden sm:inline px-2 py-0.5 text-[10px] uppercase tracking-widest font-bold rounded-full border" style={{ backgroundColor: C.bgSecondary, color: C.accentOlive, borderColor: C.border }}>v2.0.4-live</span>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-sm text-stone-500">
+          <div className="flex items-center gap-3 lg:gap-6">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-stone-500">
               <span className="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
               {isConnected ? 'System Online' : 'Reconnecting...'}
             </div>
+            {/* Mobile: compact status dot only */}
+            <span className="sm:hidden w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
             <button className="p-2 text-stone-400" style={{ ['--hover-color' as string]: C.accentOlive } as React.CSSProperties}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
             </button>
@@ -389,7 +417,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             <div
               ref={scrollContainerRef}
               onScroll={handleScroll}
-              className="flex-1 overflow-y-auto p-8 space-y-8"
+              className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8"
               id="message-container"
               data-testid="hub-message-list"
               role="log"
@@ -584,7 +612,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             </div>
 
             {/* Command Input (Terminal Style) */}
-            <div className="p-6 bg-transparent" data-purpose="terminal-input-container" data-testid="hub-input">
+            <div className="p-3 lg:p-6 bg-transparent" data-purpose="terminal-input-container" data-testid="hub-input">
               {/* Pending attachments */}
               {pendingAttachments.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2 max-w-4xl mx-auto">
@@ -679,8 +707,8 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
             </div>
           </section>
 
-          {/* Handoff Tracker Sidebar */}
-          <aside className="w-72 border-l bg-corthex-surface flex flex-col" style={{ borderColor: C.border }} data-purpose="handoff-tracker">
+          {/* Handoff Tracker Sidebar — hidden on mobile/tablet */}
+          <aside className="hidden lg:flex w-72 border-l bg-corthex-surface flex-col" style={{ borderColor: C.border }} data-purpose="handoff-tracker">
             <div className="p-6 border-b" style={{ borderColor: C.border, backgroundColor: `${C.bgSecondary}4d` }}>
               <h3 className="font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Process Delegation</h3>
               <p className="text-xs text-stone-500 mt-1">Real-time handoff chain</p>

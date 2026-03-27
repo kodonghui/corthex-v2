@@ -9,6 +9,7 @@ import {
   DollarSign, KeyRound, ClipboardList, Sparkles, Monitor,
   Orbit, FileStack, ShoppingCart, BrainCircuit, Paintbrush,
   Lock, Hexagon, Megaphone, Brain, Settings, ArrowLeftRight,
+  ChevronDown,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -18,29 +19,112 @@ declare const __BUILD_TIME__: string
 
 type Company = { id: string; name: string; slug: string; isActive: boolean }
 
-const nav: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: '/', label: '대시보드', icon: LayoutDashboard },
-  { to: '/companies', label: '회사 관리', icon: Building2 },
-  { to: '/employees', label: '직원 관리', icon: Users },
-  { to: '/users', label: '사용자 관리', icon: UserCog },
-  { to: '/departments', label: '부서 관리', icon: Building },
-  { to: '/agents', label: 'AI 에이전트', icon: Bot },
-  { to: '/tools', label: '도구 관리', icon: Wrench },
-  { to: '/costs', label: '비용 관리', icon: DollarSign },
-  { to: '/credentials', label: 'CLI / API 키', icon: KeyRound },
-  { to: '/report-lines', label: '보고 라인', icon: ClipboardList },
-  { to: '/soul-templates', label: '소울 템플릿', icon: Sparkles },
-  { to: '/monitoring', label: '시스템 모니터링', icon: Monitor },
-  { to: '/nexus', label: 'NEXUS 조직도', icon: Orbit },
-  { to: '/sketchvibe', label: 'SketchVibe', icon: Paintbrush },
-  { to: '/org-templates', label: '조직 템플릿', icon: FileStack },
-  { to: '/template-market', label: '템플릿 마켓', icon: ShoppingCart },
-  { to: '/agent-marketplace', label: '에이전트 마켓', icon: BrainCircuit },
-  { to: '/api-keys', label: '공개 API 키', icon: Lock },
-  { to: '/n8n-editor', label: 'n8n 에디터', icon: Hexagon },
-  { to: '/marketing-settings', label: '마케팅 AI 엔진', icon: Megaphone },
-  { to: '/memory-management', label: '메모리 관리', icon: Brain },
+type NavItem = { to: string; label: string; icon: LucideIcon }
+type NavGroup = { group: string; items: NavItem[] }
+
+const nav: NavGroup[] = [
+  {
+    group: '조직 관리',
+    items: [
+      { to: '/', label: '대시보드', icon: LayoutDashboard },
+      { to: '/companies', label: '회사 관리', icon: Building2 },
+      { to: '/employees', label: '직원 관리', icon: Users },
+      { to: '/users', label: '사용자 관리', icon: UserCog },
+      { to: '/departments', label: '부서 관리', icon: Building },
+      { to: '/report-lines', label: '보고 라인', icon: ClipboardList },
+      { to: '/nexus', label: 'NEXUS 조직도', icon: Orbit },
+    ],
+  },
+  {
+    group: 'AI 관리',
+    items: [
+      { to: '/agents', label: 'AI 에이전트', icon: Bot },
+      { to: '/soul-templates', label: '소울 템플릿', icon: Sparkles },
+      { to: '/tools', label: '도구 관리', icon: Wrench },
+      { to: '/memory-management', label: '메모리 관리', icon: Brain },
+    ],
+  },
+  {
+    group: '운영',
+    items: [
+      { to: '/costs', label: '비용 관리', icon: DollarSign },
+      { to: '/credentials', label: 'CLI / API 키', icon: KeyRound },
+      { to: '/monitoring', label: '시스템 모니터링', icon: Monitor },
+    ],
+  },
+  {
+    group: '마켓플레이스',
+    items: [
+      { to: '/org-templates', label: '조직 템플릿', icon: FileStack },
+      { to: '/template-market', label: '템플릿 마켓', icon: ShoppingCart },
+      { to: '/agent-marketplace', label: '에이전트 마켓', icon: BrainCircuit },
+      { to: '/api-keys', label: '공개 API 키', icon: Lock },
+    ],
+  },
+  {
+    group: '기타',
+    items: [
+      { to: '/sketchvibe', label: 'SketchVibe', icon: Paintbrush },
+      { to: '/n8n-editor', label: 'n8n 에디터', icon: Hexagon },
+      { to: '/marketing-settings', label: '마케팅 AI 엔진', icon: Megaphone },
+    ],
+  },
 ]
+
+function NavGroups({ nav: groups, onNavClick }: { nav: NavGroup[]; onNavClick?: () => void }) {
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+
+  const toggle = useCallback((group: string) => {
+    setCollapsed((prev) => ({ ...prev, [group]: !prev[group] }))
+  }, [])
+
+  return (
+    <nav className="flex-1 p-3 space-y-3 overflow-y-auto">
+      {groups.map((g) => {
+        const isCollapsed = collapsed[g.group] ?? false
+        return (
+          <div key={g.group}>
+            <button
+              type="button"
+              onClick={() => toggle(g.group)}
+              className="flex items-center justify-between w-full px-3 py-1 uppercase text-[10px] tracking-widest text-corthex-sidebar-text/50 hover:text-corthex-sidebar-text/80 transition-colors"
+            >
+              <span>{g.group}</span>
+              <ChevronDown
+                className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
+              />
+            </button>
+            {!isCollapsed && (
+              <div className="mt-1 space-y-1">
+                {g.items.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.to === '/'}
+                      onClick={onNavClick}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm min-h-[44px] transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent ${
+                          isActive
+                            ? 'bg-corthex-sidebar-active text-corthex-sidebar-text-active font-medium'
+                            : 'text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active'
+                        }`
+                      }
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </NavLink>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </nav>
+  )
+}
 
 function SwitchToCeoButton({ companyId }: { companyId: string | null }) {
   const [switching, setSwitching] = useState(false)
@@ -137,29 +221,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
         )}
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {nav.map((item) => {
-          const Icon = item.icon
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              onClick={onNavClick}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm min-h-[44px] transition-colors focus-visible:ring-2 focus-visible:ring-corthex-accent ${
-                  isActive
-                    ? 'bg-corthex-sidebar-active text-corthex-sidebar-text-active font-medium'
-                    : 'text-corthex-sidebar-text hover:bg-corthex-sidebar-hover hover:text-corthex-sidebar-text-active'
-                }`
-              }
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span>{item.label}</span>
-            </NavLink>
-          )
-        })}
-      </nav>
+      <NavGroups nav={nav} onNavClick={onNavClick} />
 
       <div className="p-3 border-t border-corthex-sidebar-border space-y-2">
         <NavLink

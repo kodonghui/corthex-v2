@@ -264,7 +264,7 @@ export function DepartmentsPage() {
               <button className="hover:text-corthex-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><Filter className="w-5 h-5" /></button>
               <button className="hover:text-corthex-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><Download className="w-5 h-5" /></button>
               <div className="h-4 w-px bg-corthex-border hidden sm:block" />
-              <span className="font-mono text-[10px] uppercase tracking-widest hidden sm:inline">Active nodes: {allAgents.length}</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest hidden sm:inline">활성 노드: {allAgents.length}</span>
             </div>
           </div>
 
