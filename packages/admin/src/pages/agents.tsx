@@ -110,6 +110,7 @@ export function AgentsPage() {
   const [detailTab, setDetailTab] = useState<DetailTab>('soul')
   const [editForm, setEditForm] = useState<Partial<Agent>>({})
   const [deactivateTarget, setDeactivateTarget] = useState<Agent | null>(null)
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<Agent | null>(null)
   const [activeSessionCount, setActiveSessionCount] = useState<number | null>(null)
   const [forceDeactivate, setForceDeactivate] = useState(false)
   const [showCacheDisableModal, setShowCacheDisableModal] = useState(false)
@@ -200,6 +201,20 @@ export function AgentsPage() {
         setActiveSessionCount(Number(err.data.activeTaskCount))
         return
       }
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const hardDeleteMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/agents/${id}/hard-delete`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['agents'] })
+      setHardDeleteTarget(null)
+      setSelectedAgent(null)
+      addToast({ type: 'success', message: '에이전트가 영구 삭제되었습니다' })
+    },
+    onError: (err: Error) => {
+      setHardDeleteTarget(null)
       addToast({ type: 'error', message: err.message })
     },
   })
@@ -646,6 +661,14 @@ export function AgentsPage() {
                     style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
                     {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
                   </button>
+                  {!selectedAgent.isActive && !selectedAgent.isSystem && !selectedAgent.isSecretary && (
+                    <button
+                      onClick={() => setHardDeleteTarget(selectedAgent)}
+                      className="w-full py-2 font-mono text-xs uppercase tracking-widest font-bold text-white"
+                      style={{ backgroundColor: 'var(--color-corthex-error)' }}>
+                      Permanently Delete
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -695,6 +718,31 @@ export function AgentsPage() {
                   {deactivateMutation.isPending ? '처리 중...' : '비활성화'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hard Delete Modal */}
+      {hardDeleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-corthex-surface border border-corthex-border w-full max-w-md mx-4 p-6">
+            <h3 className="font-mono text-sm uppercase tracking-widest font-bold text-corthex-error mb-3">
+              에이전트 영구 삭제
+            </h3>
+            <p className="text-sm text-corthex-text-secondary mb-4">
+              <strong>{hardDeleteTarget.name}</strong>의 모든 데이터(채팅, 메모리, 비용 기록 등)가 영구 삭제됩니다. 복구할 수 없습니다.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setHardDeleteTarget(null)}
+                className="flex-1 px-4 py-2 border border-corthex-border font-mono text-xs uppercase tracking-widest text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+                취소
+              </button>
+              <button onClick={() => hardDeleteMutation.mutate(hardDeleteTarget.id)} disabled={hardDeleteMutation.isPending}
+                className="flex-1 px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-corthex-error)', color: 'white' }}>
+                {hardDeleteMutation.isPending ? '처리 중...' : '영구 삭제'}
+              </button>
             </div>
           </div>
         </div>

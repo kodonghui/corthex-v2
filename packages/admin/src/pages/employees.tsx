@@ -63,6 +63,7 @@ export function EmployeesPage() {
   const [deactivateTarget, setDeactivateTarget] = useState<Employee | null>(null)
   const [reactivateTarget, setReactivateTarget] = useState<Employee | null>(null)
   const [resetPasswordTarget, setResetPasswordTarget] = useState<Employee | null>(null)
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<Employee | null>(null)
   const [passwordModal, setPasswordModal] = useState<{ name: string; password: string } | null>(null)
 
   // Invite form state
@@ -155,6 +156,19 @@ export function EmployeesPage() {
     },
     onError: (err: Error) => {
       setReactivateTarget(null)
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const hardDeleteMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/employees/${id}/hard-delete`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['employees'] })
+      setHardDeleteTarget(null)
+      addToast({ type: 'success', message: '직원이 영구 삭제되었습니다' })
+    },
+    onError: (err: Error) => {
+      setHardDeleteTarget(null)
       addToast({ type: 'error', message: err.message })
     },
   })
@@ -377,12 +391,21 @@ export function EmployeesPage() {
                               <Trash2 className="w-4 h-4" />
                             </button>
                           ) : (
-                            <button
-                              onClick={() => setReactivateTarget(emp)}
-                              className="p-1.5 text-corthex-text-secondary hover:text-corthex-success hover:bg-corthex-elevated rounded transition-colors"
-                            >
-                              <UserCheck className="w-4 h-4" />
-                            </button>
+                            <>
+                              <button
+                                onClick={() => setReactivateTarget(emp)}
+                                className="p-1.5 text-corthex-text-secondary hover:text-corthex-success hover:bg-corthex-elevated rounded transition-colors"
+                              >
+                                <UserCheck className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setHardDeleteTarget(emp)}
+                                className="p-1.5 text-corthex-text-secondary hover:text-red-600 hover:bg-corthex-elevated rounded transition-colors"
+                                title="영구 삭제"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -706,6 +729,16 @@ export function EmployeesPage() {
         description="새 임시 비밀번호가 생성됩니다."
         confirmText="초기화"
         variant="default"
+      />
+
+      <ConfirmDialog
+        isOpen={!!hardDeleteTarget}
+        onConfirm={() => hardDeleteTarget && hardDeleteMutation.mutate(hardDeleteTarget.id)}
+        onCancel={() => setHardDeleteTarget(null)}
+        title={`${hardDeleteTarget?.name} 영구 삭제`}
+        description="이 직원의 모든 데이터(채팅 기록, 보고서, 파일 등)가 영구 삭제됩니다. 복구할 수 없습니다."
+        confirmText="영구 삭제"
+        variant="danger"
       />
     </div>
   )

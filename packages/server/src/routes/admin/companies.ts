@@ -126,6 +126,15 @@ companiesRoute.delete('/companies/:id', async (c) => {
   return c.json({ data: { message: '비활성화되었습니다', ...result } })
 })
 
+// POST /api/admin/companies/:id/hard-delete — 회사 영구 삭제
+companiesRoute.post('/companies/:id/hard-delete', zValidator('json', z.object({ confirmName: z.string().min(1) })), async (c) => {
+  const id = c.req.param('id')
+  const { confirmName } = c.req.valid('json')
+  const { hardDeleteCompany } = await import('../../services/hard-delete')
+  const result = await hardDeleteCompany(id, confirmName)
+  return c.json({ data: { message: '회사가 영구 삭제되었습니다', ...result } })
+})
+
 // PUT /api/admin/companies/:id/smtp — SMTP 설정 저장
 companiesRoute.put('/companies/:id/smtp', zValidator('json', smtpConfigSchema), async (c) => {
   const id = c.req.param('id')

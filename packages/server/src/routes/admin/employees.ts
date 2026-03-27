@@ -120,6 +120,15 @@ employeesRoute.delete('/employees/:id', async (c) => {
   return c.json({ data: result.data })
 })
 
+// POST /api/admin/employees/:id/hard-delete — 직원 영구 삭제
+employeesRoute.post('/employees/:id/hard-delete', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const { hardDeleteEmployee } = await import('../../services/hard-delete')
+  const result = await hardDeleteEmployee(id, tenant.companyId)
+  return c.json({ data: { message: '직원이 영구 삭제되었습니다', ...result } })
+})
+
 // POST /api/admin/employees/:id/reactivate — 직원 재활성화
 employeesRoute.post('/employees/:id/reactivate', async (c) => {
   const tenant = c.get('tenant')

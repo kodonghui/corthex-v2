@@ -163,6 +163,15 @@ agentsRoute.delete('/agents/:id', async (c) => {
   return c.json({ success: true, data: result.data })
 })
 
+// POST /api/admin/agents/:id/hard-delete — 에이전트 영구 삭제
+agentsRoute.post('/agents/:id/hard-delete', async (c) => {
+  const tenant = c.get('tenant')
+  const id = c.req.param('id')
+  const { hardDeleteAgent } = await import('../../services/hard-delete')
+  const result = await hardDeleteAgent(id, tenant.companyId)
+  return c.json({ success: true, data: { message: '에이전트가 영구 삭제되었습니다', ...result } })
+})
+
 // POST /api/admin/agents/:id/soul-preview -- render soul with {{variable}} substitution
 agentsRoute.post('/agents/:id/soul-preview', zValidator('json', soulPreviewSchema), async (c) => {
   const tenant = c.get('tenant')
