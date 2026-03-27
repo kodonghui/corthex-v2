@@ -103,6 +103,14 @@ async function main() {
       overall_score real, dimensions jsonb, observation_count integer DEFAULT 0,
       memory_count integer DEFAULT 0, evaluated_at timestamp DEFAULT now(), created_at timestamp DEFAULT now()
     )`,
+    `CREATE TABLE IF NOT EXISTS tool_call_events (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      company_id uuid NOT NULL REFERENCES companies(id),
+      agent_id uuid REFERENCES agents(id),
+      run_id text NOT NULL, tool_name text NOT NULL,
+      started_at timestamp NOT NULL, completed_at timestamp,
+      success boolean, error_code text, duration_ms integer
+    )`,
     `CREATE TABLE IF NOT EXISTS semantic_cache (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id uuid NOT NULL, query_text text NOT NULL,

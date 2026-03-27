@@ -26,7 +26,11 @@ reportLinesRoute.get('/report-lines', async (c) => {
   const companyId = c.get('tenant').companyId
 
   const result = await db
-    .select()
+    .select({
+      id: reportLines.id,
+      userId: reportLines.reporterId,
+      reportsToUserId: reportLines.supervisorId,
+    })
     .from(reportLines)
     .where(eq(reportLines.companyId, companyId))
 

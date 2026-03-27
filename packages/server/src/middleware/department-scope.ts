@@ -27,6 +27,12 @@ export const departmentScopeMiddleware: MiddlewareHandler<AppEnv> = async (c, ne
 
   const deptIds = assignments.map(a => a.departmentId)
 
+  // If no departments assigned, grant full access (same as CEO) to avoid empty results
+  if (deptIds.length === 0) {
+    await next()
+    return
+  }
+
   // Inject into tenant context
   c.set('tenant', { ...tenant, departmentIds: deptIds })
 

@@ -37,10 +37,11 @@ export async function resolveCliToken(userId: string, companyId: string): Promis
     }
   }
 
-  // Fallback: server-level env var (dev/test)
-  if (process.env.ANTHROPIC_API_KEY) {
-    return process.env.ANTHROPIC_API_KEY
+  // Fallback: server-level env var
+  const envKey = process.env.ANTHROPIC_API_KEY
+  if (envKey) {
+    return envKey
   }
 
-  throw new Error('CLI 토큰이 등록되지 않았습니다. 관리자에게 CLI 크레덴셜 등록을 요청하세요.')
+  throw new Error('API 키가 설정되지 않았습니다. .env에 ANTHROPIC_API_KEY를 설정하거나 관리자 패널에서 CLI 크레덴셜을 등록하세요.')
 }

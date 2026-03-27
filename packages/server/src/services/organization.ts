@@ -898,7 +898,7 @@ export async function applyTemplate(
       await db
         .insert(agents)
         .values(scopedInsert(tenant.companyId, {
-          userId: tenant.userId,
+          userId: null,
           departmentId,
           name: agentDef.name,
           nameEn: agentDef.nameEn ?? null,
