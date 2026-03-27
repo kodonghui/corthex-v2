@@ -40,7 +40,7 @@ export function ConfirmDialog({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="px-3 py-1.5 text-sm rounded-lg border border-[#e5e1d3] text-[#1a1a1a] hover:bg-[#f5f0e8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#606C38]/40"
+            className="px-3 py-1.5 text-sm rounded-lg border border-corthex-border text-corthex-text-primary hover:bg-corthex-elevated transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-corthex-accent/40"
           >
             {cancelText}
           </button>
@@ -50,8 +50,8 @@ export function ConfirmDialog({
             className={cn(
               'px-3 py-1.5 text-sm rounded-lg text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
               variant === 'danger'
-                ? 'bg-[#c4622d] hover:bg-[#b5571f] focus-visible:ring-[#c4622d]/40'
-                : 'bg-[#606C38] hover:bg-[#7a8f5a] focus-visible:ring-[#606C38]/40',
+                ? 'bg-corthex-error hover:bg-corthex-error/80 focus-visible:ring-corthex-error/40'
+                : 'bg-corthex-accent hover:bg-corthex-accent-hover focus-visible:ring-corthex-accent/40',
               loading && 'opacity-50 cursor-not-allowed',
             )}
           >

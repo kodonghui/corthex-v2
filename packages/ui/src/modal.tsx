@@ -34,7 +34,7 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
         <Dialog.Content
           className={cn(
             'fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2',
-            'w-[calc(100%-2rem)] rounded-xl bg-white shadow-xl',
+            'w-[calc(100%-2rem)] rounded-xl bg-corthex-surface shadow-xl',
             'data-[state=open]:animate-[scaleIn_150ms_ease-out]',
             'focus:outline-none',
             sizeClasses[size],
@@ -45,11 +45,11 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
           {(title || true) && (
             <div className="flex items-start justify-between px-6 pt-6 pb-0">
               <div>
-                {title && <Dialog.Title className="text-base font-semibold text-[#1a1a1a]">{title}</Dialog.Title>}
-                {description && <Dialog.Description className="text-sm text-[#6b705c] mt-1">{description}</Dialog.Description>}
+                {title && <Dialog.Title className="text-base font-semibold text-corthex-text-primary">{title}</Dialog.Title>}
+                {description && <Dialog.Description className="text-sm text-corthex-text-secondary mt-1">{description}</Dialog.Description>}
                 {!title && <Dialog.Title className="sr-only">Dialog</Dialog.Title>}
               </div>
-              <Dialog.Close className="rounded-md p-1 text-[#a3a08e] hover:text-[#1a1a1a] hover:bg-[#f5f0e8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#606C38]/40">
+              <Dialog.Close className="rounded-md p-1 text-corthex-text-disabled hover:text-corthex-text-primary hover:bg-corthex-elevated transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-corthex-accent/40">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>

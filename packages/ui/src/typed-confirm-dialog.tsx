@@ -56,14 +56,14 @@ export function TypedConfirmDialog({
           <button
             onClick={handleClose}
             disabled={loading}
-            className="px-3 py-1.5 text-sm rounded-lg border border-[#e5e1d3] text-[#1a1a1a] hover:bg-[#f5f0e8] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#606C38]/40"
+            className="px-3 py-1.5 text-sm rounded-lg border border-corthex-border text-corthex-text-primary hover:bg-corthex-elevated transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-corthex-accent/40"
           >
             {cancelText}
           </button>
           <button
             onClick={handleConfirm}
             disabled={loading || !isMatch}
-            className="px-3 py-1.5 text-sm rounded-lg text-white bg-[#c4622d] hover:bg-[#b5571f] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c4622d]/40 focus-visible:ring-offset-1 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-sm rounded-lg text-white bg-corthex-error hover:bg-corthex-error/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-corthex-error/40 focus-visible:ring-offset-1 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {loading ? '처리 중...' : confirmText}
           </button>
@@ -71,15 +71,15 @@ export function TypedConfirmDialog({
       }
     >
       <div className="mt-3">
-        <label className="block text-xs font-medium text-[#666] mb-1.5">
-          {inputLabel}: <span className="font-bold text-[#1a1a1a]">{requiredText}</span>
+        <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">
+          {inputLabel}: <span className="font-bold text-corthex-text-primary">{requiredText}</span>
         </label>
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={requiredText}
-          className="w-full px-3 py-2 text-sm border border-[#e5e1d3] rounded-lg bg-white text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#c4622d]/40 focus:border-[#c4622d] placeholder:text-[#ccc]"
+          className="w-full px-3 py-2 text-sm border border-corthex-border rounded-lg bg-corthex-bg text-corthex-text-primary focus:outline-none focus:ring-2 focus:ring-corthex-error/40 focus:border-corthex-error placeholder:text-corthex-text-disabled"
           autoFocus
         />
       </div>

@@ -13,7 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useToastStore } from '../stores/toast-store'
 import { ConfirmDialog, TypedConfirmDialog, SkeletonCard } from '@corthex/ui'
-import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight, MoreVertical, AlertTriangle } from 'lucide-react'
+import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
@@ -279,9 +279,6 @@ export function CompaniesPage() {
                               </span>
                             </div>
                           </div>
-                          <button className="text-corthex-text-disabled hover:text-corthex-accent transition-colors">
-                            <MoreVertical size={18} />
-                          </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-8">

@@ -267,6 +267,62 @@
       "when": 1774195200058,
       "tag": "0058_recovery-missing-tables",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1774281600059,
+      "tag": "0059_fix-workflow-suggestions-column",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1774368000060,
+      "tag": "0060_agents-user-id-nullable",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1774454400061,
+      "tag": "0061_voyage_vector_1024",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1774540800062,
+      "tag": "0062_add_personality_traits",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1774627200063,
+      "tag": "0063_add_observations",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1774713600064,
+      "tag": "0064_agent_memories_extension",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1774800000065,
+      "tag": "0065_memory_dashboard_pinned",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1774886400066,
+      "tag": "0066_capability_evaluations",
+      "breakpoints": true
     }
   ]
 }

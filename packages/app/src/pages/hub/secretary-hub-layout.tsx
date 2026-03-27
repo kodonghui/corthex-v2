@@ -10,7 +10,6 @@ import { api } from '../../lib/api'
 import { useHubStream } from '../../hooks/use-hub-stream'
 import { useWsStore } from '../../stores/ws-store'
 import { HandoffTracker } from './handoff-tracker'
-import { SessionSidebar } from './session-sidebar'
 
 type Agent = {
   id: string
@@ -47,45 +46,25 @@ type Session = {
   lastMessageAt: string | null
 }
 
-// === Organic theme color constants ===
+// === Corthex theme color constants ===
 const C = {
   bgPrimary: 'var(--color-corthex-bg)',
-  bgSecondary: '#f5f0eb',
+  bgSecondary: 'var(--color-corthex-elevated)',
   accentOlive: 'var(--color-corthex-accent)',
-  accentOliveLight: '#869e71',
-  textMain: '#2d2d2d',
-  textMuted: '#6b7280',
-  border: '#e5e1da',
+  accentOliveLight: 'var(--color-corthex-accent-hover)',
+  textMain: 'var(--color-corthex-text-primary)',
+  textMuted: 'var(--color-corthex-text-secondary)',
+  border: 'var(--color-corthex-border)',
 }
 
 const customStyles = `
-body {
-  background-color: ${C.bgPrimary};
-  color: ${C.textMain};
-}
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: ${C.border};
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: ${C.accentOlive};
-}
-.terminal-focus:focus-within {
-  box-shadow: 0 0 0 2px rgba(90, 114, 71, 0.2);
-}
-.pulse-dot {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .4; }
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: ${C.accentOlive}; }
+.terminal-focus:focus-within { box-shadow: 0 0 0 2px var(--color-corthex-accent-hover); }
+.pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 `
 
 /** Markdown link renderer: [text](url) to clickable elements */
@@ -156,7 +135,6 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
   const { isConnected } = useWsStore()
   const [reconnectBanner, setReconnectBanner] = useState(false)
   const prevConnected = useRef(true)
-  const [navSidebarOpen, setNavSidebarOpen] = useState(false)
 
   const {
     streamState,
@@ -173,8 +151,6 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
     clearError,
     reset,
   } = useHubStream()
-
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Find or create a session with the secretary
   const { data: sessionsData } = useQuery({
@@ -324,89 +300,23 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
   }
 
   return (
-    <div data-testid="secretary-hub-layout" className="flex h-screen overflow-hidden" style={{ fontFamily: "'Pretendard', 'Inter', sans-serif" }}>
+    <div data-testid="secretary-hub-layout" className="flex h-full overflow-hidden" style={{ fontFamily: "'Pretendard', 'Inter', sans-serif" }}>
       <style>{customStyles}</style>
 
-      {/* Mobile overlay for nav sidebar */}
-      {navSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setNavSidebarOpen(false)}
-        />
-      )}
-
-      {/* Left Sidebar — hidden on mobile, slide-in drawer */}
-      <aside
-        className={`
-          fixed lg:relative inset-y-0 left-0 z-40 lg:z-20
-          w-64 border-r flex flex-col
-          transition-transform duration-200 lg:translate-x-0
-          ${navSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
-        style={{ borderColor: C.border, backgroundColor: C.bgSecondary }}
-        data-purpose="navigation-sidebar"
-      >
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: C.accentOlive }}>
-              <span className="font-bold" style={{ fontFamily: "'Noto Serif KR', serif" }}>C</span>
-            </div>
-            <h1 className="text-xl font-bold tracking-tight" style={{ color: C.accentOlive }}>CORTHEX v2</h1>
-          </div>
-          <nav className="space-y-1">
-            <span className="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-corthex-surface rounded-lg shadow-sm" style={{ color: C.accentOlive }}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              Workspace Hub
-            </span>
-            <span className="flex items-center gap-3 px-3 py-2 text-sm font-medium" style={{ color: C.textMuted }}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              Active Tasks
-            </span>
-            <span className="flex items-center gap-3 px-3 py-2 text-sm font-medium" style={{ color: C.textMuted }}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-              Agent Directory
-            </span>
-          </nav>
-        </div>
-        <div className="mt-auto p-4 border-t" style={{ borderColor: C.border }}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden">
-              <img alt="User" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLvoxDUp6q2eRNbUDsCj-ndANioID3_YCLsCTPFMiHcUMC9aC0ASN-7PHnDbwKbpd3toeezs9XQXheQxMl329dBMSE-2WkPCFgKPES4hXswucglteXwbTYvNqqGQlprZb4Tegfv7MPxBH8QzHtxGHdt07CEV0z7buWLsbDW55twu4kwSbJPr__lzQdUhb4NDGWvFT69Dx-oYueYYcIJPn1WL_J_7i6ljDwqK4ulPJdKa0Pf24nWow7BzdctLmxAEdvntrcNqzRJQ" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">CEO님</p>
-              <p className="text-xs" style={{ color: C.textMuted }}>Administrator</p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main View Area */}
-      <main className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: C.bgPrimary }}>
+      {/* Main View Area — no inner sidebar, App Layout provides navigation */}
+      <main className="flex-1 flex flex-col relative overflow-hidden bg-corthex-bg">
         {/* Header */}
-        <header className="h-14 lg:h-16 border-b px-4 lg:px-8 flex items-center justify-between z-10" style={{ borderColor: C.border, backgroundColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)' }}>
+        <header className="h-14 border-b border-corthex-border px-4 lg:px-8 flex items-center justify-between z-10 bg-corthex-surface/80 backdrop-blur-sm">
           <div className="flex items-center gap-3 lg:gap-4">
-            {/* Mobile hamburger */}
-            <button
-              className="lg:hidden p-1.5 rounded-lg hover:bg-stone-100 transition-colors"
-              onClick={() => setNavSidebarOpen(true)}
-              aria-label="Open navigation"
-            >
-              <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>
-            </button>
-            <h2 className="text-base lg:text-lg font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Workspace Hub</h2>
-            <span className="hidden sm:inline px-2 py-0.5 text-[10px] uppercase tracking-widest font-bold rounded-full border" style={{ backgroundColor: C.bgSecondary, color: C.accentOlive, borderColor: C.border }}>v2.0.4-live</span>
+            <h2 className="text-base lg:text-lg font-bold text-corthex-text-primary">Workspace Hub</h2>
+            <span className="hidden sm:inline px-2 py-0.5 text-[10px] uppercase tracking-widest font-bold rounded-full border bg-corthex-elevated text-corthex-accent border-corthex-border">v2.0.4-live</span>
           </div>
           <div className="flex items-center gap-3 lg:gap-6">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-stone-500">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-corthex-text-secondary">
               <span className="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
               {isConnected ? 'System Online' : 'Reconnecting...'}
             </div>
-            {/* Mobile: compact status dot only */}
             <span className="sm:hidden w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
-            <button className="p-2 text-stone-400" style={{ ['--hover-color' as string]: C.accentOlive } as React.CSSProperties}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-            </button>
           </div>
         </header>
 
@@ -426,7 +336,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               {/* Loading older messages */}
               {isFetchingNextPage && (
                 <div className="flex justify-center py-2">
-                  <div className="w-5 h-5 border-2 border-stone-300 rounded-full animate-spin" style={{ borderTopColor: C.accentOlive }} />
+                  <div className="w-5 h-5 border-2 border-corthex-border rounded-full animate-spin" style={{ borderTopColor: C.accentOlive }} />
                 </div>
               )}
 
@@ -434,7 +344,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               {!hasNextPage && messages.length > 0 && !isFetchingNextPage && (
                 <div className="flex items-center gap-3 py-3 px-2">
                   <div className="flex-1 h-px" style={{ backgroundColor: C.border }} />
-                  <span className="text-xs text-stone-400 shrink-0">대화 시작</span>
+                  <span className="text-xs text-corthex-text-disabled shrink-0">대화 시작</span>
                   <div className="flex-1 h-px" style={{ backgroundColor: C.border }} />
                 </div>
               )}
@@ -444,20 +354,20 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                 <div data-testid="hub-empty-state" className="flex flex-col h-full">
                   {/* Example: User message placeholder */}
                   <div className="flex gap-4 max-w-3xl">
-                    <div className="w-8 h-8 rounded bg-stone-100 flex-shrink-0 flex items-center justify-center border border-stone-200">
-                      <span className="text-xs font-bold">You</span>
+                    <div className="w-8 h-8 rounded bg-corthex-elevated flex-shrink-0 flex items-center justify-center border border-corthex-border">
+                      <span className="text-xs font-bold text-corthex-text-primary">You</span>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-bold text-stone-400 uppercase tracking-tight">You</p>
-                      <div className="text-stone-500 italic">명령을 입력하여 대화를 시작하세요...</div>
+                      <p className="text-xs font-bold text-corthex-text-disabled uppercase tracking-tight">You</p>
+                      <div className="text-corthex-text-secondary italic">명령을 입력하여 대화를 시작하세요...</div>
                     </div>
                   </div>
                   {/* Example commands */}
                   <div className="flex-1 flex flex-col items-center justify-center px-6 mt-8">
-                    <h2 className="text-lg font-bold text-stone-800 mb-2" style={{ fontFamily: "'Noto Serif KR', serif" }}>
+                    <h2 className="text-lg font-bold text-corthex-text-primary mb-2">
                       {secretary.name}에게 명령하세요
                     </h2>
-                    <p className="text-sm text-stone-500 mb-6 text-center max-w-md">
+                    <p className="text-sm text-corthex-text-secondary mb-6 text-center max-w-md">
                       무엇이든 자연어로 명령하면 적절한 에이전트에게 위임하여 처리합니다.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
@@ -465,11 +375,10 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                         <button
                           key={cmd.text}
                           onClick={() => handleExampleClick(cmd.text)}
-                          className="text-left px-4 py-3 rounded-lg border transition-all group"
-                          style={{ backgroundColor: 'white', borderColor: C.border }}
+                          className="text-left px-4 py-3 rounded-lg border border-corthex-border bg-corthex-surface transition-all group hover:border-corthex-accent"
                         >
-                          <p className="text-sm text-stone-700 group-hover:text-stone-900">{cmd.text}</p>
-                          <p className="text-xs text-stone-400 mt-0.5">{cmd.desc}</p>
+                          <p className="text-sm text-corthex-text-primary group-hover:text-corthex-accent">{cmd.text}</p>
+                          <p className="text-xs text-corthex-text-disabled mt-0.5">{cmd.desc}</p>
                         </button>
                       ))}
                     </div>
@@ -482,12 +391,12 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                 if (msg.sender === 'user') {
                   return (
                     <div key={msg.id} data-testid={`msg-user-${msg.id}`} className="flex gap-4 max-w-3xl">
-                      <div className="w-8 h-8 rounded bg-stone-100 flex-shrink-0 flex items-center justify-center border border-stone-200">
-                        <span className="text-xs font-bold">You</span>
+                      <div className="w-8 h-8 rounded bg-corthex-elevated flex-shrink-0 flex items-center justify-center border border-corthex-border">
+                        <span className="text-xs font-bold text-corthex-text-primary">You</span>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs font-bold text-stone-400 uppercase tracking-tight">You</p>
-                        <div className="text-stone-700">{renderTextWithLinks(msg.content, navigate)}</div>
+                        <p className="text-xs font-bold text-corthex-text-disabled uppercase tracking-tight">You</p>
+                        <div className="text-corthex-text-primary">{renderTextWithLinks(msg.content, navigate)}</div>
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-1">
                             {msg.attachments.map((att) => (
@@ -525,7 +434,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                       <div>
                         <p className="text-xs font-bold uppercase tracking-tight" style={{ color: C.accentOlive }}>{secretary.name}</p>
                       </div>
-                      <div className="prose prose-stone prose-sm max-w-none text-stone-800 space-y-4">
+                      <div className="prose prose-sm max-w-none text-corthex-text-primary space-y-4 prose-invert">
                         <p className="whitespace-pre-wrap">{renderTextWithLinks(msg.content, navigate)}</p>
                       </div>
                       {msg.attachments && msg.attachments.length > 0 && (
@@ -563,10 +472,10 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                   </div>
                   <div className="space-y-4 flex-1">
                     <p className="text-xs font-bold uppercase tracking-tight" style={{ color: C.accentOlive }}>
-                      {processingAgent || secretary.name} <span className="ml-2 font-normal lowercase text-stone-400 italic">processing via /stream...</span>
+                      {processingAgent || secretary.name} <span className="ml-2 font-normal lowercase text-corthex-text-disabled italic">processing via /stream...</span>
                     </p>
                     {streamingText && (
-                      <div className="prose prose-stone prose-sm max-w-none text-stone-800">
+                      <div className="prose prose-sm max-w-none text-corthex-text-primary prose-invert">
                         <p className="whitespace-pre-wrap">
                           {renderTextWithLinks(streamingText, navigate)}
                           <span className="inline-block w-2 h-4 ml-1 animate-pulse align-middle" style={{ backgroundColor: C.accentOlive }} />
@@ -586,11 +495,11 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                   <div className="flex-1 pt-2">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-corthex-text-disabled animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-corthex-text-disabled animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-corthex-text-disabled animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
-                      <span className="text-xs text-stone-400">
+                      <span className="text-xs text-corthex-text-disabled">
                         {streamState === 'accepted' && '명령 접수됨...'}
                         {streamState === 'processing' && (processingAgent ? `${processingAgent} 분석 중...` : '비서실장 분석 중...')}
                       </span>
@@ -601,10 +510,10 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
 
               {/* Error display */}
               {error && (
-                <div data-testid="hub-error" className="flex items-center gap-2 px-4 py-2 rounded-lg mx-4 border" style={{ backgroundColor: '#fef2f2', borderColor: '#fecaca' }}>
-                  <span className="text-red-500 shrink-0">!</span>
-                  <span className="text-sm text-red-600">{error}</span>
-                  <button onClick={clearError} className="text-xs text-red-400 hover:text-red-600 ml-auto">닫기</button>
+                <div data-testid="hub-error" className="flex items-center gap-2 px-4 py-2 rounded-lg mx-4 border bg-corthex-error-muted border-corthex-error/30">
+                  <span className="text-corthex-error shrink-0">!</span>
+                  <span className="text-sm text-corthex-error">{error}</span>
+                  <button onClick={clearError} className="text-xs text-corthex-error/60 hover:text-corthex-error ml-auto">닫기</button>
                 </div>
               )}
 
@@ -627,7 +536,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                       <span style={{ color: C.textMuted }}>&middot; {formatBytes(f.sizeBytes)}</span>
                       <button
                         onClick={() => setPendingAttachments((prev) => prev.filter((a) => a.id !== f.id))}
-                        className="text-stone-400 hover:text-red-500 transition-colors"
+                        className="text-corthex-text-disabled hover:text-corthex-error transition-colors"
                       >
                         x
                       </button>
@@ -638,11 +547,11 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               <div className="max-w-4xl mx-auto bg-corthex-surface border shadow-lg rounded-xl overflow-hidden terminal-focus transition-all" style={{ borderColor: C.border }}>
                 <div className="flex items-center px-4 py-2 border-b" style={{ backgroundColor: C.bgSecondary, borderColor: C.border }}>
                   <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone-300"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone-300"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone-300"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-corthex-text-disabled"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-corthex-text-disabled"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-corthex-text-disabled"></div>
                   </div>
-                  <span className="ml-4 text-[10px] font-mono text-stone-400 tracking-widest uppercase">CORTHEX_TERMINAL_V2</span>
+                  <span className="ml-4 text-[10px] font-mono text-corthex-text-disabled tracking-widest uppercase">CORTHEX_TERMINAL_V2</span>
                 </div>
                 <div className="p-4 flex items-start gap-4">
                   <span className="font-mono mt-1" style={{ color: C.accentOlive }}>&gt;</span>
@@ -654,7 +563,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                       onChange={handleFileUpload}
                     />
                     <textarea
-                      className="w-full bg-transparent border-none focus:ring-0 p-0 text-stone-800 placeholder-stone-400 resize-none"
+                      className="w-full bg-transparent border-none focus:ring-0 p-0 text-corthex-text-primary placeholder-corthex-text-disabled resize-none"
                       style={{ fontFamily: "'Pretendard', 'Inter', sans-serif" }}
                       data-testid="hub-message-input"
                       placeholder="Type @agent to mention or /command..."
@@ -676,8 +585,7 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                     <button
                       data-testid="hub-stop-btn"
                       onClick={stopStream}
-                      className="px-4 py-1.5 rounded-md text-sm font-medium transition-all shadow-sm flex items-center gap-2"
-                      style={{ backgroundColor: '#dc2626', color: 'white' }}
+                      className="px-4 py-1.5 rounded-md text-sm font-medium transition-all shadow-sm flex items-center gap-2 bg-red-600 text-white"
                       aria-label="스트리밍 중지"
                     >
                       Stop
@@ -696,12 +604,12 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                     </button>
                   )}
                 </div>
-                <div className="px-4 py-1 border-t flex justify-between" style={{ backgroundColor: '#fafaf9', borderColor: C.border }}>
+                <div className="px-4 py-1 border-t flex justify-between bg-corthex-elevated" style={{ borderColor: C.border }}>
                   <div className="flex gap-4">
-                    <span className="text-[10px] text-stone-400"><kbd className="bg-corthex-surface border px-1 rounded">@</kbd> Mention Agent</span>
-                    <span className="text-[10px] text-stone-400"><kbd className="bg-corthex-surface border px-1 rounded">/</kbd> Command</span>
+                    <span className="text-[10px] text-corthex-text-disabled"><kbd className="bg-corthex-surface border border-corthex-border px-1 rounded">@</kbd> Mention Agent</span>
+                    <span className="text-[10px] text-corthex-text-disabled"><kbd className="bg-corthex-surface border border-corthex-border px-1 rounded">/</kbd> Command</span>
                   </div>
-                  <span className="text-[10px] text-stone-400">API: /api/workspace/hub/stream</span>
+                  <span className="text-[10px] text-corthex-text-disabled">API: /api/workspace/hub/stream</span>
                 </div>
               </div>
             </div>
@@ -710,13 +618,13 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
           {/* Handoff Tracker Sidebar — hidden on mobile/tablet */}
           <aside className="hidden lg:flex w-72 border-l bg-corthex-surface flex-col" style={{ borderColor: C.border }} data-purpose="handoff-tracker">
             <div className="p-6 border-b" style={{ borderColor: C.border, backgroundColor: `${C.bgSecondary}4d` }}>
-              <h3 className="font-bold text-stone-800" style={{ fontFamily: "'Noto Serif KR', serif" }}>Process Delegation</h3>
-              <p className="text-xs text-stone-500 mt-1">Real-time handoff chain</p>
+              <h3 className="font-bold text-corthex-text-primary">Process Delegation</h3>
+              <p className="text-xs text-corthex-text-secondary mt-1">Real-time handoff chain</p>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <div className="relative">
                 {/* Connector Line */}
-                <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-stone-100"></div>
+                <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-corthex-elevated"></div>
                 {/* Chain Steps from handoffChain */}
                 <div className="space-y-8 relative">
                   {handoffChain.length > 0 ? (
@@ -726,23 +634,23 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
                       {/* Default display steps */}
                       {/* Step 1: Completed */}
                       <div className="flex items-start gap-4">
-                        <div className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white ring-4 ring-white" style={{ backgroundColor: C.accentOlive }}>
+                        <div className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white ring-4 ring-corthex-surface" style={{ backgroundColor: C.accentOlive }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-stone-800">System Secretary</h4>
-                          <p className="text-[11px] text-stone-500">Task intake &amp; Intent Mapping</p>
-                          <span className="text-[10px] font-mono text-stone-400">Waiting...</span>
+                          <h4 className="text-sm font-bold text-corthex-text-primary">System Secretary</h4>
+                          <p className="text-[11px] text-corthex-text-secondary">Task intake &amp; Intent Mapping</p>
+                          <span className="text-[10px] font-mono text-corthex-text-disabled">Waiting...</span>
                         </div>
                       </div>
                       {/* Step 2: Pending */}
                       <div className="flex items-start gap-4 opacity-50">
-                        <div className="relative z-10 w-8 h-8 rounded-full bg-stone-100 border-2 border-stone-200 flex items-center justify-center ring-4 ring-white">
-                          <div className="w-2 h-2 bg-stone-300 rounded-full"></div>
+                        <div className="relative z-10 w-8 h-8 rounded-full bg-corthex-elevated border-2 border-corthex-border flex items-center justify-center ring-4 ring-corthex-surface">
+                          <div className="w-2 h-2 bg-corthex-text-disabled rounded-full"></div>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-stone-800">Agent</h4>
-                          <p className="text-[11px] text-stone-500">Awaiting task...</p>
+                          <h4 className="text-sm font-bold text-corthex-text-primary">Agent</h4>
+                          <p className="text-[11px] text-corthex-text-secondary">Awaiting task...</p>
                         </div>
                       </div>
                     </>
@@ -751,15 +659,15 @@ export function SecretaryHubLayout({ secretary }: { secretary: Agent }) {
               </div>
             </div>
             <div className="p-6 border-t" style={{ borderColor: C.border }}>
-              <div className="p-3 rounded-lg text-[11px] text-stone-600 italic" style={{ backgroundColor: C.bgSecondary }}>
+              <div className="p-3 rounded-lg text-[11px] text-corthex-text-secondary italic" style={{ backgroundColor: C.bgSecondary }}>
                 {isProcessing
                   ? `"${processingAgent || secretary.name} is currently processing your request."`
                   : '"Ready for your next command."'
                 }
               </div>
               {costUsd != null && (
-                <div className="mt-3 text-xs text-stone-500">
-                  Session cost: <span className="font-mono font-medium text-stone-700">${costUsd.toFixed(4)}</span>
+                <div className="mt-3 text-xs text-corthex-text-secondary">
+                  Session cost: <span className="font-mono font-medium text-corthex-text-primary">${costUsd.toFixed(4)}</span>
                 </div>
               )}
             </div>

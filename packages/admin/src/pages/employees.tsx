@@ -179,8 +179,15 @@ export function EmployeesPage() {
     mutationFn: (id: string) =>
       api.post<ResetPasswordResponse>(`/admin/employees/${id}/reset-password?companyId=${selectedCompanyId}`, {}),
     onSuccess: (res) => {
-      setResetPasswordTarget(null)
-      setPasswordModal({ name: resetNameRef.current, password: res.data.tempPassword })
+      const pw = res.data?.tempPassword
+      if (!pw) {
+        setResetPasswordTarget(null)
+        addToast({ type: 'error', message: '비밀번호 생성에 실패했습니다. 다시 시도해주세요.' })
+        return
+      }
+      // Set password modal FIRST, then close confirm dialog on next frame
+      setPasswordModal({ name: resetNameRef.current, password: pw })
+      requestAnimationFrame(() => setResetPasswordTarget(null))
       addToast({ type: 'success', message: '비밀번호가 초기화되었습니다' })
     },
     onError: (err: Error) => {
@@ -678,7 +685,7 @@ export function EmployeesPage() {
             <div className="px-6 py-5 space-y-4">
               <p className="text-sm text-corthex-text-secondary">{passwordModal.name}님의 임시 비밀번호입니다.</p>
               <div className="bg-corthex-bg border border-corthex-border rounded-lg p-3 flex items-center justify-between">
-                <code className="text-lg font-mono tracking-wider select-all text-corthex-accent">{passwordModal.password}</code>
+                <code className="text-lg font-mono tracking-wider select-all text-corthex-accent">{passwordModal.password || '(생성 실패 - 다시 시도해주세요)'}</code>
                 <button
                   onClick={copyPassword}
                   className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 rounded hover:bg-corthex-elevated transition-colors"

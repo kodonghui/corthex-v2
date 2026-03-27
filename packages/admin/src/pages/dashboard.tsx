@@ -9,6 +9,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
+import { useToastStore } from '../stores/toast-store'
 import { Building2, Users, Bot, Zap, Download } from 'lucide-react'
 
 type User = { id: string; name: string; username: string; role: string; isActive: boolean }
@@ -17,6 +18,7 @@ type Department = { id: string; name: string }
 
 export function DashboardPage() {
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
+  const addToast = useToastStore((s) => s.addToast)
 
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -134,7 +136,25 @@ export function DashboardPage() {
         <div className="lg:col-span-3 bg-corthex-bg border border-corthex-border overflow-hidden">
           <div className="p-4 md:p-6 border-b border-corthex-border flex justify-between items-center">
             <h3 className="font-mono uppercase tracking-widest text-xs text-corthex-accent">Recent Activity</h3>
-            <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-colors flex items-center gap-1">
+            <button
+              className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-colors flex items-center gap-1"
+              onClick={() => {
+                addToast({ type: 'info', message: '로그 내보내기를 준비 중입니다...' })
+                const rows = [
+                  'Name,Type,Role,Status',
+                  ...users.map((u) => `${u.name},USER,${u.role},${u.isActive ? 'ACTIVE' : 'INACTIVE'}`),
+                  ...agents.map((a) => `${a.name},AGENT,${a.role},${a.status.toUpperCase()}`),
+                ]
+                const csv = rows.join('\n')
+                const blob = new Blob([csv], { type: 'text/csv' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `corthex-activity-${new Date().toISOString().split('T')[0]}.csv`
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
+            >
               로그 내보내기 <Download size={12} />
             </button>
           </div>
@@ -208,7 +228,10 @@ export function DashboardPage() {
             </table>
           </div>
           <div className="p-4 bg-corthex-surface border-t border-corthex-border flex justify-center">
-            <button className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-all">
+            <button
+              className="text-[10px] font-mono text-corthex-text-secondary hover:text-corthex-accent transition-all"
+              onClick={() => addToast({ type: 'info', message: 'Activity Log 페이지 준비 중입니다' })}
+            >
               전체 기록 보기
             </button>
           </div>
