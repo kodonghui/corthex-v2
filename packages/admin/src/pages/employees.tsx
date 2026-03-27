@@ -42,7 +42,7 @@ type CreateResponse = {
 }
 
 type ResetPasswordResponse = {
-  data: { newPassword: string }
+  data: { tempPassword: string }
 }
 
 export function EmployeesPage() {
@@ -179,7 +179,7 @@ export function EmployeesPage() {
       api.post<ResetPasswordResponse>(`/admin/employees/${id}/reset-password?companyId=${selectedCompanyId}`, {}),
     onSuccess: (res) => {
       setResetPasswordTarget(null)
-      setPasswordModal({ name: resetNameRef.current, password: res.data.newPassword })
+      setPasswordModal({ name: resetNameRef.current, password: res.data.tempPassword })
       addToast({ type: 'success', message: '비밀번호가 초기화되었습니다' })
     },
     onError: (err: Error) => {
