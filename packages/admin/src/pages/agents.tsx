@@ -45,7 +45,7 @@ type SoulTemplate = { id: string; name: string; content: string; isBuiltin: bool
 const TIER_OPTIONS = [
   { value: 'manager', label: 'Manager', desc: '팀을 이끌고 결과를 종합', defaultModel: 'claude-sonnet-4-6' },
   { value: 'specialist', label: 'Specialist', desc: '전문 분야 분석', defaultModel: 'claude-haiku-4-5' },
-  { value: 'worker', label: 'Worker', desc: '반복 작업 수행', defaultModel: 'gemini-2.5-flash' },
+  { value: 'worker', label: 'Worker', desc: '반복 작업 수행', defaultModel: 'claude-haiku-4-5' },
 ] as const
 
 const MODEL_OPTIONS = [
@@ -116,6 +116,8 @@ export function AgentsPage() {
 
   // Filters
   const [search, setSearch] = useState('')
+  const [filterTier, setFilterTier] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
 
   // Queries
   const { data: agentData, isLoading } = useQuery({
@@ -151,9 +153,11 @@ export function AgentsPage() {
   const filteredAgents = useMemo(() => {
     return agents.filter((a) => {
       if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false
+      if (filterTier && a.tier !== filterTier) return false
+      if (filterStatus && a.status !== filterStatus) return false
       return true
     })
-  }, [agents, search])
+  }, [agents, search, filterTier, filterStatus])
 
   // Mutations
   const createMutation = useMutation({
@@ -350,21 +354,21 @@ export function AgentsPage() {
             </div>
             <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Tier</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
-                <option>ALL_TIERS</option>
-                <option>MANAGER</option>
-                <option>SPECIALIST</option>
-                <option>WORKER</option>
+              <select data-testid="agents-filter-tier" value={filterTier} onChange={(e) => setFilterTier(e.target.value)} className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option value="">ALL_TIERS</option>
+                <option value="manager">MANAGER</option>
+                <option value="specialist">SPECIALIST</option>
+                <option value="worker">WORKER</option>
               </select>
             </div>
             <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Status</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
-                <option>ALL_STATES</option>
-                <option>ONLINE</option>
-                <option>WORKING</option>
-                <option>OFFLINE</option>
-                <option>ERROR</option>
+              <select data-testid="agents-filter-status" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option value="">ALL_STATES</option>
+                <option value="online">ONLINE</option>
+                <option value="working">WORKING</option>
+                <option value="offline">OFFLINE</option>
+                <option value="error">ERROR</option>
               </select>
             </div>
             <button

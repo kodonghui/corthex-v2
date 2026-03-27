@@ -13,7 +13,7 @@
 import { useState, useCallback, useRef } from 'react'
 import {
   UserPlus, Search, Filter, Users, UserCheck, Briefcase,
-  Pencil, Trash2, ChevronLeft, ChevronRight, X,
+  Pencil, Trash2, ChevronLeft, ChevronRight, X, KeyRound,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
@@ -359,6 +359,16 @@ export function EmployeesPage() {
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
+                          {emp.isActive && (
+                            <button
+                              onClick={() => setResetPasswordTarget(emp)}
+                              className="p-1.5 text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
+                              data-testid={`reset-pw-btn-${emp.id}`}
+                              title="비밀번호 초기화"
+                            >
+                              <KeyRound className="w-4 h-4" />
+                            </button>
+                          )}
                           {emp.isActive ? (
                             <button
                               onClick={() => setDeactivateTarget(emp)}

@@ -61,17 +61,19 @@ reportLinesRoute.put('/report-lines', zValidator('json', bulkUpsertSchema), asyn
     }
   }
 
-  // 기존 보고 라인 삭제 후 새로 삽입
-  await db.delete(reportLines).where(eq(reportLines.companyId, companyId))
+  // 기존 보고 라인 삭제 후 새로 삽입 (트랜잭션)
+  await db.transaction(async (tx) => {
+    await tx.delete(reportLines).where(eq(reportLines.companyId, companyId))
 
-  if (lines.length > 0) {
-    const values = lines.map((line) => ({
-      companyId,
-      reporterId: line.userId,
-      supervisorId: line.reportsToUserId,
-    }))
-    await db.insert(reportLines).values(values)
-  }
+    if (lines.length > 0) {
+      const values = lines.map((line) => ({
+        companyId,
+        reporterId: line.userId,
+        supervisorId: line.reportsToUserId,
+      }))
+      await tx.insert(reportLines).values(values)
+    }
+  })
 
   // 저장된 결과 반환
   const result = await db
