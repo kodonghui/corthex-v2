@@ -46,7 +46,7 @@ export function DashboardPage() {
 
   if (!selectedCompanyId) return (
     <div className="flex items-center justify-center h-64 text-corthex-text-disabled font-mono text-xs uppercase tracking-widest">
-      SELECT_COMPANY_TO_CONTINUE
+      사이드바에서 회사를 선택하세요
     </div>
   )
 

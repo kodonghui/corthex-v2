@@ -128,7 +128,7 @@ export function UsersPage() {
   if (!selectedCompanyId) {
     return (
       <div className="flex items-center justify-center h-64" data-testid="no-company">
-        <p className="font-mono text-xs text-corthex-text-disabled uppercase tracking-widest">SELECT_COMPANY_TO_CONTINUE</p>
+        <p className="font-mono text-xs text-corthex-text-disabled uppercase tracking-widest">사이드바에서 회사를 선택하세요</p>
       </div>
     )
   }
