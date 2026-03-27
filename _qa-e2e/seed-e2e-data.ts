@@ -25,7 +25,11 @@ async function main() {
     body: JSON.stringify({ username: 'admin', password: 'admin1234' }),
   })
   const adminToken = adminLogin.data.token
-  const companyId = adminLogin.data.user.companyId
+
+  // Get first company
+  const companiesRes = await api('/admin/companies', adminToken)
+  const companyId = companiesRes.data?.[0]?.id
+  if (!companyId) { console.log('  FATAL: no companies'); return }
   console.log('  OK admin login, companyId:', companyId)
 
   // 2. User login (for workspace APIs)
@@ -41,7 +45,7 @@ async function main() {
   const agents = agentsRes.data || []
   if (agents.length > 0) {
     const agent = agents[0]
-    await api(`/admin/agents/${agent.id}`, adminToken, {
+    await api(`/admin/agents/${agent.id}?companyId=${companyId}`, adminToken, {
       method: 'PATCH',
       body: JSON.stringify({ status: 'online' }),
     })
@@ -84,6 +88,35 @@ async function main() {
       console.log('  OK schedule created')
     } catch (e) {
       console.log('  SKIP schedule:', (e as Error).message)
+    }
+    // 6. Create inactive agent (for hard delete TC)
+    try {
+      const inactiveAgent = await api(`/admin/agents?companyId=${companyId}`, adminToken, {
+        method: 'POST',
+        body: JSON.stringify({ name: 'E2E-Inactive-Agent', role: 'Test', tier: 'worker', modelName: 'claude-haiku-4-5' }),
+      })
+      await api(`/admin/agents/${inactiveAgent.data.id}?companyId=${companyId}`, adminToken, {
+        method: 'PATCH',
+        body: JSON.stringify({ isActive: false, status: 'offline' }),
+      })
+      console.log('  OK inactive agent created')
+    } catch (e) {
+      console.log('  SKIP inactive agent:', (e as Error).message)
+    }
+
+    // 7. Create inactive employee (for hard delete TC)
+    try {
+      const emp = await api(`/admin/employees?companyId=${companyId}`, adminToken, {
+        method: 'POST',
+        body: JSON.stringify({ username: 'e2e-inactive', name: 'E2E Inactive User', email: 'e2e@test.com', role: 'user' }),
+      })
+      const empId = emp.data?.id || emp.data?.employee?.id
+      if (empId) {
+        await api(`/admin/employees/${empId}?companyId=${companyId}`, adminToken, { method: 'DELETE' })
+        console.log('  OK inactive employee created')
+      }
+    } catch (e) {
+      console.log('  SKIP inactive employee:', (e as Error).message)
     }
   } else {
     console.log('  WARN no agents found')
