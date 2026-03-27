@@ -28,6 +28,7 @@ type Employee = {
   name: string
   email: string
   isActive: boolean
+  tempPassword?: string | null
   createdAt: string
   departments: Department[]
 }
@@ -375,10 +376,16 @@ export function EmployeesPage() {
                           </button>
                           {emp.isActive && (
                             <button
-                              onClick={() => setResetPasswordTarget(emp)}
+                              onClick={() => {
+                                if (emp.tempPassword) {
+                                  setPasswordModal({ name: emp.name, password: emp.tempPassword })
+                                } else {
+                                  setResetPasswordTarget(emp)
+                                }
+                              }}
                               className="p-1.5 text-corthex-text-secondary hover:text-corthex-accent hover:bg-corthex-elevated rounded transition-colors"
                               data-testid={`reset-pw-btn-${emp.id}`}
-                              title="비밀번호 초기화"
+                              title={emp.tempPassword ? '임시 비밀번호 확인' : '비밀번호 초기화'}
                             >
                               <KeyRound className="w-4 h-4" />
                             </button>
@@ -680,7 +687,7 @@ export function EmployeesPage() {
                 </button>
               </div>
               <div className="bg-corthex-accent/10 border border-corthex-accent/20 rounded-lg p-3">
-                <p className="text-xs text-corthex-accent">이 비밀번호는 다시 확인할 수 없으니 반드시 복사해두세요.</p>
+                <p className="text-xs text-corthex-accent">직원이 첫 로그인하면 이 비밀번호는 사라집니다. 열쇠 아이콘으로 다시 확인할 수 있습니다.</p>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-corthex-border flex justify-end">

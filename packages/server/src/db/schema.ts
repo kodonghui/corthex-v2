@@ -60,6 +60,7 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }),
   role: userRoleEnum('role').notNull().default('user'),
   isActive: boolean('is_active').notNull().default(true),
+  tempPassword: text('temp_password'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({

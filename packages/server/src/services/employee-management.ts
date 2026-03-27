@@ -121,6 +121,7 @@ export async function createEmployee(
       companyId,
       username: input.username,
       passwordHash,
+      tempPassword: initialPassword,
       name: input.name,
       email: input.email,
       role: input.role ?? 'user',
@@ -218,6 +219,7 @@ export async function listEmployees(companyId: string, options: EmployeeListOpti
         email: users.email,
         role: users.role,
         isActive: users.isActive,
+        tempPassword: users.tempPassword,
         createdAt: users.createdAt,
       })
       .from(users)
@@ -263,6 +265,7 @@ export async function getEmployeeDetail(employeeId: string, companyId: string) {
       email: users.email,
       role: users.role,
       isActive: users.isActive,
+      tempPassword: users.tempPassword,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
     })
@@ -464,7 +467,7 @@ export async function resetEmployeePassword(
 
   await db
     .update(users)
-    .set({ passwordHash, updatedAt: new Date() })
+    .set({ passwordHash, tempPassword: newPassword, updatedAt: new Date() })
     .where(eq(users.id, employeeId))
 
   // Delete sessions (force logout)

@@ -163,6 +163,14 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
   }
 
+  // Clear tempPassword on first successful login
+  if (user.tempPassword) {
+    await db
+      .update(users)
+      .set({ tempPassword: null })
+      .where(eq(users.id, user.id))
+  }
+
   // users 테이블 역할을 RBAC 역할로 매핑
   const rbacRole = user.role === 'admin' ? 'ceo' as const : 'employee' as const
 
