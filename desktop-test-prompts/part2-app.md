@@ -1,6 +1,11 @@
 **의존성 확인**: Part 1을 먼저 완료하세요. 에이전트가 최소 1개 존재해야 합니다.
 접속 전 Admin 탭에서 `/admin/agents`를 확인 → 에이전트가 있는지, 1개 이상 "online"인지 확인.
-에이전트가 전부 offline이면: 에이전트 행 클릭 → 상태를 "online"으로 변경 후 진행.
+에이전트가 전부 offline이면:
+1. 에이전트 행 클릭 → 우측 상세 패널 열림
+2. Config 탭에서 **"Go Online"** 초록색 버튼 클릭
+3. **확인**: 상태가 "유휴(online)" 초록색 점으로 변경
+4. **비서실장(Secretary) 에이전트를 반드시 Online으로 만드세요** — Hub 대화에 필수
+5. 가능하면 모든 에이전트를 Online으로 전환
 
 App: https://corthex-hq.com (admin / admin1234 또는 ceo / ceo1234)
 
