@@ -1,3 +1,0 @@
-[submodule "kodonghui_full_pipeline"]
-	path = kodonghui_full_pipeline
-	url = https://github.com/kodonghui/kdh-pipelines.git
