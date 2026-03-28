@@ -21,6 +21,30 @@ type User = { id: string; name: string; username: string; role: string }
 type CliCredential = { id: string; companyId: string; userId: string; label: string; isActive: boolean; createdAt: string }
 type ApiKey = { id: string; companyId: string; userId: string; provider: string; label: string | null; createdAt: string }
 
+const PROVIDER_LABELS: Record<string, string> = {
+  anthropic: 'Anthropic', openai: 'OpenAI', google_ai: 'Google AI',
+  voyage_ai: 'Voyage AI', serper: 'Serper', notion: 'Notion',
+  google_calendar: 'Google Calendar', tts: 'TTS',
+  kis: 'KIS (한국투자증권)', email: 'Email (SMTP)',
+  smtp: 'SMTP', telegram: 'Telegram', instagram: 'Instagram',
+}
+
+const PROVIDER_FIELDS: Record<string, { fields: string[]; labels: Record<string, string> }> = {
+  anthropic: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  openai: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  google_ai: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  voyage_ai: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  serper: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  notion: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  google_calendar: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  tts: { fields: ['api_key'], labels: { api_key: 'API Key' } },
+  kis: { fields: ['app_key', 'app_secret', 'account_no'], labels: { app_key: 'App Key', app_secret: 'App Secret', account_no: 'Account No' } },
+  email: { fields: ['host', 'port', 'user', 'password', 'from'], labels: { host: 'SMTP Host', port: 'Port', user: 'Username', password: 'Password', from: 'From Address' } },
+  smtp: { fields: ['host', 'port', 'user', 'password', 'from'], labels: { host: 'SMTP Host', port: 'Port', user: 'Username', password: 'Password', from: 'From Address' } },
+  telegram: { fields: ['bot_token', 'chat_id'], labels: { bot_token: 'Bot Token', chat_id: 'Chat ID' } },
+  instagram: { fields: ['access_token', 'page_id'], labels: { access_token: 'Access Token', page_id: 'Page ID' } },
+}
+
 export function CredentialsPage() {
   const qc = useQueryClient()
   const selectedCompanyId = useAdminStore((s) => s.selectedCompanyId)
@@ -29,7 +53,7 @@ export function CredentialsPage() {
   const [showAddToken, setShowAddToken] = useState(false)
   const [tokenForm, setTokenForm] = useState({ label: '', token: '' })
   const [showAddApiKey, setShowAddApiKey] = useState(false)
-  const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', key: '', scope: 'user' as 'company' | 'user' })
+  const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', fields: {} as Record<string, string>, scope: 'user' as 'company' | 'user' })
 
   const { data: userData } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -83,7 +107,7 @@ export function CredentialsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['api-keys'] })
       setShowAddApiKey(false)
-      setApiKeyForm({ provider: 'kis', label: '', key: '', scope: 'user' })
+      setApiKeyForm({ provider: 'kis', label: '', fields: {}, scope: 'user' })
       addToast({ type: 'success', message: 'API 키가 등록되었습니다' })
     },
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
@@ -91,11 +115,22 @@ export function CredentialsPage() {
 
   const deleteApiKeyMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/admin/api-keys/${id}`),
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: ['api-keys'] })
+      const previous = qc.getQueryData<{ data: ApiKey[] }>(['api-keys'])
+      qc.setQueryData<{ data: ApiKey[] } | undefined>(['api-keys'], (old) =>
+        old ? { ...old, data: old.data.filter((k) => k.id !== id) } : old
+      )
+      return { previous }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['api-keys'] })
       addToast({ type: 'success', message: 'API 키가 삭제되었습니다' })
     },
-    onError: (err: Error) => addToast({ type: 'error', message: err.message }),
+    onError: (err: Error, _id, context) => {
+      if (context?.previous) qc.setQueryData(['api-keys'], context.previous)
+      addToast({ type: 'error', message: err.message })
+    },
   })
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
@@ -422,7 +457,7 @@ export function CredentialsPage() {
                       userId: selectedUserId,
                       provider: apiKeyForm.provider,
                       ...(apiKeyForm.label ? { label: apiKeyForm.label } : {}),
-                      credentials: { key: apiKeyForm.key },
+                      credentials: apiKeyForm.fields,
                       scope: apiKeyForm.scope,
                     })
                   }}
@@ -434,13 +469,12 @@ export function CredentialsPage() {
                       <select
                         data-testid="credentials-api-provider"
                         value={apiKeyForm.provider}
-                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value })}
+                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, provider: e.target.value, fields: {} })}
                         className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent min-h-[44px]"
                       >
-                        <option value="kis">KIS (한국투자증권)</option>
-                        <option value="notion">Notion</option>
-                        <option value="email">Email</option>
-                        <option value="telegram">Telegram</option>
+                        {Object.keys(PROVIDER_FIELDS).map((key) => (
+                          <option key={key} value={key}>{PROVIDER_LABELS[key] || key}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
@@ -466,17 +500,21 @@ export function CredentialsPage() {
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">API Key</label>
-                    <input
-                      data-testid="credentials-api-key-input"
-                      type="password"
-                      value={apiKeyForm.key}
-                      onChange={(e) => setApiKeyForm({ ...apiKeyForm, key: e.target.value })}
-                      className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent min-h-[44px]"
-                      required
-                    />
-                  </div>
+                  {(PROVIDER_FIELDS[apiKeyForm.provider]?.fields ?? ['api_key']).map((field) => (
+                    <div key={field}>
+                      <label className="block font-mono text-[9px] uppercase tracking-widest text-corthex-text-disabled mb-2">
+                        {PROVIDER_FIELDS[apiKeyForm.provider]?.labels[field] ?? field}
+                      </label>
+                      <input
+                        data-testid={`credentials-api-field-${field}`}
+                        type="password"
+                        value={apiKeyForm.fields[field] || ''}
+                        onChange={(e) => setApiKeyForm({ ...apiKeyForm, fields: { ...apiKeyForm.fields, [field]: e.target.value } })}
+                        className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-sm font-mono px-3 py-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent min-h-[44px]"
+                        required
+                      />
+                    </div>
+                  ))}
                   <div className="flex gap-3">
                     <button
                       data-testid="credentials-api-cancel"

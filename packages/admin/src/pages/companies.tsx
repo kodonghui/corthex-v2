@@ -12,8 +12,8 @@ import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useToastStore } from '../stores/toast-store'
-import { ConfirmDialog, SkeletonCard } from '@corthex/ui'
-import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
+import { ConfirmDialog, TypedConfirmDialog, SkeletonCard } from '@corthex/ui'
+import { Plus, Search, Users, Bot, Pencil, Trash2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react'
 
 type Company = {
   id: string; name: string; slug: string; isActive: boolean; createdAt: string
@@ -29,6 +29,7 @@ export function CompaniesPage() {
   const [editForm, setEditForm] = useState({ name: '', slug: '' })
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Company | null>(null)
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<Company | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['companies'],
@@ -88,6 +89,21 @@ export function CompaniesPage() {
     },
   })
 
+  const hardDeleteMutation = useMutation({
+    mutationFn: ({ id, confirmName }: { id: string; confirmName: string }) =>
+      api.post(`/admin/companies/${id}/hard-delete`, { confirmName }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['companies'] })
+      qc.invalidateQueries({ queryKey: ['companies-stats'] })
+      setHardDeleteTarget(null)
+      addToast({ type: 'success', message: '회사가 영구 삭제되었습니다' })
+    },
+    onError: (err: Error) => {
+      setHardDeleteTarget(null)
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
   const activeCount = companies.filter((c) => c.isActive).length
   const throughput = companies.length > 0 ? Math.round((activeCount / companies.length) * 100) : 0
 
@@ -121,11 +137,11 @@ export function CompaniesPage() {
         {/* Stats + Search Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-8">
           <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
-            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Total_Entities</span>
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">전체 회사</span>
             <span className="text-4xl font-black tracking-tighter text-corthex-text-primary">{companies.length.toLocaleString()}</span>
           </div>
           <div className="bg-corthex-surface border border-corthex-border p-6 flex flex-col justify-between h-32">
-            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">Active_Throughput</span>
+            <span className="font-mono text-[10px] tracking-widest text-corthex-text-secondary uppercase">활성률</span>
             <div className="flex items-end gap-2">
               <span className="text-4xl font-black tracking-tighter text-corthex-info">{throughput}</span>
               <span className="font-mono text-xs mb-1 text-corthex-text-secondary">%</span>
@@ -263,9 +279,6 @@ export function CompaniesPage() {
                               </span>
                             </div>
                           </div>
-                          <button className="text-corthex-text-disabled hover:text-corthex-accent transition-colors">
-                            <MoreVertical size={18} />
-                          </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -310,12 +323,21 @@ export function CompaniesPage() {
                             <button
                               onClick={() => setDeleteTarget(c)}
                               className="text-corthex-text-disabled hover:text-corthex-error transition-colors p-1"
-                              title="Delete"
+                              title="Deactivate"
                             >
                               <Trash2 size={14} />
                             </button>
+                            {!c.isActive && (
+                              <button
+                                onClick={() => setHardDeleteTarget(c)}
+                                className="text-corthex-text-disabled hover:text-red-600 transition-colors p-1"
+                                title="영구 삭제"
+                              >
+                                <AlertTriangle size={14} />
+                              </button>
+                            )}
                             <button className="font-mono text-[10px] tracking-[0.2em] text-corthex-accent uppercase font-bold hover:underline ml-2">
-                              ACCESS_ROOT
+                              선택
                             </button>
                           </div>
                         </div>
@@ -388,9 +410,21 @@ export function CompaniesPage() {
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         onCancel={() => setDeleteTarget(null)}
         title={`Delete ${deleteTarget?.name}`}
-        description="이 회사를 삭제하면 소속 직원의 로그인이 차단됩니다. 이 작업은 되돌릴 수 없습니다."
+        description="회사를 비활성화하면 소속 직원의 로그인이 차단됩니다. 비활성화 후 영구 삭제가 가능합니다."
         confirmText="Delete"
         variant="danger"
+      />
+
+      <TypedConfirmDialog
+        isOpen={!!hardDeleteTarget}
+        onConfirm={() => hardDeleteTarget && hardDeleteMutation.mutate({ id: hardDeleteTarget.id, confirmName: hardDeleteTarget.name })}
+        onCancel={() => setHardDeleteTarget(null)}
+        title="회사 영구 삭제"
+        description="이 작업은 회사의 모든 데이터(직원, 에이전트, 채팅, 비용 등)를 영구적으로 삭제합니다. 복구할 수 없습니다."
+        requiredText={hardDeleteTarget?.name || ''}
+        inputLabel="회사 이름을 정확히 입력하세요"
+        confirmText="영구 삭제"
+        loading={hardDeleteMutation.isPending}
       />
     </div>
   )

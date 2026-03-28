@@ -45,7 +45,7 @@ type SoulTemplate = { id: string; name: string; content: string; isBuiltin: bool
 const TIER_OPTIONS = [
   { value: 'manager', label: 'Manager', desc: '팀을 이끌고 결과를 종합', defaultModel: 'claude-sonnet-4-6' },
   { value: 'specialist', label: 'Specialist', desc: '전문 분야 분석', defaultModel: 'claude-haiku-4-5' },
-  { value: 'worker', label: 'Worker', desc: '반복 작업 수행', defaultModel: 'gemini-2.5-flash' },
+  { value: 'worker', label: 'Worker', desc: '반복 작업 수행', defaultModel: 'claude-haiku-4-5' },
 ] as const
 
 const MODEL_OPTIONS = [
@@ -110,12 +110,15 @@ export function AgentsPage() {
   const [detailTab, setDetailTab] = useState<DetailTab>('soul')
   const [editForm, setEditForm] = useState<Partial<Agent>>({})
   const [deactivateTarget, setDeactivateTarget] = useState<Agent | null>(null)
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<Agent | null>(null)
   const [activeSessionCount, setActiveSessionCount] = useState<number | null>(null)
   const [forceDeactivate, setForceDeactivate] = useState(false)
   const [showCacheDisableModal, setShowCacheDisableModal] = useState(false)
 
   // Filters
   const [search, setSearch] = useState('')
+  const [filterTier, setFilterTier] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
 
   // Queries
   const { data: agentData, isLoading } = useQuery({
@@ -151,9 +154,11 @@ export function AgentsPage() {
   const filteredAgents = useMemo(() => {
     return agents.filter((a) => {
       if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false
+      if (filterTier && a.tier !== filterTier) return false
+      if (filterStatus && a.status !== filterStatus) return false
       return true
     })
-  }, [agents, search])
+  }, [agents, search, filterTier, filterStatus])
 
   // Mutations
   const createMutation = useMutation({
@@ -196,6 +201,20 @@ export function AgentsPage() {
         setActiveSessionCount(Number(err.data.activeTaskCount))
         return
       }
+      addToast({ type: 'error', message: err.message })
+    },
+  })
+
+  const hardDeleteMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/agents/${id}/hard-delete`, {}),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['agents'] })
+      setHardDeleteTarget(null)
+      setSelectedAgent(null)
+      addToast({ type: 'success', message: '에이전트가 영구 삭제되었습니다' })
+    },
+    onError: (err: Error) => {
+      setHardDeleteTarget(null)
       addToast({ type: 'error', message: err.message })
     },
   })
@@ -245,6 +264,7 @@ export function AgentsPage() {
 
   function handleSaveInfo() {
     if (!selectedAgent) return
+    setSelectedAgent({ ...selectedAgent, name: editForm.name, role: editForm.role, tier: editForm.tier, modelName: editForm.modelName })
     updateMutation.mutate({
       id: selectedAgent.id,
       name: editForm.name,
@@ -350,21 +370,21 @@ export function AgentsPage() {
             </div>
             <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Tier</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
-                <option>ALL_TIERS</option>
-                <option>MANAGER</option>
-                <option>SPECIALIST</option>
-                <option>WORKER</option>
+              <select data-testid="agents-filter-tier" value={filterTier} onChange={(e) => setFilterTier(e.target.value)} className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option value="">ALL_TIERS</option>
+                <option value="manager">MANAGER</option>
+                <option value="specialist">SPECIALIST</option>
+                <option value="worker">WORKER</option>
               </select>
             </div>
             <div className="w-full sm:w-48">
               <label className="block font-mono text-[9px] tracking-widest text-corthex-text-disabled mb-1 uppercase">Filter_Status</label>
-              <select className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
-                <option>ALL_STATES</option>
-                <option>ONLINE</option>
-                <option>WORKING</option>
-                <option>OFFLINE</option>
-                <option>ERROR</option>
+              <select data-testid="agents-filter-status" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full bg-corthex-bg border border-corthex-border text-base sm:text-xs font-mono py-2 px-2 text-corthex-text-primary focus:outline-none focus:border-corthex-accent">
+                <option value="">ALL_STATES</option>
+                <option value="online">ONLINE</option>
+                <option value="working">WORKING</option>
+                <option value="offline">OFFLINE</option>
+                <option value="error">ERROR</option>
               </select>
             </div>
             <button
@@ -634,14 +654,42 @@ export function AgentsPage() {
                     style={{ backgroundColor: 'var(--color-corthex-accent)', color: 'var(--color-corthex-text-on-accent)' }}>
                     {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </button>
-                  <button
-                    data-testid="agents-deactivate-btn"
-                    onClick={() => openDeactivateModal(selectedAgent)}
-                    disabled={!selectedAgent.isActive}
-                    className="w-full py-2 border font-mono text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
-                    style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
-                    {selectedAgent.isActive ? 'Deactivate Agent' : 'Already Deactivated'}
-                  </button>
+                  {selectedAgent.isActive && selectedAgent.status === 'offline' && (
+                    <button
+                      data-testid="agents-go-online-btn"
+                      onClick={() => updateMutation.mutate({ id: selectedAgent.id, status: 'online' })}
+                      disabled={updateMutation.isPending}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ borderColor: '#22c55e', color: '#22c55e' }}>
+                      {updateMutation.isPending ? 'Activating...' : 'Go Online'}
+                    </button>
+                  )}
+                  {selectedAgent.isActive ? (
+                    <button
+                      data-testid="agents-deactivate-btn"
+                      onClick={() => openDeactivateModal(selectedAgent)}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest"
+                      style={{ borderColor: 'var(--color-corthex-error)', color: 'var(--color-corthex-error)' }}>
+                      Deactivate Agent
+                    </button>
+                  ) : (
+                    <button
+                      data-testid="agents-reactivate-btn"
+                      onClick={() => updateMutation.mutate({ id: selectedAgent.id, status: 'online', isActive: true })}
+                      disabled={updateMutation.isPending}
+                      className="w-full py-2 border font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                      style={{ borderColor: '#22c55e', color: '#22c55e' }}>
+                      {updateMutation.isPending ? 'Reactivating...' : 'Reactivate Agent'}
+                    </button>
+                  )}
+                  {!selectedAgent.isActive && !selectedAgent.isSystem && !selectedAgent.isSecretary && (
+                    <button
+                      onClick={() => setHardDeleteTarget(selectedAgent)}
+                      className="w-full py-2 font-mono text-xs uppercase tracking-widest font-bold text-white"
+                      style={{ backgroundColor: 'var(--color-corthex-error)' }}>
+                      Permanently Delete
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -691,6 +739,31 @@ export function AgentsPage() {
                   {deactivateMutation.isPending ? '처리 중...' : '비활성화'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hard Delete Modal */}
+      {hardDeleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-corthex-surface border border-corthex-border w-full max-w-md mx-4 p-6">
+            <h3 className="font-mono text-sm uppercase tracking-widest font-bold text-corthex-error mb-3">
+              에이전트 영구 삭제
+            </h3>
+            <p className="text-sm text-corthex-text-secondary mb-4">
+              <strong>{hardDeleteTarget.name}</strong>의 모든 데이터(채팅, 메모리, 비용 기록 등)가 영구 삭제됩니다. 복구할 수 없습니다.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setHardDeleteTarget(null)}
+                className="flex-1 px-4 py-2 border border-corthex-border font-mono text-xs uppercase tracking-widest text-corthex-text-secondary hover:bg-corthex-elevated transition-colors">
+                취소
+              </button>
+              <button onClick={() => hardDeleteMutation.mutate(hardDeleteTarget.id)} disabled={hardDeleteMutation.isPending}
+                className="flex-1 px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-corthex-error)', color: 'white' }}>
+                {hardDeleteMutation.isPending ? '처리 중...' : '영구 삭제'}
+              </button>
             </div>
           </div>
         </div>
