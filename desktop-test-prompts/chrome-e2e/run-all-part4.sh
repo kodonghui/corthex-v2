@@ -42,8 +42,15 @@ $(cat "$PREV_FILE")"
 $(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")$PREV_RESULTS
 ---
 결과를 $RESULTS_DIR/part4-$(printf '%02d' $NUM).md 에 저장. 스크린샷은 $SCREENSHOTS_DIR/ 에 저장. UX 자유 탐색도 실행."
-  claude --chrome -p "$PROMPT" --dangerously-skip-permissions
-  [ $? -ne 0 ] && echo " ⚠️  비정상 종료" || echo " ✅ 완료"
+  ATTEMPT=0
+  EXIT_CODE=1
+  while [ $ATTEMPT -lt 2 ] && [ $EXIT_CODE -ne 0 ]; do
+    ATTEMPT=$((ATTEMPT + 1))
+    [ $ATTEMPT -gt 1 ] && echo " ↻ 재시도 ($ATTEMPT/2) — 30초 대기..." && sleep 30
+    claude --chrome -p "$PROMPT" --dangerously-skip-permissions --model haiku
+    EXIT_CODE=$?
+  done
+  [ $EXIT_CODE -ne 0 ] && echo " ⚠️  비정상 종료 (${ATTEMPT}회 시도)" || echo " ✅ 완료 (시도: $ATTEMPT)"
 done
 echo ""
 echo "========================================"

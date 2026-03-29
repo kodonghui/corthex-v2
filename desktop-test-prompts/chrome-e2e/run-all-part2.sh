@@ -32,9 +32,20 @@ echo " 총 ${#PARTS[@]}개 파트"
 echo " $(date)"
 echo "========================================"
 
+# 범위 실행 지원: START_PART/END_PART 환경변수로 분할 가능 (기본: 전체)
+# 예) START_PART=1 END_PART=6 bash run-all-part2.sh   → Part 2-01~2-06 (Mac)
+#     START_PART=7 END_PART=12 bash run-all-part2.sh  → Part 2-07~2-12 (Windows)
+_START=${START_PART:-1}
+_END=${END_PART:-${#PARTS[@]}}
+
 for i in "${!PARTS[@]}"; do
   PART="${PARTS[$i]}"
   NUM=$((i + 1))
+
+  if [ $NUM -lt $_START ] || [ $NUM -gt $_END ]; then
+    continue
+  fi
+
   PART_FILE="$SCRIPT_DIR/${PART}.md"
 
   echo ""
@@ -45,6 +56,12 @@ for i in "${!PARTS[@]}"; do
 
   if [ ! -f "$PART_FILE" ]; then
     echo " ❌ 파일 없음: $PART_FILE — 건너뜀"
+    continue
+  fi
+
+  RESULT_FILE="$RESULTS_DIR/part2-$(printf '%02d' $NUM).md"
+  if [ -f "$RESULT_FILE" ] && [ -s "$RESULT_FILE" ] && [ "${FORCE_RERUN:-0}" != "1" ]; then
+    echo " ⏭  결과 이미 존재: $(basename "$RESULT_FILE") — 건너뜀 (재실행: FORCE_RERUN=1)"
     continue
   fi
 
@@ -61,14 +78,19 @@ $(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 2. 스크린샷을 $SCREENSHOTS_DIR/ 폴더에 저장
 3. 정해진 단계 끝나면 UX 자유 탐색 실행 (common-app.md 규칙 참고)"
 
-  claude --chrome -p "$PROMPT" --dangerously-skip-permissions
-
-  EXIT_CODE=$?
+  ATTEMPT=0
+  EXIT_CODE=1
+  while [ $ATTEMPT -lt 2 ] && [ $EXIT_CODE -ne 0 ]; do
+    ATTEMPT=$((ATTEMPT + 1))
+    [ $ATTEMPT -gt 1 ] && echo " ↻ 재시도 ($ATTEMPT/2) — 30초 대기..." && sleep 30
+    claude --chrome -p "$PROMPT" --dangerously-skip-permissions --model haiku
+    EXIT_CODE=$?
+  done
 
   if [ $EXIT_CODE -ne 0 ]; then
-    echo " ⚠️  $PART 비정상 종료 (code: $EXIT_CODE)"
+    echo " ⚠️  $PART 비정상 종료 (${ATTEMPT}회 시도, code: $EXIT_CODE)"
   else
-    echo " ✅ $PART 완료"
+    echo " ✅ $PART 완료 (시도: $ATTEMPT)"
   fi
 done
 

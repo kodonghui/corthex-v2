@@ -23,6 +23,14 @@ run_part() {
   echo ""
   echo "── [$PREFIX-$NUM] $PART ──"
   [ ! -f "$PART_FILE" ] && echo " ❌ 없음" && return
+
+  # 결과 이미 존재하면 건너뜀 (재실행: FORCE_RERUN=1)
+  local RESULT_FILE="$RESULTS_DIR/${PREFIX}-$(printf '%02d' $NUM).md"
+  if [ -f "$RESULT_FILE" ] && [ -s "$RESULT_FILE" ] && [ "${FORCE_RERUN:-0}" != "1" ]; then
+    echo " ⏭  결과 이미 존재 — 건너뜀 (재실행: FORCE_RERUN=1)"
+    return
+  fi
+
   local PREV=""
   if [ "$PREFIX" = "part4" ] && [ "$NUM" -gt 1 ]; then
     local PREV_FILE="$RESULTS_DIR/part4-$(printf '%02d' $((NUM-1))).md"
@@ -36,8 +44,16 @@ $(cat "$PREV_FILE")"
 $(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")$PREV
 ---
 결과를 $RESULTS_DIR/${PREFIX}-$(printf '%02d' $NUM).md 에 저장. 스크린샷은 $SCREENSHOTS_DIR/ 에 저장. UX 자유 탐색도 실행."
-  claude --chrome -p "$PROMPT" --dangerously-skip-permissions
-  [ $? -ne 0 ] && echo " ⚠️  비정상" || echo " ✅ 완료"
+
+  local ATTEMPT=0
+  local EXIT_CODE=1
+  while [ $ATTEMPT -lt 2 ] && [ $EXIT_CODE -ne 0 ]; do
+    ATTEMPT=$((ATTEMPT + 1))
+    [ $ATTEMPT -gt 1 ] && echo " ↻ 재시도 ($ATTEMPT/2) — 30초 대기..." && sleep 30
+    claude --chrome -p "$PROMPT" --dangerously-skip-permissions --model haiku
+    EXIT_CODE=$?
+  done
+  [ $EXIT_CODE -ne 0 ] && echo " ⚠️  비정상 (${ATTEMPT}회 시도)" || echo " ✅ 완료 (시도: $ATTEMPT)"
 }
 
 echo "╔══════════════════════════════════════╗"
