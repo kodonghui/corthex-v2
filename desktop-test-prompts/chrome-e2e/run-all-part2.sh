@@ -9,6 +9,8 @@ SCREENSHOTS_DIR="$SCRIPT_DIR/screenshots"
 
 mkdir -p "$RESULTS_DIR" "$SCREENSHOTS_DIR"
 
+source "$SCRIPT_DIR/load-token.sh"
+
 PARTS=(
   "part2-01-login-hub"
   "part2-02-dashboard-nexus"
@@ -46,11 +48,11 @@ for i in "${!PARTS[@]}"; do
     continue
   fi
 
-  PROMPT="$(cat "$COMMON")
+  PROMPT="$(cat "$COMMON" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 
 ---
 
-$(cat "$PART_FILE")
+$(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 
 ---
 

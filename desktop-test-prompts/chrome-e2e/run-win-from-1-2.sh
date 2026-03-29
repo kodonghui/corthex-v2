@@ -5,6 +5,18 @@ RESULTS_DIR="$SCRIPT_DIR/results"
 SCREENSHOTS_DIR="$SCRIPT_DIR/screenshots"
 mkdir -p "$RESULTS_DIR" "$SCREENSHOTS_DIR"
 
+# OAuth 토큰 자동 읽기 (~/.claude/.credentials.json)
+CRED_FILE="$HOME/.claude/.credentials.json"
+if [ -f "$CRED_FILE" ]; then
+  OAUTH_TOKEN=$(python3 -c "import json; print(json.load(open('$CRED_FILE'))['claudeAiOauth']['accessToken'])" 2>/dev/null \
+    || python -c "import json; print(json.load(open('$CRED_FILE'))['claudeAiOauth']['accessToken'])" 2>/dev/null \
+    || cat "$CRED_FILE" | grep -o '"accessToken":"[^"]*"' | head -1 | cut -d'"' -f4)
+  echo "OAuth 토큰 로드 완료: ${OAUTH_TOKEN:0:20}..."
+else
+  echo "⚠️  ~/.claude/.credentials.json 없음 — OAuth 토큰 없이 진행"
+  OAUTH_TOKEN="NO_TOKEN"
+fi
+
 run_part() {
   local COMMON="$1" PART="$2" NUM="$3" PREFIX="$4"
   local PART_FILE="$SCRIPT_DIR/${PART}.md"
@@ -19,9 +31,9 @@ run_part() {
 ## 이전 파트 결과
 $(cat "$PREV_FILE")"
   fi
-  local PROMPT="$(cat "$COMMON")
+  local PROMPT="$(cat "$COMMON" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 ---
-$(cat "$PART_FILE")$PREV
+$(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")$PREV
 ---
 결과를 $RESULTS_DIR/${PREFIX}-$(printf '%02d' $NUM).md 에 저장. 스크린샷은 $SCREENSHOTS_DIR/ 에 저장. UX 자유 탐색도 실행."
   claude --chrome -p "$PROMPT" --dangerously-skip-permissions

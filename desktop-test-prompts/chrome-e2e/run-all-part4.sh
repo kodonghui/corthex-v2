@@ -5,6 +5,8 @@ RESULTS_DIR="$SCRIPT_DIR/results"
 SCREENSHOTS_DIR="$SCRIPT_DIR/screenshots"
 mkdir -p "$RESULTS_DIR" "$SCREENSHOTS_DIR"
 
+source "$SCRIPT_DIR/load-token.sh"
+
 PARTS=("part4-01-admin-setup" "part4-02-app-first-login" "part4-03-app-chat-workflow" "part4-04-cleanup-verify")
 
 echo "========================================"
@@ -35,11 +37,11 @@ $(cat "$PREV_FILE")"
     fi
   fi
 
-  PROMPT="$(cat "$COMMON")
+  PROMPT="$(cat "$COMMON" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 ---
-$(cat "$PART_FILE")$PREV_RESULTS
+$(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")$PREV_RESULTS
 ---
-결과를 $RESULTS_DIR/part4-$(printf '%02d' $NUM).md 에 저장. 스크린샷은 $SCREENSHOTS_DIR/ 에 저장."
+결과를 $RESULTS_DIR/part4-$(printf '%02d' $NUM).md 에 저장. 스크린샷은 $SCREENSHOTS_DIR/ 에 저장. UX 자유 탐색도 실행."
   claude --chrome -p "$PROMPT" --dangerously-skip-permissions
   [ $? -ne 0 ] && echo " ⚠️  비정상 종료" || echo " ✅ 완료"
 done

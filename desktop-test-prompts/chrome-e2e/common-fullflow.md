@@ -23,7 +23,7 @@
 - 에이전트2: `데이터분석봇`
 - 에이전트2 역할: `데이터 분석 전문가`
 - 소울 텍스트: `당신은 넥스트웨이브의 비서입니다. 일정 관리와 회의 정리를 담당합니다.`
-- API 키 (Anthropic OAuth): `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`
+- API 키 (Anthropic OAuth): `{{OAUTH_TOKEN}}`
 
 ## 규칙
 - 각 단계 실행 후 결과를 PASS/FAIL로 보고

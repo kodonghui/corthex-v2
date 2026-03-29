@@ -20,7 +20,7 @@
 - 에이전트 역할: `품질 분석 및 테스트 전문가`
 - 소울 텍스트: `당신은 품질 분석 전문가입니다. 테스트 결과를 분석하고 개선안을 제시합니다.`
 - 소울 템플릿 이름: `품질분석소울`
-- API 키 (Anthropic OAuth): `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`
+- API 키 (Anthropic OAuth): `{{OAUTH_TOKEN}}`
 
 ## 규칙
 - 각 단계 실행 후 결과를 PASS/FAIL로 보고

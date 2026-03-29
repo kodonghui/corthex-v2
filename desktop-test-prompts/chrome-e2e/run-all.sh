@@ -10,6 +10,9 @@ SCREENSHOTS_DIR="$SCRIPT_DIR/screenshots"
 
 mkdir -p "$RESULTS_DIR" "$SCREENSHOTS_DIR"
 
+# OAuth 토큰 자동 로드
+source "$SCRIPT_DIR/load-token.sh"
+
 PARTS=(
   "part1-01-login"
   "part1-02-onboarding"
@@ -51,11 +54,11 @@ for i in "${!PARTS[@]}"; do
   fi
 
   # common.md + part 파일을 합쳐서 프롬프트로 전달
-  PROMPT="$(cat "$COMMON")
+  PROMPT="$(cat "$COMMON" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 
 ---
 
-$(cat "$PART_FILE")
+$(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
 
 ---
 
