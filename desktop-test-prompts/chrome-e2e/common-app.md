@@ -10,6 +10,7 @@
 - 부서명: `보안점검팀`
 - 직원: `cqa01` / `크롬검수원`
 - 에이전트: 기존 시드 에이전트 (비서실장, 개발팀장 등)
+- API 키 (Anthropic OAuth): `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`
 
 ## 규칙
 - 각 단계 실행 후 결과를 PASS/FAIL로 보고

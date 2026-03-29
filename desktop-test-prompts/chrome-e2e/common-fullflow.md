@@ -23,7 +23,7 @@
 - 에이전트2: `코드리뷰봇`
 - 에이전트2 역할: `코드 리뷰 전문가`
 - 소울 텍스트: `당신은 풀플로우테크의 비서입니다. 일정 관리와 회의 정리를 담당합니다.`
-- API 키: `sk-fullflow-test-key`
+- API 키 (Anthropic OAuth): `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`
 
 ## 규칙
 - 각 단계 실행 후 결과를 PASS/FAIL로 보고
