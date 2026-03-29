@@ -404,7 +404,7 @@ export function CredentialsPage() {
                         {c.isActive && (
                           <button
                             data-testid={`credentials-cli-deactivate-${c.id}`}
-                            onClick={() => { if (confirm('이 토큰을 비활성화하시겠습니까?')) deactivateTokenMutation.mutate(c.id) }}
+                            onClick={() => setRevokeTokenId(c.id)}
                             className="font-mono text-xs uppercase tracking-widest hover:underline min-h-[44px]"
                             style={{ color: 'var(--color-corthex-error)' }}
                           >
@@ -619,7 +619,7 @@ export function CredentialsPage() {
                           </div>
                           <button
                             data-testid={`credentials-api-delete-${k.id}`}
-                            onClick={() => { if (confirm('이 API 키를 삭제하시겠습니까?')) deleteApiKeyMutation.mutate(k.id) }}
+                            onClick={() => setDeleteApiKeyId(k.id)}
                             className="font-mono text-xs uppercase tracking-widest hover:underline min-h-[44px]"
                             style={{ color: 'var(--color-corthex-error)' }}
                           >
