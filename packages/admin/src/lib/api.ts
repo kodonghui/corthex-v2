@@ -21,8 +21,25 @@ const errorMessages: Record<string, string> = {
   USER_002: '이미 존재하는 아이디입니다',
   COMPANY_001: '회사를 찾을 수 없습니다',
   DEPT_001: '부서를 찾을 수 없습니다',
+  DEPT_DUPLICATE: '이미 존재하는 부서 이름입니다',
+  CREDENTIAL_DUPLICATE_KEY: '이미 등록된 키입니다',
+  CIRCULAR_REPORT: '순환 보고 라인이 감지되었습니다',
   TENANT_001: '접근 권한이 없습니다',
   RATE_001: 'API 요청 한도를 초과했습니다',
+  ST_006: '이미 공개된 템플릿입니다',
+  ST_007: '이미 비공개 상태입니다',
+  CASCADE_003: 'mode는 force 또는 wait_completion만 가능합니다',
+}
+
+function friendlyMessage(raw: string): string {
+  if (raw.includes('unique constraint')) {
+    if (raw.includes('slug')) return '이미 사용 중인 슬러그입니다'
+    if (raw.includes('name')) return '이미 사용 중인 이름입니다'
+    return '이미 존재하는 데이터입니다'
+  }
+  if (raw.includes('foreign key constraint')) return '연관된 데이터가 있어 처리할 수 없습니다'
+  if (raw.includes('violates check constraint')) return '입력값이 허용 범위를 벗어났습니다'
+  return raw
 }
 
 class RateLimitError extends Error {
@@ -74,7 +91,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: { message: 'Network error' } }))
     const code = err.error?.code as string | undefined
-    const message = (code && errorMessages[code]) || err.error?.message || `HTTP ${res.status}`
+    const raw = err.error?.message || `HTTP ${res.status}`
+    const message = (code && errorMessages[code]) || friendlyMessage(raw)
     throw new ApiError(message, code, err.data)
   }
 

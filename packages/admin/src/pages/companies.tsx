@@ -202,7 +202,7 @@ export function CompaniesPage() {
               <div className="col-span-2 flex gap-3 justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowCreate(false)}
+                  onClick={() => { setShowCreate(false); setForm({ name: '', slug: '' }); createMutation.reset() }}
                   className="font-mono text-[10px] text-corthex-text-secondary hover:text-corthex-text-primary uppercase tracking-widest px-4 py-2 transition-colors"
                 >
                   Cancel

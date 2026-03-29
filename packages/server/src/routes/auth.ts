@@ -137,7 +137,7 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
     .where(eq(users.username, username))
     .limit(1)
 
-  if (!user || !user.isActive) {
+  if (!user) {
     logActivity({
       companyId: 'system',
       type: 'login',
@@ -146,6 +146,19 @@ authRoute.post('/auth/login', zValidator('json', loginSchema), async (c) => {
       action: `로그인 실패 (존재하지 않는 계정): ${username}`,
     })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
+  }
+
+  if (!user.isActive) {
+    logActivity({
+      companyId: user.companyId,
+      type: 'login',
+      phase: 'error',
+      actorType: 'user',
+      actorId: user.id,
+      actorName: user.name,
+      action: '로그인 실패 (비활성 계정)',
+    })
+    throw new HTTPError(401, '이 계정은 비활성화되어 있습니다. 관리자에게 문의하세요.', 'AUTH_005')
   }
 
   // 비밀번호 검증 (bcrypt 대신 Bun.password 사용)
@@ -212,7 +225,7 @@ authRoute.post('/auth/admin/login', zValidator('json', loginSchema), async (c) =
     .where(eq(adminUsers.username, username))
     .limit(1)
 
-  if (!admin || !admin.isActive) {
+  if (!admin) {
     logActivity({
       companyId: 'system',
       type: 'login',
@@ -221,6 +234,19 @@ authRoute.post('/auth/admin/login', zValidator('json', loginSchema), async (c) =
       action: `관리자 로그인 실패 (존재하지 않는 계정): ${username}`,
     })
     throw new HTTPError(401, '아이디 또는 비밀번호가 올바르지 않습니다', 'AUTH_001')
+  }
+
+  if (!admin.isActive) {
+    logActivity({
+      companyId: 'system',
+      type: 'login',
+      phase: 'error',
+      actorType: 'system',
+      actorId: admin.id,
+      actorName: admin.name,
+      action: '관리자 로그인 실패 (비활성 계정)',
+    })
+    throw new HTTPError(401, '이 계정은 비활성화되어 있습니다. 관리자에게 문의하세요.', 'AUTH_005')
   }
 
   const valid = await Bun.password.verify(password, admin.passwordHash)

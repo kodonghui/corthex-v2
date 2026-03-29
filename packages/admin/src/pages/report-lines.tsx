@@ -65,6 +65,10 @@ export function ReportLinesPage() {
   })
 
   const handleChange = (userId: string, reportsTo: string) => {
+    if (reportsTo && isCircular(userId, reportsTo, lines)) {
+      addToast({ type: 'error', message: '순환 보고 라인이 감지되었습니다' })
+      return
+    }
     setLines((prev) => ({ ...prev, [userId]: reportsTo }))
     setHasChanges(true)
   }
@@ -80,8 +84,23 @@ export function ReportLinesPage() {
     saveMutation.mutate({ companyId: selectedCompanyId, lines: payload })
   }
 
+  const isCircular = (userId: string, supervisorId: string, current: Record<string, string>): boolean => {
+    let cursor = supervisorId
+    const visited = new Set<string>()
+    while (cursor && !visited.has(cursor)) {
+      if (cursor === userId) return true
+      visited.add(cursor)
+      cursor = current[cursor]
+    }
+    return false
+  }
+
   const handleAddLine = () => {
     if (!newReporter || !newSupervisor || newReporter === newSupervisor) return
+    if (isCircular(newReporter, newSupervisor, lines)) {
+      addToast({ type: 'error', message: '순환 보고 라인이 감지되었습니다' })
+      return
+    }
     setLines((prev) => ({ ...prev, [newReporter]: newSupervisor }))
     setHasChanges(true)
     setNewReporter('')

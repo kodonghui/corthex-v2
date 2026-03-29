@@ -87,7 +87,7 @@ async function processJob(job: typeof nightJobs.$inferSelect) {
     const [agent] = await db
       .select({ id: agents.id, isSecretary: agents.isSecretary, name: agents.name })
       .from(agents)
-      .where(eq(agents.id, job.agentId))
+      .where(and(eq(agents.id, job.agentId), eq(agents.companyId, job.companyId)))
       .limit(1)
 
     if (!agent) throw new Error('에이전트를 찾을 수 없습니다')

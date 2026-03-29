@@ -80,7 +80,7 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
 
   const handleNameChange = (v: string) => {
     setName(v)
-    setDirty(v !== company.name)
+    setDirty(v.trim() !== company.name && v.trim().length > 0)
   }
 
   return (
@@ -151,8 +151,9 @@ function CompanyInfoSection({ company, onSave }: { company: Company; onSave: (da
             Discard
           </button>
           <button
-            onClick={() => onSave({ name })}
-            className="px-10 py-2 bg-gradient-to-br from-corthex-accent to-corthex-accent-deep text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-widest shadow-[0_4px_12px_rgba(202,138,4,0.3)] hover:shadow-[0_4px_20px_rgba(202,138,4,0.5)] active:scale-95 transition-all"
+            onClick={() => onSave({ name: name.trim() })}
+            disabled={!name.trim()}
+            className="px-10 py-2 bg-gradient-to-br from-corthex-accent to-corthex-accent-deep text-corthex-text-on-accent font-mono font-bold text-xs uppercase tracking-widest shadow-[0_4px_12px_rgba(202,138,4,0.3)] hover:shadow-[0_4px_20px_rgba(202,138,4,0.5)] active:scale-95 transition-all disabled:opacity-50"
           >
             Save Settings
           </button>

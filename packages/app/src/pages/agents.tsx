@@ -43,6 +43,7 @@ import {
   ChevronDown,
   MoreVertical,
 } from 'lucide-react'
+import { useAuthStore } from '../stores/auth-store'
 import { BigFiveSliderGroup } from '../components/agents/big-five-slider-group'
 import type { PersonalityTraits } from '@corthex/shared'
 import { PERSONALITY_PRESETS } from '@corthex/shared'
@@ -435,6 +436,7 @@ function AgentDetailPanel({
   onDelete,
   onSoulSave,
   isUpdating,
+  isAdmin,
 }: {
   agent: Agent
   deptName: string
@@ -444,6 +446,7 @@ function AgentDetailPanel({
   onDelete: () => void
   onSoulSave: (soul: string) => void
   isUpdating: boolean
+  isAdmin: boolean
 }) {
   const [detailTab, setDetailTab] = useState<DetailTab>('overview')
   const [isEditing, setIsEditing] = useState(false)
@@ -494,14 +497,16 @@ function AgentDetailPanel({
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-corthex-border hover:bg-corthex-elevated transition-colors font-medium text-sm text-corthex-text-primary">
-            <Pencil className="w-4 h-4" /> 수정
-          </button>
-          <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
-            <Trash2 className="w-4 h-4" /> 비활성화
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2">
+            <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-corthex-border hover:bg-corthex-elevated transition-colors font-medium text-sm text-corthex-text-primary">
+              <Pencil className="w-4 h-4" /> 수정
+            </button>
+            <button onClick={onDelete} disabled={agent.isSystem || agent.isSecretary} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-medium text-sm shadow-sm disabled:opacity-30">
+              <Trash2 className="w-4 h-4" /> 비활성화
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Stats Grid */}
@@ -674,6 +679,9 @@ export function AgentsPage() {
   const [filterDept, setFilterDept] = useState('')
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('active')
   const [searchQuery, setSearchQuery] = useState('')
+  const [cardMenuOpenId, setCardMenuOpenId] = useState<string | null>(null)
+  const user = useAuthStore((s) => s.user)
+  const isAdmin = user?.role === 'admin'
 
   const buildQueryString = () => {
     const params = new URLSearchParams()
@@ -890,7 +898,7 @@ export function AgentsPage() {
                 <div
                   key={agent.id}
                   data-testid={`agent-row-${agent.id}`}
-                  onClick={() => setSelectedAgent(isSelected ? null : agent)}
+                  onClick={() => { setCardMenuOpenId(null); setSelectedAgent(isSelected ? null : agent) }}
                   className={`bg-corthex-surface border rounded-xl p-5 transition-all group flex flex-col cursor-pointer ${
                     isSelected
                       ? 'border-corthex-accent'
@@ -935,12 +943,33 @@ export function AgentsPage() {
                           : '—'}
                       </span>
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDeleteAgent(agent) }}
-                      className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center hover:bg-corthex-elevated transition-colors text-corthex-text-secondary"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
+                    {isAdmin && (
+                      <div className="relative">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setCardMenuOpenId(cardMenuOpenId === agent.id ? null : agent.id) }}
+                          className="w-8 h-8 rounded border border-corthex-border flex items-center justify-center hover:bg-corthex-elevated transition-colors text-corthex-text-secondary"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        {cardMenuOpenId === agent.id && (
+                          <div className="absolute right-0 bottom-10 z-20 w-36 bg-corthex-surface border border-corthex-border rounded-lg shadow-lg py-1">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCardMenuOpenId(null); setSelectedAgent(agent) }}
+                              className="w-full text-left px-3 py-2 text-sm text-corthex-text-primary hover:bg-corthex-elevated flex items-center gap-2"
+                            >
+                              <Pencil className="w-3.5 h-3.5" /> 수정
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCardMenuOpenId(null); setDeleteAgent(agent) }}
+                              disabled={agent.isSystem || agent.isSecretary}
+                              className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-corthex-elevated flex items-center gap-2 disabled:opacity-30"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> 비활성화
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
@@ -960,6 +989,7 @@ export function AgentsPage() {
               onDelete={() => setDeleteAgent(selectedAgent)}
               onSoulSave={handleSoulSave}
               isUpdating={updateMutation.isPending}
+              isAdmin={isAdmin}
             />
           </div>
         )}

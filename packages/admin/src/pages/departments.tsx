@@ -9,7 +9,7 @@
  *   GET    /admin/departments/{id}/cascade-analysis
  *   GET    /admin/agents?companyId={id}
  */
-import { useState } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
@@ -87,7 +87,14 @@ export function DepartmentsPage() {
 
   const depts = deptData?.data || []
   const allAgents = agentData?.data || []
-  const agentCountByDept = (deptId: string) => allAgents.filter((a) => a.departmentId === deptId).length
+  const agentCountMap = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const a of allAgents) {
+      if (a.departmentId) map.set(a.departmentId, (map.get(a.departmentId) || 0) + 1)
+    }
+    return map
+  }, [allAgents])
+  const agentCountByDept = (deptId: string) => agentCountMap.get(deptId) || 0
 
   const filteredDepts = searchQuery
     ? depts.filter((d) => d.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -125,24 +132,32 @@ export function DepartmentsPage() {
     onError: (err: Error) => addToast({ type: 'error', message: err.message }),
   })
 
+  const cascadeAbortRef = useRef<AbortController | null>(null)
+
   async function openCascadeModal(dept: Department) {
+    cascadeAbortRef.current?.abort()
+    const controller = new AbortController()
+    cascadeAbortRef.current = controller
     setCascadeTarget(dept)
     setCascadeData(null)
     setCascadeLoading(true)
     setCascadeMode('wait_completion')
     try {
       const result = await api.get<{ data: CascadeAnalysis }>(`/admin/departments/${dept.id}/cascade-analysis`)
+      if (controller.signal.aborted) return
       setCascadeData(result.data)
     } catch (err) {
+      if (controller.signal.aborted) return
       addToast({ type: 'error', message: (err as Error).message })
       setCascadeTarget(null)
       setCascadeData(null)
     } finally {
-      setCascadeLoading(false)
+      if (!controller.signal.aborted) setCascadeLoading(false)
     }
   }
 
   function closeCascadeModal() {
+    cascadeAbortRef.current?.abort()
     setCascadeTarget(null)
     setCascadeData(null)
     setCascadeMode('wait_completion')

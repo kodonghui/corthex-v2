@@ -53,6 +53,7 @@ export const useWsStore = create<WsState>((set, get) => ({
 
     ws.onclose = (event) => {
       const wasConnected = get().isConnected
+      channelListeners.clear()
       set({ isConnected: false, socket: null })
       const noReconnect = [1000, 4001, 4002]
       if (!noReconnect.includes(event.code) && !serverRestarting) {

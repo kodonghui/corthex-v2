@@ -241,6 +241,7 @@ function WelcomeStep({
 }) {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(company.name)
+  const [slugCopied, setSlugCopied] = useState(false)
   const addToast = useToastStore((s) => s.addToast)
   const qc = useQueryClient()
 
@@ -249,6 +250,7 @@ function WelcomeStep({
       api.patch<{ data: Company }>(`/admin/companies/${company.id}`, { name: newName }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-detail'] })
+      qc.invalidateQueries({ queryKey: ['companies'] })
       setEditing(false)
       addToast({ type: 'success', message: '회사명이 수정되었습니다' })
     },
@@ -307,9 +309,25 @@ function WelcomeStep({
               </button>
             </div>
           )}
-          <p className="font-mono text-[9px] text-corthex-text-disabled uppercase tracking-widest">
-            slug: {company.slug}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-mono text-[9px] text-corthex-text-disabled uppercase tracking-widest">
+              slug: {company.slug}
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(company.slug)
+                  setSlugCopied(true)
+                  setTimeout(() => setSlugCopied(false), 2000)
+                } catch {
+                  addToast({ type: 'error', message: '복사에 실패했습니다' })
+                }
+              }}
+              className="font-mono text-[9px] uppercase tracking-widest text-corthex-accent hover:text-corthex-accent-hover transition-colors"
+            >
+              {slugCopied ? 'Copied!' : 'COPY'}
+            </button>
+          </div>
         </div>
 
         {/* Welcome message */}

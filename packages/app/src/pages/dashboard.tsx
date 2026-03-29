@@ -419,6 +419,11 @@ export function DashboardPage() {
     queryFn: () => api.get<{ data: Agent[] }>('/workspace/agents'),
   })
 
+  const { data: orgRes } = useQuery({
+    queryKey: ['dashboard-org'],
+    queryFn: () => api.get<{ data: { departments: { id: string }[] } }>('/workspace/org-chart'),
+  })
+
   const summary = summaryRes?.data
   const usage = usageRes?.data
   const budget = budgetRes?.data
@@ -447,7 +452,7 @@ export function DashboardPage() {
 
   // Stat card derived values
   const activeAgents = summary?.agents.active ?? 0
-  const deptCount = budget?.byDepartment?.length ?? 0
+  const deptCount = orgRes?.data?.departments?.length ?? budget?.byDepartment?.length ?? 0
   const pendingJobs = summary
     ? Math.max(0, summary.tasks.total - summary.tasks.completed - summary.tasks.inProgress - summary.tasks.failed)
     : 0
@@ -504,7 +509,11 @@ export function DashboardPage() {
               <div className="bg-corthex-surface border border-corthex-border/40 rounded-lg p-5 group hover:border-corthex-accent/50 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <Bot className="w-6 h-6 text-corthex-accent" />
-                  <span className="bg-green-500/10 text-corthex-success text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
+                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
+                    isConnected
+                      ? 'bg-green-500/10 text-corthex-success border-green-500/20'
+                      : 'bg-red-500/10 text-corthex-error border-red-500/20'
+                  }`}>{isConnected ? 'ONLINE' : 'OFFLINE'}</span>
                 </div>
                 <div className="font-mono text-[30px] font-bold text-corthex-text-primary leading-tight">
                   {String(activeAgents).padStart(2, '0')}

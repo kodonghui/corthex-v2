@@ -377,32 +377,36 @@ export function N8nWorkflowsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
             <div className="bg-corthex-elevated/40 border border-corthex-border p-6 flex flex-col justify-between aspect-video rounded">
               <span className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-widest">
-                Total Throughput
+                Total Executions
               </span>
               <div>
-                <div className="text-4xl font-black text-corthex-text-primary">2.4M</div>
-                <div className="text-[10px] font-mono text-corthex-accent mt-1 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> +14.2% THIS WEEK
+                <div className="text-4xl font-black text-corthex-text-primary">{executions.length > 0 ? executions.length : '—'}</div>
+                <div className="text-[10px] font-mono text-corthex-text-disabled mt-1 uppercase">
+                  Recorded Runs
                 </div>
               </div>
             </div>
             <div className="bg-corthex-elevated/40 border border-corthex-border p-6 flex flex-col justify-between aspect-video rounded">
               <span className="text-[10px] font-mono text-corthex-text-disabled uppercase tracking-widest">
-                Active Instances
+                Active Workflows
               </span>
               <div>
-                <div className="text-4xl font-black text-corthex-text-primary">882</div>
+                <div className="text-4xl font-black text-corthex-text-primary">{workflows.filter(w => w.active).length > 0 ? workflows.filter(w => w.active).length : '—'}</div>
                 <div className="text-[10px] font-mono text-corthex-text-disabled mt-1 uppercase">
-                  Parallel Processing Ops
+                  Currently Running
                 </div>
               </div>
             </div>
-            <div className="bg-corthex-accent/5 border border-corthex-accent/20 p-6 flex flex-col justify-between aspect-video rounded">
-              <span className="text-[10px] font-mono text-corthex-accent uppercase tracking-widest">System Health</span>
+            <div className={`p-6 flex flex-col justify-between aspect-video rounded border ${
+              health?.available ? 'bg-corthex-accent/5 border-corthex-accent/20' : 'bg-corthex-elevated/40 border-corthex-border'
+            }`}>
+              <span className={`text-[10px] font-mono uppercase tracking-widest ${health?.available ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`}>System Health</span>
               <div>
-                <div className="text-4xl font-black text-corthex-accent">99.9%</div>
+                <div className={`text-4xl font-black ${health?.available ? 'text-corthex-accent' : 'text-corthex-text-disabled'}`}>
+                  {health ? (health.available ? 'OK' : 'DOWN') : '—'}
+                </div>
                 <div className="text-[10px] font-mono text-corthex-text-secondary mt-1 uppercase tracking-tighter">
-                  Uptime Cluster 01-ALPHA
+                  {health?.responseTimeMs ? `${health.responseTimeMs}ms response` : 'n8n Service'}
                 </div>
               </div>
             </div>

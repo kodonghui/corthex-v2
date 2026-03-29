@@ -297,7 +297,7 @@ function NexusPageInner() {
   // Loading
   if (isLoading) {
     return (
-      <div data-testid="nexus-page" className="h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
+      <div data-testid="nexus-page" className="h-[calc(100vh-3.5rem)] lg:h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
         {/* Title overlay */}
         <div className="absolute top-6 left-6 z-30 pointer-events-none">
           <h1 className="text-xl font-bold text-corthex-text-primary tracking-tight">
@@ -320,7 +320,7 @@ function NexusPageInner() {
   // Error
   if (isError) {
     return (
-      <div data-testid="nexus-page" className="h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
+      <div data-testid="nexus-page" className="h-[calc(100vh-3.5rem)] lg:h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
         <div className="absolute top-6 left-6 z-30 pointer-events-none">
           <h1 className="text-xl font-bold text-corthex-text-primary tracking-tight">
             CORTHEX <span className="text-corthex-accent">NEXUS</span>
@@ -346,7 +346,7 @@ function NexusPageInner() {
 
   if (isEmpty) {
     return (
-      <div data-testid="nexus-page" className="h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
+      <div data-testid="nexus-page" className="h-[calc(100vh-3.5rem)] lg:h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
         <div className="absolute top-6 left-6 z-30 pointer-events-none">
           <h1 className="text-xl font-bold text-corthex-text-primary tracking-tight">
             CORTHEX <span className="text-corthex-accent">NEXUS</span>
@@ -372,7 +372,7 @@ function NexusPageInner() {
   }
 
   return (
-    <div data-testid="nexus-page" className="h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
+    <div data-testid="nexus-page" className="h-[calc(100vh-3.5rem)] lg:h-screen relative overflow-hidden bg-corthex-bg" style={canvasGridStyle}>
       {/* Canvas fills entire space */}
       <NexusCanvas
         nodes={currentNodes}

@@ -377,6 +377,10 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
       addToast({ type: 'error', message: '숫자를 입력해주세요' })
       return
     }
+    if (monthly < 0 || daily < 0) {
+      addToast({ type: 'error', message: '예산은 0 이상이어야 합니다' })
+      return
+    }
     if (threshold < 0 || threshold > 100) {
       addToast({ type: 'error', message: '경고 임계값은 0~100% 사이여야 합니다' })
       return
@@ -398,7 +402,7 @@ function BudgetPanel({ companyId, summaryData }: { companyId: string; summaryDat
 
   const monthlyBudgetMicro = budget ? budget.monthlyBudget : 0
   const currentSpendMicro = summaryData?.totalCostMicro ?? 0
-  const usagePercent = monthlyBudgetMicro > 0 ? Math.min((currentSpendMicro / monthlyBudgetMicro) * 100, 100) : 83
+  const usagePercent = monthlyBudgetMicro > 0 ? Math.min((currentSpendMicro / monthlyBudgetMicro) * 100, 100) : 0
 
   if (isLoading) {
     return (

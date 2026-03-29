@@ -50,6 +50,7 @@ export function MonitoringPage() {
     refetchInterval: 30_000,
     refetchOnMount: 'always',
     staleTime: 0,
+    placeholderData: (prev) => prev,
   })
 
   const data = rawData && rawData.server ? rawData : undefined

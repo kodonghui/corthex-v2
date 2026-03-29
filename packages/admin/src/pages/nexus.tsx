@@ -103,6 +103,7 @@ function NexusCanvas() {
   const [isDirty, setIsDirty] = useState(false)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const [draggingAgentId, setDraggingAgentId] = useState<string | null>(null)
   const [selectedAgentIds, setSelectedAgentIds] = useState<Set<string>>(new Set())
@@ -373,6 +374,23 @@ function NexusCanvas() {
     }
   }, [selectedNodeId, layoutReady, fitView])
 
+  // Search: highlight matching nodes
+  useEffect(() => {
+    if (!layoutReady) return
+    const term = searchTerm.trim().toLowerCase()
+    setNodes((prev) =>
+      prev.map((n) => {
+        const label = ((n.data as { name?: string; label?: string }).name ?? (n.data as { label?: string }).label ?? '').toLowerCase()
+        const matched = term.length > 0 && label.includes(term)
+        const prev_dimmed = (n.data as { dimmed?: boolean }).dimmed ?? false
+        const prev_highlighted = (n.data as { highlighted?: boolean }).highlighted ?? false
+        const shouldDim = term.length > 0 && !matched
+        if (prev_dimmed === shouldDim && prev_highlighted === matched) return n
+        return { ...n, data: { ...n.data, dimmed: shouldDim, highlighted: matched }, style: { ...n.style, opacity: shouldDim ? 0.25 : 1 } }
+      }),
+    )
+  }, [searchTerm, layoutReady, setNodes])
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (isDirty) handleSaveLayout() }
@@ -446,6 +464,8 @@ function NexusCanvas() {
               className="border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64 bg-corthex-elevated"
               placeholder="Search infrastructure..."
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button className="p-2 rounded-xl transition-colors bg-corthex-elevated hover:bg-corthex-border">
