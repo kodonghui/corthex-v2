@@ -90,7 +90,7 @@ $(cat "$PART_FILE" | sed "s|{{OAUTH_TOKEN}}|$OAUTH_TOKEN|g")
   while [ $ATTEMPT -lt 2 ] && [ $EXIT_CODE -ne 0 ]; do
     ATTEMPT=$((ATTEMPT + 1))
     [ $ATTEMPT -gt 1 ] && echo " ↻ 재시도 ($ATTEMPT/2) — 30초 대기..." && sleep 30
-    claude --chrome -p "$PROMPT" --dangerously-skip-permissions --model haiku
+    claude --chrome -p "$PROMPT" --dangerously-skip-permissions
     EXIT_CODE=$?
   done
 
