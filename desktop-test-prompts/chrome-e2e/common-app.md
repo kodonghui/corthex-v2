@@ -10,7 +10,7 @@
 - 부서명: `품질관리부`
 - 직원: `wqa01` / `윈검수관`
 - 에이전트: 기존 시드 에이전트 + 품질분석봇
-- API 키 (Anthropic OAuth): `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`
+- API 키 (Anthropic OAuth): `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`
 
 ## 규칙
 - 각 단계 실행 후 결과를 PASS/FAIL로 보고
