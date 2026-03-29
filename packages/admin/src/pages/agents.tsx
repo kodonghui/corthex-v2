@@ -264,7 +264,7 @@ export function AgentsPage() {
 
   function handleSaveInfo() {
     if (!selectedAgent) return
-    setSelectedAgent({ ...selectedAgent, name: editForm.name, role: editForm.role, tier: editForm.tier, modelName: editForm.modelName })
+    setSelectedAgent({ ...selectedAgent, name: editForm.name ?? selectedAgent.name, role: editForm.role ?? selectedAgent.role, tier: editForm.tier ?? selectedAgent.tier, modelName: editForm.modelName ?? selectedAgent.modelName })
     updateMutation.mutate({
       id: selectedAgent.id,
       name: editForm.name,
