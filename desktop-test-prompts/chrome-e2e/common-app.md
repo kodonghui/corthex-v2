@@ -6,10 +6,10 @@
 - Admin 계정: admin / admin1234 (관리자 시점 필요 시)
 
 ## 테스트 데이터 (Part 1에서 생성됨 — 재사용)
-- 회사명: `크롬QA공사`
-- 부서명: `보안점검팀`
-- 직원: `cqa01` / `크롬검수원`
-- 에이전트: 기존 시드 에이전트 (비서실장, 개발팀장 등)
+- 회사명: `윈도QA랩`
+- 부서명: `품질관리부`
+- 직원: `wqa01` / `윈검수관`
+- 에이전트: 기존 시드 에이전트 + 품질분석봇
 - API 키 (Anthropic OAuth): `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`
 
 ## 규칙

@@ -9,20 +9,20 @@
 - Superadmin: admin / admin1234
 
 ## 테스트 데이터 (Part 4 전용 — 기존과 겹치지 않게)
-- 회사명: `풀플로우테크`
-- 회사 슬러그: `fullflow-tech`
-- CEO 아이디: `ff-ceo`
-- CEO 이름: `김풀플로우`
-- CEO 이메일: `ceo@fullflow.dev`
-- 부서1: `개발본부`
-- 부서2: `마케팅팀`
-- 직원 아이디: `ff-dev01`
-- 직원 이름: `박개발`
-- 에이전트1: `풀플로우비서`
+- 회사명: `넥스트웨이브`
+- 회사 슬러그: `nextwave-inc`
+- CEO 아이디: `nw-ceo`
+- CEO 이름: `최넥스트`
+- CEO 이메일: `ceo@nextwave.dev`
+- 부서1: `AI연구소`
+- 부서2: `사업개발팀`
+- 직원 아이디: `nw-dev01`
+- 직원 이름: `한개발`
+- 에이전트1: `넥스트비서`
 - 에이전트1 역할: `CEO 비서 및 일정 관리`
-- 에이전트2: `코드리뷰봇`
-- 에이전트2 역할: `코드 리뷰 전문가`
-- 소울 텍스트: `당신은 풀플로우테크의 비서입니다. 일정 관리와 회의 정리를 담당합니다.`
+- 에이전트2: `데이터분석봇`
+- 에이전트2 역할: `데이터 분석 전문가`
+- 소울 텍스트: `당신은 넥스트웨이브의 비서입니다. 일정 관리와 회의 정리를 담당합니다.`
 - API 키 (Anthropic OAuth): `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`
 
 ## 규칙

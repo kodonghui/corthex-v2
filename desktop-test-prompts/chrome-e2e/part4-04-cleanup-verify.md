@@ -8,11 +8,11 @@
 ### 1. Admin으로 전환
 1. https://corthex-hq.com/admin/login → admin / admin1234
 
-### 2. 풀플로우테크 데이터 확인
-2. 회사 → 풀플로우테크 → **확인**: 활성 상태
-3. 직원 → **확인**: 김풀플로우(ff-ceo), 박개발(ff-dev01) 존재
+### 2. 넥스트웨이브 데이터 확인
+2. 회사 → 넥스트웨이브 → **확인**: 활성 상태
+3. 직원 → **확인**: 최넥스트(nw-ceo), 한개발(nw-dev01) 존재
 4. 부서 → **확인**: 개발본부, 마케팅팀 존재
-5. 에이전트 → **확인**: 풀플로우비서, 코드리뷰봇 online
+5. 에이전트 → **확인**: 넥스트비서, 데이터분석봇 online
 6. 비용 → **확인**: API 호출 기록 (Part 4-03 대화에서 발생)
 7. 스크린샷: `screenshots/part4-04-admin-verify.png`
 
@@ -21,7 +21,7 @@
 9. 스크린샷: `screenshots/part4-04-monitoring.png`
 
 ### 4. 데이터 정리 (선택)
-10. 풀플로우테크 회사 → 비활성화 (Deactivate)
+10. 넥스트웨이브 회사 → 비활성화 (Deactivate)
 11. **확인**: 비활성화 성공
 12. 스크린샷: `screenshots/part4-04-cleanup.png`
 
