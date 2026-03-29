@@ -661,7 +661,7 @@ export function CostsPage() {
             <span>SYSTEM_VERSION: 4.2.0-STABLE</span>
             <span>LAST_SYNC: {new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC</span>
           </div>
-          <div>© 2024 CORTHEX_SYSTEMS_GLOBAL</div>
+          <div>© 2026 CORTHEX. All rights reserved.</div>
         </footer>
 
       </div>
