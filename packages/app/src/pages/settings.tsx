@@ -110,12 +110,12 @@ function getStoredTheme(): ThemeMode {
 function applyTheme(theme: ThemeMode) {
   const root = document.documentElement
   if (theme === 'dark') {
-    root.classList.add('dark')
+    root.setAttribute('data-theme', localStorage.getItem('corthex_active_theme') || 'command')
   } else if (theme === 'light') {
-    root.classList.remove('dark')
+    root.setAttribute('data-theme', 'corporate')
   } else {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    root.classList.toggle('dark', prefersDark)
+    root.setAttribute('data-theme', prefersDark ? (localStorage.getItem('corthex_active_theme') || 'command') : 'corporate')
   }
   localStorage.setItem('corthex_theme', theme)
 }

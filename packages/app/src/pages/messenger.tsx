@@ -137,13 +137,19 @@ const DEMO_CONVERSATIONS = [
   { id: '7', initials: 'TT', name: '트레이딩팀 Trading', preview: '오늘 포지션 리뷰', time: '10:45', unread: 0, color: 'var(--color-corthex-accent-deep)' },
 ]
 
-const DEMO_MESSAGES = [
-  { id: 'm1', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:02', content: '3월 시장 분석 리포트를 첨부합니다. 주요 포인트는 아래와 같습니다.', own: false },
-  { id: 'm2', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:11', content: null, own: false, file: { name: '시장분석_2026Q1.pdf', size: '2.4 MB', type: 'PDF Document' } },
-  { id: 'm3', sender: '이다은', initials: 'DL', color: 'var(--color-corthex-accent-deep)', time: '14:20', content: '분석 결과가 흥미롭네요. 경쟁사 대비 성장률이 12% 높습니다.', own: false },
-  { id: 'm5', sender: '정민우', initials: 'MW', color: '#908a78', time: '14:28', content: '다음 미팅에서 세부 전략을 논의합시다. 화요일 2시 가능한가요?', own: false },
-  { id: 'm6', sender: '나 (김수호)', initials: 'SK', color: 'var(--color-corthex-accent-deep)', time: '14:32', content: '좋습니다. 미팅 일정 확정하겠습니다. 참석자 명단 공유 부탁드립니다.', own: true },
-]
+const DEMO_MESSAGES: Record<string, { id: string; sender: string; initials: string; color: string; time: string; content: string | null; own: boolean; file?: { name: string; size: string; type: string } }[]> = {
+  '1': [
+    { id: 'm1', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:02', content: '3월 시장 분석 리포트를 첨부합니다. 주요 포인트는 아래와 같습니다.', own: false },
+    { id: 'm2', sender: '김수호', initials: 'SK', color: 'var(--color-corthex-accent)', time: '14:11', content: null, own: false, file: { name: '시장분석_2026Q1.pdf', size: '2.4 MB', type: 'PDF Document' } },
+    { id: 'm6', sender: '나 (김수호)', initials: 'SK', color: 'var(--color-corthex-accent-deep)', time: '14:32', content: '좋습니다. 미팅 일정 확정하겠습니다. 참석자 명단 공유 부탁드립니다.', own: true },
+  ],
+  '2': [
+    { id: 'm3', sender: '이다은', initials: 'DL', color: 'var(--color-corthex-accent-deep)', time: '14:20', content: '분석 결과가 흥미롭네요. 경쟁사 대비 성장률이 12% 높습니다.', own: false },
+  ],
+  '3': [
+    { id: 'm5', sender: '정민우', initials: 'MW', color: '#908a78', time: '14:28', content: '다음 미팅에서 세부 전략을 논의합시다. 화요일 2시 가능한가요?', own: false },
+  ],
+}
 
 export function MessengerPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -260,7 +266,7 @@ export function MessengerPage() {
             </span>
           </div>
 
-          {DEMO_MESSAGES.map((msg) => {
+          {(DEMO_MESSAGES[activeConvId] || []).map((msg) => {
             if (msg.own) {
               return (
                 <div key={msg.id} className="flex gap-4 max-w-2xl ml-auto flex-row-reverse">

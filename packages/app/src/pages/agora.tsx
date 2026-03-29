@@ -281,6 +281,7 @@ export function AgoraPage() {
               return (
                 <article
                   key={thread.id}
+                  onClick={() => handleSelectDebate({ id: thread.id, title: thread.title, category: thread.category, status: 'active' } as never)}
                   className="group bg-corthex-surface border border-corthex-border hover:border-corthex-accent/50 rounded-xl p-4 md:p-5 transition-all cursor-pointer"
                 >
                   <div className="flex items-start justify-between mb-3">

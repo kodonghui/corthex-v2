@@ -7,7 +7,7 @@
  *   GET  /workspace/sns/stats?days=N   - Fetch SNS statistics
  *   (Tab components use additional endpoints)
  */
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from '@corthex/ui'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
@@ -120,7 +120,7 @@ const DEMO_POSTS = [
 export function SnsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tab = searchParams.get('tab') || 'scheduled'
-  const [activeFilter, setActiveFilter] = [FILTER_CHIPS[0], (_v: string) => {}] // Static for demo
+  const [activeFilter, setActiveFilter] = useState(FILTER_CHIPS[0])
 
   const setTab = useCallback((t: string) => {
     setSearchParams({ tab: t }, { replace: true })

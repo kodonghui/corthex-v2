@@ -362,7 +362,7 @@ function NexusPageInner() {
             </div>
             <h2 className="text-lg font-bold text-corthex-accent">조직이 구성되지 않았습니다</h2>
             <p className="text-sm text-corthex-text-secondary">관리자 패널에서 부서와 에이전트를 추가해주세요</p>
-            <button className="mt-2 h-10 px-6 bg-corthex-accent text-corthex-text-on-accent rounded-lg text-sm font-bold hover:bg-corthex-accent-hover transition-colors">
+            <button onClick={() => window.open('/admin/departments', '_blank')} className="mt-2 h-10 px-6 bg-corthex-accent text-corthex-text-on-accent rounded-lg text-sm font-bold hover:bg-corthex-accent-hover transition-colors">
               Initialize Workspace
             </button>
           </div>

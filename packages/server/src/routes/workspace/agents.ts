@@ -27,7 +27,24 @@ workspaceAgentsRoute.use('*', departmentScopeMiddleware)
 workspaceAgentsRoute.get('/agents', async (c) => {
   const tenant = c.get('tenant')
 
-  const conditions = [eq(agents.companyId, tenant.companyId), eq(agents.isActive, true)]
+  const queryDeptId = c.req.query('departmentId')
+  const queryIsActive = c.req.query('isActive')
+
+  const conditions = [eq(agents.companyId, tenant.companyId)]
+
+  // isActive filter (default: true)
+  if (queryIsActive === 'false') {
+    conditions.push(eq(agents.isActive, false))
+  } else if (queryIsActive === 'all') {
+    // no filter — show both active and inactive
+  } else {
+    conditions.push(eq(agents.isActive, true))
+  }
+
+  // departmentId filter from query param
+  if (queryDeptId) {
+    conditions.push(eq(agents.departmentId, queryDeptId))
+  }
 
   // Employee: only show agents from assigned departments
   if (tenant.departmentIds) {
