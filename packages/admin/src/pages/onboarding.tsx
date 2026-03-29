@@ -93,8 +93,8 @@ type InvitedEmployee = {
 const STEPS = [
   { num: 1, label: 'Company' },
   { num: 2, label: 'Departments' },
-  { num: 3, label: 'Agents' },
-  { num: 4, label: 'CLI Token' },
+  { num: 3, label: 'API Keys' },
+  { num: 4, label: 'Team' },
   { num: 5, label: 'Complete' },
 ]
 

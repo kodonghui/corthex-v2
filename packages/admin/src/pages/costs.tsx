@@ -467,6 +467,21 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
 
   const items = data?.data?.items ?? []
 
+  const exportCsv = () => {
+    if (items.length === 0) return
+    const rows = [
+      'Date,Input Tokens,Output Tokens,Call Count,Cost (USD)',
+      ...items.map((d) => `${d.date},${d.inputTokens},${d.outputTokens},${d.callCount},${microToUsd(d.costMicro)}`),
+    ]
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `corthex-costs-${startDate}-${endDate}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <section className="bg-corthex-surface border border-corthex-border/10 overflow-hidden">
       <div className="p-6 border-b border-corthex-border/10 flex items-center justify-between">
@@ -474,7 +489,10 @@ function RecentCostRecords({ startDate, endDate, companyId }: { startDate: strin
           <FileText className="w-4 h-4 text-corthex-accent" />
           Top Consumption Records
         </h4>
-        <button className="flex items-center gap-2 px-4 py-2 bg-corthex-accent-deep text-corthex-text-on-accent font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-corthex-accent transition-colors">
+        <button
+          onClick={exportCsv}
+          className="flex items-center gap-2 px-4 py-2 bg-corthex-accent-deep text-corthex-text-on-accent font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-corthex-accent transition-colors"
+        >
           <Download className="w-3 h-3" />
           Export CSV
         </button>

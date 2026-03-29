@@ -60,6 +60,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   email: 'Email',
   telegram: 'Telegram',
   instagram: 'Instagram',
+  voyage_ai: 'Voyage AI (Embeddings)',
   serper: 'Serper (Search)',
   notion: 'Notion',
   google_calendar: 'Google Calendar',

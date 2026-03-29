@@ -16,6 +16,7 @@ import { api } from '../lib/api'
 import { useAdminStore } from '../stores/admin-store'
 import { useToastStore } from '../stores/toast-store'
 import { Plus, Filter, ArrowUpDown, MoreVertical, KeyRound, Database, Cloud, Shield, Activity, Lock, Users } from 'lucide-react'
+import { ConfirmDialog } from '@corthex/ui'
 
 type User = { id: string; name: string; username: string; role: string }
 type CliCredential = { id: string; companyId: string; userId: string; label: string; isActive: boolean; createdAt: string }
@@ -54,6 +55,8 @@ export function CredentialsPage() {
   const [tokenForm, setTokenForm] = useState({ label: '', token: '' })
   const [showAddApiKey, setShowAddApiKey] = useState(false)
   const [apiKeyForm, setApiKeyForm] = useState({ provider: 'kis' as string, label: '', fields: {} as Record<string, string>, scope: 'user' as 'company' | 'user' })
+  const [revokeTokenId, setRevokeTokenId] = useState<string | null>(null)
+  const [deleteApiKeyId, setDeleteApiKeyId] = useState<string | null>(null)
 
   const { data: userData } = useQuery({
     queryKey: ['users', selectedCompanyId],
@@ -360,9 +363,7 @@ export function CredentialsPage() {
                                 <button
                                   data-testid={`credentials-cli-deactivate-${c.id}`}
                                   onClick={() => {
-                                    if (confirm('이 토큰을 비활성화하시겠습니까?')) {
-                                      deactivateTokenMutation.mutate(c.id)
-                                    }
+                                    setRevokeTokenId(c.id)
                                   }}
                                   className="font-mono text-xs uppercase tracking-widest hover:underline"
                                   style={{ color: 'var(--color-corthex-error)' }}
@@ -590,9 +591,7 @@ export function CredentialsPage() {
                               <button
                                 data-testid={`credentials-api-delete-${k.id}`}
                                 onClick={() => {
-                                  if (confirm('이 API 키를 삭제하시겠습니까?')) {
-                                    deleteApiKeyMutation.mutate(k.id)
-                                  }
+                                  setDeleteApiKeyId(k.id)
                                 }}
                                 className="font-mono text-xs uppercase tracking-widest hover:underline"
                                 style={{ color: 'var(--color-corthex-error)' }}
@@ -679,6 +678,26 @@ export function CredentialsPage() {
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={!!revokeTokenId}
+        onConfirm={() => { if (revokeTokenId) deactivateTokenMutation.mutate(revokeTokenId); setRevokeTokenId(null) }}
+        onCancel={() => setRevokeTokenId(null)}
+        title="토큰 비활성화"
+        description="이 CLI 토큰을 비활성화하시겠습니까? 비활성화된 토큰으로는 더 이상 인증할 수 없습니다."
+        confirmText="비활성화"
+        variant="danger"
+      />
+
+      <ConfirmDialog
+        isOpen={!!deleteApiKeyId}
+        onConfirm={() => { if (deleteApiKeyId) deleteApiKeyMutation.mutate(deleteApiKeyId); setDeleteApiKeyId(null) }}
+        onCancel={() => setDeleteApiKeyId(null)}
+        title="API 키 삭제"
+        description="이 API 키를 삭제하시겠습니까? 삭제된 키는 복구할 수 없습니다."
+        confirmText="삭제"
+        variant="danger"
+      />
     </div>
   )
 }

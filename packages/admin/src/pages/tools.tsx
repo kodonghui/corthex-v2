@@ -52,7 +52,7 @@ export function ToolsPage() {
   })
 
   const catalog = catalogData?.data || []
-  const agents = agentData?.data || []
+  const agents = useMemo(() => [...(agentData?.data || [])].sort((a, b) => a.name.localeCompare(b.name)), [agentData])
 
   const allTools = useMemo(() => catalog.flatMap((g) => g.tools), [catalog])
 

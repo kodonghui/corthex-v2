@@ -145,8 +145,8 @@ export function LoginPage() {
       <footer className="fixed bottom-0 w-full flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 py-4 sm:py-6">
         <span className="text-corthex-text-disabled text-xs tracking-wide">© 2024 CORTHEX. All rights reserved.</span>
         <div className="flex gap-4">
-          <a className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Privacy Policy</a>
-          <a className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Terms of Service</a>
+          <a href="/privacy" className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Privacy Policy</a>
+          <a href="/terms" className="text-corthex-text-disabled text-xs hover:text-corthex-text-secondary transition-colors cursor-pointer">Terms of Service</a>
         </div>
       </footer>
     </div>

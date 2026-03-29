@@ -202,9 +202,12 @@ export function EmployeesPage() {
   }
 
   // Copy password
+  const [copied, setCopied] = useState(false)
   const copyPassword = () => {
     if (passwordModal) {
       navigator.clipboard.writeText(passwordModal.password)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
       addToast({ type: 'success', message: '비밀번호가 복사되었습니다' })
     }
   }
@@ -528,9 +531,11 @@ export function EmployeesPage() {
                 <label className="block text-xs font-medium text-corthex-text-secondary mb-1.5">아이디 *</label>
                 <input
                   value={inviteForm.username}
-                  onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value })}
+                  onChange={(e) => setInviteForm({ ...inviteForm, username: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '') })}
                   className="w-full bg-corthex-bg border border-corthex-border rounded-lg px-3 py-2 text-base sm:text-sm text-corthex-text-primary transition-colors focus:outline-none focus:ring-1 focus:ring-corthex-accent"
-                  placeholder="사용자 아이디"
+                  placeholder="영문, 숫자, 밑줄, 하이픈만 가능"
+                  pattern="^[a-zA-Z0-9_-]+$"
+                  title="영문, 숫자, 밑줄(_), 하이픈(-)만 사용 가능합니다"
                   required
                 />
               </div>
@@ -690,7 +695,7 @@ export function EmployeesPage() {
                   onClick={copyPassword}
                   className="text-xs text-corthex-text-secondary hover:text-corthex-text-primary px-2 py-1 rounded hover:bg-corthex-elevated transition-colors"
                 >
-                  복사
+                  {copied ? '복사됨!' : '복사'}
                 </button>
               </div>
               <div className="bg-corthex-accent/10 border border-corthex-accent/20 rounded-lg p-3">

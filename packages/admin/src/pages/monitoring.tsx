@@ -48,6 +48,8 @@ export function MonitoringPage() {
     queryKey: ['monitoring'],
     queryFn: () => api.get<MonitoringData>('/admin/monitoring/status'),
     refetchInterval: 30_000,
+    refetchOnMount: 'always',
+    staleTime: 0,
   })
 
   const data = rawData && rawData.server ? rawData : undefined
