@@ -12,8 +12,7 @@ import { OnboardingWizard } from '../components/onboarding/OnboardingWizard'
 // ============================================================
 type OnboardingStatus = {
   completed: boolean
-  hasAgents: boolean
-  hasDepartments: boolean
+  selectedTemplateId: string | null
 }
 
 export function OnboardingPage() {
@@ -30,7 +29,7 @@ export function OnboardingPage() {
 
   // If already completed (has agents), redirect to hub
   useEffect(() => {
-    if (status?.completed || status?.hasAgents) {
+    if (status?.completed) {
       navigate('/hub', { replace: true })
     }
   }, [status, navigate])

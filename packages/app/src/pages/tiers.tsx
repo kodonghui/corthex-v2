@@ -275,6 +275,7 @@ export function TiersPage() {
             <p className="text-corthex-text-secondary text-sm">Define and manage hierarchical permission structures and model assignments for agents.</p>
           </div>
           <button
+            data-testid="create-tier-btn"
             onClick={() => setCreateOpen(true)}
             className="bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-bg px-4 py-2 min-h-[44px] rounded-lg font-medium flex items-center gap-2 transition-all active:scale-95"
           >

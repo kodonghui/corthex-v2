@@ -55,7 +55,15 @@ export const useWsStore = create<WsState>((set, get) => ({
       const wasConnected = get().isConnected
       channelListeners.clear()
       set({ isConnected: false, socket: null })
-      const noReconnect = [1000, 4001, 4002]
+      const noReconnect = [1000, 4002]
+      if (event.code === 4001) {
+        // Token expired — try once with fresh token from localStorage
+        const freshToken = localStorage.getItem('corthex_token')
+        if (freshToken && freshToken !== token) {
+          setTimeout(() => get().connect(freshToken), BACKOFF_BASE)
+        }
+        return
+      }
       if (!noReconnect.includes(event.code) && !serverRestarting) {
         // FR49: Toast on unexpected disconnect
         if (wasConnected) {
@@ -64,7 +72,8 @@ export const useWsStore = create<WsState>((set, get) => ({
         const attempt = get().reconnectAttempt
         const delay = getBackoffDelay(attempt)
         set({ reconnectAttempt: attempt + 1 })
-        setTimeout(() => get().connect(token), delay)
+        const freshToken = localStorage.getItem('corthex_token') || token
+        setTimeout(() => get().connect(freshToken), delay)
       }
     }
 
@@ -76,7 +85,8 @@ export const useWsStore = create<WsState>((set, get) => ({
           // FR49: Toast for server restart
           toast.warning('서버가 재시작됩니다. 잠시 후 자동 재연결됩니다...')
           set({ reconnectAttempt: 0 })
-          setTimeout(() => get().connect(token), BACKOFF_BASE)
+          const freshToken = localStorage.getItem('corthex_token') || token
+          setTimeout(() => get().connect(freshToken), BACKOFF_BASE)
           return
         }
 

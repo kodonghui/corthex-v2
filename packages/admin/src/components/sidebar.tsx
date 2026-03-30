@@ -174,6 +174,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
 
   // 회사 미선택 또는 선택된 회사가 목록에 없으면 첫 번째 회사 자동 선택
   useEffect(() => {
+    if (companiesLoading) return
     if (companies.length === 0) {
       if (selectedCompanyId) setSelectedCompanyId(null)
       return
@@ -182,7 +183,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
     if (!found) {
       setSelectedCompanyId(companies[0].id)
     }
-  }, [selectedCompanyId, companies, setSelectedCompanyId])
+  }, [selectedCompanyId, companies, companiesLoading, setSelectedCompanyId])
 
   return (
     <aside className="w-60 h-screen flex flex-col bg-corthex-sidebar-bg text-corthex-sidebar-text">

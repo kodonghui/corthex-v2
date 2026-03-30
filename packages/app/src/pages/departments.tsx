@@ -459,6 +459,7 @@ export function DepartmentsPage() {
                 <h1 className="text-2xl lg:text-4xl font-bold tracking-tight text-corthex-text-primary">{departments.length} Departments</h1>
               </div>
               <button
+                data-testid="create-department-btn"
                 onClick={() => setCreateOpen(true)}
                 className="flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-corthex-accent hover:bg-corthex-accent-hover text-corthex-text-on-accent rounded-lg font-bold text-sm transition-all active:scale-95"
               >

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './sidebar'
 import { useAuthStore } from '../stores/auth-store'
+import { useWsStore } from '../stores/ws-store'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { ToastProvider } from '@corthex/ui'
@@ -52,8 +53,16 @@ export function Layout() {
     try { return localStorage.getItem('corthex_sidebar_collapsed') === 'true' } catch { return false }
   })
   const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
   const location = useLocation()
   const navigate = useNavigate()
+
+  // WebSocket 초기 연결 + 토큰 변경 시 재연결
+  useEffect(() => {
+    if (!token) return
+    useWsStore.getState().connect(token)
+    return () => { useWsStore.getState().disconnect() }
+  }, [token])
 
   const pageName = useMemo(() => {
     const segment = location.pathname.split('/').filter(Boolean)[0] || 'hub'

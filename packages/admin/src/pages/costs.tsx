@@ -629,14 +629,14 @@ export function CostsPage() {
               <input
                 type="date"
                 value={startDate}
-                onChange={(e) => { setStartDate(e.target.value); setPeriod('ALL') }}
+                onChange={(e) => { const v = e.target.value; setStartDate(v); if (v > endDate) setEndDate(v); setPeriod('ALL') }}
                 className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-base sm:text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
               <span className="font-mono text-xs text-corthex-text-disabled">~</span>
               <input
                 type="date"
                 value={endDate}
-                onChange={(e) => { setEndDate(e.target.value); setPeriod('ALL') }}
+                onChange={(e) => { const v = e.target.value; setEndDate(v); if (v < startDate) setStartDate(v); setPeriod('ALL') }}
                 className="bg-corthex-surface border border-corthex-border/30 text-corthex-text-secondary font-mono text-base sm:text-xs px-3 py-2 focus:outline-none focus:border-corthex-accent"
               />
             </div>

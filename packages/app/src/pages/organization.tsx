@@ -35,10 +35,23 @@ function TabSkeleton() {
 // ── Overview Dashboard ──
 
 function OrganizationOverview({ onNavigate }: { onNavigate: (tab: OrgTab) => void }) {
-  const { data } = useQuery({
+  const { data, isError, refetch } = useQuery({
     queryKey: ['workspace-org-chart'],
     queryFn: () => api.get<OrgChartSummary>('/workspace/org-chart'),
   })
+
+  if (isError) {
+    return (
+      <div className="min-h-full p-6 lg:p-10 flex items-center justify-center">
+        <div className="bg-corthex-error/10 border border-corthex-error/20 rounded-xl p-8 text-center max-w-sm">
+          <p className="text-sm text-corthex-error font-medium mb-3">조직도를 불러올 수 없습니다</p>
+          <button onClick={() => refetch()} className="text-xs text-corthex-error hover:opacity-70 underline">
+            다시 시도
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   const org = data?.data
   const deptCount = org?.departments.length ?? 0

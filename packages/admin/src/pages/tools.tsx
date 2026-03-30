@@ -204,7 +204,7 @@ export function ToolsPage() {
 
   return (
     <div data-testid="tools-page" className="min-h-screen bg-corthex-bg">
-      <div className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
+      <div className={`p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 ${changeCount > 0 ? 'pb-24' : ''}`}>
         {/* Page Header */}
         <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-corthex-border/10 pb-8">
           <div className="space-y-2">

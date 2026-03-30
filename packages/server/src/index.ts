@@ -112,6 +112,14 @@ export let isShuttingDown = false
 
 // 글로벌 미들웨어
 app.use('*', compress())
+// Ensure JSON responses include charset=utf-8 (compress may strip it)
+app.use('*', async (c, next) => {
+  await next()
+  const ct = c.res.headers.get('Content-Type')
+  if (ct && ct.includes('application/json') && !ct.includes('charset')) {
+    c.res.headers.set('Content-Type', ct + '; charset=utf-8')
+  }
+})
 app.use('*', secureHeaders({
   strictTransportSecurity: isProd ? 'max-age=31536000; includeSubDomains' : false,
   contentSecurityPolicy: isProd ? {
