@@ -1,5 +1,7 @@
 # ECC 3-Hour Maintenance Log
 
+## 2026-04-03 03:00 UTC — tsc: server=1(bun-types) admin=1(baseUrl) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
 ## 2026-04-03 00:00 UTC — tsc: server=1(bun-types env) admin=1(baseUrl deprecated) app=1 | colors: 0 | console.log: 33 | api: OK | memory: OK
 
 ## 2026-04-02 21:00 UTC — tsc: server=1(bun-types env) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
