@@ -1,5 +1,7 @@
 # ECC 3-Hour Maintenance Log
 
+## 2026-04-06 09:30 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
 ## 2026-04-06 06:39 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(503 upstream TLS) | memory: OK
 
 ## 2026-04-06 03:26 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
