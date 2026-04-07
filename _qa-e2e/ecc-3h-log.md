@@ -1,5 +1,7 @@
 # ECC 3-Hour Maintenance Log
 
+## 2026-04-07 06:40 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(403 CF) | memory: OK
+
 ## 2026-04-07 03:28 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(curl/vite-block) | memory: OK
 
 ## 2026-04-06 12:30 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(curl) | memory: OK
