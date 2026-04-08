@@ -105,3 +105,21 @@
 ## 2026-04-06 18:00 UTC — tsc: server=1(bun-types) admin=1(baseUrl-deprecated) | colors: 0 | console.log: 33 | api: FAIL(CF-blocked) | memory: OK
 
 ## 2026-04-07 00:00 UTC — tsc: server=1(bun-types) admin=1(baseUrl-deprecated) | colors: 0 | console.log: 33 | api: FAIL(CF-blocked) | memory: OK
+
+## 2026-04-07 09:31 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(403 CF) | memory: OK
+
+## 2026-04-07 12:30 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(CF) | memory: OK
+
+## 2026-04-07 15:30 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-07 18:30 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-07 21:29 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-08 03:29 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-08 09:33 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-08 12:46 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-08 15:33 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
