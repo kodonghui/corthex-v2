@@ -197,3 +197,5 @@
 ## 2026-04-13 09:55 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(500) | memory: OK
 
 ## 2026-04-13 15:55 UTC — tsc: server=1(bun-types) admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: OK | memory: OK
+
+## 2026-04-14 01:06 UTC — tsc: server=0 admin=1(baseUrl deprecated) | colors: 0 | console.log: 33 | api: FAIL(sandbox) | memory: OK
